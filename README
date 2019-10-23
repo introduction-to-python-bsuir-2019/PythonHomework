@@ -1,0 +1,15 @@
+git #2 homework
+
+1.  Create github account if or use existing one if any.
+2.  Make a fork from repository https://github.com/introduction-to-python-bsuir-2019/GitHomework
+3.  Add your fork as a remote to your repo from git #1 homework.
+4.  Set newly added remote as tracking branch to the local master branch.
+5.  Rebase master to fork remote (origin/master by default). Hint:  resulting master branch should include README from upstream repo.
+6.  Reset master to the state previous to final merge from git #1 homework. Hint: resulting master shouldn’t include any changes from owner_name.
+7.  Switch to the owner_name  branch.
+8.  Rebase owner_name  to the master.
+9.  Add .gitignore file that ignores jpg files as a separate commit.
+10. Revert the last commit (the one with gitignore changes).
+11. Merge owner_name branch back to master.
+12. Push master to the fork master.
+12. Send PR from fork master to the https://github.com/introduction-to-python-bsuir-2019/GitHomework repository master. Provide your name and email in PR description.
