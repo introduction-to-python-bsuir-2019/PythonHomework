@@ -1,43 +1,95 @@
 import requests
+import re
+
+import lxml.html as html
 import xml.etree.ElementTree as ET
 
+import argparse
 
-def get_news(url, limit=None):
-    request = requests.get('https://news.yahoo.com/rss')
+class NewsReader:
+    def __init__(self, url, limit=None):
+        self.url = url
+        self.limit = limit
+        self.items = self.get_news()
 
-    result = request.text
-    tree = ET.fromstring(result)
+    def get_news(self):
+        request = requests.get('https://news.yahoo.com/rss')
 
-    items = dict()
-    items.setdefault('title', ' ')
+        result = request.text
+        tree = ET.fromstring(result)
 
-    for head_el in tree[0]:
-        if head_el.tag == 'title':
-            items['title'] = head_el.text
+        items = dict()
+        items.setdefault('title', ' ')
 
-    for num, item in enumerate(tree.iter('item')):
+        for head_el in tree[0]:
+            if head_el.tag == 'title':
+                items['title'] = head_el.text
 
-        if limit is not None and limit == num:
-            break
+        for num, item in enumerate(tree.iter('item')):
 
-        items.setdefault(num, {})
+            if self.limit is not None and self.limit == num:
+                break
 
-        news_description = dict()
+            items.setdefault(num, {})
 
-        for description in item:
-            news_description[description.tag] = description.text
+            news_description = dict()
 
-        items[num].update(news_description)
+            for description in item:
+                news_description[description.tag] = description.text
 
-    return items
+            items[num].update(news_description)
+
+        return items
+
+    @staticmethod
+    def get_image_regexpr(description):
+        image_url = re.findall(r'src="([^"]+)"', description)
+        image_description = re.findall(r'alt="([^"]+)"', description)
+
+        return image_url, image_description
+
+    @staticmethod
+    def get_image(description):
+        xhtml = html.fromstring(description)
+        image_src = xhtml.xpath('//img/@src')
+        image_description = xhtml.xpath('//img/@alt')
+
+        return image_src, image_description
+
+    @staticmethod
+    def get_description(description):
+        node = html.fromstring(description)
+
+        return node.text_content()
+
+    @staticmethod
+    def news_text(news):
+        image = NewsReader.get_image(news['description'])
+
+        # TODO: solve problem with image indexing
+
+        image_src = image[0][0]
+        image_description = image[1][0]
+
+        result = "\n\tTitle: {}\n\tDate: {}\n\tLink: {}\n\n\tImage link: {}\n\t" \
+                 "Image description: {}\n\tDescription: {}".format(news['title'],
+                                                                   news['pubDate'],
+                                                                   news['link'],
+                                                                   image_src,
+                                                                   image_description,
+                                                                   NewsReader.get_description(news['description']))
+
+        return result
+
+    def fancy_output(self):
+        for key, value in self.items.items():
+            if key == 'title':
+                print(f'Feed: {value}')
+            else:
+                print(self.news_text(value))
+
+            print('_' * 100)
 
 
-def get_image(description):
-    pass
-
-
-def fancy_output():
-    pass
-
-
-print(get_news('https://news.yahoo.com/rss'))
+rss = NewsReader('https://news.yahoo.com/rss', limit=2)
+rss.fancy_output()
