@@ -3,23 +3,40 @@ import re
 
 import lxml.html as html
 import xml.etree.ElementTree as ET
+import json
 
 import argparse
 
+PROJECT_VERSION = '1.0'
+
+
 class NewsReader:
+    """
+        Class for reading news from rss-format files.
+
+        @Input: url
+    """
+
     def __init__(self, url, limit=None):
+        """
+
+        :param url: url of rss
+        :param limit: limit of news in feed
+        """
+
         self.url = url
         self.limit = limit
         self.items = self.get_news()
 
     def get_news(self):
-        request = requests.get('https://news.yahoo.com/rss')
+        request = requests.get('https://news.yahoo.com/rss')  # TODO: catch all errors
 
         result = request.text
         tree = ET.fromstring(result)
 
         items = dict()
         items.setdefault('title', ' ')
+        useful_tags = ['title', 'pubDate', 'link', 'description']
 
         for head_el in tree[0]:
             if head_el.tag == 'title':
@@ -35,11 +52,29 @@ class NewsReader:
             news_description = dict()
 
             for description in item:
-                news_description[description.tag] = description.text
+                if description.tag in useful_tags:
+                    news_description[description.tag] = description.text
+
+            text, image_link, image_text = NewsReader.parse_description(news_description['description'])
+
+            news_description['description'] = text
+            news_description['imageLink'] = image_link
+            news_description['imageDescription'] = image_text
 
             items[num].update(news_description)
 
         return items
+
+    @staticmethod
+    def parse_description(description):
+        text = NewsReader.get_description(description)
+        image = NewsReader.get_image(description)
+
+        # TODO: deal with image indexing
+        image_link = image[0][0]
+        image_text = image[1][0]
+
+        return text, image_link, image_text
 
     @staticmethod
     def get_image_regexpr(description):
@@ -64,20 +99,14 @@ class NewsReader:
 
     @staticmethod
     def news_text(news):
-        image = NewsReader.get_image(news['description'])
-
-        # TODO: solve problem with image indexing
-
-        image_src = image[0][0]
-        image_description = image[1][0]
 
         result = "\n\tTitle: {}\n\tDate: {}\n\tLink: {}\n\n\tImage link: {}\n\t" \
                  "Image description: {}\n\tDescription: {}".format(news['title'],
                                                                    news['pubDate'],
                                                                    news['link'],
-                                                                   image_src,
-                                                                   image_description,
-                                                                   NewsReader.get_description(news['description']))
+                                                                   news['imageLink'],
+                                                                   news['imageDescription'],
+                                                                   news['description'])
 
         return result
 
@@ -90,6 +119,35 @@ class NewsReader:
 
             print('_' * 100)
 
+    def to_json(self):
+        json_result = json.dumps(self.items)
+        # json_result = json.loads(json_result)
 
-rss = NewsReader('https://news.yahoo.com/rss', limit=2)
-rss.fancy_output()
+        return json_result
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='News Reader utility')
+
+    parser.add_argument('source', type=str, help='RSS URL')
+
+    parser.add_argument('--version', help='Print version info', action='store_true')
+    parser.add_argument('--json', help='Pring result as json in stdout', action='store_true')
+    parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
+    # TODO: add flags to output logs
+    parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+
+    args = parser.parse_args()
+    print(args)
+
+    if args.version:
+        print(PROJECT_VERSION)
+    elif args.json:
+        news = NewsReader(args.source, args.limit)
+
+        print(news.to_json())
+    else:
+        news = NewsReader(args.source, args.limit)
+
+        news.fancy_output()
+
