@@ -1,10 +1,14 @@
 import requests
 import re
+import os
+
 import datetime
+from dateutil.parser import parse
 
 import lxml.html as html
 import xml.etree.ElementTree as ET
 import json
+import csv
 
 import argparse
 
@@ -19,7 +23,7 @@ class NewsReader:
         @Input: url
     """
 
-    def __init__(self, url, limit=None, verbose=False):
+    def __init__(self, url, limit=None, verbose=False, cashing=False):
         """
 
         :param url: url of rss
@@ -29,6 +33,7 @@ class NewsReader:
         self.url = url
         self.limit = limit
         self.verbose = verbose
+        self.cashing = cashing
 
         self.items = self.get_news()
 
@@ -69,11 +74,39 @@ class NewsReader:
             news_description['imageDescription'] = image_text
 
             items[num].update(news_description)
+            NewsReader._cash_news(items[num])
 
         return items
 
-    def cash_news(self):
-        pass
+    @staticmethod
+    def _cash_news(news, dir='news_cash', ):
+        date = NewsReader.get_date(news)
+        date = ''.join(str(date).split('-'))
+
+        if not os.path.exists(dir):
+            os.mkdir(dir)
+
+        path = os.path.join(dir, date + '.csv')
+        with open(path, 'w+') as file:
+            csv_writer = csv.writer(file, delimiter=',',
+                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            if os.path.getsize(path) == 0:
+                head = ','.join(news.keys())
+
+                file.write(head + '\n')
+
+            csv_writer.writerow(news.values())
+
+    @staticmethod
+    def get_date(news):
+        news_date = news['pubDate']
+
+        # news_date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+        news_date = parse(news_date)
+        news_date = news_date.date()
+
+        return news_date
 
     @staticmethod
     def parse_description(description):
@@ -144,36 +177,41 @@ class NewsReader:
         return json_result
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
+feed = NewsReader('	https://news.yahoo.com/rss/', limit=3, cashing=True)
+print(feed.to_json())
 
-    parser.add_argument('source', type=str, help='RSS URL')
+# date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
 
-    parser.add_argument('--version', help='Print version info', action='store_true')
-    parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
-    parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
-    parser.add_argument('--cashing', help='Cash news if chosen', action='store_true')
-
-    # TODO: add flags to output logs
-    parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
-    parser.add_argument('--date', type=datetime.datetime, help='Reads cashed news by date. And output them')
-
-    args = parser.parse_args()
-    print(args)
-
-    if args.version:
-        print(PROJECT_VERSION)
-        print(PROJECT_DESCRIPTION)
-
-    if args.json:
-        news = NewsReader(args.source, args.limit, args.verbose)
-
-        print(news.to_json())
-    else:
-        news = NewsReader(args.source, args.limit, args.verbose)
-
-        news.fancy_output()
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
+#
+#     parser.add_argument('source', type=str, help='RSS URL')
+#
+#     parser.add_argument('--version', help='Print version info', action='store_true')
+#     parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
+#     parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
+#     parser.add_argument('--cashing', help='Cash news if chosen', action='store_true')
+#
+#     # TODO: add flags to output logs
+#     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+#     parser.add_argument('--date', type=datetime.datetime, help='Reads cashed news by date. And output them')
+#
+#     args = parser.parse_args()
+#     print(args)
+#
+#     if args.version:
+#         print(PROJECT_VERSION)
+#         print(PROJECT_DESCRIPTION)
+#
+#     if args.json:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#
+#         print(news.to_json())
+#     else:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#
+#         news.fancy_output()
+#
+#
+# if __name__ == '__main__':
+#     main()
