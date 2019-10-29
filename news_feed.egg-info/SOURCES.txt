@@ -1,0 +1,10 @@
+README.md
+setup.py
+news_feed/__init__.py
+news_feed/rss_reader.py
+news_feed.egg-info/PKG-INFO
+news_feed.egg-info/SOURCES.txt
+news_feed.egg-info/dependency_links.txt
+news_feed.egg-info/entry_points.txt
+news_feed.egg-info/requires.txt
+news_feed.egg-info/top_level.txt

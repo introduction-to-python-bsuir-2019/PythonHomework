@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: news-feed
+Version: 0.2
+Summary: News aggregator
+Home-page: https://github.com/Vadbeg/news_feed_reader
+Author: Vadim Titko
+Author-email: Vadbeg@tut.by
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

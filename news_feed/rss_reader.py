@@ -1,5 +1,6 @@
 import requests
 import re
+import datetime
 
 import lxml.html as html
 import xml.etree.ElementTree as ET
@@ -8,6 +9,7 @@ import json
 import argparse
 
 PROJECT_VERSION = '1.0'
+PROJECT_DESCRIPTION = ''
 
 
 class NewsReader:
@@ -17,7 +19,7 @@ class NewsReader:
         @Input: url
     """
 
-    def __init__(self, url, limit=None):
+    def __init__(self, url, limit=None, verbose=False):
         """
 
         :param url: url of rss
@@ -26,10 +28,15 @@ class NewsReader:
 
         self.url = url
         self.limit = limit
+        self.verbose = verbose
+
         self.items = self.get_news()
 
     def get_news(self):
-        request = requests.get('https://news.yahoo.com/rss')  # TODO: catch all errors
+        request = requests.get(self.url)  # TODO: catch all errors
+
+        if self.verbose:
+            print(request.status_code)  # TODO: create understandable error status output
 
         result = request.text
         tree = ET.fromstring(result)
@@ -65,29 +72,35 @@ class NewsReader:
 
         return items
 
+    def cash_news(self):
+        pass
+
     @staticmethod
     def parse_description(description):
         text = NewsReader.get_description(description)
         image = NewsReader.get_image(description)
 
         # TODO: deal with image indexing
-        image_link = image[0][0]
-        image_text = image[1][0]
+        image_link = image[0]
+        image_text = image[1]
 
         return text, image_link, image_text
-
-    @staticmethod
-    def get_image_regexpr(description):
-        image_url = re.findall(r'src="([^"]+)"', description)
-        image_description = re.findall(r'alt="([^"]+)"', description)
-
-        return image_url, image_description
 
     @staticmethod
     def get_image(description):
         xhtml = html.fromstring(description)
         image_src = xhtml.xpath('//img/@src')
         image_description = xhtml.xpath('//img/@alt')
+
+        if len(image_src) == 0:
+            image_src = 'No image'
+        else:
+            image_src = image_src[0]
+
+        if len(image_description) == 0:
+            image_description = 'No image description'
+        else:
+            image_description = image_description[0]
 
         return image_src, image_description
 
@@ -111,6 +124,9 @@ class NewsReader:
         return result
 
     def fancy_output(self):
+        if self.verbose:
+            print('News feed is ready')
+
         for key, value in self.items.items():
             if key == 'title':
                 print(f'Feed: {value}')
@@ -120,34 +136,44 @@ class NewsReader:
             print('_' * 100)
 
     def to_json(self):
+        if self.verbose:
+            print('Json was created')
+
         json_result = json.dumps(self.items)
-        # json_result = json.loads(json_result)
 
         return json_result
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='News Reader utility')
+def main():
+    parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
 
     parser.add_argument('source', type=str, help='RSS URL')
 
     parser.add_argument('--version', help='Print version info', action='store_true')
-    parser.add_argument('--json', help='Pring result as json in stdout', action='store_true')
+    parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
     parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
+    parser.add_argument('--cashing', help='Cash news if chosen', action='store_true')
+
     # TODO: add flags to output logs
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+    parser.add_argument('--date', type=datetime.datetime, help='Reads cashed news by date. And output them')
 
     args = parser.parse_args()
     print(args)
 
     if args.version:
         print(PROJECT_VERSION)
-    elif args.json:
-        news = NewsReader(args.source, args.limit)
+        print(PROJECT_DESCRIPTION)
+
+    if args.json:
+        news = NewsReader(args.source, args.limit, args.verbose)
 
         print(news.to_json())
     else:
-        news = NewsReader(args.source, args.limit)
+        news = NewsReader(args.source, args.limit, args.verbose)
 
         news.fancy_output()
 
+
+if __name__ == '__main__':
+    main()

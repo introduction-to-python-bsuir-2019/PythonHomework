@@ -1,0 +1,3 @@
+[console_scripts]
+rss_reader = news_feed.rss_reader:main
+
