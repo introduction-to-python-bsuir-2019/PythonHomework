@@ -38,6 +38,13 @@ class NewsReader:
         self.items = self.get_news()
 
     def get_news(self):
+        """
+        Read rss from self.url and creates from it
+        dictionary. If self.cashing is True -> cashed news
+
+        :return: dictionary of news
+        """
+
         request = requests.get(self.url)  # TODO: catch all errors
 
         if self.verbose:
@@ -45,6 +52,7 @@ class NewsReader:
 
         result = request.text
         tree = ET.fromstring(result)
+        print(result)
 
         items = dict()
         items.setdefault('title', ' ')
@@ -62,6 +70,7 @@ class NewsReader:
             items.setdefault(num, {})
 
             news_description = dict()
+            # TODO: set useful_tags as default tags!
 
             for description in item:
                 if description.tag in useful_tags:
@@ -74,12 +83,23 @@ class NewsReader:
             news_description['imageDescription'] = image_text
 
             items[num].update(news_description)
-            NewsReader._cash_news(items[num])
+
+            if self.cashing:
+                NewsReader._cash_news(items[num])
 
         return items
 
     @staticmethod
-    def _cash_news(news, dir='news_cash', ):
+    def _cash_news(news, dir='news_cash'):
+        """
+        Cashes news into csv format by publication date
+        into given directory
+
+        :param news: dictionary of given news
+        :param dir: directory into which we save news
+        :return: None
+        """
+
         date = NewsReader.get_date(news)
         date = ''.join(str(date).split('-'))
 
@@ -87,19 +107,60 @@ class NewsReader:
             os.mkdir(dir)
 
         path = os.path.join(dir, date + '.csv')
-        with open(path, 'w+') as file:
+        with open(path, 'a', newline='', encoding='UTF-8') as file:
             csv_writer = csv.writer(file, delimiter=',',
                                     quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
             if os.path.getsize(path) == 0:
-                head = ','.join(news.keys())
+                csv_writer.writerow(news.keys())
 
-                file.write(head + '\n')
-
+            print(news.values())
             csv_writer.writerow(news.values())
 
     @staticmethod
+    def read_by_date(date, dir='news_cash'):
+        """
+        Reads news from csv by given date
+        from given directory
+
+        :param date: news date
+        :param dir: directory from which we get news
+        :return: dictionary of news
+        """
+
+        dates = os.listdir(dir)
+
+        if date not in dates:
+            pass  # TODO: raise some exception
+
+        path = os.path.join(dir, date + '.csv')
+        with open(path, 'r', encoding='UTF-8') as file:
+            csv_reader = csv.reader(file, delimiter=',',
+                                    quotechar='"')
+
+            header = list()
+            items = dict()
+            for index, row in enumerate(csv_reader):
+                if index == 0:
+                    header = row
+                    continue
+
+                items.setdefault(index, list())
+
+                items[index] = dict(zip(header, row))
+
+        return items
+
+    @staticmethod
     def get_date(news):
+        """
+        Returns date of news publication
+
+        :param news: dictionary of given news
+        :return: date of news publication
+        """
+
+        print(news)
         news_date = news['pubDate']
 
         # news_date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
@@ -110,6 +171,13 @@ class NewsReader:
 
     @staticmethod
     def parse_description(description):
+        """
+        Return news description
+
+        :param description: raw news description
+        :return: news description
+        """
+
         text = NewsReader.get_description(description)
         image = NewsReader.get_image(description)
 
@@ -121,6 +189,14 @@ class NewsReader:
 
     @staticmethod
     def get_image(description):
+        """
+        Parse description file trying to find image
+        source and description of this image
+
+        :param description: raw news description
+        :return: image source, image description
+        """
+
         xhtml = html.fromstring(description)
         image_src = xhtml.xpath('//img/@src')
         image_description = xhtml.xpath('//img/@alt')
@@ -139,12 +215,27 @@ class NewsReader:
 
     @staticmethod
     def get_description(description):
+        """
+        Remove all tags from raw description and
+        return just simple news description
+
+        :param description: news description
+        :return: processed description
+        """
+
         node = html.fromstring(description)
 
         return node.text_content()
 
     @staticmethod
     def news_text(news):
+        """
+        Process news in dictionary format into
+        readable text
+
+        :param news: news dictionary
+        :return: readable news description
+        """
 
         result = "\n\tTitle: {}\n\tDate: {}\n\tLink: {}\n\n\tImage link: {}\n\t" \
                  "Image description: {}\n\tDescription: {}".format(news['title'],
@@ -157,6 +248,13 @@ class NewsReader:
         return result
 
     def fancy_output(self):
+        """
+        Output readable information about news
+        from items dictionary
+
+        :return: None
+        """
+
         if self.verbose:
             print('News feed is ready')
 
@@ -169,6 +267,13 @@ class NewsReader:
             print('_' * 100)
 
     def to_json(self):
+        """
+        Convert self.items (all news description)
+        into json format
+
+        :return: json format news
+        """
+
         if self.verbose:
             print('Json was created')
 
@@ -177,8 +282,8 @@ class NewsReader:
         return json_result
 
 
-feed = NewsReader('	https://news.yahoo.com/rss/', limit=3, cashing=True)
-print(feed.to_json())
+feed = NewsReader('	http://rss.cnn.com/rss/edition_world.rss', limit=None, cashing=True)
+print(feed.read_by_date('20191028'))
 
 # date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
 
