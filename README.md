@@ -19,3 +19,6 @@ There are several notes:
   * the `--limit` argument affects JSON generation to.
   * with the argument `--verbose` program prints all logs in stdout.
   * with the argument `--version` program prints in stdout it's current version and complete it's work. The version supposed to change with every iteration.
+
+## Distribution
+Utility is wrapped into package named _rssreader_. Additionally this package exports CLI utility named _rss-reader_.
