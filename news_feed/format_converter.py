@@ -21,13 +21,14 @@ def silent_remove(path):
     except OSError:
         pass
 
+
 class PdfNewsConverter(FPDF):
     """
     Easy-to-use pdf rss news converter
 
     """
 
-    def __init__(self, items, asd):
+    def __init__(self, items):
         """
 
         :param items: Rss in dictionary
@@ -126,6 +127,7 @@ class PdfNewsConverter(FPDF):
         image_link = item['imageLink']
         image_description = item['imageDescription']
 
+        print(image_link)
         self.set_font('Times', 'I', 14)
         self.multi_cell(w=0, h=10,
                         txt=title, align='C')
@@ -165,12 +167,136 @@ class PdfNewsConverter(FPDF):
                 self.add_news_page(plot)
 
 
+class HTMLNewsConverter:
+    """
+    Easy-to-use html rss news-converter
+
+    """
+
+    def __init__(self, items):
+        """
+
+        :param items: Rss in dictionary
+        """
+
+        self.items = items
+
+    one_news_template = """
+            <h2>{title}</h2>
+            <p>Date: {pubDate}</p>
+            <a href='{link}'>News link</a>
+            <p>{description}</p>
+            <img src='{imageLink}', alt='No image'>
+            <p>Image description: {imageDescription}</p>
+    """
+
+    def add_one_news(self, item):
+        """
+        Add one news info into html
+
+        :param item: one news info
+        :return: one news info into html
+        """
+
+        title = item['title']
+        pub_date = item['pubDate']
+        link = item['link']
+        description = item['description']
+        image_link = item['imageLink']
+        image_description = item['imageDescription']
+
+        template = self.one_news_template.format(
+            title=title,
+            pubDate=pub_date,
+            link=link,
+            description=description,
+            imageLink=image_link,
+            imageDescription=image_description
+        )
+
+        return template
+
+    @staticmethod
+    def create_res_html_template():
+        """
+        Creates outer tags for whole html.
+
+        :return: outer opening tags, outer closing tags
+        """
+
+        res_html_start = """
+<!DOCTYPE html>
+    <html>
+        <body>
+        """
+
+        res_html_end = """
+    </body>
+</html>
+        """
+
+        return res_html_start, res_html_end
+
+    @staticmethod
+    def create_title(title):
+        """
+        Create tag for title of rss source
+
+        :param title: title of rss source
+        :return: title of rss source in html
+        """
+
+        title = f"""
+            <h4>{title}</h4>
+        """
+
+        return title
+
+    def add_all_news(self):
+        """
+        Add all news into html between outer
+        opening tags and outer closing tags
+
+        :return: resulting html file
+        """
+
+        res_html_start, res_html_end = self.create_res_html_template()
+
+        for el, plot in self.items.items():
+            if el == 'title':
+                res_html_start += self.create_title(plot)
+            else:
+                res_html_start += self.add_one_news(plot)
+
+        res_html = res_html_start + res_html_end
+
+        return res_html
+
+    def output(self, path):
+        """
+        Outputs resulting html into file
+
+        :param path: path into which we should add res html
+        :return: None
+        """
+
+        res_html = self.add_all_news()
+
+        with open(path, 'w') as file:
+            file.write(res_html)
+
+
 feed = NewsReader('https://news.yahoo.com/rss/', limit=None, cashing=False)
 it = feed.items
 it = it
 
-pdf = PdfNewsConverter(it)
+# pdf = PdfNewsConverter(it)
+#
+# pdf.add_all_news()
+# pdf.output('news.pdf', 'F')
+# print(pdf.items)
 
-pdf.add_all_news()
-pdf.output('news.pdf', 'F')
-print(pdf.items)
+html = HTMLNewsConverter(it)
+
+html.output('news.html')
+
