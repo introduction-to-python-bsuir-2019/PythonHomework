@@ -1,5 +1,4 @@
 import requests
-import re
 import os
 
 import datetime
@@ -16,11 +15,15 @@ PROJECT_VERSION = '1.0'
 PROJECT_DESCRIPTION = ''
 
 
+class NewsNotFoundError(FileNotFoundError):
+    pass
+
+
 class NewsReader:
     """
         Class for reading news from rss-format files.
 
-        @Input: url
+        :param: url
     """
 
     def __init__(self, url, limit=None, verbose=False, cashing=False):
@@ -52,7 +55,6 @@ class NewsReader:
 
         result = request.text
         tree = ET.fromstring(result)
-        print(result)
 
         items = dict()
         items.setdefault('title', ' ')
@@ -71,6 +73,11 @@ class NewsReader:
 
             news_description = dict()
             # TODO: set useful_tags as default tags!
+
+            news_description.setdefault('title', 'no title')
+            news_description.setdefault('pubDate', str(datetime.datetime.today().date()))
+            news_description.setdefault('link', 'no link')
+            news_description.setdefault('description', 'no description')
 
             for description in item:
                 if description.tag in useful_tags:
@@ -114,7 +121,6 @@ class NewsReader:
             if os.path.getsize(path) == 0:
                 csv_writer.writerow(news.keys())
 
-            print(news.values())
             csv_writer.writerow(news.values())
 
     @staticmethod
@@ -160,7 +166,6 @@ class NewsReader:
         :return: date of news publication
         """
 
-        print(news)
         news_date = news['pubDate']
 
         # news_date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
@@ -282,8 +287,10 @@ class NewsReader:
         return json_result
 
 
-feed = NewsReader('	http://rss.cnn.com/rss/edition_world.rss', limit=None, cashing=True)
-print(feed.read_by_date('20191028'))
+# feed = NewsReader('	http://rss.cnn.com/rss/edition_world.rss', limit=None, cashing=True)
+# print(feed.read_by_date('20191028'))
+# it = feed.items
+
 
 # date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
 
