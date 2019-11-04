@@ -119,18 +119,27 @@ class NewsReader:
         date = NewsReader.get_date(news['pubDate'])
         date = ''.join(str(date).split('-'))
 
+        values = list(news.values())
+        column_names = list(news.keys())
+
+        data_temp = pd.DataFrame(data=[values], columns=column_names)
+
         if not os.path.exists(dir):
             os.mkdir(dir)
 
         path = os.path.join(dir, date + '.csv')
-        with open(path, 'a', newline='', encoding='UTF-8') as file:
-            csv_writer = csv.writer(file, delimiter=',',
-                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-            if os.path.getsize(path) == 0:
-                csv_writer.writerow(news.keys())
+        if os.path.isfile(path):  # If file exists -> load it into dataframe
+            data = pd.read_csv(path)
+        else:
+            data = pd.DataFrame(columns=column_names)
 
-            csv_writer.writerow(news.values())
+        is_unique = data_temp.isin(data['title']).sum().sum()
+        print(is_unique)
+
+        if not is_unique:
+            data = data.append(data_temp)
+            data.to_csv(path, index=False)
 
     @staticmethod
     def read_by_date(date, dir='news_cash'):
