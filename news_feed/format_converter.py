@@ -289,14 +289,14 @@ class HTMLNewsConverter:
 feed = NewsReader('https://news.yahoo.com/rss/', limit=None, cashing=False)
 it = feed.items
 it = it
-
+#
 # pdf = PdfNewsConverter(it)
 #
 # pdf.add_all_news()
 # pdf.output('news.pdf', 'F')
-# print(pdf.items)
+#
+# html = HTMLNewsConverter(it)
+#
+# html.output('news.html')
 
-html = HTMLNewsConverter(it)
-
-html.output('news.html')
-
+feed.fancy_output()

@@ -28,7 +28,7 @@ setup(
         ]
     },
 
-    install_requires=['lxml>=4.3.0', 'dateutil'],
+    install_requires=['lxml>=4.3.0', 'dateutil', 'requests'],
     python_requires='>=3.6'
 )
 

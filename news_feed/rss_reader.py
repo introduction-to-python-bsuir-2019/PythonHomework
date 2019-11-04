@@ -5,9 +5,12 @@ import datetime
 from dateutil.parser import parse
 
 import lxml.html as html
+import lxml.etree as etree
 import xml.etree.ElementTree as ET
+
 import json
 import csv
+import pandas as pd
 
 import argparse
 
@@ -48,7 +51,14 @@ class NewsReader:
         :return: dictionary of news
         """
 
-        request = requests.get(self.url)  # TODO: catch all errors
+        try:
+            request = requests.get(self.url)
+        except requests.exceptions.MissingSchema:
+            print(f'Invalid URL: {self.url}. Paste items by yourself.')
+            return None
+
+        if not request.ok:
+            raise requests.exceptions.InvalidURL(f'You URL is invalid. Status code: {request.status_code}')
 
         if self.verbose:
             print(request.status_code)  # TODO: create understandable error status output
@@ -72,7 +82,6 @@ class NewsReader:
             items.setdefault(num, {})
 
             news_description = dict()
-            # TODO: set useful_tags as default tags!
 
             news_description.setdefault('title', 'no title')
             news_description.setdefault('pubDate', str(datetime.datetime.today().date()))
@@ -107,7 +116,7 @@ class NewsReader:
         :return: None
         """
 
-        date = NewsReader.get_date(news)
+        date = NewsReader.get_date(news['pubDate'])
         date = ''.join(str(date).split('-'))
 
         if not os.path.exists(dir):
@@ -136,8 +145,8 @@ class NewsReader:
 
         dates = os.listdir(dir)
 
-        if date not in dates:
-            pass  # TODO: raise some exception
+        if date + '.csv' not in dates:
+            raise NewsNotFoundError('There is no chased news with such date')
 
         path = os.path.join(dir, date + '.csv')
         with open(path, 'r', encoding='UTF-8') as file:
@@ -158,18 +167,20 @@ class NewsReader:
         return items
 
     @staticmethod
-    def get_date(news):
+    def get_date(news_date):
         """
         Returns date of news publication
 
-        :param news: dictionary of given news
+        :param news: string date from dictionary of given news
         :return: date of news publication
         """
 
-        news_date = news['pubDate']
+        try:
+            news_date = parse(news_date)
+        except ValueError:
+            print('There is not date. Today\'s has been pasted')
+            news_date = datetime.datetime.today()
 
-        # news_date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
-        news_date = parse(news_date)
         news_date = news_date.date()
 
         return news_date
@@ -191,6 +202,23 @@ class NewsReader:
         image_text = image[1]
 
         return text, image_link, image_text
+
+    @staticmethod
+    def get_description(description):
+        """
+        Remove all tags from raw description and
+        return just simple news description
+
+        :param description: news description
+        :return: processed description
+        """
+
+        try:
+            node = html.fromstring(description)
+        except etree.ParserError:
+            return ''
+
+        return node.text_content()
 
     @staticmethod
     def get_image(description):
@@ -219,20 +247,6 @@ class NewsReader:
         return image_src, image_description
 
     @staticmethod
-    def get_description(description):
-        """
-        Remove all tags from raw description and
-        return just simple news description
-
-        :param description: news description
-        :return: processed description
-        """
-
-        node = html.fromstring(description)
-
-        return node.text_content()
-
-    @staticmethod
     def news_text(news):
         """
         Process news in dictionary format into
@@ -252,7 +266,7 @@ class NewsReader:
 
         return result
 
-    def fancy_output(self):
+    def fancy_output(self, items):
         """
         Output readable information about news
         from items dictionary
@@ -263,7 +277,7 @@ class NewsReader:
         if self.verbose:
             print('News feed is ready')
 
-        for key, value in self.items.items():
+        for key, value in items.items():
             if key == 'title':
                 print(f'Feed: {value}')
             else:
@@ -287,12 +301,10 @@ class NewsReader:
         return json_result
 
 
-# feed = NewsReader('	http://rss.cnn.com/rss/edition_world.rss', limit=None, cashing=True)
-# print(feed.read_by_date('20191028'))
-# it = feed.items
+feed = NewsReader('http://rss.cnn.com/rss/edition_world.rss', limit=10, cashing=True)
+# items = feed.read_by_date('20190607')
 
-
-# date = datetime.datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+feed.fancy_output(feed.items)
 
 # def main():
 #     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
@@ -306,7 +318,7 @@ class NewsReader:
 #
 #     # TODO: add flags to output logs
 #     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
-#     parser.add_argument('--date', type=datetime.datetime, help='Reads cashed news by date. And output them')
+#     parser.add_argument('--date', type=str, help='Reads cashed news by date. And output them')
 #
 #     args = parser.parse_args()
 #     print(args)
@@ -319,10 +331,15 @@ class NewsReader:
 #         news = NewsReader(args.source, args.limit, args.verbose)
 #
 #         print(news.to_json())
+#     elif args.date:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#         items = news.read_by_date(args.date)
+#
+#         news.fancy_output(items)
 #     else:
 #         news = NewsReader(args.source, args.limit, args.verbose)
 #
-#         news.fancy_output()
+#         news.fancy_output(news.items)
 #
 #
 # if __name__ == '__main__':
