@@ -5,8 +5,6 @@ import requests
 from io import BytesIO
 import os
 
-from rss_reader import NewsReader
-
 
 def silent_remove(path):
     """
@@ -91,7 +89,7 @@ class PdfNewsConverter(FPDF):
             self.set_x(self.w / 2 - 15)
             self.image(filename, type='jpg')
         except requests.exceptions.MissingSchema:
-
+            self.set_x(0)
             self.cell(0, 10, 'No image', 0, 0, 'C')
         finally:
             self.set_x(0)
@@ -127,7 +125,6 @@ class PdfNewsConverter(FPDF):
         image_link = item['imageLink']
         image_description = item['imageDescription']
 
-        print(image_link)
         self.set_font('Times', 'I', 14)
         self.multi_cell(w=0, h=10,
                         txt=title, align='C')
@@ -149,7 +146,6 @@ class PdfNewsConverter(FPDF):
         self.multi_cell(w=0, h=5,
                         txt=f'Image description: {image_description}',
                         align='C')
-        print(image_description)
 
         # self.cell(w=5, h=20, txt='', border=0, ln=20, align='L')
 
@@ -286,9 +282,6 @@ class HTMLNewsConverter:
             file.write(res_html)
 
 
-feed = NewsReader('https://news.yahoo.com/rss/', limit=None, cashing=False)
-it = feed.items
-it = it
 #
 # pdf = PdfNewsConverter(it)
 #
@@ -299,4 +292,3 @@ it = it
 #
 # html.output('news.html')
 
-feed.fancy_output()
