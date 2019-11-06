@@ -5,5 +5,5 @@ if __name__ == '__main__':
     loader = unittest.TestLoader()
     start_dir = os.path.dirname(__file__)
     suite = loader.discover(start_dir)
-    runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest.TextTestRunner()
     runner.run(suite)

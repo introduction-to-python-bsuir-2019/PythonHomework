@@ -2,8 +2,9 @@
 Tests for rssreader.news module
 """
 import unittest
-from rssreader.news import News
 from datetime import date
+
+from rssreader.news import News
 
 
 class NewsTestCase(unittest.TestCase):
@@ -23,7 +24,7 @@ class NewsTestCase(unittest.TestCase):
 
     def test_get_text(self):
         standard = 'Title: Some news\nDate: Thu, 31 Oct 2019 10:25:00 +0300\nLink: https://dummy.xz/1\n\n' \
-                   'Everything is ok\n\nLinks:\n [0]: https://img.dummy.xz/pic1.jpg (image/jpeg))\n'
+                   'Everything is ok\n\nLinks:\n[0]: https://img.dummy.xz/pic1.jpg (image/jpeg))\n'
 
         self.assertEqual(standard, self.some_news.get_text())
 

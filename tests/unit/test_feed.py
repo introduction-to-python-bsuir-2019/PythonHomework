@@ -2,12 +2,14 @@
 Tests for rssreader.feed module
 """
 import unittest
-from rssreader.news import News
-from rssreader.feed import Feed
-from datetime import date
-import feedparser
+from datetime import datetime
 import io
 from contextlib import redirect_stdout
+
+import feedparser
+
+from rssreader.news import News
+from rssreader.feed import Feed
 
 
 class FeedTestCase(unittest.TestCase):
@@ -19,9 +21,10 @@ class FeedTestCase(unittest.TestCase):
 
         self.feed = Feed('https://dummy.xz/here.rss', 1)
         self.feed.encoding = 'utf-8'
+        self.feed.title = 'Dummy news'
 
         self.first_news = News(
-            'First news', 'Thu, 30 Oct 2019 10:25:00 +0300', date(2019, 10, 30), 'https://dummy.xz/1',
+            'First news', 'Thu, 30 Oct 2019 10:22:00 +0300', datetime(2019, 10, 30, 10, 22), 'https://dummy.xz/1',
             'Everything is ok', [{'type': 'image/jpeg)', 'href': 'https://img.dummy.xz/pic1.jpg'}]
         )
 
@@ -29,9 +32,6 @@ class FeedTestCase(unittest.TestCase):
 
         with open('tests/correct.rss', 'r') as fd:
             self.correct_rss = fd.read()
-
-        with open('tests/incorrect.rss', 'r') as fd:
-            self.incorrect_rss = fd.read()
 
     def test_request(self):
         """
@@ -56,19 +56,25 @@ class FeedTestCase(unittest.TestCase):
         self.assertEqual('Good news', self.feed.title)
         standards = [
             News(
-                'Sun', 'Thu, 31 Oct 2019 14:42:00 +0300', date(2019, 10, 31), 'https://news.good.by/wild/1.html',
-                'The sun is shining', [{'type': 'image/jpeg',
-                                        'href': 'https://img.good.by/n/reuters/0c/a/meksika_1.jpg'}]
+                'Sun', 'Thu, 31 Oct 2019 14:42:00 +0300', datetime(2019, 10, 31, 14, 42, 0),
+                'https://news.good.by/wild/1.html',
+                'The sun is shining', [
+                    {'type': 'text/html', 'href': 'https://news.good.by/wild/1.html'},
+                    {'type': 'image/jpeg', 'href': 'https://img.good.by/n/reuters/0c/a/meksika_1.jpg'}]
             ),
             News(
-                'Birds', 'Thu, 31 Oct 2019 18:42:00 +0300', date(2019, 10, 31), 'https://news.good.by/wild/2.html',
-                'The birds are signing', [{'type': 'image/jpeg',
-                                           'href': 'https://img.good.by/n/reuters/0c/a/meksika_2.jpg'}]
+                'Birds', 'Thu, 31 Oct 2019 18:42:00 +0300', datetime(2019, 10, 31, 18, 42, 0),
+                'https://news.good.by/wild/2.html',
+                'The birds are signing', [
+                    {'type': 'text/html', 'href': 'https://news.good.by/wild/2.html'},
+                    {'type': 'image/jpeg', 'href': 'https://img.good.by/n/reuters/0c/a/meksika_2.jpg'}]
             ),
             News(
-                'Animals', 'Mon, 29 Oct 2019 14:42:00 +0300', date(2019, 10, 29), 'https://news.good.by/wild/3.html',
-                'The animals are jumping', [{'type': 'image/jpeg',
-                                             'href': 'https://img.good.by/n/reuters/0c/a/meksika_3.jpg'}]
+                'Animals', 'Mon, 29 Oct 2019 14:42:00 +0300', datetime(2019, 10, 29, 14, 42),
+                'https://news.good.by/wild/3.html',
+                'The animals are jumping', [
+                    {'type': 'text/html', 'href': 'https://news.good.by/wild/3.html'},
+                    {'type': 'image/jpeg', 'href': 'https://img.good.by/n/reuters/0c/a/meksika_3.jpg'}]
             )
         ]
 
@@ -79,16 +85,19 @@ class FeedTestCase(unittest.TestCase):
 
     def test__parse_one(self):
         """
-        Feed is successfully parsed but only one news is stored because of the limit
+        Limit argument does not impact on parsing - all news are parsed.
         """
         self.feed.news = []
         self.feed.limit = 1
         data = feedparser.parse(self.correct_rss)
         self.feed._parse(data)
-        self.assertEqual(1, len(self.feed.news))
+        self.assertEqual(3, len(self.feed.news))
 
     def test__parse_err(self):
         """feed.bozo attribute is set to 1. That means that feed is not well-formed."""
+        with open('tests/incorrect.rss', 'r') as fd:
+            self.incorrect_rss = fd.read()
+
         data = feedparser.parse(self.incorrect_rss)
         with self.assertRaises(Exception) as cm:
             self.feed._parse(data)
@@ -97,8 +106,9 @@ class FeedTestCase(unittest.TestCase):
         """
         Feed is converted into json
         """
-        standard = '{\n    "feed": "",\n    "news": [\n        {\n            "title": "First news",\n            ' \
-                   '"published": "Thu, 30 Oct 2019 10:25:00 +0300",\n            "link": "https://dummy.xz/1",\n  ' \
+        standard = '{\n    "feed": "Dummy news",\n    ' \
+                   '"news": [\n        {\n            "title": "First news",\n            ' \
+                   '"published": "Thu, 30 Oct 2019 10:22:00 +0300",\n            "link": "https://dummy.xz/1",\n  ' \
                    '          "description": "Everything is ok",\n            "hrefs": [\n                {\n     ' \
                    '               "type": "image/jpeg)",\n                    "href": "https://img.dummy.xz/pic1.' \
                    'jpg"\n                }\n            ]\n        }\n    ]\n}'
@@ -108,15 +118,16 @@ class FeedTestCase(unittest.TestCase):
         """
         Feed is converted into text. This text is displayed into console.
         """
-        standard = 'Feed: \n\nTitle: First news\nDate: Thu, 30 Oct 2019 10:25:00 +0300\nLink: https://dummy.xz/1\n\n' \
-                   'Everything is ok\n\nLinks:\n [0]: https://img.dummy.xz/pic1.jpg (image/jpeg))\n'
+        standard = 'Feed: Dummy news\n\nTitle: First news\nDate: Thu, 30 Oct 2019 10:22:00 +0300\n' \
+                   'Link: https://dummy.xz/1\n\n' \
+                   'Everything is ok\n\nLinks:\n[0]: https://img.dummy.xz/pic1.jpg (image/jpeg))\n'
         self.assertEqual(standard, self.feed.get_text())
 
     def test_add_news(self):
         """New news is added"""
         init_len = len(self.feed.news)
-        self.feed.add_news('Third news', 'Thu, 31 Oct 2019 10:25:00 +0300', date(2019, 10, 31), 'https://dummy.xz/3',
-                           'I trust you', [])
+        self.feed.add_news('Third news', 'Thu, 31 Oct 2019 10:22:00 +0300', datetime(2019, 10, 31, 10, 22, 0),
+                           'https://dummy.xz/3', 'I trust you', [])
         self.assertEqual(init_len + 1, len(self.feed.news))
 
     def test_print_json_ok(self):
@@ -138,8 +149,9 @@ class FeedTestCase(unittest.TestCase):
             self.assertEqual(self.feed.get_text()+'\n', buf.getvalue())
 
     def test_print_err(self):
-        """Exception is raised as there is no news"""
+        """
+        Exception is raised as there is no news
+        """
         self.feed.news = []
         with self.assertRaises(Exception) as cm:
-            self.feed.print(False)
-
+            self.feed.print(False, to_json=True)

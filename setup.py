@@ -1,4 +1,5 @@
 from setuptools import setup
+
 from rssreader import conf
 
 setup(
@@ -9,11 +10,6 @@ setup(
     author="Andrei Puzanau",
     author_email="puzanov.a.a@gmail.com",
     packages=[conf.__package__],
-    install_requires=[
-        "feedparser==5.2.1",
-        "bs4==0.0.1",
-        "typing"
-    ],
     python_requires='>=3.8',
     entry_points={
         'console_scripts':

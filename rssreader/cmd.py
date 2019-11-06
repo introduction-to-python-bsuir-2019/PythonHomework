@@ -2,7 +2,7 @@
 from rssreader import rss_reader
 
 
-def main():
+def main() -> None:
     """Just call main function from rss_reader module"""
     rss_reader.main()
 
