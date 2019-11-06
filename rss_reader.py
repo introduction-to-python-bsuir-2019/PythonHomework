@@ -1,4 +1,5 @@
 import argparse
+from functools import reduce
 
 parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
 parser.add_argument('source',nargs='?',help='RSS URL')
@@ -18,8 +19,18 @@ class Error(Exception):
         self.error=code
 
 
-if bool(args.version)==bool(args.source):
-    raise Error(err[1])
+def verboser(func,action):
+    def wrapper(*args, **kwargs):
+        print('Started '+action)
+        result=func(*args,**kwargs)
+        print('Finished '+action)
+        return result
+    return wrapper
+
+
+#if args.version==reduce(lambda x,y: x or y,list(map(bool,[args.limit,args.source,args.json,args.verbose]))):
+#    raise Error(err[1)
+
 
 
 #if args.version:
