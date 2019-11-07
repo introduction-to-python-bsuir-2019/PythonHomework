@@ -2,6 +2,7 @@ import argparse
 import requests
 import html
 from bs4 import BeautifulSoup
+import re
 
 parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
 exclusive=parser.add_mutually_exclusive_group()
@@ -27,17 +28,19 @@ class Error(Exception):
 class News:
     def __init__(self,wall_of_text):
         self.title=convert_to_readable(wall_of_text,'title',False)
-        self.source=convert_to_readable(wall_of_text,'link/',False)
+        self.source=convert_to_readable(wall_of_text,'link/',True)
         self.date=convert_to_readable(wall_of_text,'pubdate',False)
         self.content=convert_to_readable(wall_of_text,'description',False)
-        self.images=convert_to_readable(wall_of_text,'img src=',True)
+        self.images=convert_to_readable(wall_of_text,'<img',True)
 
     def show_fields(self):
         print('\n\n'+'Title: '+self.title)
         print('Link: '+self.source)
         print('Date: '+self.date)
         print('\n'+self.content)
-        print('\nImage: '+self.images)
+        print('\nImages: ')
+        for number, image in enumerate(self.images):
+            print('['+str(number+1)+'] '+image)
 
 
 def verboser(func,action):
@@ -53,20 +56,27 @@ def ultimately_unescape(str):
         str=html.unescape(str)
     return str
 
-def cut_tags(text, cutfrom,tag_name):
-    while text[cutfrom]=='<':
-        cutfrom=text.find('>',cutfrom)+1
-    return cutfrom
-
-def convert_to_readable(text,tag_name,is_in_tag):
+def convert_to_readable(text,tag_name,is_link):
     text=ultimately_unescape(str(text))
-    cutfrom=text.find(tag_name)+len(tag_name)+1
-    cutfrom=cut_tags(text,cutfrom,tag_name)
-    if not is_in_tag:
+    if not is_link:
+        cutfrom=text.find(tag_name)+len(tag_name)+1
+        cutto=text.find('/'+tag_name,cutfrom)-1
+        text=text[cutfrom:cutto]
+        text=cut_tags(text)
+        return text
+    if tag_name=='link/':
+        cutfrom=text.find(tag_name)+len(tag_name)+1
         cutto=text.find('<',cutfrom)
-    else:
-        cutto=text.find('"',cutfrom)
-    return text[cutfrom:cutto] if cutfrom>len(tag_name) else 'None'
+        return text[cutfrom:cutto]
+    links=re.finditer(tag_name,text)
+    links=[image.start() for image in links]
+    indexes=[text.find('src',image) for image in links]
+    return set(text[index+5:text.find('"',index+5)] for index in indexes)
+
+def cut_tags(text):
+    while text.find('<')>-1 and text.find('>')>-1:
+        text=text.replace(text[text.find('<'):text.find('>')+1],'')
+    return text
 
 
 def retrieve_news(link, limit):
