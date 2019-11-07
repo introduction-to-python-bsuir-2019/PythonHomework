@@ -4,12 +4,14 @@ import html
 from bs4 import BeautifulSoup
 
 parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
-parser.add_argument('source',nargs='?',help='RSS URL')
-parser.add_argument('--version',action='store_true',help='Print version info')
+exclusive=parser.add_mutually_exclusive_group()
 parser.add_argument('--json',action='store_true', help='Print result as JSON in stdout')
 parser.add_argument('--verbose',action='store_true',help='Outputs verbose status messages')
 parser.add_argument('--limit', type=int,action='store',help='Limit news topics if this parameter provided')
+exclusive.add_argument('--version',action='store_true',help='Print version info')
+exclusive.add_argument('source',nargs='?',help='RSS URL',default=None)
 args=parser.parse_args()
+
 
 version='v1.0'
 err={1: 'You don\'t use --version together with other arguments',
@@ -24,14 +26,14 @@ class Error(Exception):
 
 class News:
     def __init__(self,wall_of_text):
-        self.title=convert_to_readable_head(wall_of_text,'title')
-        self.source=convert_to_readable_body(wall_of_text,'a href=')
-        self.date=convert_to_readable_head(wall_of_text,'pubdate')
-        self.content=convert_to_readable_body(wall_of_text,'</a')
-        self.images=convert_to_readable_body(wall_of_text,'img src=')
+        self.title=convert_to_readable(wall_of_text,'title',False)
+        self.source=convert_to_readable(wall_of_text,'link/',False)
+        self.date=convert_to_readable(wall_of_text,'pubdate',False)
+        self.content=convert_to_readable(wall_of_text,'description',False)
+        self.images=convert_to_readable(wall_of_text,'img src=',True)
 
     def show_fields(self):
-        print('\n\n\n'+'Title: '+self.title)
+        print('\n\n'+'Title: '+self.title)
         print('Link: '+self.source)
         print('Date: '+self.date)
         print('\n'+self.content)
@@ -51,23 +53,27 @@ def ultimately_unescape(str):
         str=html.unescape(str)
     return str
 
-def convert_to_readable_head(text,tag_name):
-    readable=text(tag_name)[0]
-    readable=str(readable)[len(tag_name)+2:-len(tag_name)-3]
-    return ultimately_unescape(readable)
+def cut_tags(text, cutfrom,tag_name):
+    while text[cutfrom]=='<':
+        cutfrom=text.find('>',cutfrom)+1
+    return cutfrom
 
-def convert_to_readable_body(text,tag_name):
-    body=convert_to_readable_head(text,'description')
-    body=str(body)
-    cutfrom=body.find(tag_name)+len(tag_name)+1
-    return body[cutfrom:min(body.find('"',cutfrom),body.find('<',cutfrom))]
-    
+def convert_to_readable(text,tag_name,is_in_tag):
+    text=ultimately_unescape(str(text))
+    cutfrom=text.find(tag_name)+len(tag_name)+1
+    cutfrom=cut_tags(text,cutfrom,tag_name)
+    if not is_in_tag:
+        cutto=text.find('<',cutfrom)
+    else:
+        cutto=text.find('"',cutfrom)
+    return text[cutfrom:cutto] if cutfrom>len(tag_name) else 'None'
+
 
 def retrieve_news(link, limit):
     soup=requests.get(link).text
     soup=BeautifulSoup(soup,"html5lib")
-    title=convert_to_readable_head(soup,'title')
-    print('Source: '+title)
+    title=convert_to_readable(soup,'title',False)
+    print('\nSource: '+title)
     content=soup('item')
     news=[]
     for item in (content[:min(limit,len(content))] if limit else content):
@@ -83,7 +89,7 @@ def print_news(news):
         item.show_fields()
 
 
-if args.version and (args.source or args.json or args.verbose or args.limit):
+if args.version and (args.json or args.limit):
     raise Error(err[1])
 if not (args.version or args.source):
     raise Error(err[2])
