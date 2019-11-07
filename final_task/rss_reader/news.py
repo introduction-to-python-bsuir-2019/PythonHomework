@@ -3,9 +3,10 @@ This module contains classes for fetching and representing RSS
 """
 
 import feedparser
-import image
+import rss_reader.image as image
 from bs4 import BeautifulSoup
 from html import unescape
+from collections import namedtuple
 
 
 class News:
@@ -15,12 +16,21 @@ class News:
     """
 
     def __init__(self, url, count):
-        data = feedparser.parse(url)
+        self.count = count
+        self.url = url
+        self.feed = ''
+        self.items = []
+
+    def get_news(self):
+        """
+        This method gets and parses RSS
+        :return: None
+        """
+        data = feedparser.parse(self.url)
         if data['bozo']:
             raise ValueError("Wrong URL address or there is no access to the Internet")
         self.feed = data['feed'].get('title', None)
-        entries = data['entries'] if count < 0 else data['entries'][:count]
-        self.items = []
+        entries = data['entries'] if self.count < 0 else data['entries'][:self.count]
         for entry in entries:
             title = unescape(entry.get('title', 'No title'))
             date = entry.get('published', 'Unknown')
@@ -35,7 +45,11 @@ class News:
             result += str(item) + '\n\n'
         return result
 
-    def json(self):
+    def to_json(self):
+        """
+        This method converts News object to JSON format
+        :return: dict
+        """
         news_items = []
         for item in self.items:
             images = [{'link': img.link, 'alt': img.alt} for img in item.content.images_links]
@@ -46,6 +60,10 @@ class News:
         return {'news': {'feed': self.feed, 'items': news_items}}
 
     def get_count(self):
+        """
+        This method returns count of items in News object
+        :return: int
+        """
         return len(self.items)
 
 

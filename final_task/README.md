@@ -1,4 +1,4 @@
-<h4><b>[Iteration 1] One-shot command-line RSS reader.</b></h4>
+<h4><b>[Iteration 2] One-shot command-line RSS reader.</b></h4>
 
 <h5>Utility interface</h5>
 
@@ -46,3 +46,5 @@ optional arguments:
   }
 }
 </pre>
+
+<li>This package exports CLI utility rss-reader</li> 
