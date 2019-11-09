@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--version',
                         action='version',
                         help='Print version info',
-                        version='%(prog)s 0.1')
+                        version='%(prog)s 1.0')
 
     parser.add_argument('--json',
                         action='store_true',
@@ -34,5 +34,4 @@ if __name__ == '__main__':
 
     rss_object = RssHandler(args.source)
 
-    if args.json is True:
-        rss_object.to_json()
+    rss_object.output(args.json, args.limit)

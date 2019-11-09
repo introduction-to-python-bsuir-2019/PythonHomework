@@ -1,5 +1,16 @@
 import unittest
-from rss_reader import RssReader
+from RssHandle import RssReader
 
 class RssReaderTest(unittest.TestCase):
-    pass
+
+    def test_url_handler(self):
+        pass
+
+    def test_rss_dict(self):
+        pass
+
+    def test_to_json(self, limit):
+        pass
+
+    def output(self, json_param, limit):
+        pass 
