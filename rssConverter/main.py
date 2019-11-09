@@ -1,5 +1,5 @@
-from rssConverter.RssConverter import RssConverter
 import argparse
+from rssConverter.RssConverter import RssConverter
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Rss reader')
@@ -13,9 +13,17 @@ if __name__ == "__main__":
         type=bool,
         help='do you need json format'
     )
+    parser.add_argument(
+        '--h',
+        type=bool,
+        help='help printer'
+    )
     args = parser.parse_args()
+    if args.h:
+        print()
     rss = RssConverter()
-    new = rss.get_news('https://news.yahoo.com/rss/', args.limit)
-    rss.print_news(new)
+    not_parsed_news = rss.get_news('https://news.yahoo.com/rss/')
+    news_list = rss.parse_news(not_parsed_news)
+    rss.print_news(news_list, args.limit)
     if args.json:
-        rss.json_convert(new)
+        rss.in_json_format(news_list, args.limit)

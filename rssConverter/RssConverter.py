@@ -1,51 +1,77 @@
 import feedparser
 import re
 import json
+from rssConverter.New import New
 
 
 class RssConverter:
 
     def __init__(self):
-        self.tags = ['image', 'links', 'title', 'link', 'pubDate', 'published', 'summary', ]
+        self.tags = ['image', 'links', 'title', 'pubDate', 'published', 'summary', ]
 
-    def get_news(self, url, limit=None):
+    def get_news(self, url):
         result = feedparser.parse(url)
         if result['entries'] and result.status == 200:
-            return self.dict_list__maker(result, limit)
+            return result['entries']
         else:
             raise Exception("something wrong with with url. Please check url and try later ")
 
-    def dict_list__maker(self, rss, limit=None):
+    def get_limited_news(self, dict_list, limit):
         if limit is None:
-            limit = len(dict(rss))
-        entries = rss['entries']
-        return entries[:limit]
+            limit = len(dict_list)
+        return dict_list[:limit]
 
-    def print_news(self, dict_list):
+    def parse_news(self, dict_list):
+        news_list = []
+        summary_parser = r'>[A-ZА-Я0-9a-zа-я][‘+,:;=?@#|.^*() %!a-zA-Zа-яА-Я0-9"\s]*'  # readable item summary output
         for dictionary in dict_list:
+            new = New()
             for key, value in dictionary.items():
                 if key in self.tags:
                     if key == 'summary':
-                        print("\n")
-                        result = re.search(r'>[A-ZА-Я0-9a-zа-я][‘+,:;=?@#|.^*() %!a-zA-Zа-яА-Я0-9"\s]*', value)
+                        result = re.search(summary_parser, value)
                         if result:
-                            print(result.group(0)[1:-1])
+                            new.items['summary'] = result.group(0)[1:-1]
                     elif key == 'links':  # list of links
-                        for j in value:
-                            print("\n")
-                            print(j.get('type', '') + '     ' + j.get('href', ''))
-                    elif key == 'item':
-                        self.print_result(self, value.items)
+                        links = {}
+                        for link in value:
+                            links[link.get('type', '')] = link.get('href', '')
+                        new.items['links'] = links
+
                     else:
+                        new.items[key] = value
+            news_list.append(new)
+        return news_list
+
+    def print_news(self, news_list, limit=None):
+        news_list = self.get_limited_news(news_list, limit)
+        for new in news_list:
+            for key, item in new.items.items():
+                if key == 'links':
+                    for key_link, item_link in item.items():
                         print("\n")
-                        print(key + '    ' + value)
+                        print(key_link+'    '+item_link)
+                elif item is not None:
+                    print("\n")
+                    print(key + '    ' + item)
             print('-----------------------------------------------------------------------------------')
 
-    def json_convert(self, dict_list):
-        for i in dict_list:
-            print(json.dumps(i, sort_keys=True,
-                             indent=4, separators=(',', ': ')))
-
-
-
-
+    def in_json_format(self, news_list, limit):
+        news_list = self.get_limited_news(news_list, limit)
+        print('{')
+        print('\t' + 'news:')
+        print('\t' + '[')
+        for new in news_list:
+            print('\t'*2 + '{')
+            for key, item in new.items.items():
+                if key == 'links':
+                    print("\t" * 3 + 'links:')
+                    print("\t" * 3 + '[')
+                    for key_link, item_link in item.items():
+                        print("\t" * 4 + key_link + ':' + item_link + ';')
+                    print("\t" * 3 + '];')
+                elif item is not None:
+                    print("\t"*3 + key + ':' + item+';')
+            print("\t" * 2 + '};')
+        print("\t" * 1 + '];')
+        print('};')
