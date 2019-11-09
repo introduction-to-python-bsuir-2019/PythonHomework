@@ -1,7 +1,6 @@
 import feedparser
 import re
-import json
-from rssConverter.New import New
+from New import New
 
 
 class RssConverter:
