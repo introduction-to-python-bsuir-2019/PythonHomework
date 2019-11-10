@@ -77,6 +77,12 @@ class RSSFeed:
 def main(args):
     """ Main entry point of the app """
 
+    if args.verbose:
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+        logging.info("Verbose output.")
+    else:
+        logging.basicConfig(format="%(levelname)s: %(message)s")
+
     feed = RSSFeed(source=args.source)
     feed.get_rss()
     feed.print_rss(limit=args.limit, is_json=args.json)
