@@ -3,6 +3,7 @@ import requests
 import html
 from bs4 import BeautifulSoup
 import re
+import json
 
 parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
 exclusive=parser.add_mutually_exclusive_group()
@@ -71,7 +72,7 @@ def convert_to_readable(text,tag_name,is_link):
     links=re.finditer(tag_name,text)
     links=[image.start() for image in links]
     indexes=[text.find('src',image) for image in links]
-    return set(text[index+5:text.find('"',index+5)] for index in indexes)
+    return list(set(text[index+5:text.find('"',index+5)] for index in indexes))
 
 def cut_tags(text):
     while text.find('<')>-1 and text.find('>')>-1:
@@ -91,8 +92,15 @@ def retrieve_news(link, limit):
     return news
 
 
-def make_json(*args):
-    pass
+def make_json(news):
+    with open('news.json','w') as filer:
+        for item in news:
+            json.dump(item.__dict__,filer)
+#    with open('news.json','w') as filer:
+#        for item in news:
+#           json.dumps(news,item.__dict__) 
+
+
 
 def print_news(news):
     for item in news:
