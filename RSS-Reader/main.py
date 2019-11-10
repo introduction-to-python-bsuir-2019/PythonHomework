@@ -5,7 +5,7 @@ from logging import config
 import argparse
 
 from rss_parser import RssReader
-
+import caсhing_news
 
 VERSION = '1.0'
 
@@ -64,6 +64,11 @@ def init_args(parser: argparse.ArgumentParser) -> None:
         help='Limit news topics if this parameter provided'
     )
     parser.add_argument(
+        "--date",
+        type=str,
+        help='Argument, which allows to get !cashed! news by date. Format: YYYYMMDD'
+    )
+    parser.add_argument(
         "link",
         type=str,
         nargs='?',
@@ -110,6 +115,17 @@ if __name__ == "__main__":
 
         print(news)
         logger.info(CORRECT_END_LOG)
+    elif args.date is not None:
+        logger.info(f'Getting cashed news by date: {args.date}')
+
+        try:
+            print(cashing_news.db_read(args.date))
+            logger.info(CORRECT_END_LOG)
+        except cashing_news.sqlite3.OperationalError:
+            print('Incorrect value of date!')
+            print('You may enter next values: ')
+            print(cashing_news.get_list_of_tables())
+            logger.info('Was entered incorrect value of date')
     else:
         logger.error('END (no args)')
         parser.parse_args(['-h'])
