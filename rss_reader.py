@@ -11,42 +11,82 @@ import feedparser
 import argparse
 import requests
 import time
+import logging
+import json
 
 # from colorama import init  # for colorizing https://pypi.org/project/colorama/
 # init(autoreset=True)
 
 
-def get_rss(source):
-    """ Gets rss feed by source """
-    response = requests.get(source)
-    rss = feedparser.parse(response.text)
-    return rss
+class RSSFeed:
+    """ Class for rss feed"""
+    def __init__(self, source):
+        self.source = source
+        self.title = None
+        self.entries = None
+        self.raw_rss = None
 
+    def _get_rss_in_json(self, entries=False):
+        """ Converts rss feed to json """
+        logging.info("Converting rss feed to json")
+        if entries:
+            return json.dumps({"title": self.title, "entries": entries})
+        else:
+            return json.dumps({"title": self.title, "entries": self.entries})
 
-def print_rss(rss, limit):
-    """ Prints rss feed """
-    print(f"Feed: {rss['feed']['title']}\n")
-    if limit:
-        entries = rss.entries[:limit]
-    else:
-        entries = rss.entries
-    for entry in entries:
-        print(f"{entry.title}\n"
-              f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', entry.published_parsed)}\n"
-              f"{entry.link}\n\n"
-              f"{entry.summary}\n\n")
+    def get_rss(self):
+        """ Gets rss feed by source """
+        logging.info("Getting rss feed")
+        response = requests.get(self.source).text
+
+        rss = feedparser.parse(response)
+        self.title = rss['feed']['title']
+        self.raw_rss = response
+        self.entries = []
+        for entry in rss.entries:
+            self.entries.append({
+                "title": entry.title,
+                "date": time.strftime('%Y-%m-%dT%H:%M:%SZ', entry.published_parsed),
+                "link": entry.link,
+                "summary": entry.summary
+            })
+
+    def print_rss(self, limit, is_json=False):
+        """ Prints rss feed """
+        logging.info("Printing rss feed")
+        if not self.entries:
+            print("error")
+
+        if limit:
+            entries = self.entries[:limit]
+        else:
+            entries = self.entries
+
+        if is_json:
+            entries = self._get_rss_in_json(entries)
+            print(entries)
+        else:
+            print(self.title + "\n")
+            for entry in entries:
+                print(f"{entry['title']}\n"
+                      f"{entry['date']}\n"
+                      f"{entry['link']}\n\n"
+                      f"{entry['summary']}\n\n")
 
 
 def main(args):
     """ Main entry point of the app """
-    source = args.source
-    rss = get_rss(source)
-    print_rss(rss, args.limit)
+
+    feed = RSSFeed(source=args.source)
+    feed.get_rss()
+    feed.print_rss(limit=args.limit, is_json=args.json)
+
+    logging.info("Exiting")
 
 
 if __name__ == "__main__":
     """ This is executed when run from the command line """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
 
     # Required positional argument
     parser.add_argument("source", help="rss url")
