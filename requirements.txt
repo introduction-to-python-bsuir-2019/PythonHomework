@@ -1,0 +1,4 @@
+coloredlogs
+feedparser
+html2text
+bs4
