@@ -23,10 +23,14 @@ def get_rss(source):
     return rss
 
 
-def print_rss(rss):
+def print_rss(rss, limit):
     """ Prints rss feed """
     print(f"Feed: {rss['feed']['title']}\n")
-    for entry in rss.entries:
+    if limit:
+        entries = rss.entries[:limit]
+    else:
+        entries = rss.entries
+    for entry in entries:
         print(f"{entry.title}\n"
               f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', entry.published_parsed)}\n"
               f"{entry.link}\n\n"
@@ -37,7 +41,7 @@ def main(args):
     """ Main entry point of the app """
     source = args.source
     rss = get_rss(source)
-    print_rss(rss)
+    print_rss(rss, args.limit)
 
 
 if __name__ == "__main__":
