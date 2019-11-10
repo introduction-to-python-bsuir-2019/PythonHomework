@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 import argparse
-from RssConverter import RssConverter
+from rssConverter.RssConverter import RssConverter
 import logging
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description='Rss reader', add_help=True)
     current_version = "1.0.0"
     log_file = 'rss_converter.log'
