@@ -8,5 +8,3 @@ for entry in NewsFeed.entries:
 
 	print (entry.title)
 	print (entry.published)
-
-	print ("******")
