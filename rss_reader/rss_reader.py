@@ -3,9 +3,18 @@ import feedparser
 import html
 from bs4 import BeautifulSoup
 import json
-from tqdm import tqdm
+#from tqdm import tqdm
 
 import version
+
+class News_Feed:
+    def __init__(self, feed_title, items):
+        self.feed_title=feed_title
+        self.items=items
+
+    def print_feed(self):
+        with open("data_file.json", "w") as write_file:
+            json.dump({"Feed":self.feed_title, "Items":[item.return_item() for item in self.items]}, write_file)
 
 class Item:
     def __init__(self, title, date, link, description, links):
@@ -14,7 +23,9 @@ class Item:
         self.link=link
         self.description=description
         self.links=links
-    
+        
+    def return_item(self):
+        return {"title": self.title,"description": self.description,"link": self.link,"pubDate": self.date,"source": self.links}
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
@@ -29,9 +40,8 @@ def main() -> None:
     if args.limit==-1 :
         args.limit=len(NewsFeed.entries)
 
-
-    d=json.dumps([{"title": "title1","description": "description1","link": "link2","pubDate": "pubDate1","source": {"url1": "url1","__url2": "url2"}}, {"title": "title2","description": "description2","link": "link2","pubDate": "pubDate2","source": {"url1": "url1","__url2": "url2"}}])
-    open("out.json","w").write(d)
+    news=[]
+    
     for i in range(args.limit) :
         
         entry = NewsFeed.entries[i]
@@ -82,7 +92,8 @@ def main() -> None:
                 video_links.append('[{0}]: {1}'.format(j, link))
                 j+=1    
         links={'images_links':images_links,'href_links':href_links,'video_links':video_links}
-        item=Item(html.unescape(entry['title']),entry['published'],entry['link'],soup.text,links)
+        
+        news.append(Item(html.unescape(entry['title']),entry['published'],entry['link'],soup.text,links))
         print(soup.text)
         print ()
         print ()
@@ -104,7 +115,8 @@ def main() -> None:
         print ()
         print ()
         print ()
-    
+    newsFeed=News_Feed("URL", news)
+    newsFeed.print_feed();
 if __name__ == '__main__':
     
     main()
