@@ -4,7 +4,7 @@ import logging
 import sys
 import getpass
 
-from yahoo import Bot
+from bots.tut import Bot
 from utils.RssInterface import RssException
 
 
@@ -46,9 +46,9 @@ def logger_init(level=None):
 
 def main(url, logger, limit=10):
 
-    parser = Bot(yahoo, limit, logger)
+    parser = Bot(tut_by_rss, limit, logger)
     try:
-        news = parser.get_json()
+        news = parser.get_news()
     except RssException as ex:
         logger.error(ex.args[0])
         logger.info('Exiting...')
@@ -67,10 +67,9 @@ if __name__ == "__main__":
         """
     PARSER = argparse.ArgumentParser(
         description='''
-                App finds the cheapest flight between city pairs using\n
-            two different flight search APIs:
-                1. Dohop ticketing API - api.dohop.com;
-                2. Kiwi API - docs.kiwi.com;
+                Rss reader. 
+                Just enter rss url from your favorite site and app will print 
+                latest news.
                 '''
     )
 

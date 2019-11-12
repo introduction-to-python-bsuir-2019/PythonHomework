@@ -49,7 +49,11 @@ class Bot(BaseRssBot):
                     pass
                 elif tag.name == 'img':
                     src = tag.attrs.get('src')
-                    img_idx = imgs.index(src) + len(links) + 1
+                    try:
+                        img_idx = imgs.index(src) + len(links) + 1
+                    except ValueError:
+                        imgs.append(src)
+                        img_idx = len(imgs) + len(links)
                     out_str += f'\n[image {img_idx}:  {tag.attrs.get("title")}][{img_idx}]'
                 elif tag.name == 'p':
                     out_str += '\n' + tag.text
