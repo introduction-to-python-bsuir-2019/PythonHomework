@@ -1,13 +1,27 @@
+"""
+This module contains class for converting parsed data from RSS.
+"""
 import textwrap
 import functools
 import json
 
 
 class Converter:
+    """
+    This class represents format converter for parsed data from RSS.
+    """
     def __init__(self, feeds):
+        """
+        :param feeds: Parsed data from RSS.
+        """
         self.__feeds = feeds
 
     def to_console_format(self, str_len=80):
+        """
+        Convert data to console format.
+        :param str_len: Length of output strings.
+        :return: Converted data.
+        """
         strings = []
         for feed in self.__feeds:
             strings.append(f"Feed: {feed.get('feed_title')}")
@@ -35,4 +49,9 @@ class Converter:
         return result_string
 
     def to_json_format(self, str_len=80):
+        """
+        Convert data to json format.
+        :param str_len: Length of output strings.
+        :return: Converted data.
+        """
         return textwrap.fill(json.dumps(self.__feeds, ensure_ascii=False), width=str_len)
