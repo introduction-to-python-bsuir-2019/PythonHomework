@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 from rssConverter.RssConverter import RssConverter
+from rssConverter.Exeptions import RssGetError, IncorrectLimit
 import logging
 
 
@@ -9,11 +10,12 @@ def main():
     current_version = "1.0.0"
     log_file = 'rss_converter.log'
     parser.add_argument(
-        '--url',
+        'url',
         help='url address'
     )
     parser.add_argument(
-        '--limit',
+        "-l",
+        "--limit",
         type=int,
         help=' Limit news topics if this parameter provided'
     )
@@ -24,11 +26,13 @@ def main():
     )
     parser.add_argument(
         '--json',
-        help='Print result as JSON in stdout'
+        help='Print result as JSON in stdout',
+        default=False
     )
     parser.add_argument(
         '--verbose',
-        help='Outputs verbose status messages'
+        help='Outputs verbose status messages',
+        default=False
     )
     args = parser.parse_args()
     logger = logging.getLogger('rss_converter')
@@ -36,22 +40,35 @@ def main():
     logger.info('Start')
     rss = RssConverter()
     logger.info("try to get news")
-    if args.url:
-        not_parsed_news = rss.get_news(args.url)
-        logger.info("got news")
-        news_list = rss.parse_news(not_parsed_news)
-        logger.info("parse rss to news list")
-        logger.info("print news")
-        rss.print_news(news_list, args.limit)
-        logger.info("news are printed")
-        if args.version:
-            pass
-        if args.json:
-            logger.info("print json")
-            rss.in_json_format(news_list, args.limit)
-            logger.info("json is printed")
-        if args.verbose:
-            with open(log_file) as log_file:
-                print(log_file.read())
+    try:
+        if args.url:
+            not_parsed_news = rss.get_news(args.url)
+            logger.info("got news")
+            news_list = rss.parse_news(not_parsed_news)
+            logger.info("parse rss to news list")
+            logger.info("print news")
+            rss.print_news(news_list, args.limit if args.limit else args.l)
+            logger.info("news are printed")
+            if args.version:
+                pass
+            if args.json:
+                logger.info("print json")
+                rss.in_json_format(news_list, args.limit if args.limit else args.l)
+                logger.info("json is printed")
+            if args.verbose:
+                with open(log_file) as log_file:
+                    print(log_file.read())
+        else:
+            print('please specify url')
+    except RssGetError as ex:
+        logger.info("incorrect url")
+        print('You have entered {0} url, but it is incorrect or you have network problem. Please check it and try again'
+              .format(ex.url))
+    except IncorrectLimit as ex:
+        logger.info("incorrect limit")
+        print(
+            'Limit should not be more than {0}'.format(ex.max_quantity))
+    except Exception as ex:
+        logger.info("Something has gone wrong. Exception is  {0}".format(ex))
     else:
-        print('please specify url')
+        logger.info("Everything have worked without problems")

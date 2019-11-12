@@ -16,8 +16,11 @@ class RssConverter:
             raise Exception("something wrong with with url. Please check url and try later ")
 
     def get_limited_news(self, dict_list, limit):
+        news_quantity = len(dict_list)
         if limit is None:
-            limit = len(dict_list)
+            limit = news_quantity
+        elif limit > news_quantity:
+            raise
         return dict_list[:limit]
 
     def parse_news(self, dict_list):
