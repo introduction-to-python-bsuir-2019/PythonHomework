@@ -5,7 +5,7 @@ from logging import config
 import argparse
 
 from rss_parser import RssReader
-import caсhing_news
+import caching_news
 
 VERSION = '1.0'
 
@@ -80,6 +80,16 @@ def init_args(parser: argparse.ArgumentParser) -> None:
         help='Print all logs in stdout',
         action='store_true'
     )
+    parser.add_argument(
+        "--to_fb2",
+        type=str,
+        help="Convert news to fb2 format.\
+        Path must contain exsisting directories\
+        Supports LIMIT",
+        metavar='PATH'
+    )
+
+
 
 
 if __name__ == "__main__":
@@ -110,22 +120,30 @@ if __name__ == "__main__":
 
         if args.json is True:
             news = rss_reader.get_news_as_json(limit=limit)
+            print(news)
+        elif args.to_fb2 is not None:
+            with open(args.to_fb2, 'w+') as fb2_file:
+                fb2_file.write(rss_reader.get_news_as_fb2(limit=limit))
         else:
             news = rss_reader.get_news_as_string(limit=limit)
+            print(news)
 
-        print(news)
+        # rss_reader.get_news_as_fb2()
+
+        # print(news)
         logger.info(CORRECT_END_LOG)
     elif args.date is not None:
         logger.info(f'Getting cashed news by date: {args.date}')
 
         try:
-            print(cashing_news.db_read(args.date))
+            print(caching_news.db_read(args.date))
             logger.info(CORRECT_END_LOG)
-        except cashing_news.sqlite3.OperationalError:
+        except caching_news.sqlite3.OperationalError:
             print('Incorrect value of date!')
             print('You may enter next values: ')
-            print(cashing_news.get_list_of_tables())
+            print(caching_news.get_list_of_tables())
             logger.info('Was entered incorrect value of date')
     else:
         logger.error('END (no args)')
+        print('Missing argument: LINK\n')
         parser.parse_args(['-h'])

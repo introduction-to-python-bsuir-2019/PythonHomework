@@ -1,3 +1,5 @@
+'''Module, which allows to cache news while program is called'''
+
 import logging
 import sqlite3
 
@@ -83,7 +85,7 @@ def db_read(date: str) -> str:
 
 	with DataBaseConn(DB_NAME) as connection:
 		cursor = connection.cursor()
-		cursor.execute("SELECT * FROM {}".format(HEADER_TABLE_NAME + date))
+		cursor.execute("SELECT DISTINCT * FROM {}".format(HEADER_TABLE_NAME + date))
 
 		rows = cursor.fetchall()
 		news = ''

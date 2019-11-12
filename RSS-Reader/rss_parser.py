@@ -13,7 +13,8 @@ import json
 
 from rss_reader_consts import *
 
-import caсhing_news
+import caching_news
+import to_fb2_converter
 
 
 ROOT_LOGGER_NAME = 'RssReader'
@@ -33,39 +34,68 @@ class RssReader:
 		self.link = link
 
 
-	def _get_feed(self) -> str:
-		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_feed')
+	def _get_feed_title(self) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_feed_title')
 		logger.info('Getting title of resource')
 
 		return self.rss.feed.title
 
 
-	def _get_title(self, one_news: FeedParserDict) -> str:
-		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_title')
+	def _get_feed_subtitle(self) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_feed_subtitle')
+		logger.info('Getting subtitle of resource')
+
+		return self.rss.feed.subtitle
+
+
+	def _get_feed_image_url(self) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_feed_subtitle')
+		logger.info('Getting cover image-url of resource')		
+
+		return self.rss.feed.image.href
+
+
+	def _get_item_image_url(self, one_news: FeedParserDict) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_image_url')
+		logger.info('Getting image-url of one news')		
+
+		return one_news.media_content[0]['url']
+
+
+	def _get_item_title(self, one_news: FeedParserDict) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_title')
 		logger.info('Getting title of one news')
 
 		return one_news.title
 
 
-	def _get_date(self, one_news: FeedParserDict) -> str:
-		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_date')
+	def _get_item_date(self, one_news: FeedParserDict) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_date')
 		logger.info('Getting publishing date of one news')
 
 		return one_news.published
 
 
-	def _get_link(self, one_news: FeedParserDict) -> str:
-		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_link')
-		logger.info('Getting link on one news')
+	def _get_item_link(self, one_news: FeedParserDict) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_link')
+		logger.info('Getting link of one news')
 
 		return one_news.link
 
 
-	def _get_content(self, one_news: FeedParserDict) -> str:
-		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_content')
+	def _parse_item(self, elem: str) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._parse_item')
+		logger.info('Extract short content of one news on html-format')
+
+		soup = BeautifulSoup(elem, "html.parser")
+		return soup.get_text()
+
+
+	def _get_item_content(self, one_news: FeedParserDict) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_content')
 		logger.info('Getting short content of one news')
 
-		return self._parse_elem(one_news.summary_detail.value)
+		return self._parse_item(one_news.summary_detail.value)
 
 
 	def _get_rss(self) -> None:
@@ -75,42 +105,67 @@ class RssReader:
 		self.rss = parse(self.link)
 
 
+	def _get_news_as_list(self) -> list:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_news_as_list')
+		logger.info(f'Getting news as list of dicts')
+		
+		self._get_rss()
+
+		news = list()
+
+		for one_news in self.rss.entries:
+			piece_of_news = dict()
+
+			# print(one_news.media_content[0]['url']) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! GETTING IMAGE !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			piece_of_news[KEYWORD_TITLE] = self._get_item_title(one_news)
+			piece_of_news[KEYWORD_DATE] = self._get_item_date(one_news)
+			piece_of_news[KEYWORD_LINK] = self._get_item_link(one_news)
+			piece_of_news[KEYWORD_IMG_LINK] = self._get_item_image_url(one_news)
+			piece_of_news[KEYWORD_CONTENT] = self._get_item_content(one_news)
+
+			news.append(piece_of_news.copy())
+			piece_of_news.clear()
+
+		return news
+
+
 	def get_news_as_string(self, limit: int=0) -> str:
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.get_news_as_string')
 		logger.info(f'Getting news with string-format with limit: {limit}')
 
-		self._get_rss()
+		news_list = self._get_news_as_list()
 
 		if limit == 0:
 			limit = len(self.rss.entries)
 
-		feed = self._get_feed()
+		feed = self._get_feed_title()
 		
-		i = 0
-
 		news = ''
-		for one_news in self.rss.entries:
-			title = self._get_title(one_news)
-			date = self._get_date(one_news)
-			link = self._get_link(one_news)
-			content = self._get_content(one_news)
+		for one_news in news_list:
 
 			if limit > 0:
-				news += str(i) + ') '
-				i+= 1
+				news += EN + NEWS_SEPARATOR + DEN
 
-				news += KEYWORD_TITLE + title + EN
-				news += KEYWORD_DATE + date + EN
-				news += KEYWORD_LINK + link + EN
-				news += KEYWORD_CONTENT + content + DEN
-				news += NEWS_SEPARATOR + DEN
+				for key_word in one_news:
+					if key_word == KEYWORD_CONTENT:
+						news += EN
+					news += key_word + one_news[key_word] + EN
+
 			limit -= 1
 
-			cashing_news.db_write(self.convert_date_to_YYYYMMDD(date), title, link, content)
+			caching_news.db_write(self._convert_date_to_YYYYMMDD(one_news[KEYWORD_DATE]),
+			 						one_news[KEYWORD_TITLE],
+			 						one_news[KEYWORD_LINK],
+			 						one_news[KEYWORD_CONTENT]
+			 						)
 		return feed + DEN + news
 
 
-	def convert_date_to_YYYYMMDD(self, date : str) -> str:
+	def _convert_date_to_YYYYMMDD(self, date : str) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.convert_date_to_YYYYMMDD')
+		logger.info('Converting date to YYYYMMDD format')
+
 		return (''.join(date.split()[3:0:-1])).replace(date.split()[2], MONTHS[date.split()[2]])
 
 
@@ -123,13 +178,39 @@ class RssReader:
 		return json.dumps(self.rss, indent=4)
 
 
-	def _parse_elem(self, elem: str) -> str:
-		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._parse_elem')
-		logger.info('Extract short content of one news on html-format')
+	def get_news_as_fb2(self, limit: int=0) -> str:
+		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.get_news_as_fb2')
+		logger.info('Converting news to .fb2 format')		
+		
+		news_list = self._get_news_as_list()
 
-		soup = BeautifulSoup(elem, "html.parser")
-		return soup.get_text()
+		if limit == 0:
+			limit = len(self.rss.entries)		
 
+		sections = ''
+		for piece_of_news in news_list:
+			if limit == 0:
+				break
 
-	def temp_debug_func(self):
-		pass
+			sections += to_fb2_converter.section(
+				title=piece_of_news[KEYWORD_TITLE],
+				date=piece_of_news[KEYWORD_DATE],
+				content=piece_of_news[KEYWORD_CONTENT],
+				link=piece_of_news[KEYWORD_LINK],
+				image_url=piece_of_news[KEYWORD_IMG_LINK]
+				)
+
+			limit -= 1
+
+		result = to_fb2_converter.header(title=self._get_feed_title(),
+										subtitle=self._get_feed_subtitle(),
+										image_url=self._get_feed_image_url()
+										)
+		result += sections
+		result += to_fb2_converter.tail()
+		result = result.replace('&', 'and')
+
+		return result
+
+		# with open('newsV1.fb2', 'w+') as file:
+		# 	file.write(result)
