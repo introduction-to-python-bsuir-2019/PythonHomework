@@ -4,7 +4,8 @@ import logging
 import sys
 import getpass
 
-from rss_parser import RssParser, RssException
+from yahoo import Bot
+from utils.RssInterface import RssException
 
 
 python_wiki_rss_url = "http://www.python.org/cgi-bin/moinmoin/" \
@@ -43,38 +44,17 @@ def logger_init(level=None):
     return logger
 
 
-def print_news(news, logger):
-    logger.info("info")
-    logger.debug("debug")
-    logger.warning("warning")
+def main(url, logger, limit=10):
 
-    logger.warning('WARNING: %s', 'connection reset')
-    logger.info('INFO: %s', 'connection reset')
-    logger.debug('DEBUG: %s', 'connection reset')
-    logger.error('ERROR: %s', 'connection reset')
-    for i, item in enumerate(news):
-        id = item['id']
-        tags = [tag.get('term') for tag in item.get('tags', '')]
-        print(f'{(str(i) + ":").ljust(3)} {item.get("title", "")}\n'
-              f'\turl: {item.get("link", "")}\n'
-              # f'\tnews image: {item["links"][1]["href"]}\n'
-              f'\tauthor: {item.get("author", "")}\n'
-              f'\ttags: {tags}\n'
-              f'\tpublished: {item.get("published", "")}\n'
-              )
-
-
-def main(logger, limit=10):
-
-    parser = RssParser(limit, logger)
+    parser = Bot(yahoo, limit, logger)
     try:
-        parser.parse_rss(yahoo)
+        news = parser.get_json()
     except RssException as ex:
         logger.error(ex.args[0])
         logger.info('Exiting...')
     else:
 
-        parser.get_news()
+        print(news)
 
 
 if __name__ == "__main__":
@@ -104,6 +84,8 @@ if __name__ == "__main__":
                         )
     PARSER.add_argument('--limit',
                         help='Limit news topics if this parameter provided',
+                        default=10,
+                        type=int,
                         )
     PARSER.add_argument('--json',
                         help='Print result as JSON in stdout',
@@ -124,6 +106,6 @@ if __name__ == "__main__":
 
     logger.info(f'Lets start! Url={ARGS.url}')
 
-    main(logger=logger, limit=ARGS.limit)
+    main(url=ARGS.url, logger=logger, limit=ARGS.limit)
 
 
