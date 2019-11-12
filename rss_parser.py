@@ -18,7 +18,7 @@ class Parser:
 
     def parse_feed(self, items_count=-1):
         d = feedparser.parse(self.url)
-        if d.status != 200:
+        if d.bozo != 0 or d.status != 200:
             return None
         feed = d.get("feed", {})
         result_data = Parser.__apply_field_mapping(FEED_FIELD_MAPPING, feed)
@@ -26,10 +26,7 @@ class Parser:
                  for item in d.get("entries", [])[:items_count]]
         for item in items:
             soup = BeautifulSoup(item["item_description"], 'html.parser')
-            item_img_link = soup.find("img").get("src")
-            if not item_img_link:
-                item_img_link = None
-            item["item_img_link"] = item_img_link
+            item["item_img_links"] = [link.get("src") for link in soup.find_all("img") if link.get("src")]
             item["item_description"] = soup.text
 
         result_data["items"] = items

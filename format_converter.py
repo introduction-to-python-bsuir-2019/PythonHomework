@@ -20,7 +20,9 @@ class Converter:
                 strings.append(f"Description: {item.get('item_description')}")
                 strings.append("\n")
                 strings.append(f"Link: {item.get('item_link')}")
-                strings.append(f"Image link: {item.get('item_img_link')}")
+                strings.append("Image links:")
+                for img_link in item.get('item_img_links'):
+                    strings.append(f"{img_link}")
                 strings.append("-" * str_len)
                 strings.append("\n")
         strings.pop()
@@ -31,3 +33,6 @@ class Converter:
         result_string += functools.reduce(lambda a, b: a + b, strings)
 
         return result_string
+
+    def to_json_format(self, str_len=80):
+        return textwrap.fill(json.dumps(self.__feeds, ensure_ascii=False), width=str_len)
