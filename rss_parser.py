@@ -1,4 +1,5 @@
 import feedparser
+from bs4 import BeautifulSoup
 
 FEED_FIELD_MAPPING = {"title": "feed_title",
                       "link": "feed_link"}
@@ -15,18 +16,24 @@ class Parser:
     def __init__(self, url):
         self.url = url
 
-    def parse_feed(self, items=-1):
+    def parse_feed(self, items_count=-1):
         d = feedparser.parse(self.url)
-        feed = d.get("feed", default={})
-        feed_data = Parser.__apply_field_mapping(FEED_FIELD_MAPPING, feed)
-        result_items = []
-        for item in d.get("entries")[:items]:
-            item_data = Parser.__apply_field_mapping(ITEM_FIELD_MAPPING, item)
-            result_item = {}
-            result_item.update(feed_data)
-            result_item.update(item_data)
-            result_items.append(result_item)
-        return result_items
+        if d.status != 200:
+            return None
+        feed = d.get("feed", {})
+        result_data = Parser.__apply_field_mapping(FEED_FIELD_MAPPING, feed)
+        items = [Parser.__apply_field_mapping(ITEM_FIELD_MAPPING, item)
+                 for item in d.get("entries", [])[:items_count]]
+        for item in items:
+            soup = BeautifulSoup(item["item_description"], 'html.parser')
+            item_img_link = soup.find("img").get("src")
+            if not item_img_link:
+                item_img_link = None
+            item["item_img_link"] = item_img_link
+            item["item_description"] = soup.text
+
+        result_data["items"] = items
+        return result_data
 
     @staticmethod
     def __apply_field_mapping(field_mapping, source):
