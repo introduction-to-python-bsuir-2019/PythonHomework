@@ -3,10 +3,11 @@ import argparse
 import logging
 import sys
 import getpass
+from importlib import import_module
 
 from bots.tut import Bot
 from utils.RssInterface import RssException
-
+import bots
 
 python_wiki_rss_url = "http://www.python.org/cgi-bin/moinmoin/" \
                       "RecentChanges?action=rss_rc"
@@ -43,10 +44,19 @@ def logger_init(level=None):
     # coloredlogs.install(level=level, logger=logger)
     return logger
 
+def get_bot_instance(url: str):
+    if url.find('news.yahoo.com/rss') + 1:
+        bot = import_module('bots.yahoo').Bot
+    elif url.find('news.tut.by/rss') + 1:
+        bot = import_module('bots.tut').Bot
+    else:
+        bot = import_module('bots.default').Bot
+    return bot
+
 
 def main(url, logger, limit=10):
-
-    parser = Bot(tut_by_rss, limit, logger)
+    bot = get_bot_instance(url)
+    parser = bot(url, limit, logger)
     try:
         news = parser.get_news()
     except RssException as ex:
