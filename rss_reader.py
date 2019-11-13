@@ -6,20 +6,21 @@ import re
 import json
 import feedparser
 
-parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
-exclusive=parser.add_mutually_exclusive_group()
-parser.add_argument('--json',action='store_true', help='Print result as JSON in stdout')
-parser.add_argument('--verbose',action='store_true',help='Outputs verbose status messages')
-parser.add_argument('--limit', type=int,action='store',help='Limit news topics if this parameter provided')
-exclusive.add_argument('--version',action='store_true',help='Print version info')
-exclusive.add_argument('source',nargs='?',help='RSS URL',default=None)
-args=parser.parse_args()
 
+def parse_arguments():
+    parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
+    exclusive=parser.add_mutually_exclusive_group()
+    parser.add_argument('--json',action='store_true', help='Print result as JSON in stdout')
+    parser.add_argument('--verbose',action='store_true',help='Outputs verbose status messages')
+    parser.add_argument('--limit', type=int,action='store',help='Limit news topics if this parameter provided')
+    exclusive.add_argument('--version',action='store_true',help='Print version info')
+    exclusive.add_argument('source',nargs='?',help='RSS URL',default=None)
+    return parser.parse_args()
 
-version='v1.1'
-err={1: 'You don\'t use --version together with other arguments',
+VERSION='v1.1'
+ERR={1: 'You don\'t use --version together with other arguments',
     2: 'Source or --version expected',
-    3: 'Incorrect limit input (likely to be non-positive input)'}
+    3: 'Incorrect limit input (likely to be non-positive)'}
 
 
 class Error(Exception):
@@ -100,22 +101,26 @@ def print_news(news):
     for item in news:
         item.show_fields()
 
-if args.version and (args.json or args.limit):
-    raise Error(err[1])
-if not (args.version or args.source):
-    raise Error(err[2])
-if args.limit and args.limit<1:
-    raise Error(err[3])
+def main():
+    args=parse_arguments()
+    if args.version and (args.json or args.limit):
+        raise Error(err[1])
+    if not (args.version or args.source):
+        raise Error(err[2])
+    if args.limit and args.limit<1:
+        raise Error(err[3])
+    if args.version:
+        print('RSS-reader '+version)
+    else:
+      #  if ARGS.verbose:
+      #      retrieve_news=verboser(retrieve_news,'retrieving')
+      #      print_news=verboser(print_news,'printing')
+      #      make_json=verboser(make_json,'making JSON')
+        news=retrieve_news(args.source, args.limit)
+        print_news(news)
+        if args.json:
+            make_json(news)
 
-if args.version:
-    print('RSS-reader '+version)
-else:
-    if args.verbose:
-        print_news=verboser(print_news,'printing')
-        retrieve_news=verboser(retrieve_news,'retrieving')
-        make_json=verboser(make_json,'making JSON')
-    news=retrieve_news(args.source,args.limit)
-    print_news(news)
-    if args.json:
-        make_json(news)
+if __name__=='__main__':
+    main()
 
