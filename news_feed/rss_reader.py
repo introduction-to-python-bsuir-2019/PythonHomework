@@ -23,6 +23,7 @@ import xml.etree.ElementTree as ET
 import json
 import csv
 import pandas as pd
+import sqlite3
 
 import argparse
 
@@ -116,7 +117,7 @@ class NewsReader:
             items[num].update(news_description)
 
             if self.cashing:
-                NewsReader._cash_news(items[num])
+                NewsReader._cash_news_sql(items[num])
 
         return items
 
@@ -154,6 +155,44 @@ class NewsReader:
         if not is_unique:
             data = data.append(data_temp)
             data.to_csv(path, index=False)
+
+    @staticmethod
+    def _cash_news_sql(news, dir='news_cash'):
+        conn = sqlite3.connect('database.sqlite')
+
+        date = NewsReader.get_date(news['pubDate'])
+        date = ''.join(str(date).split('-'))
+
+        values = list(news.values())
+        column_names = list(news.keys())
+
+        cursor = conn.cursor()
+
+        print(sqlite3.paramstyle)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS name=? (
+                title varchar(255),
+                link varchar(255),
+                description varchar(1000),
+                imageLink varchar(1000),
+                imageDescription varchar(1000)
+            )
+        """, (date, ))
+
+        cursor.execute("""
+            INSERT INTO ? 
+            VALUES (?, ?, ?, ?, ?)        
+        """, (date,
+              news['title'],
+              news['link'],
+              news['description'],
+              news['imageLink'],
+              news['imageDescription']))
+
+        cursor.close()
+
+
 
     @staticmethod
     def read_by_date(date, dir='news_cash'):
@@ -324,67 +363,67 @@ class NewsReader:
         return json_result
 
 
-# feed = NewsReader('http://rss.cnn.com/rss/edition_world.rss', limit=10, cashing=True)
+feed = NewsReader('http://rss.cnn.com/rss/edition_world.rss', limit=10, cashing=True)
 # items = feed.read_by_date('20190607')
 
 # feed.fancy_output(feed.items)
 
-
-def main():
-    parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
-
-    parser.add_argument('source', type=str, help='RSS URL')
-
-    parser.add_argument('--version', help='Print version info', action='store_true')
-    parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
-    parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
-    parser.add_argument('--cashing', help='Cash news if chosen', action='store_true')
-
-    # TODO: add flags to output logs
-    parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
-    parser.add_argument('--date', type=str, help='Reads cashed news by date. And output them')
-
-    parser.add_argument('--to-pdf', type=str,
-                        help='Read rss by url and write it into pdf. Print file name as input')
-    parser.add_argument('--to-html', type=str,
-                        help='Read rss by url and write it into html. Print file name as input')
-
-    args = parser.parse_args()
-    print(args)
-
-    if args.version:
-        print(PROJECT_VERSION)
-        print(PROJECT_DESCRIPTION)
-
-    if args.json:
-        news = NewsReader(args.source, args.limit, args.verbose)
-
-        print(news.to_json())
-    elif args.date:
-        news = NewsReader(args.source, args.limit, args.verbose)
-        items = news.read_by_date(args.date)
-
-        news.fancy_output(items)
-    elif args.to_pdf:
-        news = NewsReader(args.source, args.limit, args.verbose)
-        it = news.items
-
-        pdf = PdfNewsConverter(it)
-        pdf.add_all_news()
-        pdf.output(args.to_pdf, 'F')
-    elif args.to_html:
-        news = NewsReader(args.source, args.limit, args.verbose)
-        it = news.items
-
-        print('WTF')
-        html_converter = HTMLNewsConverter(it)
-        print(args.to_html)
-        html_converter.output(args.to_html)
-    else:
-        news = NewsReader(args.source, args.limit, args.verbose)
-
-        news.fancy_output(news.items)
-
-
-if __name__ == '__main__':
-    main()
+#
+# def main():
+#     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
+#
+#     parser.add_argument('source', type=str, help='RSS URL')
+#
+#     parser.add_argument('--version', help='Print version info', action='store_true')
+#     parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
+#     parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
+#     parser.add_argument('--cashing', help='Cash news if chosen', action='store_true')
+#
+#     # TODO: add flags to output logs
+#     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+#     parser.add_argument('--date', type=str, help='Reads cashed news by date. And output them')
+#
+#     parser.add_argument('--to-pdf', type=str,
+#                         help='Read rss by url and write it into pdf. Print file name as input')
+#     parser.add_argument('--to-html', type=str,
+#                         help='Read rss by url and write it into html. Print file name as input')
+#
+#     args = parser.parse_args()
+#     print(args)
+#
+#     if args.version:
+#         print(PROJECT_VERSION)
+#         print(PROJECT_DESCRIPTION)
+#
+#     if args.json:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#
+#         print(news.to_json())
+#     elif args.date:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#         items = news.read_by_date(args.date)
+#
+#         news.fancy_output(items)
+#     elif args.to_pdf:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#         it = news.items
+#
+#         pdf = PdfNewsConverter(it)
+#         pdf.add_all_news()
+#         pdf.output(args.to_pdf, 'F')
+#     elif args.to_html:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#         it = news.items
+#
+#         print('WTF')
+#         html_converter = HTMLNewsConverter(it)
+#         print(args.to_html)
+#         html_converter.output(args.to_html)
+#     else:
+#         news = NewsReader(args.source, args.limit, args.verbose)
+#
+#         news.fancy_output(news.items)
+#
+#
+# if __name__ == '__main__':
+#     main()
