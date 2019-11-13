@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
+
 """
-Module Docstring
+Simple RSS reader
 """
 
 __author__ = "DiSonDS"
