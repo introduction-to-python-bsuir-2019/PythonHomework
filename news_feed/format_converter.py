@@ -48,7 +48,11 @@ class PdfNewsConverter(FPDF):
         self.cell(100)
         self.ln(20)
 
-        header = self.items['title']
+        try:
+            header = self.items['title']
+        except KeyError:
+            header = ''
+
         self.cell(w=0, h=10,
                   txt=header, align='C', ln=2)
 
@@ -104,8 +108,8 @@ class PdfNewsConverter(FPDF):
         :return: new-encoded text
         """
 
-        return txt.encode('latin-1',
-                          'replace').decode('latin-1')
+        return str(txt).encode('latin-1',
+                               'replace').decode('latin-1')
 
     def add_news_page(self, item):
         """

@@ -103,6 +103,9 @@ venv.bak/
 
 #pycharm configs
 .idea/
+.build/
+.dist/
+.news_feed.egg-info/
 
 #project files
 *.csv
