@@ -3,14 +3,14 @@ import json
 
 
 class RSSreader:
-    def __init__(self):
-        pass
+    def __init__(self, args):
+        self.args = args
 
-    def get_feed(self, args):
-        NewsFeed = feedparser.parse(args.url)
+    def get_feed(self):
+        NewsFeed = feedparser.parse(self.args.get_args().url)
         print(NewsFeed.entries[0].keys())
         print('Number of RSS posts:', len(NewsFeed.entries), end='\n\n')
-        return NewsFeed.entries[:args.limit]
+        return NewsFeed.entries[:self.args.get_args().limit]
 
     def print_feed(self, entries):
         for entry in entries:
