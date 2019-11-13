@@ -1,6 +1,7 @@
 import feedparser
 import re
 from rssConverter.New import New
+from rssConverter.Exeptions import RssGetError, IncorrectLimit
 
 
 class RssConverter:
@@ -13,14 +14,14 @@ class RssConverter:
         if result['entries'] and result.status == 200:
             return result['entries']
         else:
-            raise Exception("something wrong with with url. Please check url and try later ")
+            raise RssGetError("url")
 
     def get_limited_news(self, dict_list, limit):
         news_quantity = len(dict_list)
         if limit is None:
             limit = news_quantity
         elif limit > news_quantity:
-            raise
+            raise IncorrectLimit(news_quantity)
         return dict_list[:limit]
 
     def parse_news(self, dict_list):

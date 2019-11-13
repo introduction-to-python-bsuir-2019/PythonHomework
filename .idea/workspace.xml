@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0226338d-3a13-4922-828e-85ee018d61c6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/rssConverter/Exeptions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rssConverter/RssConverter.py" beforeDir="false" afterPath="$PROJECT_DIR$/rssConverter/RssConverter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rssConverter/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/rssConverter/main.py" afterDir="false" />
@@ -25,7 +24,7 @@
   </component>
   <component name="ProjectId" id="1SmoHrTwimRzI2Gzgr9CUPgqRpx" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../arduinoCourseWork" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">

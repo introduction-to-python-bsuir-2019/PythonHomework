@@ -21,21 +21,28 @@ def main():
     )
     parser.add_argument(
         '--version',
-        type=int,
-        help=' Print version info'
+        action="store_true",
+        help=' Print version info',
+        default=False
     )
     parser.add_argument(
         '--json',
+        action="store_true",
         help='Print result as JSON in stdout',
         default=False
     )
     parser.add_argument(
         '--verbose',
+        action="store_true",
         help='Outputs verbose status messages',
         default=False
     )
     args = parser.parse_args()
     logger = logging.getLogger('rss_converter')
+    file_handler = logging.FileHandler(log_file)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
     logger.setLevel(logging.INFO)
     logger.info('Start')
     rss = RssConverter()
@@ -47,13 +54,13 @@ def main():
             news_list = rss.parse_news(not_parsed_news)
             logger.info("parse rss to news list")
             logger.info("print news")
-            rss.print_news(news_list, args.limit if args.limit else args.l)
+            rss.print_news(news_list, args.limit)
             logger.info("news are printed")
             if args.version:
-                pass
+                print(current_version)
             if args.json:
                 logger.info("print json")
-                rss.in_json_format(news_list, args.limit if args.limit else args.l)
+                rss.in_json_format(news_list, args.limit)
                 logger.info("json is printed")
             if args.verbose:
                 with open(log_file) as log_file:
