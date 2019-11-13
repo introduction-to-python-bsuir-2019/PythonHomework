@@ -23,6 +23,7 @@ import xml.etree.ElementTree as ET
 import json
 import csv
 import pandas as pd
+import sqlite3
 
 import argparse
 
@@ -116,7 +117,7 @@ class NewsReader:
             items[num].update(news_description)
 
             if self.cashing:
-                NewsReader._cash_news(items[num])
+                NewsReader._cash_news_sql(items[num])
 
         return items
 
@@ -154,6 +155,77 @@ class NewsReader:
         if not is_unique:
             data = data.append(data_temp)
             data.to_csv(path, index=False)
+
+    @staticmethod
+    def _cash_news_sql(news, dir='news_cash'):
+        conn = sqlite3.connect('database.sqlite')
+
+        date = NewsReader.get_date(news['pubDate'])
+        date_id = ''.join(str(date).split('-'))
+
+        values = list(news.values())
+        column_names = list(news.keys())
+
+        cursor = conn.cursor()
+
+        # TODO: do something with unique values, because UNIQUE isn't really cool
+
+        cursor.execute("""  
+            CREATE TABLE IF NOT EXISTS news(
+                dateId int NOT NULL,
+                pubDate varchar(255),
+                title varchar(255) UNIQUE,
+                link varchar(255),
+                description varchar(1000),
+                imageLink varchar(1000),
+                imageDescription varchar(1000)
+            );
+        """)  # is not secure?!
+
+        try:
+            cursor.execute("""
+                INSERT INTO news
+                VALUES (:dateId, :pubDate, :title, :link, :description, :imageLink, :imageDescription)        
+            """, {'dateId': date_id,
+                  'pubDate': date,
+                  'title': news['title'],
+                  'link': news['link'],
+                  'description': news['description'],
+                  'imageLink': news['imageLink'],
+                  'imageDescription': news['imageDescription']})
+        except sqlite3.IntegrityError:
+            pass
+
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def read_by_date_sql(date, dir='news_cash'):
+        conn = sqlite3.connect('database.sqlite')
+
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT *
+            FROM news
+            WHERE dateId=:date
+        """, (date, ))
+
+        data = cursor.fetchall()
+
+        headers = list(map(lambda x: x[0], cursor.description))
+        print(headers)
+
+        result = dict()
+        for index, row in enumerate(data):
+            result.setdefault(index, dict())
+
+            result[index] = dict(zip(headers, row))
+
+        cursor.close()
+        conn.close()
+
+        return result
 
     @staticmethod
     def read_by_date(date, dir='news_cash'):
@@ -324,11 +396,13 @@ class NewsReader:
         return json_result
 
 
-# feed = NewsReader('http://rss.cnn.com/rss/edition_world.rss', limit=10, cashing=True)
-# items = feed.read_by_date('20190607')
+feed = NewsReader('https://news.yahoo.com/rss/', limit=10, cashing=True)
+items = feed.read_by_date_sql('20191112')
 
-# feed.fancy_output(feed.items)
+print(items)
+feed.fancy_output(items)
 
+print(items)
 
 def main():
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')

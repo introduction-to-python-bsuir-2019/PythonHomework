@@ -110,6 +110,8 @@ venv.bak/
 *.png
 *.pdf
 *.html
+*.sql*
+
 
 # mypy
 .mypy_cache/
