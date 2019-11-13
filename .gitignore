@@ -105,3 +105,4 @@ venv.bak/
 
 # IDE
 .idea
+rss_reader.py
