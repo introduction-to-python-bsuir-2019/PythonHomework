@@ -1,23 +1,7 @@
-import requests
-import base64
-import shutil
-
 import xml.etree.ElementTree as tree
 import xml.dom.minidom as minidom
 
-
-def _get_image_as_base64(image_url: str) -> str:
-	resp = requests.get(image_url, stream=True)
-
-	with open('temp_img', 'wb') as img:
-		resp.raw.decode_content = True
-		shutil.copyfileobj(resp.raw, img)
-
-	with open('temp_img', 'rb') as img:
-		encode_str = base64.b64encode(img.read())
-
-	return encode_str.decode('ascii')
-
+from image_handler import get_image_as_base64
 
 class FB2:
 	''''''
@@ -36,13 +20,13 @@ class FB2:
 		return (tree.tostring(self.root)).decode('ascii')
 
 
-	def write_to_file(self, filename):
-		with open(filename, 'w') as file:
+	def write_to_file(self, filepath: str) -> None:
+		with open(filepath, 'w') as file:
 			file.write(self.create_xml_as_string())
 
-		pretty_string = minidom.parse(filename).toprettyxml()
+		pretty_string = minidom.parse(filepath).toprettyxml()
 		
-		with open(filename, 'w') as file:
+		with open(filepath, 'w') as file:
 			file.write(pretty_string)
 
 
@@ -53,7 +37,7 @@ class FB2:
 		binary = tree.SubElement(self.root, 'binary')
 		binary.set('id', image_name)
 		binary.set('content-type', 'image/png')
-		binary.text = _get_image_as_base64(image_url)
+		binary.text = get_image_as_base64(image_url)
 
 
 	def add_description_of_resource(self, title_info, subtitle_info, image_url):

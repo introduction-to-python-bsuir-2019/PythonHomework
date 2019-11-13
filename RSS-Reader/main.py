@@ -122,14 +122,11 @@ if __name__ == "__main__":
             news = rss_reader.get_news_as_json(limit=limit)
             print(news)
         elif args.to_fb2 is not None:
-            rss_reader.get_news_as_fb2(limit=limit, filename=args.to_fb2)
+            # rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
+            rss_reader.get_news_as_pdf(limit=limit, filepath='test.pdf')
         else:
             news = rss_reader.get_news_as_string(limit=limit)
             print(news)
-
-        # rss_reader.get_news_as_fb2()
-
-        # print(news)
         logger.info(CORRECT_END_LOG)
     elif args.date is not None:
         logger.info(f'Getting cashed news by date: {args.date}')
