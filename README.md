@@ -1,5 +1,5 @@
-##It is a one-shot command-line RSS reader by Zviger.
-###User interface
+## It is a one-shot command-line RSS reader by Zviger.
+### User interface
 ```text
 usage: frbz.py [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] source
 
@@ -16,7 +16,7 @@ optional arguments:
   --length LENGTH       Sets the length of each line of news output
 ```
 
-###Json structure
+### Json structure
 ```json
 [
   {
