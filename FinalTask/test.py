@@ -12,5 +12,5 @@ class RssReaderTest(unittest.TestCase):
     def test_to_json(self, limit):
         pass
 
-    def output(self, json_param, limit):
-        pass 
+    def test_output(self, json_param, limit):
+        pass

@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import feedparser
+import logging
 import json
 
 
@@ -24,10 +25,7 @@ class RssHandler:
     def url_handler(self):
         """Takes URL and return rss object"""
         self.feed = feedparser.parse(self.rss)
-        try:
-            self.feed.status
-        except KeyError:
-            raise Exception("There is no such URL!")
+        logging.info("RSS-Feed was parsed.")
 
     def rss_dict(self):
         """Make dictionary from RSS-Feed"""
@@ -42,17 +40,21 @@ class RssHandler:
                                           'text': soup.get_text(), 'links': links,
                                            'media': media, 'src_link': descr['link']})
 
+        logging.info('Created dictionary from parsed RSS-Feed.')
+
     def to_json(self, limit):
         """Make JSON file from RSS"""
         json_dict = self.feed_dict.copy()
         json_dict['news']
         if limit is not None: del(json_dict['news'][limit:])
         self.json_feed = json.dumps(json_dict, cls=SetEncoder)
+        logging.info('Created JSON object from dictionary.')
 
     def output(self, json_param, limit):
         """Outputs information in stdout"""
+        logging.info('Printing RSS-Feed in stdout.')
         if not json_param:
-            print(f"Feed: {self.feed_dict['source']}")
+            print(f"\nFeed: {self.feed_dict['source']}")
             for elem in self.feed_dict['news']:
                 if self.feed_dict['news'].index(elem) == limit:
                     break
@@ -70,5 +72,6 @@ Source link: {elem['src_link']}
                     print(f'[{count + 1}]{link}')
                 print('-'*80)
         else:
+            logging.info('Printing JSON object created from RSS-Feed in stdout.')
             self.to_json(limit)
             print(self.json_feed)

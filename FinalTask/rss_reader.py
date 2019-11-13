@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import logging
 from RSSHandle import RssHandler
 
 
@@ -13,9 +14,8 @@ if __name__ == '__main__':
                         help='RSS URL')
 
     parser.add_argument('--version',
-                        action='version',
-                        help='Print version info',
-                        version='%(prog)s 1.0')
+                        action='store_true',
+                        help='Print version info')
 
     parser.add_argument('--json',
                         action='store_true',
@@ -31,6 +31,12 @@ if __name__ == '__main__':
                         help='Limit news topics if this parameter provided')
 
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+    if args.version:
+        print('\nRSS-Reader v1.0\n')
 
     rss_object = RssHandler(args.source)
 
