@@ -40,7 +40,6 @@ class RssConverter:
                         for link in value:
                             links[link.get('type', '')] = link.get('href', '')
                         new.items['links'] = links
-
                     else:
                         new.items[key] = value
             news_list.append(new)

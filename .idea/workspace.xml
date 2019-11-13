@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0226338d-3a13-4922-828e-85ee018d61c6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/rssConverter/DataSafer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rssConverter/Exeptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/rssConverter/Exeptions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rssConverter/RssConverter.py" beforeDir="false" afterPath="$PROJECT_DIR$/rssConverter/RssConverter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rssConverter/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/rssConverter/main.py" afterDir="false" />
     </list>
