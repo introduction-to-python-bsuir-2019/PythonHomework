@@ -2,18 +2,11 @@ import requests
 import base64
 import shutil
 
-
-ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.to_fb2_converter'
-
-
-binary = ''
+import xml.etree.ElementTree as tree
+import xml.dom.minidom as minidom
 
 
 def _get_image_as_base64(image_url: str) -> str:
-	logger = logging.getLogger(MODULE_LOGGER_NAME + '._get_image_as_base64')
-	logger.info('Getting base64-code of image')
-
 	resp = requests.get(image_url, stream=True)
 
 	with open('temp_img', 'wb') as img:
@@ -26,69 +19,82 @@ def _get_image_as_base64(image_url: str) -> str:
 	return encode_str.decode('ascii')
 
 
-def _add_image_binary(image_url: str, image_name: str) -> None:
-	logger = logging.getLogger(MODULE_LOGGER_NAME + '._add_image_binary')
-	logger.info('Add base64-code of image to binary-block')
+class FB2:
+	''''''
 
-	global binary
-	binary += f'''<binary id="{image_name}" content-type="image/png">{_get_image_as_base64(image_url)}</binary>'''
+	def __init__(self):
+		self.root = tree.Element('FictionBook')
+		self.root.set('xmlns:l', "http://www.w3.org/1999/xlink")
 
+		self.description = tree.SubElement(self.root, 'description')
+		self.body = tree.SubElement(self.root, 'body')
 
-def header(title: str, subtitle: str, image_url: str) -> str:
-	logger = logging.getLogger(MODULE_LOGGER_NAME + '.header')
-	logger.info('Return header of xml(fb2) format')
-
-	image_name = 'cover.png'
-	_add_image(image_url, image_name)
-	return f'''
-	<FictionBook  xmlns:l="http://www.w3.org/1999/xlink">
-	<description>
-	</description>
-	<body>
-	<title>
-	<p>NEWS BY {title}</p>
-	</title>
-	<p>{subtitle}</p>
-	<image l:href="#{image_name}"/>
-	'''
+		self.image_iter = 0
 
 
-def tail() -> str:
-	logger = logging.getLogger(MODULE_LOGGER_NAME + '.tail')
-	logger.info('Return tail of xml(fb2) format')
-
-	return f'''
-	</body>
-	{binary}
-	</FictionBook>'''
+	def create_xml_as_string(self):
+		return (tree.tostring(self.root)).decode('ascii')
 
 
-img_iter = -1
+	def write_to_file(self, filename):
+		with open(filename, 'w') as file:
+			file.write(self.create_xml_as_string())
+
+		pretty_string = minidom.parse(filename).toprettyxml()
+		
+		with open(filename, 'w') as file:
+			file.write(pretty_string)
 
 
-def section(title: str, date: str, content: str, link: str, image_url: str) -> str:
-	logger = logging.getLogger(MODULE_LOGGER_NAME + '.section')
-	logger.info('Return section of xml(fb2) format')
-	
-	global img_iter
-	img_iter += 1
+	def _add_image_binary(self, image_url: str, image_name: str):
+		if image_url == '' or image_url == None:
+			return
 
-	try:
-		_add_image_binary(image_url, f'img{img_iter}.png')
-	except requests.exceptions.MissingSchema:
-		pass
+		binary = tree.SubElement(self.root, 'binary')
+		binary.set('id', image_name)
+		binary.set('content-type', 'image/png')
+		binary.text = _get_image_as_base64(image_url)
 
-	return f'''
-	<section>
-	<title>
-	<p>{title}</p>
-	</title>
-	<p>{date}</p>
-	<p>{link}</p>
-	<empty-line/>
-	<image l:href="#img{img_iter}.png"/>
-	<empty-line/>
-	<p>{content}</p>
-	<empty-line/>
-	</section>
-	'''
+
+	def add_description_of_resource(self, title_info, subtitle_info, image_url):
+		title = tree.SubElement(self.body, 'title')
+
+		title_descr = tree.SubElement(title, 'p')
+		subtitle_descr = tree.SubElement(self.body, 'p')
+
+		title_descr.text = title_info
+		subtitle_descr.text = subtitle_info
+
+		self._add_image(self.body, image_url, 'cover.png')
+
+
+	def _add_tag_p(self, parent, text):
+		p = tree.SubElement(parent, 'p')
+		p.text = text
+
+
+	def _add_tag_emptyline(self, parent):
+		tree.SubElement(parent, 'empty-line')
+
+
+	def _add_image(self, parent, img_url, img_name):
+		image = tree.SubElement(parent, 'image')
+		image.set('l:href', '#' + img_name)
+
+		self._add_image_binary(img_url, img_name)
+
+
+	def add_section(self, title_info, date, link, img_link, content):
+		section = tree.SubElement(self.body, 'section')
+		title = tree.SubElement(section, 'title')
+		
+		self._add_tag_p(title, title_info)
+		self._add_tag_p(section, date)
+		self._add_tag_p(section, link)
+		self._add_tag_emptyline(section)
+		self._add_image(section, img_link, ('img' + str(self.image_iter) + '.png'))
+		self._add_tag_emptyline(section)
+		self._add_tag_p(section, content)
+
+		self.image_iter += 1
+

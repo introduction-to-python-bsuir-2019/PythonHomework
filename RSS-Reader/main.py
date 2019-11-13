@@ -122,8 +122,7 @@ if __name__ == "__main__":
             news = rss_reader.get_news_as_json(limit=limit)
             print(news)
         elif args.to_fb2 is not None:
-            with open(args.to_fb2, 'w+') as fb2_file:
-                fb2_file.write(rss_reader.get_news_as_fb2(limit=limit))
+            rss_reader.get_news_as_fb2(limit=limit, filename=args.to_fb2)
         else:
             news = rss_reader.get_news_as_string(limit=limit)
             print(news)

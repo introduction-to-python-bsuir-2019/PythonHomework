@@ -178,7 +178,7 @@ class RssReader:
 		return json.dumps(self.rss, indent=4)
 
 
-	def get_news_as_fb2(self, limit: int=0) -> str:
+	def get_news_as_fb2(self, filename: str, limit: int=0) -> str:
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.get_news_as_fb2')
 		logger.info('Converting news to .fb2 format')		
 		
@@ -187,30 +187,31 @@ class RssReader:
 		if limit == 0:
 			limit = len(self.rss.entries)		
 
-		sections = ''
+		fb2 = to_fb2_converter.FB2()
+
+		fb2.add_description_of_resource(self._get_feed_title(),
+										self._get_feed_subtitle(),
+										self._get_feed_image_url()
+										)
+
 		for piece_of_news in news_list:
 			if limit == 0:
 				break
-
-			sections += to_fb2_converter.section(
-				title=piece_of_news[KEYWORD_TITLE],
-				date=piece_of_news[KEYWORD_DATE],
-				content=piece_of_news[KEYWORD_CONTENT],
-				link=piece_of_news[KEYWORD_LINK],
-				image_url=piece_of_news[KEYWORD_IMG_LINK]
-				)
+			fb2.add_section(
+			title_info=piece_of_news[KEYWORD_TITLE],
+			date=piece_of_news[KEYWORD_DATE],
+			content=piece_of_news[KEYWORD_CONTENT],
+			link=piece_of_news[KEYWORD_LINK],
+			img_link=piece_of_news[KEYWORD_IMG_LINK]
+			)
 
 			limit -= 1
 
-		result = to_fb2_converter.header(title=self._get_feed_title(),
-										subtitle=self._get_feed_subtitle(),
-										image_url=self._get_feed_image_url()
-										)
-		result += sections
-		result += to_fb2_converter.tail()
-		result = result.replace('&', 'and')
+		# print(fb2.create_xml_as_string())
 
-		return result
+		fb2.write_to_file(filename)
+
+		# return result
 
 		# with open('newsV1.fb2', 'w+') as file:
 		# 	file.write(result)
