@@ -26,6 +26,7 @@ import pandas as pd
 import sqlite3
 
 import argparse
+import logging
 
 from format_converter import PdfNewsConverter, HTMLNewsConverter
 
@@ -45,7 +46,7 @@ class NewsReader:
         :param: url
     """
 
-    def __init__(self, url, limit=None, verbose=False, cashing=False):
+    def __init__(self, url, limit=None, caching=False):
         """
 
         :param url: url of rss
@@ -54,8 +55,7 @@ class NewsReader:
 
         self.url = url
         self.limit = limit
-        self.verbose = verbose
-        self.cashing = cashing
+        self.cashing = caching
 
         self.items = self.get_news()
 
@@ -70,14 +70,15 @@ class NewsReader:
         try:
             request = requests.get(self.url)
         except requests.exceptions.MissingSchema:
-            print(f'Invalid URL: {self.url}. Paste items by yourself.')
+            logging.warning(f'Invalid URL: {self.url}. Paste items by yourself.')
             return None
 
         if not request.ok:
             raise requests.exceptions.InvalidURL(f'You URL is invalid. Status code: {request.status_code}')
+        else:
+            logging.info('URL is valid, news were collected')
 
-        if self.verbose:
-            print(request.status_code)  # TODO: create understandable error status output
+        logging.info(f'Status code: {request.status_code}')  # TODO: create understandable error status output
 
         result = request.text
         tree = ET.fromstring(result)
@@ -117,7 +118,11 @@ class NewsReader:
             items[num].update(news_description)
 
             if self.cashing:
-                NewsReader._cash_news_sql(items[num])
+                conn = sqlite3.connect('database.sqlite')
+                NewsReader._cash_news_sql(items[num], conn)
+                conn.close()
+
+        logging.info('Dictionary from rss-feed was created')
 
         return items
 
@@ -157,8 +162,18 @@ class NewsReader:
             data.to_csv(path, index=False)
 
     @staticmethod
-    def _cash_news_sql(news, dir='news_cash'):
-        conn = sqlite3.connect('database.sqlite')
+    def _cash_news_sql(news, connection, dir='news_cash'):
+        """
+        Cashes news into sql database format by publication date
+        into given directory
+
+        !Important: connection to database was added for memory saving
+
+        :param news: dictionary of given news
+        :param connection: connection to sql database
+        :param dir: directory into which we save news
+        :return: None
+        """
 
         date = NewsReader.get_date(news['pubDate'])
         date_id = ''.join(str(date).split('-'))
@@ -166,7 +181,7 @@ class NewsReader:
         values = list(news.values())
         column_names = list(news.keys())
 
-        cursor = conn.cursor()
+        cursor = connection.cursor()
 
         # TODO: do something with unique values, because UNIQUE isn't really cool
 
@@ -196,11 +211,20 @@ class NewsReader:
         except sqlite3.IntegrityError:
             pass
 
-        conn.commit()
-        conn.close()
+        cursor.close()
+        connection.commit()
 
     @staticmethod
     def read_by_date_sql(date, dir='news_cash'):
+        """
+        Reads news from sql database by given date
+        from given directory
+
+        :param date: news date
+        :param dir: directory from which we get news
+        :return: dictionary of news
+        """
+
         conn = sqlite3.connect('database.sqlite')
 
         cursor = conn.cursor()
@@ -369,8 +393,7 @@ class NewsReader:
         :return: None
         """
 
-        if self.verbose:
-            print('News feed is ready')
+        logging.info(print('News feed is ready'))
 
         for key, value in items.items():
             if key == 'title':
@@ -380,7 +403,8 @@ class NewsReader:
 
             print('_' * 100)
 
-    def to_json(self):
+    @staticmethod
+    def to_json(items):
         """
         Convert self.items (all news description)
         into json format
@@ -388,21 +412,21 @@ class NewsReader:
         :return: json format news
         """
 
-        if self.verbose:
-            print('Json was created')
+        logging.info('Json was created')
 
-        json_result = json.dumps(self.items)
+        json_result = json.dumps(items)
 
         return json_result
 
 
-feed = NewsReader('https://news.yahoo.com/rss/', limit=10, cashing=True)
-items = feed.read_by_date_sql('20191112')
+# feed = NewsReader('https://news.yahoo.com/rss/', limit=10, cashing=True)
+# items = feed.read_by_date_sql('20191112')
+#
+# print(items)
+# feed.fancy_output(items)
+#
+# print(items)
 
-print(items)
-feed.fancy_output(items)
-
-print(items)
 
 def main():
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
@@ -412,7 +436,7 @@ def main():
     parser.add_argument('--version', help='Print version info', action='store_true')
     parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
     parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
-    parser.add_argument('--cashing', help='Cash news if chosen', action='store_true')
+    parser.add_argument('--caching', help='Cache news if chosen', action='store_true')
 
     # TODO: add flags to output logs
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
@@ -424,38 +448,46 @@ def main():
                         help='Read rss by url and write it into html. Print file name as input')
 
     args = parser.parse_args()
-    print(args)
 
     if args.version:
         print(PROJECT_VERSION)
         print(PROJECT_DESCRIPTION)
 
-    if args.json:
-        news = NewsReader(args.source, args.limit, args.verbose)
+    if args.verbose:
+        logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s',
+                            level=logging.DEBUG)
+    else:
+        # logging.basicConfig()
+        pass
 
-        print(news.to_json())
+    if args.json:
+        news = NewsReader(args.source, args.limit, args.caching)
+
+        if args.date:
+            print(news.to_json(news.read_by_date_sql(args.date)))
+        else:
+            print(news.to_json(news))
+
     elif args.date:
-        news = NewsReader(args.source, args.limit, args.verbose)
-        items = news.read_by_date(args.date)
+        news = NewsReader(args.source, args.limit, args.caching)
+        items = news.read_by_date_sql(args.date)
 
         news.fancy_output(items)
     elif args.to_pdf:
-        news = NewsReader(args.source, args.limit, args.verbose)
+        news = NewsReader(args.source, args.limit, args.caching)
         it = news.items
 
         pdf = PdfNewsConverter(it)
         pdf.add_all_news()
         pdf.output(args.to_pdf, 'F')
     elif args.to_html:
-        news = NewsReader(args.source, args.limit, args.verbose)
+        news = NewsReader(args.source, args.limit, args.caching)
         it = news.items
 
-        print('WTF')
         html_converter = HTMLNewsConverter(it)
-        print(args.to_html)
         html_converter.output(args.to_html)
     else:
-        news = NewsReader(args.source, args.limit, args.verbose)
+        news = NewsReader(args.source, args.limit, args.caching)
 
         news.fancy_output(news.items)
 
