@@ -27,7 +27,11 @@
 		"images": 
 		{
 			"description": "List of links to related images",
-			"type": "array"
+			"type": "array",
+			"items":
+			{
+				"type": "string"
+			}
 		}
 	}
 }

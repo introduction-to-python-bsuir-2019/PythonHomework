@@ -4,6 +4,7 @@ import html
 from bs4 import BeautifulSoup
 import re
 import json
+import feedparser
 
 parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
 exclusive=parser.add_mutually_exclusive_group()
@@ -15,10 +16,10 @@ exclusive.add_argument('source',nargs='?',help='RSS URL',default=None)
 args=parser.parse_args()
 
 
-version='v1.0'
+version='v1.1'
 err={1: 'You don\'t use --version together with other arguments',
     2: 'Source or --version expected',
-    3: 'Incorrect limit input'}
+    3: 'Incorrect limit input (likely to be non-positive input)'}
 
 
 class Error(Exception):
@@ -27,12 +28,18 @@ class Error(Exception):
 
 
 class News:
-    def __init__(self,wall_of_text):
-        self.title=convert_to_readable(wall_of_text,'title',False)
-        self.source=convert_to_readable(wall_of_text,'link/',True)
-        self.date=convert_to_readable(wall_of_text,'pubdate',False)
-        self.content=convert_to_readable(wall_of_text,'description',False)
-        self.images=convert_to_readable(wall_of_text,'<img',True)
+    def __init__(self,content,soup):
+        self.title=ultimately_unescape(content['title'])
+        self.source=ultimately_unescape(content['link'])
+        self.date=ultimately_unescape(content['published'])
+        self.content=ultimately_unescape(clear_tags(content['summary']))
+        self.images=[ultimately_unescape(link['href']) for link in content['links'] if 'image' in link['type']]
+        self.images+=find_images(ultimately_unescape(str(soup)))
+        try:
+            self.images+=[media['url'] for media in content['media_content'] if 'image' in media['type']]
+        except KeyError:
+            pass
+        self.images=[image for index, image in enumerate(self.images) if self.images.index(image)==index]
 
     def show_fields(self):
         print('\n\n'+'Title: '+self.title)
@@ -52,43 +59,35 @@ def verboser(func,action):
         return result
     return wrapper
 
-def ultimately_unescape(str):
-    while html.unescape(str)!=str:
-        str=html.unescape(str)
-    return str
+def ultimately_unescape(text):
+    while html.unescape(text)!=text:
+        text=html.unescape(text)
+    return text
 
-def convert_to_readable(text,tag_name,is_link):
-    text=ultimately_unescape(str(text))
-    if not is_link:
-        cutfrom=text.find(tag_name)+len(tag_name)+1
-        cutto=text.find('/'+tag_name,cutfrom)-1
-        text=text[cutfrom:cutto]
-        text=cut_tags(text)
-        return text
-    if tag_name=='link/':
-        cutfrom=text.find(tag_name)+len(tag_name)+1
-        cutto=text.find('<',cutfrom)
-        return text[cutfrom:cutto]
-    links=re.finditer(tag_name,text)
-    links=[image.start() for image in links]
-    indexes=[text.find('src',image) for image in links]
-    return list(set(text[index+5:text.find('"',index+5)] for index in indexes))
+def find_images(text):
+    res=[]
+    occurences=re.finditer('<img',text)
+    tags=[(text.rfind('<',0,item.start()+2),text.find('>',item.start()+2)) for item in occurences]
+    where_links_start=[text.find('src',start,end)+5 for start, end in tags]
+    borders=[(start,text.find('"',start)) for start in where_links_start]
+    res+=[text[opener:closer] for opener, closer in borders]
+    return res
 
-def cut_tags(text):
+def clear_tags(text):
     while text.find('<')>-1 and text.find('>')>-1:
         text=text.replace(text[text.find('<'):text.find('>')+1],'')
     return text
 
-
 def retrieve_news(link, limit):
+    feed=feedparser.parse(link)
     soup=requests.get(link).text
     soup=BeautifulSoup(soup,"html5lib")
-    title=convert_to_readable(soup,'title',False)
-    print('\nSource: '+title)
-    content=soup('item')
+    news_separated=soup('item')
+    print('\nSource: '+feed['feed']['title'])
+    newsdict=feed['entries']
     news=[]
-    for item in (content[:min(limit,len(content))] if limit else content):
-        news.append(News(item))
+    for index, item in (enumerate(newsdict[:min(limit,len(newsdict))]) if limit else enumerate(newsdict)):
+        news.append(News(item,news_separated[index]))
     return news
 
 
@@ -96,16 +95,10 @@ def make_json(news):
     with open('news.json','w') as filer:
         for item in news:
             json.dump(item.__dict__,filer)
-#    with open('news.json','w') as filer:
-#        for item in news:
-#           json.dumps(news,item.__dict__) 
-
-
 
 def print_news(news):
     for item in news:
         item.show_fields()
-
 
 if args.version and (args.json or args.limit):
     raise Error(err[1])
@@ -115,7 +108,7 @@ if args.limit and args.limit<1:
     raise Error(err[3])
 
 if args.version:
-    print('Current version of RSS-reader: '+version)
+    print('RSS-reader '+version)
 else:
     if args.verbose:
         print_news=verboser(print_news,'printing')
