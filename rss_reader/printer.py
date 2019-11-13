@@ -1,19 +1,19 @@
-import pprint
-
-
 class Printer:
     ''' Class for all output operations '''
     def stdout_print(self, feed, limit):
         ''' Print feed to cmd'''
-        print(f'\nFeed: {feed["feed_name"]}\n')
+        print(f'\nFeed: {feed["feed_name"]}\nFeed date: {feed["feed_date"]}\n')
         for article in feed['articles'][:limit]:
-            links = ''
-            num = 1
-            for link in article.media['links']:
-                links += '[{}]: {} (link)\n'.format(num, link)
-                num += 1
-            for image in article.media['images']:
-                links += '[{}]: {} (image)\n'.format(num, image['source_url'])
+            if not article.media['links'] and not article.media['images']:
+                links = 'No links'
+            else:
+                links = ''
+                counter = 1
+                for link in article.media['links']:
+                    links += '[{}]: {} (link)\n'.format(counter, link)
+                    counter += 1
+                for image in article.media['images']:
+                    links += '[{}]: {} (image)\n'.format(counter, image['source_url'])
             print('Title: {}\nDate: {}\nLink: {}\n\n{}\n\n\nLinks:\n{}'.format(article.title,
                                                                                article.date,
                                                                                article.link,
