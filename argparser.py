@@ -18,6 +18,11 @@ class ArgParser:
             default=None,
             help='Sets a limit for news output (default - no limit)'
         )
+        argparser.add_argument(
+            '--json',
+            action='store_true',
+            help='Prints feed in JSON format in stdout'
+        )
         args = argparser.parse_args()
         return args
 

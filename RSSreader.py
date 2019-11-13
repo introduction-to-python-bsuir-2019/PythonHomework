@@ -1,4 +1,5 @@
 import feedparser
+import json
 
 
 class RSSreader:
@@ -18,4 +19,16 @@ class RSSreader:
             print(f'Published: {entry.published}', end='\n\n')
             print(f'Summary: {entry.summary}', end='\n\n')
             print(f'Link: {entry.link}')
+            print('========================================================')
+
+    def print_feed_json(self, entries):
+        for entry in entries:
+            feed = {
+                'Title': entry.title,
+                'Published': entry.published,
+                'Summary': entry.summary,
+                'Link': entry.link,
+            }
+            print('========================================================')
+            print(json.dumps(feed, indent=2))
             print('========================================================')
