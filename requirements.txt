@@ -1,3 +1,4 @@
 feedparser  # rss parsing
 requests  # http requests
+bs4 # for xml and html
 # colorama  # colored output

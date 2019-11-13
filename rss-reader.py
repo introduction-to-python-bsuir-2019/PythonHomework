@@ -15,6 +15,7 @@ import requests
 import time
 import logging
 import json
+import bs4
 
 # from colorama import init  # for colorizing https://pypi.org/project/colorama/
 # init(autoreset=True)
@@ -32,9 +33,9 @@ class RSSFeed:
         """ Converts rss feed to json """
         logging.info("Converting rss feed to json")
         if entries:
-            return json.dumps({"title": self.title, "entries": entries})
+            return json.dumps({"feed": self.title, "entries": entries})
         else:
-            return json.dumps({"title": self.title, "entries": self.entries})
+            return json.dumps({"feed": self.title, "entries": self.entries})
 
     def get_rss(self):
         """ Gets rss feed by source """
@@ -50,7 +51,7 @@ class RSSFeed:
                 "title": entry.title,
                 "date": time.strftime('%Y-%m-%dT%H:%M:%SZ', entry.published_parsed),
                 "link": entry.link,
-                "summary": entry.summary
+                "summary": bs4.BeautifulSoup(entry.summary, "html.parser").text
             })
 
     def print_rss(self, limit, is_json=False):
@@ -68,11 +69,11 @@ class RSSFeed:
             entries = self._get_rss_in_json(entries)
             print(entries)
         else:
-            print(self.title + "\n")
+            print(f"Feed: {self.title}\n")
             for entry in entries:
-                print(f"{entry['title']}\n"
-                      f"{entry['date']}\n"
-                      f"{entry['link']}\n\n"
+                print(f"Title: {entry['title']}\n"
+                      f"Date: {entry['date']}\n"
+                      f"Link: {entry['link']}\n\n"
                       f"{entry['summary']}\n\n")
 
 

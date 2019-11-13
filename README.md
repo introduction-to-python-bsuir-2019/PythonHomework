@@ -12,7 +12,7 @@
 -  **--limit** (limit printed entries)
 
 ## JSON structure
-`{"title": "rss_title", "entries": [{"title": "title", "date": "date", "link": "link", "summary": "summary"}, ...]}`
+`{"feed": "rss_title", "entries": [{"title": "title", "date": "date", "link": "link", "summary": "summary"}, ...]}`
 
 # TODO
 -   [x] [Iteration 1] One-shot command-line RSS reader.
