@@ -29,7 +29,7 @@ import argparse
 import logging
 from colorama import Fore, Style
 
-from format_converter import PdfNewsConverter, HTMLNewsConverter
+from .format_converter import PdfNewsConverter, HTMLNewsConverter  # no dot here -> not worked properly
 
 
 PROJECT_VERSION = '1.5'

@@ -11,7 +11,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
 
-    py_modules=['news_feed.rss_reader'],
+    py_modules=['news_feed.rss_reader', 'news_feed.format_converter'],
     author='Vadim Titko',
     author_email='Vadbeg@tut.by',
     url='https://github.com/Vadbeg/news_feed_reader',
@@ -28,7 +28,7 @@ setup(
         ]
     },
 
-    install_requires=['lxml>=4.3.0', 'dateutil', 'requests', 'pandas'],
+    install_requires=['lxml>=4.3.0', 'requests', 'pandas'],
     python_requires='>=3.6'
 )
 
