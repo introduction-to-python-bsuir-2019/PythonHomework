@@ -6,7 +6,11 @@ setuptools.setup(
                 description='Pure Python CLI RSS reader',
                 author='Aliaksei Krop',
                 author_email='qqaezz@gmail.com',
-                packages=setuptools.find_packages(include=['rss_reader, RSSHandle']),
+                packages=setuptools.find_packages(),
                 python_requires='>=3',
-                scripts = ['rss_reader']
+                py_modules=["RSSHandle"],
+                scripts = ['rss_reader.py'],
+                package_data={
+                    '':['*.txt']
+                }
 )
