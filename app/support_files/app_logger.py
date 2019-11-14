@@ -2,10 +2,11 @@
 This module provides functions to work with logging.
 """
 import logging
+from logging import Logger
 import sys
 
 
-def init_logger(name: str) -> logging.Logger:
+def init_logger(name: str) -> Logger:
     """
     Initialize and return logger object.
     :param name: Name of the logger object.

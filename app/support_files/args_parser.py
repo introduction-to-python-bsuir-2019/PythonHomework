@@ -2,10 +2,12 @@
 This module is a parser of console arguments for this project.
 """
 import argparse
+from argparse import Namespace
+
 import app
 
 
-def get_args():
+def get_args() -> Namespace:
     """
     Function, that parse console args.
     :return: An object that provides the values ​​of parsed arguments.

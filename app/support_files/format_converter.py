@@ -6,6 +6,7 @@ import functools
 import json
 import dataclasses
 from typing import List
+
 from app.support_files.dtos import Feed
 
 
@@ -14,7 +15,7 @@ class Converter:
     This class represents format converter for parsed data from RSS.
     """
 
-    def __init__(self, feeds: List[Feed]):
+    def __init__(self, feeds: List[Feed]) -> None:
         """
         :param feeds: Parsed data from RSS.
         """

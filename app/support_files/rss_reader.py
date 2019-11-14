@@ -10,7 +10,7 @@ class Reader:
     Class for fork with RSS.
     """
     @staticmethod
-    def exec_console_args():
+    def exec_console_args() -> None:
         """
         Execute console commands.
         """

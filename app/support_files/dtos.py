@@ -7,6 +7,9 @@ from typing import List
 
 @dataclass
 class Item:
+    """
+    This class represents each item in feed.
+    """
     title: str = "no title"
     link: str = "no link"
     author: str = "no author"
@@ -17,6 +20,9 @@ class Item:
 
 @dataclass
 class Feed:
+    """
+    This class represents feed.
+    """
     title: str = "no title"
     link: str = "no link"
     items: List[Item] = field(default_factory=list)

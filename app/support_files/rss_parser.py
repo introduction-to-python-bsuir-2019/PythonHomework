@@ -1,8 +1,11 @@
 """
 This module contains class for parsing RSS.
 """
-import feedparser
+from typing import Dict, Any
+
 from bs4 import BeautifulSoup
+import feedparser
+
 from app.support_files.dtos import Item, Feed
 
 FEED_FIELD_MAPPING = {"title": "title",
@@ -15,7 +18,7 @@ ITEM_FIELD_MAPPING = {"title": "title",
                       "published": "published"}
 
 
-def apply_field_mapping(field_mapping: dict, source: dict) -> dict:
+def apply_field_mapping(field_mapping: Dict[str, str], source: Dict[str, str]) -> Dict[str, Any]:
     return {v: source.get(k) for k, v in field_mapping.items() if source.get(k)}
 
 
