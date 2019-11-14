@@ -6,6 +6,7 @@ import functools
 import json
 import dataclasses
 from typing import List
+from time import strftime, altzone
 
 from app.support_files.dtos import Feed
 
@@ -35,7 +36,7 @@ class Converter:
             for item in feed.items:
                 strings.append(separator)
                 strings.append(f"Author: {item.author}")
-                strings.append(f"Published: {item.published}")
+                strings.append(f"Published: {strftime('%a, %d %b %Y %X', item.published_parsed)} {altzone / 3600}")
                 strings.append("\n")
                 strings.append(f"Title: {item.title}")
                 strings.append(f"Description: {item.description}")

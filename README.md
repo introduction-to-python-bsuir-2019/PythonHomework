@@ -23,20 +23,22 @@ optional arguments:
 ### Json structure
 ```json
 [
-  {"title": "Yahoo News - Latest News & Headlines", 
+  {
+    "title": "Yahoo News - Latest News & Headlines",
     "link": "https://www.yahoo.com/news",
     "items":
       [
-        {"title": "CouldPresident Trump be impeached and removed from office \u2014 but still reelected?",
-         "link": "https://news.yahoo.com/could-president-trump-be-impeached-and-removed-from-office-but-still-reelected-184643831.html",
+        {
+          "title": "Sorry, Hillary: Democrats don&#39;t need a savior",
+          "link": "https://news.yahoo.com/sorry-hillary-democrats-dont-need-a-savior-194253123.html",
           "author": "no author",
-          "published": "Tue, 12 Nov 2019 13:46:43 -0500",
-          "description": "What happens when a presidentialimpeachment inquiry runs into a presidential election year? The United States in uncharted territory.",
-          "img_links": 
+          "published_parsed": [2019, 11, 13, 19, 42, 53, 2, 317, 0],
+          "description": "With the Iowa caucuses fast approaching, Hillary Clinton is just the latest in the colorful cast of characters who seem to have surveyed the sprawling Democratic field, sensed something lacking and decided that \u201csomething\u201d might be them.",
+          "img_links":
             [
-              "http://l2.yimg.com/uu/api/res/1.2/7LKu1VqFsBWR.ZGGf.U.zQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://s.yimg.com/os/creatr-images/2019-11/fae1bf00-0581-11ea-93ff-f43ed8c16284"
+              "http://l.yimg.com/uu/api/res/1.2/xq3Ser6KXPfV6aeoxbq9Uw--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-11/14586fd0-064d-11ea-b7df-7288f8d8c1a7"
             ]
-         }
+        }
       ]
   }
 ]

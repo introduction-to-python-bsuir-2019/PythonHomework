@@ -2,6 +2,7 @@
 This module contains data classes to work with feeds.
 """
 from dataclasses import dataclass, field
+from time import struct_time, localtime, time
 from typing import List
 
 
@@ -13,7 +14,7 @@ class Item:
     title: str = "no title"
     link: str = "no link"
     author: str = "no author"
-    published: str = "no date"
+    published_parsed: struct_time = localtime(time())
     description: str = "description"
     img_links: List[str] = field(default_factory=list)
 

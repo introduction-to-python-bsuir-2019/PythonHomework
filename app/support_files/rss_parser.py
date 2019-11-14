@@ -15,7 +15,7 @@ ITEM_FIELD_MAPPING = {"title": "title",
                       "link": "link",
                       "author": "author",
                       "description": "description",
-                      "published": "published"}
+                      "published_parsed": "published_parsed"}
 
 
 def apply_field_mapping(field_mapping: Dict[str, str], source: Dict[str, str]) -> Dict[str, Any]:
