@@ -22,7 +22,7 @@ optional arguments:
 
 ```
 
-With the argument `--json` the program converts the news into [JSON](https://en.wikipedia.org/wiki/JSON) format.(Still in progress)
+With the argument `--json` the program converts the news into [JSON](https://en.wikipedia.org/wiki/JSON) format.
 
 With the argument `--limit` the program prints given number of news.
 
