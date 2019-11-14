@@ -1,25 +1,23 @@
-import logging
-import sys
-from . import rss_parser, args_parser, format_converter
+"""
+This module contains class for fork with RSS.
+"""
+from app.support_files import rss_parser, args_parser, format_converter, app_logger
 
 
 class Reader:
 
+    """
+    Class for fork with RSS.
+    """
     @staticmethod
     def exec_console_args():
-        logger = logging.getLogger("console_app")
-        logger.setLevel(logging.INFO)
-        # create the logging file handler
-        fh = logging.StreamHandler(sys.stdout)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
-        fh.setFormatter(formatter)
-        # add handler to logger object
-        logger.addHandler(fh)
-
+        """
+        Execute console commands.
+        """
+        logger = app_logger.init_logger("console_app")
         _args = args_parser.get_args()
-        logger.disabled =  not _args.verbose
+        logger.disabled = not _args.verbose
         logger.info("Program started")
-
         logger.info(f"Parsing {_args.source} started")
         parser = rss_parser.Parser(_args.source)
 
@@ -28,19 +26,20 @@ class Reader:
 
         if limit < 1 and limit != -1:
             print("The limit must be -1 or greater than 0")
-            return
+            return None
 
-        feeds = [parser.parse_feed(limit)]
-        if feeds[0] is None:
-            print("Invalid url.")
-            return
+        try:
+            feed = parser.parse_feed(limit)
+        except ConnectionError as err:
+            print(err)
+            return None
         logger.info(f"Parsing {_args.source} finished")
 
         len_each_line = _args.length
         if len_each_line < 60:
             print("The length must be greater than 60")
-            return
-        converter = format_converter.Converter(feeds)
+            return None
+        converter = format_converter.Converter([feed])
         if to_json:
             logger.info("Data is converted to json format and printing is started")
             print(converter.to_json_format(str_len=len_each_line))

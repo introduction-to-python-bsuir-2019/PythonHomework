@@ -23,21 +23,21 @@ optional arguments:
 ### Json structure
 ```json
 [
-  {
-    "feed_title": "Yahoo News - Latest News & Headlines",
-    "feed_link": "https://www.yahoo.com/news",
+  {"title": "Yahoo News - Latest News & Headlines", 
+    "link": "https://www.yahoo.com/news",
     "items":
-    [
-      {
-        "item_title": "Top House Armed Services Republican: Trump&#39;s Ukraine call was &#39;inappropriate&#39; but not impeachable",
-        "item_link": "https://news.yahoo.com/trump-impeachment-mac-thornberry-abc-this-week-165743982.html",
-        "item_author": null, "item_description": "Rep. Mac Thornberry, R-Texas, said President Trump's call with Ukraine'spresident was \"inappropriate\" — but it did not warrant his impeachment.",
-        "item_date": "Sun, 10 Nov 2019 11:57:43-0500", "item_img_links":
-        [
-          "http://l1.yimg.com/uu/api/res/1.2/nZ9ESccFgs8cyvX3b2LOUA--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-11/922d39a0-03db-11ea-bf1e-9fbc638c65a1"
-        ]
-       }
-    ]
+      [
+        {"title": "CouldPresident Trump be impeached and removed from office \u2014 but still reelected?",
+         "link": "https://news.yahoo.com/could-president-trump-be-impeached-and-removed-from-office-but-still-reelected-184643831.html",
+          "author": "no author",
+          "published": "Tue, 12 Nov 2019 13:46:43 -0500",
+          "description": "What happens when a presidentialimpeachment inquiry runs into a presidential election year? The United States in uncharted territory.",
+          "img_links": 
+            [
+              "http://l2.yimg.com/uu/api/res/1.2/7LKu1VqFsBWR.ZGGf.U.zQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://s.yimg.com/os/creatr-images/2019-11/fae1bf00-0581-11ea-93ff-f43ed8c16284"
+            ]
+         }
+      ]
   }
 ]
 ```

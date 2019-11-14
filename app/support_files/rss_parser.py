@@ -3,54 +3,53 @@ This module contains class for parsing RSS.
 """
 import feedparser
 from bs4 import BeautifulSoup
+from app.support_files.dtos import Item, Feed
 
-FEED_FIELD_MAPPING = {"title": "feed_title",
-                      "link": "feed_link"}
+FEED_FIELD_MAPPING = {"title": "title",
+                      "link": "link"}
 
-ITEM_FIELD_MAPPING = {"title": "item_title",
-                      "link": "item_link",
-                      "author": "item_author",
-                      "description": "item_description",
-                      "published": "item_date"}
+ITEM_FIELD_MAPPING = {"title": "title",
+                      "link": "link",
+                      "author": "author",
+                      "description": "description",
+                      "published": "published"}
+
+
+def apply_field_mapping(field_mapping: dict, source: dict) -> dict:
+    return {v: source.get(k) for k, v in field_mapping.items() if source.get(k)}
 
 
 class Parser:
     """
     This class provides methods to parse RSS.
     """
-    def __init__(self, url):
+
+    def __init__(self, url: str):
         """
         :param url: Url of RSS.
         """
         self.url = url
 
-    def parse_feed(self, items_limit=-1):
+    def parse_feed(self, items_limit: int = -1) -> Feed:
         """
         Parse the RSS file.
         :param items_limit: Limit count of returned items
-        :return: Dict with parsed data.
         """
         data = feedparser.parse(self.url)
         if data.bozo != 0 or data.status != 200:
-            return None
+            raise ConnectionError("Invalid url")
         feed = data.get("feed", {})
-        result_data = Parser.__apply_field_mapping(FEED_FIELD_MAPPING, feed)
-        items = [Parser.__apply_field_mapping(ITEM_FIELD_MAPPING, item)
-                 for item in data.get("entries", [])[:items_limit]]
-        for item in items:
-            soup = BeautifulSoup(item["item_description"], 'html.parser')
-            item["item_img_links"] = [link.get("src") for link in soup.find_all("img") if link.get("src")]
-            item["item_description"] = soup.text
+        feed_data = apply_field_mapping(FEED_FIELD_MAPPING, feed)
+        feed = Feed(**feed_data)
+        items_data = [apply_field_mapping(ITEM_FIELD_MAPPING, item)
+                      for item in data.get("entries", [])[:items_limit]]
+        for item_data in items_data:
+            soup = BeautifulSoup(item_data["description"], 'html.parser')
+            item_data["img_links"] = [link.get("src") for link in soup.find_all("img") if link.get("src")]
+            item_data["description"] = soup.text
 
-        result_data["items"] = items
-        return result_data
-
-    @staticmethod
-    def __apply_field_mapping(field_mapping, source):
-        data = {}
-        for key in field_mapping:
-            data[field_mapping[key]] = source.get(key)
-        return data
+        feed.items = [Item(**item_data) for item_data in items_data]
+        return feed
 
 
 if __name__ == "__main__":
