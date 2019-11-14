@@ -1,20 +1,17 @@
-#!/usr/local/opt/python/bin/python3.7
+"""
+Main module. Launch the rss reader and output the result
+"""
 import argparse
 import logging
 import sys
 import getpass
 from importlib import import_module
 
-from bots.tut import Bot
 from utils.RssInterface import RssException
-import bots
+from utils import RssInterface
 
-python_wiki_rss_url = "http://www.python.org/cgi-bin/moinmoin/" \
-                      "RecentChanges?action=rss_rc"
-tut_by_rss = 'https://news.tut.by/rss/index.rss'
-google_rss = 'https://news.google.com/news/rss'
-one_news_item = 'https://news.tut.by/world/658449.html?utm_campaign=news-feed&utm_medium=rss&utm_source=rss-news'
-yahoo = 'https://news.yahoo.com/rss/'
+
+PROG_VERSION = 1.0
 
 
 def logger_init(level=None):
@@ -24,7 +21,7 @@ def logger_init(level=None):
     Other logs in regards of the 'level' are printed into console
     """
 
-    level = level or logging.WARNING
+    level = level or logging.CRITICAL
     logger = logging.getLogger(getpass.getuser())
     logger.setLevel(level=level)
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -35,50 +32,68 @@ def logger_init(level=None):
     fh.setFormatter(formatter)
 
     # Logging into console
-    consoleHandler = logging.StreamHandler(sys.stdout)
-    consoleHandler.setFormatter(formatter)
-    consoleHandler.setLevel(level)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(level)
 
     logger.addHandler(fh)
-    logger.addHandler(consoleHandler)
-    # coloredlogs.install(level=level, logger=logger)
+    logger.addHandler(console_handler)
     return logger
 
-def get_bot_instance(url: str):
+
+def get_bot_instance(url: str) -> RssInterface:
+    """
+    Choosing an appropriate bot to the url
+    :param url: url, contained rss feed
+    :return: Bot class inherited from RssInterface, appropriate to the url
+    """
     if url.find('news.yahoo.com/rss') + 1:
         bot = import_module('bots.yahoo').Bot
+        logger.info('Yahoo bot is loaded')
     elif url.find('news.tut.by/rss') + 1:
         bot = import_module('bots.tut').Bot
+        logger.info('Tut.by bot is loaded')
     else:
         bot = import_module('bots.default').Bot
+        logger.info('Default bot is loaded')
     return bot
 
 
-def main(url, logger, limit=10):
+def main(url: str, logger: logging.Logger, limit: int, width: int, json: bool, verbose: bool) -> None:
+    """
+     Main func calls rss reader
+
+    :param url: news rss url
+    :param logger: logger object
+    :param limit: limit of printed news
+    :param width: width of the screen to print the news
+    :param json: bool flag to print in json format
+    :param json: bool flag to print in json format
+    :return: None
+    """
     bot = get_bot_instance(url)
-    parser = bot(url, limit, logger)
+
     try:
-        news = parser.get_news()
+        rss_reader = bot(url=url, limit=limit, logger=logger, width=width)
+        if json:
+            news = rss_reader.get_json()
+        else:
+            news = rss_reader.get_news()
     except RssException as ex:
         logger.error(ex.args[0])
         logger.info('Exiting...')
+    except Exception as ex:
+        logger.error(f'Unhandled exception!\n{ex}\nExiting...')
     else:
-
         print(news)
 
 
 if __name__ == "__main__":
-    """
-        usage: python test_task.py  KEF NCE 2019-11-13
 
-        - finds the cheapest flight of different APIs;
-        - sorts itineraries;
-        - converts the flight price in BYN;
-        """
     PARSER = argparse.ArgumentParser(
         description='''
-                Rss reader. 
-                Just enter rss url from your favorite site and app will print 
+                Rss reader.
+                Just enter rss url from your favorite site and app will print
                 latest news.
                 '''
     )
@@ -103,7 +118,12 @@ if __name__ == "__main__":
     PARSER.add_argument('-v', '--version',
                         help='Print version info',
                         action='version',
-                        version='%(prog)s 1.0'
+                        version=f'%(prog)s {PROG_VERSION}'
+                        )
+    PARSER.add_argument('--width',
+                        help='Define a screen width to display news',
+                        default=120,
+                        type=int,
                         )
 
     ARGS = PARSER.parse_args()
@@ -114,7 +134,7 @@ if __name__ == "__main__":
         logger = logger_init()
 
     logger.info(f'Lets start! Url={ARGS.url}')
+    args = '\n'.join([str(item) for item in ARGS._get_kwargs()])
+    logger.info(f"Our args: \n{args}")
 
-    main(url=ARGS.url, logger=logger, limit=ARGS.limit)
-
-
+    main(url=ARGS.url, logger=logger, limit=ARGS.limit, width=ARGS.width, json=ARGS.json, verbose=ARGS.verbose)

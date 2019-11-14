@@ -2,6 +2,8 @@ from utils.RssInterface import BaseRssBot
 import bs4
 from terminaltables import SingleTable
 from colorclass import Color
+
+
 class Bot(BaseRssBot):
 
     def table_server_timings(self):
@@ -14,7 +16,6 @@ class Bot(BaseRssBot):
         table_instance = SingleTable(table_data)
         table_instance.inner_heading_row_border = False
         return table_instance.table
-
 
     def _parse_news_item(self, news_item: dict):
         out_str = ''

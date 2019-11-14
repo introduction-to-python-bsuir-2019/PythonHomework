@@ -10,7 +10,11 @@ from utils.RssInterface import BaseRssBot
 class Bot(BaseRssBot):
 
     def _get_news_as_dict(self, feed: feedparser.FeedParserDict) -> typing.Dict[str, typing.Any]:
+        """
+        Returns str containing formatted news from internal attr self.feed
 
+        :return: str with news
+        """
         news = {'feed': feed.get('feed').get('title'),
                 'items': []}
 
@@ -27,10 +31,16 @@ class Bot(BaseRssBot):
             }
             self._parse_news_item(news_item)
             news['items'].append(news_item)
-
+        self.logger.info(f'Feedparser object is converted into dictionary')
         return news
 
     def _parse_news_item(self, news_item: typing.Dict[str, typing.Any]):
+        """
+        Forms a human readable string from news_item and adds it to the news_item dict
+        :param news_item: news_item content
+        :return: extend news_item dict with human readable news content
+        """
+        self.logger.info(f'Extending {news_item.get("title")}')
 
         out_str = ''
         out_str += f"\nTitle: {news_item.get('title', '')}\n" \
