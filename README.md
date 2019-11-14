@@ -1,4 +1,8 @@
 ## It is a one-shot command-line RSS reader by Zviger.
+### Installation
+```text
+Clone this repository and run setup.py file with parameters "install --user"
+```
 ### User interface
 ```text
 usage: frbz.py [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] source

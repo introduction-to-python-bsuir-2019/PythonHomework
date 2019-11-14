@@ -1,6 +1,6 @@
 import logging
 import sys
-from support_files import args_parser, format_converter, rss_parser
+from . import rss_parser, args_parser, format_converter
 
 
 class Reader:
