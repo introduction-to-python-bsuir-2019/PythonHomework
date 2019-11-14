@@ -36,7 +36,7 @@ if __name__ == '__main__':
         logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
     if args.version:
-        print('\nRSS-Reader v1.0\n')
+        print('\nRSS-Reader v2.0\n')
 
     rss_object = RssHandler(args.source)
 

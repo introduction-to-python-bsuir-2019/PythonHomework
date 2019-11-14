@@ -46,7 +46,8 @@ class RssHandler:
         """Make JSON file from RSS"""
         json_dict = self.feed_dict.copy()
         json_dict['news']
-        if limit is not None: del(json_dict['news'][limit:])
+        if limit is not None:
+            del(json_dict['news'][limit:])
         self.json_feed = json.dumps(json_dict, cls=SetEncoder)
         logging.info('Created JSON object from dictionary.')
 
