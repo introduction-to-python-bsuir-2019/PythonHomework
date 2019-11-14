@@ -26,6 +26,6 @@ With the argument `--json` the program converts the news into [JSON](https://en.
 
 With the argument `--limit` the program prints given number of news.
 
-With the argument `--verbose` the program prints all logs in stdout.(Still in progress)
+With the argument `--verbose` the program prints all logs in stdout.
 
 Withe the argument `--version` the program prints in stdout it's current version and complete it's work.
