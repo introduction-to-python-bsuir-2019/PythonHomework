@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 import feedparser
-
+import jsonpickle
 
 def parse_arguments():
     parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
@@ -18,17 +18,8 @@ def parse_arguments():
     return parser.parse_args()
 
 VERSION='v1.1'
-ERR={1: 'You don\'t use --version together with other arguments',
-    2: 'Source or --version expected',
-    3: 'Incorrect limit input (likely to be non-positive)'}
 
-
-class Error(Exception):
-    def __init__(self, code):
-        self.error=code
-
-
-class News:
+class News(object):
     def __init__(self,content,soup):
         self.title=ultimately_unescape(content['title'])
         self.source=ultimately_unescape(content['link'])
@@ -93,22 +84,30 @@ def retrieve_news(link, limit):
 
 
 def make_json(news):
-    with open('news.json','w') as filer:
-        for item in news:
-            json.dump(item.__dict__,filer)
-
+    json_news=[]
+    for item in news:
+        json_news.append(json.dumps(item))
+    return json_news
+        # with open('newqs.json','w') as filer:
+       # for item in news:
+            #json.dump(item, filer)
+            #json.dump(jsonpickle.encode(item),filer) 
+            
 def print_news(news):
     for item in news:
-        item.show_fields()
+        try:
+            item.show_fields()
+        except AttributeError:
+            print(item)
 
 def main():
     args=parse_arguments()
     if args.version and (args.json or args.limit):
-        raise Error(err[1])
+        raise ValueError('You don\'t use --version together with other arguments')
     if not (args.version or args.source):
-        raise Error(err[2])
+        raise ValueError('Source or --version expected')
     if args.limit and args.limit<1:
-        raise Error(err[3])
+        raise ValueError('Incorrect limit input (likely to be non-positive)')
     if args.version:
         print('RSS-reader '+version)
     else:
@@ -117,9 +116,9 @@ def main():
       #      print_news=verboser(print_news,'printing')
       #      make_json=verboser(make_json,'making JSON')
         news=retrieve_news(args.source, args.limit)
-        print_news(news)
         if args.json:
-            make_json(news)
+            news=make_json(news)
+        print_news(news)
 
 if __name__=='__main__':
     main()
