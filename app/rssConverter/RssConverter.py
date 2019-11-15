@@ -1,5 +1,5 @@
 import feedparser
-import re
+from bs4 import BeautifulSoup
 from app.rssConverter.New import New
 from app.rssConverter.Exeptions import RssGetError, IncorrectLimit
 
@@ -7,11 +7,11 @@ from app.rssConverter.Exeptions import RssGetError, IncorrectLimit
 class RssConverter:
 
     def __init__(self):
-        self.tags = ['image', 'links', 'title', 'pubDate', 'published', 'summary', ]
+        self.tags = ['link', 'title', 'pubDate', 'published', ]
 
     def get_news(self, url):
         result = feedparser.parse(url)
-        if result['entries'] and result.status == 200:
+        if result.bozo == 0 and result.status == 200:
             return result['entries']
         else:
             raise RssGetError("url")
@@ -26,22 +26,18 @@ class RssConverter:
 
     def parse_news(self, dict_list):
         news_list = []
-        summary_parser = r'>[A-ZА-Я0-9a-zа-я][‘+,:;=?@#|.^*() %!a-zA-Zа-яА-Я0-9"\s]*'  # readable item summary output
         for dictionary in dict_list:
             new = New()
-            for key, value in dictionary.items():
-                if key in self.tags:
-                    if key == 'summary':
-                        result = re.search(summary_parser, value)
-                        if result:
-                            new.items['summary'] = result.group(0)[1:-1]
-                    elif key == 'links':  # list of links
-                        links = {}
-                        for link in value:
-                            links[link.get('type', '')] = link.get('href', '')
-                        new.items['links'] = links
-                    else:
-                        new.items[key] = value
+            soup = BeautifulSoup(dictionary.get('summary', None), 'html.parser')
+            new.items['images'] = []
+            for image in soup.find_all('img'):
+                src = image.get('src', 'Unknown')
+                if src:
+                    new.items['images'].append(src)
+                new.items['summary'] = soup.text
+            new.items['links'] = [link['href'] for link in soup.find_all('a') if link.get('href', None)]
+            for key in self.tags:
+                new.items[key] = dictionary.get(key, 'Unknown')
             news_list.append(new)
         return news_list
 
@@ -49,11 +45,15 @@ class RssConverter:
         news_list = self.get_limited_news(news_list, limit)
         for new in news_list:
             for key, item in new.items.items():
-                if key == 'links':
-                    for key_link, item_link in item.items():
+                if key == 'images' or key == 'links':
+                    print("\n")
+                    print(key)
+                    for href in item:
                         print("\n")
-                        print(key_link+'    '+item_link)
-                elif item is not None:
+                        print(href)
+                else:
+                    if item == 'Unknown' and key in ['pubDate', 'published']:
+                        continue
                     print("\n")
                     print(key + '    ' + item)
             print('-----------------------------------------------------------------------------------')
@@ -64,16 +64,18 @@ class RssConverter:
         print('\t' + 'news:')
         print('\t' + '[')
         for new in news_list:
-            print('\t'*2 + '{')
+            print('\t' * 2 + '{')
             for key, item in new.items.items():
-                if key == 'links':
+                if key == 'links' or key == 'images':
                     print("\t" * 3 + 'links:')
                     print("\t" * 3 + '[')
-                    for key_link, item_link in item.items():
-                        print("\t" * 4 + key_link + ':' + item_link + ';')
+                    for link in item:
+                        print("\t" * 4 + link + ';')
                     print("\t" * 3 + '];')
-                elif item is not None:
-                    print("\t"*3 + key + ':' + item+';')
+                else:
+                    if item == 'Unknown' and key in ['pubDate', 'published']:
+                        continue
+                    print("\t" * 3 + key + ':' + item + ';')
             print("\t" * 2 + '};')
         print("\t" * 1 + '];')
         print('};')
