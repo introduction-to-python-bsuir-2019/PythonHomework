@@ -7,6 +7,8 @@ def main():
     args = ArgParser()
     rss_reader = RSSreader(args)
     feed = rss_reader.get_feed()
+    if args.get_args().version:
+        print(args.get_args().version)
     if args.get_args().json:
         rss_reader.print_feed_json(feed)
     else:

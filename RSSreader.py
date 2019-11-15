@@ -10,10 +10,8 @@ class RSSreader:
 
     def get_feed(self):
         """ Returns read feed """
-        NewsFeed = feedparser.parse(self.args.get_args().url)
-        print(NewsFeed.entries[0].keys())
-        print('Number of RSS posts:', len(NewsFeed.entries), end='\n\n')
-        return NewsFeed.entries[:self.args.get_args().limit]
+        news_feed = feedparser.parse(self.args.get_args().url)
+        return news_feed.entries[:self.args.get_args().limit]
 
     def print_feed(self, entries):
         """ Prints feed in stdout """
