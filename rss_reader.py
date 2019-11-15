@@ -16,8 +16,6 @@ def main():
     args = parse_arguments()
     rss = reader.RSSReader(args)
     rss.show_news()
-    #print(args.json)
-
 
 
 if __name__ == "__main__":
