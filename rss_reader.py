@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 import feedparser
+import logging
 
 def parse_arguments():
     parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
@@ -18,7 +19,7 @@ def parse_arguments():
 
 VERSION='v1.1'
 
-class News(object):
+class NewsItem:
     def __init__(self,content,soup):
         self.title=ultimately_unescape(content['title'])
         self.source=ultimately_unescape(content['link'])
@@ -41,21 +42,13 @@ class News(object):
         for number, image in enumerate(self.images):
             print('['+str(number+1)+'] '+image)
 
-
-def verboser(func,action):
-    def wrapper(*args, **kwargs):
-        print('Started '+action)
-        result=func(*args,**kwargs)
-        print('Finished '+action)
-        return result
-    return wrapper
-
 def ultimately_unescape(text):
     while html.unescape(text)!=text:
         text=html.unescape(text)
     return text
 
 def find_images(text):
+    logging.info('Searching for additional images...')
     res=[]
     occurences=re.finditer('<img',text)
     tags=[(text.rfind('<',0,item.start()+2),text.find('>',item.start()+2)) for item in occurences]
@@ -65,24 +58,28 @@ def find_images(text):
     return res
 
 def clear_tags(text):
+    logging.info('Sweeping the main content...')
     while text.find('<')>-1 and text.find('>')>-1:
         text=text.replace(text[text.find('<'):text.find('>')+1],'')
     return text
 
 def retrieve_news(link, limit):
+    logging.info('Retrieving news...')
     feed=feedparser.parse(link)
     soup=requests.get(link).text
     soup=BeautifulSoup(soup,"html5lib")
     news_separated=soup('item')
+    logging.info('News retrieved, converting to readable format...')
     print('\nSource: '+feed['feed']['title'])
     newsdict=feed['entries']
     news=[]
     for index, item in (enumerate(newsdict[:min(limit,len(newsdict))]) if limit else enumerate(newsdict)):
-        news.append(News(item,news_separated[index]))
+        news.append(NewsItem(item,news_separated[index]))
     return news
 
 
 def make_json(news):
+    logging.info('Converting to JSON...')
     json_news=[]
     for item in news:
         json_news.append(json.dumps({"title": item.title,
@@ -110,10 +107,10 @@ def main():
     if args.version:
         print('RSS-reader '+version)
     else:
-      #  if ARGS.verbose:
-      #      retrieve_news=verboser(retrieve_news,'retrieving')
-      #      print_news=verboser(print_news,'printing')
-      #      make_json=verboser(make_json,'making JSON')
+        if args.verbose:
+            logging.basicConfig(level=logging.INFO, 
+                                format='%(asctime)s - %(message)s',
+                                datefmt='%H:%M:%S')
         news=retrieve_news(args.source, args.limit)
         if args.json:
             news=make_json(news)
