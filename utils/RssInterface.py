@@ -92,7 +92,13 @@ class BaseRssBot(RssBotInterface):
             #
             exception = feed.get('bozo_exception')
             self.logger.warning(f'Having an exception while parsing xml: {exception}')
-            raise RssException(f'Error while parsing xml: \n {exception}\nBad rss feed. Check your url')
+
+            exception_sting = f'\tError while parsing xml: \n {exception}\n\tBad rss feed. Check your url\n\n' \
+                              f'\tTry to use one of this as example:\n' \
+                              f'\ttut_by_rss = "https://news.tut.by/rss/index.rss"\n' \
+                              f'\tgoogle_rss = "https://news.google.com/news/rss"\n' \
+                              f'\tyahoo = "https://news.yahoo.com/rss/"'
+            raise RssException(exception_sting)
 
         self.logger.info(f'well formed xml = {feed.get("bozo")}\n'
                          f'url= {feed.get("url")}\n'

@@ -1,7 +1,6 @@
 import unittest
 import logging
 from rss import logger_init, get_bot_instance, main
-import rss
 from bots import yahoo, tut, default
 from unittest.mock import patch, Mock
 from contextlib import redirect_stdout
@@ -65,7 +64,7 @@ class TestMainModule(unittest.TestCase):
         with open('./test/data/help.txt', 'r') as f:
             out_str = f.read()
 
-        self.assertEqual(len(out_str), 84)
+        self.assertEqual(len(out_str), 261)
         self.assertEqual(out_str.find('not well-formed (invalid token)'), -1)
 
     def test_main_output_json_on(self):

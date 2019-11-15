@@ -32,3 +32,20 @@ Exception tracebacks in stdout are prohibited.
 * Feedparser module is used for rss parsing;
 * There are several bots for parsing news: default bor for unimplemented RSS urls and
     custom bots (yahoo, tut) with detailed approach to parsing.
+
+## Code self-checking
+Use ./pycodestyle.sh to check the code corresponding to `pep8`
+(pycodestyle package must be installed)
+
+## Testing
+Use 
+```
+nosetests --with-coverage --cover-erase --cover-package=utils --cover-html
+nosetests --with-coverage --cover-erase --cover-package=bots --cover-html
+nosetests --with-coverage --cover-erase --cover-package=rss --cover-html
+```
+- to pass test with coverage
+(nose and coverage packages must be installed)
+
+
+

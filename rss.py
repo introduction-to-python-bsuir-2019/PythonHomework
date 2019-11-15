@@ -14,6 +14,7 @@ from utils import RssInterface
 
 PROG_VERSION = 1.0
 
+
 def logger_init(level=None):
     """Logger initialisation
 

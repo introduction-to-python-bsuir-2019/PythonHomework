@@ -3,7 +3,6 @@ Tests depend on local data. You have to launch the script
 from the root directory (there rss.py is locate)
 
 Example links:
-reddit_rss = 'reddit.com/r/worldnews/.rss'
 tut_by_rss = 'https://news.tut.by/rss/index.rss'
 google_rss = 'https://news.google.com/news/rss'
 yahoo = 'https://news.yahoo.com/rss/'
