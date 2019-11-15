@@ -6,7 +6,6 @@ import feedparser
 import rss_reader.image as image
 from bs4 import BeautifulSoup
 from html import unescape
-from collections import namedtuple
 
 
 class News:
