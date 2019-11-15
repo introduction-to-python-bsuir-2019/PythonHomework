@@ -63,7 +63,7 @@ def main():
     is_error = False
     rss_news = News(args.source, args.limit)
     try:
-        rss_news.get_news()
+        rss_news.parse_news()
     except Exception as err:
         is_error = True
         error_message = err

@@ -20,7 +20,7 @@ class News:
         self.feed = ''
         self.items = []
 
-    def get_news(self):
+    def parse_news(self):
         """
         This method gets and parses RSS
         :return: None
