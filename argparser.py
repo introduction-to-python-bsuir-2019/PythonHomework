@@ -2,10 +2,12 @@ import argparse
 
 
 class ArgParser:
+    """ Reads arguments """
     def __init__(self):
         self.args = self.parse_args()
 
     def parse_args(self):
+        """ Reads arguments from the cmd and returns them """
         argparser = argparse.ArgumentParser(description='One-shot command-line RSS reader')
         argparser.add_argument(
             'url',
@@ -27,4 +29,5 @@ class ArgParser:
         return args
 
     def get_args(self):
+        """ Returns arguments """
         return self.args

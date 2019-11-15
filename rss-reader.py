@@ -3,6 +3,7 @@ from RSSreader import RSSreader
 
 
 def main():
+    """ Reads arguments and displays news """
     args = ArgParser()
     rss_reader = RSSreader(args)
     feed = rss_reader.get_feed()
