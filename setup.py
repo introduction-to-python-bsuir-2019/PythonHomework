@@ -1,13 +1,11 @@
 import setuptools
 import os
-import app
 
 with open("requirements.txt") as fp:
     install_requires = fp.read()
 
 setuptools.setup(
     name='rss_reader',
-    version=app.__version__,
     author='echizhevskaya',
     long_description=open(os.path.join(os.path.dirname(__file__), "README.md")).read(),
     url='https://github.com/KateChizhevskaya/PythonHomework',
