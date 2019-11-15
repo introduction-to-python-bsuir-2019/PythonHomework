@@ -47,17 +47,24 @@ def get_rss(url):
 def get_news():
     """This function get information from rss page and print int cmd"""
     args = parsargument()
-    soup = Soup4(get_rss(args.source), "lxml")
+    soup = Soup4(get_rss(args.source), "xml")
     items = soup.find_all('item', limit=args.limit)
+    feed = soup.title.string
+    print("Feed: " + feed + "\n")
     for item in items:
-        date = item.find('pubdate').string
+        date = item.find('pubDate').string
         title = item.find('title').string
         descrip = item.find('description').string
         description = re.sub('<.*?>', '', descrip)
-        print(title.replace("&#39;", "'"))
+        link = item.find('link').string
+        image_link = item.find('media:content').get('url')
+        print("Link : " + link)
+        print("Title: " + title.replace("&#39;", "'").replace("&quot;", ""))
         print("Date: " + date)
-        print(description.replace("&#39;", "'"))
-        print()
+        print("\nNews: " + description.replace("&#39;", "'").replace("&quot;", "").replace("&gt;", ""))
+        print("\nImages_link: " + image_link)
+        print("\n\n")
+
 
 # print(args.verbose)
 get_news()
