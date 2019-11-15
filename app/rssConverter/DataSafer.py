@@ -1,5 +1,5 @@
 import shelve
-from rssConverter.Exeptions import IncorrectDateOrURL
+from app.rssConverter import IncorrectDateOrURL
 
 
 class NewsGetterSafer:

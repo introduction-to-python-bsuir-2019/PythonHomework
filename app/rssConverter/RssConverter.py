@@ -1,7 +1,7 @@
 import feedparser
 import re
-from rssConverter.New import New
-from rssConverter.Exeptions import RssGetError, IncorrectLimit
+from app.rssConverter import New
+from app.rssConverter import RssGetError, IncorrectLimit
 
 
 class RssConverter:

@@ -1,15 +1,14 @@
-#!/usr/bin/python3
 import argparse
 import logging
+import app
 from datetime import datetime
-from rssConverter.RssConverter import RssConverter
-from rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDateOrURL
-from rssConverter.DataSafer import NewsGetterSafer
+from app.rssConverter import RssConverter
+from app.rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDateOrURL
+from app.rssConverter.DataSafer import NewsGetterSafer
 
 
 def main():
     parser = argparse.ArgumentParser(description='Rss reader', add_help=True)
-    current_version = "1.0.0"
     log_file = 'rss_converter.log'
     parser = args_adding(parser)
     args = parser.parse_args()
@@ -30,8 +29,6 @@ def main():
                 logger.info("news saved")
             rss.print_news(news_list, args.limit)
             logger.info("news are printed")
-            if args.version:
-                print(current_version)
             if args.json:
                 logger.info("print json")
                 rss.in_json_format(news_list, args.limit)
@@ -84,7 +81,8 @@ def args_adding(parser):
     )
     parser.add_argument(
         '--version',
-        action="store_true",
+        action="version",
+        version=f"%(prog)s {app.__version__}",
         help=' Print version info',
         default=False
     )
