@@ -1,18 +1,18 @@
 """
-Main module. Launch the rss reader and output the result
+Main module. Launches the rss reader and output the result
 """
 import argparse
 import logging
 import sys
 import getpass
 from importlib import import_module
+from contextlib import suppress
 
 from utils.RssInterface import RssException
 from utils import RssInterface
 
 
 PROG_VERSION = 1.0
-
 
 def logger_init(level=None):
     """Logger initialisation
@@ -36,12 +36,12 @@ def logger_init(level=None):
     console_handler.setFormatter(formatter)
     console_handler.setLevel(level)
 
-    logger.addHandler(fh)
+    # logger.addHandler(fh)
     logger.addHandler(console_handler)
     return logger
 
 
-def get_bot_instance(url: str) -> RssInterface:
+def get_bot_instance(url: str, logger: logging.Logger) -> RssInterface:
     """
     Choosing an appropriate bot to the url
     :param url: url, contained rss feed
@@ -59,19 +59,28 @@ def get_bot_instance(url: str) -> RssInterface:
     return bot
 
 
-def main(url: str, logger: logging.Logger, limit: int, width: int, json: bool, verbose: bool) -> None:
+def main(url: str, limit: int, width: int, json: bool, verbose: bool) -> None:
     """
      Main func calls rss reader
 
     :param url: news rss url
-    :param logger: logger object
     :param limit: limit of printed news
     :param width: width of the screen to print the news
     :param json: bool flag to print in json format
-    :param json: bool flag to print in json format
+    :param verbose: bool flag to set logger level
     :return: None
     """
-    bot = get_bot_instance(url)
+
+    # Logger initialisation depends on verbose param
+    if verbose:
+        logger = logger_init(level=logging.DEBUG)
+    else:
+        logger = logger_init()
+
+    logger.info(f'Lets start! Url={url}')
+
+    # Get appropriate to the url bot class
+    bot = get_bot_instance(url, logger)
 
     try:
         rss_reader = bot(url=url, limit=limit, logger=logger, width=width)
@@ -80,10 +89,10 @@ def main(url: str, logger: logging.Logger, limit: int, width: int, json: bool, v
         else:
             news = rss_reader.get_news()
     except RssException as ex:
-        logger.error(ex.args[0])
-        logger.info('Exiting...')
+        print(ex.args[0])
+
     except Exception as ex:
-        logger.error(f'Unhandled exception!\n{ex}\nExiting...')
+        print(f'Unhandled exception!\n{ex}\nExiting...')
     else:
         print(news)
 
@@ -128,13 +137,4 @@ if __name__ == "__main__":
 
     ARGS = PARSER.parse_args()
 
-    if ARGS.verbose:
-        logger = logger_init(level=logging.DEBUG)
-    else:
-        logger = logger_init()
-
-    logger.info(f'Lets start! Url={ARGS.url}')
-    args = '\n'.join([str(item) for item in ARGS._get_kwargs()])
-    logger.info(f"Our args: \n{args}")
-
-    main(url=ARGS.url, logger=logger, limit=ARGS.limit, width=ARGS.width, json=ARGS.json, verbose=ARGS.verbose)
+    main(url=ARGS.url, limit=ARGS.limit, width=ARGS.width, json=ARGS.json, verbose=ARGS.verbose)

@@ -34,7 +34,7 @@ class Bot(BaseRssBot):
         self.logger.info(f'Feedparser object is converted into dictionary')
         return news
 
-    def _parse_news_item(self, news_item: typing.Dict[str, typing.Any]):
+    def _parse_news_item(self, news_item: typing.Dict[str, typing.Any]) -> None:
         """
         Forms a human readable string from news_item and adds it to the news_item dict
         :param news_item: news_item content
@@ -60,9 +60,9 @@ class Bot(BaseRssBot):
             elif tag.name == 'img':
                 src = tag.attrs.get('src')
                 # src = src.replace('thumbnails/', '')
-                try:
+                if src in imgs:
                     img_idx = imgs.index(src) + len(links) + 1
-                except ValueError:
+                else:
                     imgs.append(src)
                     img_idx = len(imgs) + len(links)
 

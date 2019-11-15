@@ -86,19 +86,19 @@ class BaseRssBot(RssBotInterface):
 
         feed = feedparser.parse(self.url)
 
-        self.logger.info(f'Got feedparser object')
+        self.logger.debug(f'Got feedparser object')
 
         if feed.get('bozo_exception'):
             #
             exception = feed.get('bozo_exception')
-            raise RssException(f'Error while parsing xml: \n {exception}')
-            self.logger.error(f'Bad rss feed. Check your url')
+            self.logger.warning(f'Having an exception while parsing xml: {exception}')
+            raise RssException(f'Error while parsing xml: \n {exception}\nBad rss feed. Check your url')
 
-        self.logger.info(f'well formed xml = {feed["bozo"]}\n'
-                         f'url= {feed["url"]}\n'
-                         f'title= {feed["channel"]["title"]}\n'
-                         f'description= {feed["channel"]["description"]}\n'
-                         f'link to recent changes= {feed["channel"]["link"]}\n'
+        self.logger.info(f'well formed xml = {feed.get("bozo")}\n'
+                         f'url= {feed.get("url")}\n'
+                         f'title= {feed.get("channel")["title"]}\n'
+                         f'description= {feed.get("channel")["description"]}\n'
+                         f'link to recent changes= {feed.get("channel")["link"]}\n'
                          )
         return feed
 
@@ -157,7 +157,7 @@ class BaseRssBot(RssBotInterface):
         self.logger.info(f'Feedparser object is converted into dictionary')
         return news
 
-    def _parse_news_item(self, news_item: Dict[str, Union[str, List[str]]]):
+    def _parse_news_item(self, news_item: Dict[str, Union[str, List[str]]]) -> None:
         """
         Forms a human readable string from news_item and adds it to the news_item dict
         :param news_item: news_item content
@@ -182,10 +182,9 @@ class BaseRssBot(RssBotInterface):
                     self.logger.warning(f'Link {link} isn\'t found')
             elif tag.name == 'img':
                 src = tag.attrs.get('src', '')
-                try:
+                if src in imgs:
                     img_idx = imgs.index(src) + len(links) + 1
-                except ValueError:
-                    self.logger.warning(f'Img {src} isn\'t found')
+                else:
                     imgs.append(src)
                     img_idx = len(imgs) + len(links)
                 out_str += f'\n[image {img_idx}:  {tag.attrs.get("title")}][{img_idx}]'

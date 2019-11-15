@@ -4,3 +4,7 @@ main.log
 venv/
 __pycache__/
 .mypy_cache
+.coverage
+cover/
+test/data/help.txt
+test/data/yahoo.txt
