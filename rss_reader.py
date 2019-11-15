@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 import re
 import json
 import feedparser
-import jsonpickle
 
 def parse_arguments():
     parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
@@ -86,12 +85,12 @@ def retrieve_news(link, limit):
 def make_json(news):
     json_news=[]
     for item in news:
-        json_news.append(json.dumps(item))
+        json_news.append(json.dumps({"title": item.title,
+                                    "source":item.source,
+                                    "date": item.date,
+                                    "content": item.content,
+                                    "images": item.images},ensure_ascii=False))
     return json_news
-        # with open('newqs.json','w') as filer:
-       # for item in news:
-            #json.dump(item, filer)
-            #json.dump(jsonpickle.encode(item),filer) 
             
 def print_news(news):
     for item in news:
