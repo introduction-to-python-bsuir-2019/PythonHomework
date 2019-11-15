@@ -2,7 +2,7 @@ import argparse
 import logging
 import app
 from datetime import datetime
-from app.rssConverter import RssConverter
+from app.rssConverter.RssConverter import RssConverter
 from app.rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDateOrURL
 from app.rssConverter.DataSafer import NewsGetterSafer
 
