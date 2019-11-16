@@ -18,8 +18,27 @@ def index(request):
     return HttpResponse('You are on app page')
 
 
-def add_to_database(info, model):
-    pass
+def add_to_news_database(items, model):
+    info_all = list()
+
+    for id_num, item in items.items():
+        if id_num != 'title':
+            try:
+                info = model(date_id=id_num,
+                             pubDate=str(parse(item['pubDate']).date()),
+                             title=html.unescape(item['title']),
+                             link=item['link'],
+                             description=item['description'],
+                             imageLink=item['imageLink'],
+                             imageDescription=item['imageDescription'])
+
+                info_all.append(info)
+            except IntegrityError as e:
+                pass
+
+    # We should ignore conflicts because of UNIQUE values. We cannot add them into database
+    model.objects.bulk_create(info_all, ignore_conflicts=True)
+    # This way of adding row into database is highly efficient
 
 
 def rss_source(request):
@@ -32,20 +51,7 @@ def rss_source(request):
             news_reader = NewsReader(url)
             items = news_reader.items
 
-            for id_num, item in items.items():
-                if id_num != 'title':
-                    try:
-                        info = NewsInfo(date_id=id_num,
-                                        pubDate=str(parse(item['pubDate']).date()),
-                                        title=html.unescape(item['title']),
-                                        link=item['link'],
-                                        description=item['description'],
-                                        imageLink=item['imageLink'],
-                                        imageDescription=item['imageDescription'])
-
-                        info.save()
-                    except IntegrityError as e:
-                        pass
+            add_to_news_database(items, NewsInfo)
 
             return redirect('home')
 
