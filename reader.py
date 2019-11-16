@@ -5,16 +5,17 @@ from xml.dom.minidom import parseString
 from html_parser import parse_HTML
 
 
-def output(string, sep=' ', end='\n', flush=False):
+def output(string, sep=' ', end='\n', flush=False, verbose=True):
     """Output function for singe string but convert &#39; to '"""
-    string = string.replace("&#39;", "'")
-    print(string, sep=sep, end=end, flush=flush)
+    if verbose:
+        string = string.replace("&#39;", "'")
+        print(string, sep=sep, end=end, flush=flush)
     
 
 class RSSReader():
     """RSSReader: Class for reading rss channels.
-
-
+    Methods:
+    show_news() - output news to stdout
     """
     def __init__(self, args):
         super(RSSReader, self).__init__()
@@ -25,11 +26,13 @@ class RSSReader():
         self.__text = ""
 
     def __read_news(self):
-        """ """
+        """Read data from link"""
         try:
+            output(f"Reading information from {self.__source}", end='...\n', verbose=self.__verbose)
             with urllib.request.urlopen(self.__source) as rss:
                 bytestr = rss.read()
                 self.__text = bytestr.decode("utf8")
+            output("Complete.", verbose=self.__verbose)
         except Exception as e:
             if type(e) is ValueError:
                 output("Error: Can't connect, please try with https://")
@@ -41,6 +44,8 @@ class RSSReader():
 
 
     def __parse(self):
+        """Parse XML data to python structures"""
+        output("Parsing information...", verbose=self.__verbose)
         xml = parseString(self.__text)
         feed = xml.getElementsByTagName("title")[0].firstChild.data
         items = xml.getElementsByTagName("item")
@@ -57,18 +62,22 @@ class RSSReader():
                         item.getElementsByTagName("link")[0].firstChild.data,
                         text,
                         links]]
+            output(f"{counter} article parsed.", verbose=self.__verbose)
+        output("Complete.", verbose=self.__verbose)
         return feed, column
 
     def show_news(self):
+        """Read, parse and print info in stdout"""
         self.__read_news()
         feed, column = self.__parse()
-        output(f"Feed: {feed}", end="\n\n")
+        output(f"{feed}", end="\n\n")
         for news in column:
             output(f"Title: {news[0]}")
             output(f"Date: {news[1]}")
             output(f"Link: {news[2]}", end="\n\n")
             output(news[3], end="\n\n")
-            output("Links:")
+            if len(news[4]) != 0:
+                output("Links:")
             for i in range(len(news[4])):
                 output(f"[{i+1}]: {news[4][i]}")
             output("\n\n")
