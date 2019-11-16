@@ -8,7 +8,7 @@ from printer import Printer
 from exceptions import SourceConnectingError
 
 
-APP_VERSION = '0.2'
+APP_VERSION = '0.3'
 
 
 class RSS_reader:
@@ -39,7 +39,7 @@ class RSS_reader:
 
         self.feed = self.parser.parse(request.content)
         if not self.limit:
-            self.limit = len(self.feed) + 1
+            self.limit = len(self.feed['articles']) + 1
 
     def print_feed(self):
         if self.json_mode:
@@ -48,7 +48,7 @@ class RSS_reader:
             self.printer.stdout_print(self.feed, self.limit)
 
 
-if __name__ == "__main__":
+def main():
     cmd_arg_parser = argparse.ArgumentParser(description='Pure Python comandline RSS reader')
     cmd_arg_parser.add_argument('source', help='RSS URL')
     cmd_arg_parser.add_argument('--version', help='Print version info',
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     cmd_args = cmd_arg_parser.parse_args()
 
     log_handlers = [
-        logging.FileHandler(os.path.dirname(os.path.abspath(__file__))+'rss_reader.log'),
+        logging.FileHandler('rss_reader.log'),
     ]
     if cmd_args.verbose:
         log_handlers.append(logging.StreamHandler())
@@ -71,3 +71,7 @@ if __name__ == "__main__":
     reader = RSS_reader(cmd_args)
     reader.get_feed_from_source()
     reader.print_feed()
+    
+
+if __name__ == "__main__":
+    main()

@@ -2,7 +2,7 @@ class Printer:
     ''' Class for all output operations '''
     def stdout_print(self, feed, limit):
         ''' Print feed to cmd'''
-        print(f'\nFeed: {feed["feed_name"]}\nFeed date: {feed["feed_date"]}\n')
+        print(f'\nFeed: {feed["feed_name"]}\n')
         for article in feed['articles'][:limit]:
             if not article.media['links'] and not article.media['images']:
                 links = 'No links'

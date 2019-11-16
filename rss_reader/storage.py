@@ -10,7 +10,7 @@ class Article:
 
     def to_dict(self):
         """Convert article data at dict and return it"""
-        return {'date': self.date,
+        return {'date': self.date.strftime("%a, %d %b %Y %H:%M:%S %z"),
                 'title': self.title,
                 'content': self.content,
                 'media': self.media,
