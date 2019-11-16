@@ -8,7 +8,7 @@ from printer import Printer
 from exceptions import SourceConnectingError
 
 
-APP_VERSION = '0.3'
+APP_VERSION = '1.0'
 
 
 class RSS_reader:
