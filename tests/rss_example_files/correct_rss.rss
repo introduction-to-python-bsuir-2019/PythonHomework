@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+<channel>
+    <title>Yahoo News - Latest News &amp; Headlines</title>
+    <link>https://www.yahoo.com/news</link>
+    <description>The latest news and headlines from Yahoo! News. Get breaking news stories and in-depth coverage with videos and photos.</description>
+    <language>en-US</language>
+    <copyright>Copyright (c) 2019 Yahoo! Inc. All rights reserved</copyright>
+    <pubDate>Thu, 14 Nov 2019 10:31:33 -0500</pubDate>
+    <ttl>5</ttl>
+    <image>
+        <title>Yahoo News - Latest News &amp; Headlines</title>
+        <link>https://www.yahoo.com/news</link>
+        <url>http://l.yimg.com/rz/d/yahoo_news_en-US_s_f_p_168x21_news.png</url>
+    </image>
+    <item>
+        <title>Some title &amp; </title>
+        <description>&lt;p&gt;&lt;a href="https://some-source.net/somelink.html"&gt;&lt;img src="http://some-image-link-f43ed8c16284" width="130" height="86" alt="Image description" align="left" title="image title" border="0" &gt;&lt;/a&gt;Some article text with intersting things&lt;p&gt;&lt;br clear="all"&gt;</description>
+        <link>https://www.yahoo.com/news</link>
+        <pubDate>Tue, 12 Nov 2019 13:46:43 -0500</pubDate
+        ><source url="https://www.yahoo.com/news">Yahoo News Video</source>
+        <guid isPermaLink="false">184643831.html</guid>
+        <media:content height="86" url="https://image-url-f43ed8c16284" width="130"/>
+        <media:text type="html">&lt;p&gt;&lt;a href="some-link-184643831.html"&gt;&lt;img src="http://some-image.com/image" width="130" height="86" alt="image description" align="left" title="image title" border="0" &gt;&lt;/a&gt;Article text.&lt;p&gt;&lt;br clear="all"&gt;</media:text>
+        <media:credit role="publishing company"/>
+    </item>
+</channel>
+</rss>
