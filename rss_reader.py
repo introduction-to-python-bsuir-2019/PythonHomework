@@ -19,6 +19,21 @@ def parse_arguments():
 
 VERSION='v1.1'
 
+class NewsFeed:        
+    def __init__(self, link, limit):
+        logging.info('Retrieving news...')
+        feed=feedparser.parse(link)
+        soup=requests.get(link).text
+        soup=BeautifulSoup(soup,"html5lib")
+        news_separated=soup('item')
+        logging.info('News retrieved, converting to readable format...')
+        self.title=feed['feed']['title']
+        newsdict=feed['entries']
+        self.news=[]
+        for index, item in (enumerate(newsdict[:min(limit,len(newsdict))]) if limit else enumerate(newsdict)):
+            self.news.append(NewsItem(item,news_separated[index]))
+
+
 class NewsItem:
     def __init__(self,content,soup):
         self.title=ultimately_unescape(content['title'])
@@ -77,24 +92,22 @@ def retrieve_news(link, limit):
         news.append(NewsItem(item,news_separated[index]))
     return news
 
-
 def make_json(news):
     logging.info('Converting to JSON...')
-    json_news=[]
-    for item in news:
-        json_news.append(json.dumps({"title": item.title,
-                                    "source":item.source,
-                                    "date": item.date,
-                                    "content": item.content,
-                                    "images": item.images},ensure_ascii=False))
-    return json_news
+    return json.dumps({'title': news.title,
+                       'news': [{'news title': item.title,
+                                 'source': item.source,
+                                 'date': item.date,
+                                 'content': item.content,
+                                 'images': item.images} for item in news.news]},ensure_ascii=False)
             
 def print_news(news):
-    for item in news:
-        try:
+    try:
+        print('\nSource: '+news.title)
+        for item in news.news:
             item.show_fields()
-        except AttributeError:
-            print(item)
+    except (AttributeError, TypeError):
+        print(news)
 
 def main():
     args=parse_arguments()
@@ -111,9 +124,9 @@ def main():
             logging.basicConfig(level=logging.INFO, 
                                 format='%(asctime)s - %(message)s',
                                 datefmt='%H:%M:%S')
-        news=retrieve_news(args.source, args.limit)
+        feed=NewsFeed(args.source, args.limit)
         if args.json:
-            news=make_json(news)
+            news=make_json(feed)
         print_news(news)
 
 if __name__=='__main__':
