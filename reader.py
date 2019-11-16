@@ -13,7 +13,7 @@ def output(string, sep=' ', end='\n', flush=False, verbose=True):
 
 
 def progress(elems, done, length=20):
-    """Take arguments 
+    """Take arguments
     elems: count of elements
     done: progress (in elements)
     length: progress bar length
@@ -113,7 +113,7 @@ class RSSReader():
             if separ:
                 json += ','
             separ = True
-            json += '\n    {\n      "title": "' + news[0] + '",'
+            json += '{\n      "title": "' + news[0] + '",'
             json += '\n      "date": "' + news[1] + '",'
             json += '\n      "link": "' + news[2] + '",'
             json += '\n      "description": "' + news[3] + '",'
@@ -121,9 +121,13 @@ class RSSReader():
             links = ""
             for lin in news[4]:
                 links += f'\n        "{lin}",'
-            json += links[:-1] + "\n      ]" + "\n    }"
+            if len(links) != 0:
+                json += links[:-1] + "\n      ]"
+            else:
+                json += ']'
+            json += "\n    }"
             counter += 1
             if self.__verbose:
                 progress(len(column), counter)
-        json += '\n  ]\n}'
+        json += ']\n}'
         output(json)
