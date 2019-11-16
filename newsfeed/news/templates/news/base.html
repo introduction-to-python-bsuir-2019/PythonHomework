@@ -29,6 +29,16 @@
               <a class="nav-item nav-link" href=" url 'blog-home' ">Home</a>
               <a class="nav-item nav-link" href=" url 'blog-about' ">About</a>
             </div>
+
+              <div class="navbar-nav">
+                  <form class="form-inline my-2 my-lg-0" action="{% url 'search-result' %}" method="GET">
+                      {% csrf_token %}
+
+                      <input name="query" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" value="{{ request.GET.query }}">
+                      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+
+                  </form>
+              </div>
             <!-- Navbar Right Side -->
 <!--            <div class="navbar-nav">-->
 

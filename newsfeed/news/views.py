@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView
 
 from django.db.utils import IntegrityError
+from django.db.models import Q
 
 from .forms import GetRSSForm
 from .models import NewsInfo
@@ -100,3 +101,19 @@ class RSSPostListView(ListView):
         return NewsInfo.objects.filter(rss_hash=self.kwargs.get('rss_hash'))  #!@!@!@
 
 
+class SearchResultView(ListView):
+    model = NewsInfo
+    template_name = 'news/news_by_date.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        print('WTF')
+        print(query)
+
+        return NewsInfo.objects.filter(
+            Q(description__icontains=query) |
+            Q(pubDate__icontains=query) |
+            Q(date_id__icontains=query) |
+            Q(title__icontains=query)
+        )

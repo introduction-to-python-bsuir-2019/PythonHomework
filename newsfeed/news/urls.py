@@ -4,7 +4,8 @@ from .views import (index,
                     rss_source,
                     PostListView,
                     DatePostListView,
-                    RSSPostListView)
+                    RSSPostListView,
+                    SearchResultView)
 
 
 urlpatterns = [
@@ -17,4 +18,7 @@ urlpatterns = [
     path('home/rss_source/<str:rss_hash>',
          RSSPostListView.as_view(),
          name='news-by-rss'),
+    path('home/search/',
+         SearchResultView.as_view(),
+         name='search-result')
 ]
