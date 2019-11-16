@@ -1,13 +1,22 @@
+"""
+    Contains ArgParser class which allows parse arguments from cmd
+"""
+
 import argparse
+
+
+__version__ = '0.1.0'
 
 
 class ArgParser:
     """ Reads arguments """
+
     def __init__(self):
         self.args = self.parse_args()
 
     def parse_args(self):
         """ Reads arguments from the cmd and returns them """
+
         argparser = argparse.ArgumentParser(description='One-shot command-line RSS reader', prog='rss-reader')
         argparser.add_argument(
             'url',
@@ -28,9 +37,14 @@ class ArgParser:
         argparser.add_argument(
             '--version',
             action='version',
-            version='rss reader version 1.0',
+            version=f'%(prog)s version {__version__}',
             default=None,
-            help='prints version of program'
+            help='Prints version of program'
+        )
+        argparser.add_argument(
+            '--verbose',
+            action='store_true',
+            help='Prints all logs in stdout'
         )
         args = argparser.parse_args()
         return args
