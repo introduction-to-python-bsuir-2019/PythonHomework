@@ -15,7 +15,10 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     rss = reader.RSSReader(args)
-    rss.show_news()
+    if args.json:
+        rss.show_json()
+    else:
+        rss.show_news()
 
 
 if __name__ == "__main__":
