@@ -4,8 +4,10 @@ import html
 import json
 from bs4 import BeautifulSoup
 from SourseReader import NewsReader
+import logging
 PROJECT_VERSION = 'Version 0.5 : '
 PROJECT_STATUS = 'FIGHTING WITH SUMMARY'
+
 
 def Main():
 	parser = argparse.ArgumentParser(prog = 'RSS-READER',description=' Provide simple "one shot" RSS Reader')
@@ -16,21 +18,26 @@ def Main():
 	parser.add_argument("--limit",default=3,
 						 help = "Limit news topics if this parameter provided.Default value is 3",type = int)
 
-	args = parser.parse_args()
-	print(args)
 
+	args = parser.parse_args()
 
 	news = NewsReader(args.url,args.limit)
-	news.parse_rss()
+	
+	if args.verbose:
+		logging.basicConfig(level=logging.INFO, format='%(relativeCreated)6d %(threadName)s %(message)s')
+
 	if args.version:
 		print(PROJECT_VERSION + PROJECT_STATUS, end='\n')
 		return
+
 	if args.json:
-		print(news.make_json())
+		news.parse_rss()
+		news.make_json()
+		print('-'*80)
+
 	else:
+		news.parse_rss()
 		news.print_rss()
-
-
 				
 
 
