@@ -1,7 +1,10 @@
 import argparse
-from bs4 import BeautifulSoup as Soup4
-from urllib.request import *
 import re
+import logging
+
+from bs4 import BeautifulSoup as Soup4
+from urllib.request import Request
+from urllib.request import urlopen
 
 
 def parsargument():
@@ -15,7 +18,7 @@ def parsargument():
     parser.add_argument(
         '--version',
         action='version',
-        version='%(prog)s' + ' 0.0.1',
+        version='%(prog)s' + ' 0.1',
         help='Print version info'
     )
     parser.add_argument(
@@ -39,32 +42,100 @@ def parsargument():
 
 
 def get_rss(url):
+    logging.info('Opened URL for news reading, URL: %s' % url)
     req = Request(url)
+    logging.info('Read our request to rss')
     rss = urlopen(req).read()
     return rss
 
 
+class RssFeed:
+    """This class contains lists of title, dates, descriptions,links.
+    Methods: get_title, get_date, get_description, get_link, get_feed"""
+
+    def __init__(self):
+        """Initialization"""
+        self.args = parsargument()  # args contains all arguments
+        self.soup = Soup4(get_rss(self.args.source), "xml")  # convert our page to xml
+        self.title = []  # List of titles
+        self.date = []  # List of dates
+        self.description = []  # List of description of feed
+        self.link = []  # List of links(not image)
+        self.image_link = []  # List of image links
+
+    def get_title(self, item):
+        """This method get title of feed"""
+        title = item.find('title').string
+        self.title.append(title.replace("&#39;", "'").replace("&quot;", ""))
+        logging.info('Get title success')
+
+    def get_date(self, item):
+        """This method get date of publication"""
+        self.date.append(item.find('pubDate').string)
+        logging.info('Get date success')
+
+    def get_description(self, item):
+        """This method get description of feed"""
+        descrip = item.find('description').string
+        descrip = descrip.replace("&#39;", "'").replace("&quot;", "").replace("&gt;", "").replace("&nbsp;&nbsp;", "\n")
+        self.description.append(re.sub('<.*?>', '', descrip))
+        logging.info('Get description success')
+
+    def get_link(self, item):
+        """This method get all links from rss"""
+
+        self.link.append(item.find('link').string)
+        logging.info('Get link source success')
+        media_link = item.find_all('media:content')
+        images = []  # List of image links for one item
+        for img_link in media_link:
+            if (img_link.get('type') == 'image/jpeg') or (not img_link.get('type')):
+                images.append(img_link.get('url'))
+        self.image_link.append(images)
+        logging.info('Get image link success')
+
+    def get_feed(self):
+        """This method get all information from rss to string"""
+        logging.info("Limit is: (%s) " % str(self.args.limit))
+        logging.info("Find <item> tags in feed.")
+        items = self.soup.find_all('item', limit=self.args.limit)
+        for item in items:
+            self.get_link(item)
+            self.get_date(item)
+            self.get_description(item)
+            self.get_title(item)
+        else:
+            logging.info("All goods:)")
+
+    def print_news(self):
+        """This method print feed"""
+        for number in range(0, len(self.title)):
+            print('Title: ' + self.title[number])
+            print('Date: ' + self.date[number])
+            print('Link: ' + self.link[number])
+            print('\nNews: ' + self.description[number])
+            if self.image_link[number]:
+                print('\nImage link: ')
+                print('\n'.join(self.image_link[number]))
+                print('\n\n')
+            else:
+                logging.info(' Feed #' + str(number) + ' doesn\'t has image')
+                print('\nImage link: None\n\n')
+        logging.info("All news are printed")
+
+
 def get_news():
     """This function get information from rss page and print int cmd"""
-    args = parsargument()
-    soup = Soup4(get_rss(args.source), "xml")
-    items = soup.find_all('item', limit=args.limit)
-    feed = soup.title.string
-    print("Feed: " + feed + "\n")
-    for item in items:
-        date = item.find('pubDate').string
-        title = item.find('title').string
-        descrip = item.find('description').string
-        description = re.sub('<.*?>', '', descrip)
-        link = item.find('link').string
-        image_link = item.find('media:content').get('url')
-        print("Link : " + link)
-        print("Title: " + title.replace("&#39;", "'").replace("&quot;", ""))
-        print("Date: " + date)
-        print("\nNews: " + description.replace("&#39;", "'").replace("&quot;", "").replace("&gt;", ""))
-        print("\nImages_link: " + image_link)
-        print("\n\n")
+    logging.info("Start parsing feeds")
+    news = RssFeed()
+    news.get_feed()
+    feed = news.soup.title.string
+    print("\nFeed: " + feed + "\n")
+    news.print_news()
 
 
-# print(args.verbose)
+open('logger.log', 'w').close()
+if parsargument().verbose:
+    logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG, filename='logger.log')
 get_news()
