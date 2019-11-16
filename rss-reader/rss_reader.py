@@ -21,7 +21,7 @@ import logging
 import feedparser
 import argparse
 
-from htmlparser import *
+from .htmlparser import *
 
 
 class RSSReader:
