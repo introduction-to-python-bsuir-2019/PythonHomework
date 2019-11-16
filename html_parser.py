@@ -12,12 +12,13 @@ class _html_parser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == "img":
             num = len(self.links)+1
-            self.text += f"[Image {num}: "
+            self.text += "[Image"
             for attr in attrs:
-                if attr[0] == "alt":
-                    self.text += attr[1] + f"][{num}]"
+                if attr[0] == "alt" and attr[1] != "":
+                    self.text += f": {attr[1]}"
                 elif attr[0] == "src":
                     self.links += [attr[1] + " (image)"]
+            self.text +=  f"][{num}]"
         elif tag == "a":
             for attr in attrs:
                 if attr[0] == "href":
