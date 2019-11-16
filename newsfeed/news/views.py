@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView
 
@@ -20,20 +20,28 @@ def index(request):
 
 def add_to_news_database(items, model):
     info_all = list()
+    rss_title = "no title"
 
     for id_num, item in items.items():
-        if id_num != 'title':
+        if id_num == 'title':
+            rss_title = item
+        else:
             try:
-                info = model(date_id=id_num,
-                             pubDate=str(parse(item['pubDate']).date()),
+                date = NewsReader.get_date(item['pubDate'])
+                date_id = ''.join(str(date).split('-'))
+
+                info = model(date_id=date_id,
+                             pubDate=str(date),
                              title=html.unescape(item['title']),
+                             rss_title=rss_title,
+                             rss_hash=hash(rss_title),
                              link=item['link'],
                              description=item['description'],
                              imageLink=item['imageLink'],
                              imageDescription=item['imageDescription'])
 
                 info_all.append(info)
-            except IntegrityError as e:
+            except IntegrityError as e:  # it cannot be caused
                 pass
 
     # We should ignore conflicts because of UNIQUE values. We cannot add them into database
@@ -66,3 +74,29 @@ class PostListView(ListView):
     template_name = 'news/home.html'
     context_object_name = 'posts'
     ordering = ['-pubDate']
+
+
+class DatePostListView(ListView):
+    model = NewsInfo
+    template_name = 'news/news_by_date.html'
+    context_object_name = 'posts'
+
+    print('DatePostListView')
+
+    def get_queryset(self):
+        print('DatePostListView query')
+        # post = get_object_or_404(Ne)/
+        return NewsInfo.objects.filter(date_id=self.kwargs.get('date_id'))
+
+
+class RSSPostListView(ListView):
+    model = NewsInfo
+    template_name = 'news/news_by_rss.html'
+    context_object_name = 'posts'
+    print('RSSPostListView')
+
+    def get_queryset(self):
+        print('WTF, i\'l try to')
+        return NewsInfo.objects.filter(rss_hash=self.kwargs.get('rss_hash'))  #!@!@!@
+
+

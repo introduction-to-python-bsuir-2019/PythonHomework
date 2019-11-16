@@ -1,13 +1,13 @@
 {% extends 'news/base.html' %}
-
 {% block content %}
     {% for post in posts %}
+
         <article class="media content-section">
             <img class="rounded-circle article-img" src="#">
             <div class="media-body">
                 <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'news-by-rss' post.rss_hash %}">{{ post.rss_title }}</a>
-                    <a class="mr-2" href="{% url 'news-by-date' post.date_id %}">
+                    <a class="mr-2" href="#">{{ post.rss_title }}</a>
+                    <a class="mr-2" href="#">
                         <small class="text-muted">{{ post.pubDate|date:"F j, Y" }}</small>
                     </a>
                 </div>
