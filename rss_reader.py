@@ -1,4 +1,4 @@
-#!/usr/bin/python3.8
+#!/usr/bin/env python3.8
 import logging
 from App.RSSListener import RSSListener
 from App import Args_parser
