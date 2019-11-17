@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="top-pure-rss-reader",
+    name="rss-reader",
     version="0.2",
     author="Archeex",
     author_email="qsanich@gmail.com",
