@@ -2,8 +2,8 @@
     Controls the launch of the rss-reader program
 """
 
-from argparser import ArgParser
-from RSSreader import RSSreader
+from app.argparser import ArgParser
+from app.RSSreader import RSSreader
 import logging
 
 
