@@ -39,9 +39,11 @@ class RSSFeed:
         """ Converts rss feed to json """
         logging.info("Converting rss feed to json")
         if entries:
-            return json.dumps({"feed": self.title, "entries": entries}, indent=2)
+            return json.dumps({"feed": self.title, "entries": entries},
+                              indent=2, ensure_ascii=False)
         else:
-            return json.dumps({"feed": self.title, "entries": self.entries}, indent=2)
+            return json.dumps({"feed": self.title, "entries": self.entries},
+                              indent=2, ensure_ascii=False)
 
     def get_rss(self):
         """ Gets rss feed by source """
