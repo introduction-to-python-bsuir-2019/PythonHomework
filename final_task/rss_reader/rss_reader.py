@@ -16,7 +16,7 @@ def init_cli_parser():
     """
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader.', prog='rss-reader')
     parser.add_argument("source", type=str, nargs='?', default=None, help="RSS URL")
-    parser.add_argument('--version', help="print version info", action='version', version='%(prog)s 1.1')
+    parser.add_argument('--version', help="print version info", action='version', version='%(prog)s 1.2')
     parser.add_argument("--json", help="print result as JSON in stdout", action="store_true")
     parser.add_argument("--verbose", help="outputs verbose status messages", action="store_true")
     parser.add_argument("--limit", type=int, help="limit news topics if this parameter provided")
@@ -66,8 +66,8 @@ def get_post_content(post):
     for img in soup.find_all('img'):
         if not img.get('src', 'Unknown') == '':
             data['hrefs'] += [(img.get('src', 'Unknown'), 'image', img.get('alt', ''))]
-            data['description'] = f"[image {len(data['hrefs'])}: \
-                {img.get('alt', '')}] [{len(data['hrefs'])}]\n" + data['description']
+            data['description'] = \
+                f"[image {len(data['hrefs'])}: {img.get('alt', '')}] [{len(data['hrefs'])}]\n" + data['description']
 
     return data
 
@@ -133,8 +133,8 @@ def main():
             display_news(feed_title, news, args.limit if args.limit else len(news))
         else:
             logger.info(f"displaying news in json format..\n")
-            print(json.dumps({'news': {'feed': feed_title, 'publications': \
-                news[:args.limit if args.limit else len(news)]}}, indent=2))
+            print(json.dumps({'news': {'feed': feed_title, \
+                'publications': news[:args.limit if args.limit else len(news)]}}, indent=2))
 
         logger.info(f"publications were successfully shown - {args.limit if args.limit else len(news)}")
         logger.info(f"end of work -->|")
