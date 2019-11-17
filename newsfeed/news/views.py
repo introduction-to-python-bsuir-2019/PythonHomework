@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 
 from django.db.utils import IntegrityError
 from django.db.models import Q
 
+from django.core.paginator import Paginator
+
 from .forms import GetRSSForm
 from .models import NewsInfo
+from .render import Render as PdfRender
 
 from news_feed.rss_reader import NewsReader
 
@@ -16,7 +19,7 @@ import html
 
 
 def index(request):
-    return HttpResponse('You are on app page')
+    return redirect('home')
 
 
 def add_to_news_database(items, model):
@@ -70,11 +73,33 @@ def rss_source(request):
     return render(request, 'news/rss_source.html', {'form': form})
 
 
+def remove_data(model):
+    model.objects.all().delete()
+    print('Have been removed!')
+
+
+def remove_news(request):
+    if request.method == 'GET':
+        remove_data(NewsInfo)
+
+    return redirect('home')
+
+
 class PostListView(ListView):
     model = NewsInfo
     template_name = 'news/home.html'
     context_object_name = 'posts'
     ordering = ['-pubDate']
+    paginate_by = 10
+
+
+# class RemovePostListView(ListView):
+#     remove_data(NewsInfo)
+#     model = NewsInfo
+#
+#     template_name = 'news/home.html'
+#     context_object_name = 'posts'
+#     ordering = ['-pubDate']
 
 
 class DatePostListView(ListView):
@@ -105,6 +130,7 @@ class SearchResultView(ListView):
     model = NewsInfo
     template_name = 'news/news_by_date.html'
     context_object_name = 'posts'
+    ordering = ['-pubDate']
 
     def get_queryset(self):
         query = self.request.GET.get('query')
@@ -117,3 +143,17 @@ class SearchResultView(ListView):
             Q(date_id__icontains=query) |
             Q(title__icontains=query)
         )
+
+
+class PdfView(View):
+
+    def get(self, reqeust):
+        posts = NewsInfo.objects.all()
+        # today = ti
+
+        params = {
+            'posts': posts,
+            'reqeust': reqeust
+        }
+
+        return PdfRender.render('pdf/pdf.html', params)

@@ -11,23 +11,23 @@
     <link rel='stylesheet' type='text/css' href="{% static 'news/main.css' %}">
 
     {% if title %}
-        <title>Django Blog - {{ title }}</title>
+        <title>Django News - {{ title }}</title>
     {% else %}
-        <title>Django Blog</title>
+        <title>Django News</title>
     {% endif %}
 </head>
 <body>
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href=" url 'blog-home' ">Django Blog</a>
+          <a class="navbar-brand mr-4" href="{% url 'home' %}">Django News</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href=" url 'blog-home' ">Home</a>
-              <a class="nav-item nav-link" href=" url 'blog-about' ">About</a>
+              <a class="nav-item nav-link" href="{% url 'home' %}">Home</a>
+              <!--<a class="nav-item nav-link" href=" url 'blog-about' ">About</a>-->
             </div>
 
               <div class="navbar-nav">
@@ -38,6 +38,8 @@
                       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 
                   </form>
+
+                  <a class="nav-item nav-link" href="{% url 'rrs_source' %}">Add rss source</a>
               </div>
             <!-- Navbar Right Side -->
 <!--            <div class="navbar-nav">-->
@@ -67,7 +69,22 @@
         <div class="col-md-4">
           <div class="content-section">
             <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.
+            <p class='text-muted'>Some additional buttons
+                <form class="form-group" action="{% url 'remove-news' %}" method="GET">
+                    <button class="btn btn-outline-info" type="submit">
+                        Clear News
+                    </button>
+
+                </form>
+
+                <form class="form-group" action="{% url 'to-pdf' %}" method="GET">
+                    <button class="btn btn-outline-info" type="submit">
+                        Import all to pdf.
+                    </button>
+
+                </form>
+
+
               <ul class="list-group">
                 <li class="list-group-item list-group-item-light">Latest Posts</li>
                 <li class="list-group-item list-group-item-light">Announcements</li>

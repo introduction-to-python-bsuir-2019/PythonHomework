@@ -5,12 +5,14 @@ from .views import (index,
                     PostListView,
                     DatePostListView,
                     RSSPostListView,
-                    SearchResultView)
+                    SearchResultView,
+                    remove_news,
+                    PdfView)
 
 
 urlpatterns = [
-    # path('', index, name='index'),
-    path('', rss_source, name='rrs_source'),
+    path('', index, name='index'),
+    path('home/rss', rss_source, name='rrs_source'),
     path('home/', PostListView.as_view(), name='home'),
     path('home/date/<str:date_id>',
          DatePostListView.as_view(),
@@ -20,5 +22,11 @@ urlpatterns = [
          name='news-by-rss'),
     path('home/search/',
          SearchResultView.as_view(),
-         name='search-result')
+         name='search-result'),
+    path('home/remove',
+         remove_news,
+         name='remove-news'),
+    path('render/pdf/',
+         PdfView.as_view(),
+         name='to-pdf')
 ]

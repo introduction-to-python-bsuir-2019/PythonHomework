@@ -19,4 +19,20 @@
         </article>
     {% endfor %}
 
+    {% if is_paginated %}
+        <!--<div class="pagination">-->
+        <center>
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page=1">First</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+                <a class="btn btn-info mb-4 mr-2" href="#">{{ page_obj.number }}</a>
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages  }}">Last</a>
+            {% endif %}
+        </center>
+        <!--</div>-->
+    {% endif %}
+
 {% endblock content %}
