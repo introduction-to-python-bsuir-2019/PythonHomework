@@ -1,0 +1,7 @@
+finalTaskPart1.py
+setup.py
+RSS_READER.py.egg-info/PKG-INFO
+RSS_READER.py.egg-info/SOURCES.txt
+RSS_READER.py.egg-info/dependency_links.txt
+RSS_READER.py.egg-info/requires.txt
+RSS_READER.py.egg-info/top_level.txt
