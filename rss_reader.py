@@ -9,6 +9,7 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 
+import sys
 import feedparser
 import argparse
 import requests
@@ -19,6 +20,11 @@ import bs4
 
 # from colorama import init  # for colorizing https://pypi.org/project/colorama/
 # init(autoreset=True)
+
+
+class RSSFeedException(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 class RSSFeed:
@@ -43,6 +49,8 @@ class RSSFeed:
         response = requests.get(self.source).text
 
         rss = feedparser.parse(response)
+        if rss['bozo']:
+            raise RSSFeedException(message="Incorrect url")
         self.title = rss['feed']['title']
         self.raw_rss = response
         self.entries = []
@@ -120,4 +128,9 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--limit", action="store", type=int, dest="limit")
 
     args = parser.parse_args()
-    main(args)
+
+    try:
+        main(args)
+    except RSSFeedException as e:
+        print(f"{e.message}")
+        sys.exit(0)
