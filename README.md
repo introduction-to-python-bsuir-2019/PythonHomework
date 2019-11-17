@@ -25,7 +25,7 @@ Example: `cache/20191117/www.androidpolice.com.rss`
 # TODO
 -   [x] [Iteration 1] One-shot command-line RSS reader.
 -   [x] [Iteration 2] Distribution
--   [ ] [Iteration 3] News caching
+-   [x] [Iteration 3] News caching
 -   [ ] [Iteration 4] Format converter
 -   [ ] * [Iteration 5] Output colorization
 -   [ ] * [Iteration 6] Web-server

@@ -7,7 +7,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='rss-reader',
-    version='0.2.0',
+    version='0.3.0',
     description='A simple Python3.8 rss reader',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
