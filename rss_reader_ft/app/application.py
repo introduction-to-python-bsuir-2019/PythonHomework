@@ -1,12 +1,13 @@
 """Module contains objects related to logs"""
 import sys
 import logging
+from typing import Dict
 
 from rss.data_loader import DataLoader
 from rss.rss_feed import RSSFeed
+from rss.print_data import Output
 from app.argument_parser import ArgumentParser
 from app.application_log import ApplicationLog
-from rss.print_data import Output
 
 
 class Application:
@@ -14,7 +15,7 @@ class Application:
 
     def __init__(self):
         """Init Application class"""
-        self.dict_args = ArgumentParser.parse_args()
+        self.dict_args: Dict = ArgumentParser.parse_args()
 
     def run_app(self) -> None:
         """Мethod sets application behavior"""

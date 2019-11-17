@@ -1,6 +1,7 @@
 """Module contains objects related to JSON"""
 import json
 import logging
+from typing import Dict
 
 from conversion.format_converter import FormatConverter
 
@@ -12,7 +13,7 @@ class JsonConverter(FormatConverter):
     """
     def __init__(self, rss_feed_dict):
         """Init JsonConverter class"""
-        self.convert_data = rss_feed_dict
+        self.convert_data: Dict = rss_feed_dict
 
     def convert_to_format(self) -> json:
         """Сonversion method to JSON format"""

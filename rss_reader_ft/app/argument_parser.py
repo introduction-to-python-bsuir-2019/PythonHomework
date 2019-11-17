@@ -1,5 +1,6 @@
 """Module contains objects related to arguments parsing"""
 import logging
+from typing import Dict
 
 import argparse
 
@@ -9,7 +10,7 @@ from app.rss_reader_config import __version__
 class ArgumentParser:
     """ArgumentParser class"""
     @staticmethod
-    def parse_args() -> dict:
+    def parse_args() -> Dict:
         """
         The method in which we set the parser,
         indicate what objects we expect from it,

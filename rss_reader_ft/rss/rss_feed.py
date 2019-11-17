@@ -1,5 +1,6 @@
 """Module contains objects related to rss feed"""
 import logging
+from typing import TypedDict, Dict, List
 
 from bs4 import BeautifulSoup
 
@@ -10,11 +11,11 @@ class RSSFeed:
         """Init RSSFeed class"""
         self.rss_url: str = dict_args['source']
         self.limit: int = dict_args['limit']
-        self.rss_feed = data
-        self.news = []
-        self.rss_feed_dict = {}
+        self.rss_feed: TypedDict = data
+        self.news: List = []
+        self.rss_feed_dict: Dict = {}
 
-    def data_processing(self) -> dict:
+    def data_processing(self) -> Dict:
         """
         Method for converting rss data to a dictionary
         and correcting them,
