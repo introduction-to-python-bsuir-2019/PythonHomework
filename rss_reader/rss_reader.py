@@ -3,8 +3,8 @@
 import feedparser
 import logging
 
-from .article import Article
-from .json_format import JsonFormat
+from article import Article
+from json_format import JsonFormat
 
 
 class Reader:
@@ -15,6 +15,7 @@ class Reader:
         self.limit = limit
         self.articles = []
         self.json = json
+        self.hrefs = []
 
     def parse_url(self):
         """Get RSS xml-file from url"""
@@ -29,7 +30,11 @@ class Reader:
 
         i = 0
         for item in source.entries:
-            self.articles.append(Article(item.title, item.published, item.description, item.link))
+            content = []
+            for element in item.media_content:
+                content.append(element['url'])
+
+            self.articles.append(Article(item.title, item.published, item.description, item.link, content))
 
             i += 1
             if i == self.limit:
@@ -50,6 +55,7 @@ class Reader:
             feed_dict.update({'date': article.date})
             feed_dict.update({'text': article.text})
             feed_dict.update({'link': article.link})
+            feed_dict.update({'hrefs': article.hrefs})
             array.append(feed_dict)
 
         return array
@@ -69,3 +75,6 @@ class Reader:
         print(f'Link: {article.link}')
         print('\nArticle text:')
         print(article.text)
+        print('\nHrefs:')
+        for href in article.hrefs:
+            print(href)

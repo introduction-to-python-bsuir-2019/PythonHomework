@@ -8,11 +8,12 @@ import logging
 class Article:
     logger = logging.getLogger('__main__.py')
 
-    def __init__(self, title, date, text, link):
+    def __init__(self, title, date, text, link, hrefs):
         self.title = title
         self.date = date
         self.text = self.strip_html_string(text)
         self.link = link.split('?')[0]
+        self.hrefs = hrefs
 
     def convert_time_to_unix(self):
         """Convert datetime to unix time"""
