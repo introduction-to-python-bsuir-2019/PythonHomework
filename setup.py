@@ -1,18 +1,15 @@
-from setuptools import setup, find_packages
 from os import path
+from setuptools import setup, find_packages
 
-here = path.abspath(path.dirname(__file__))
-
-# Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
-
+HERE = path.abspath(path.dirname(__file__))
+with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
 setup(
     name='rss-reader',
     version='0.2.0',
     description='A simple Python3.8 rss reader',
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     url='https://github.com/introduction-to-python-bsuir-2019/PythonHomework',
     author='DiSonDS',
