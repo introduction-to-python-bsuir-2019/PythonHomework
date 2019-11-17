@@ -1,10 +1,11 @@
 import argparse
-import re
+import json
 import logging
-
-from bs4 import BeautifulSoup as Soup4
+import re
 from urllib.request import Request
 from urllib.request import urlopen
+
+from bs4 import BeautifulSoup as Soup4
 
 
 def parsargument():
@@ -83,7 +84,6 @@ class RssFeed:
 
     def get_link(self, item):
         """This method get all links from rss"""
-
         self.link.append(item.find('link').string)
         logging.info('Get link source success')
         media_link = item.find_all('media:content')
@@ -109,6 +109,8 @@ class RssFeed:
 
     def print_news(self):
         """This method print feed"""
+        feed = self.soup.title.string
+        print("\nFeed: " + feed + "\n")
         for number in range(0, len(self.title)):
             print('Title: ' + self.title[number])
             print('Date: ' + self.date[number])
@@ -123,19 +125,34 @@ class RssFeed:
                 print('\nImage link: None\n\n')
         logging.info("All news are printed")
 
+    def print_json(self):
+        print(json.dumps({'title': self.soup.find('title').string,
+                          'news': [{'Title': self.title[number],
+                                    'Date': self.date[number],
+                                    'Link': self.link[number],
+                                    'Feed': self.description[number],
+                                    'Image link': self.image_link[number]
+                                    } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4))
+
 
 def get_news():
     """This function get information from rss page and print int cmd"""
     logging.info("Start parsing feeds")
     news = RssFeed()
     news.get_feed()
-    feed = news.soup.title.string
-    print("\nFeed: " + feed + "\n")
-    news.print_news()
+    if news.args.json:
+        news.print_json()
+    else:
+        news.print_news()
 
 
-open('logger.log', 'w').close()
-if parsargument().verbose:
-    logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
-                        level=logging.DEBUG, filename='logger.log')
-get_news()
+def main():
+    open('logger.log', 'w').close()
+    if parsargument().verbose:
+        logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
+                            level=logging.DEBUG, filename='logger.log')
+    get_news()
+
+
+if __name__ == '__main__':
+    main()
