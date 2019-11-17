@@ -55,6 +55,8 @@ Launch:
 ``` python3 setup.py sdist bdist_wheel```
 In the ./dist repo you'll find a .tar and .whl files.
 
+https://drive.google.com/file/d/1RbMYxvpEXTx77Dk61xPkwSChD_jTf0jf/view?usp=sharin
+
 
 
 
