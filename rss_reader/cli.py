@@ -20,7 +20,7 @@ def adding_arguments():
     parser.add_argument('--limit', metavar='LIMIT', nargs=1, type=int)
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--json', action='store_true')
-    parser.add_argument('--date', nargs='+', type=int)
+    parser.add_argument('--date', nargs=1, type=int)
     return parser
 
 
