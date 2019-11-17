@@ -10,6 +10,6 @@ setup(name='rss_reader',
 	author='KozachenkoKirill',
 	author_email='mr.elaskin@mail.ru',
 	license='EPAM-Introduction-to-Python-2019',
-	packages=['RSS-Reader'],
+	packages=['rss_reader'],
 	zip_safe=False
 )
