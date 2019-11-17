@@ -1,35 +1,29 @@
 import logging as log
 import json
 import feedparser
-from validator_collection.checkers import is_url
 
 
-class RssReader:
-    def __init__(self, source):
-        pass
+class RssReader(object):
+    def __init__(self, source, limit, date, json):
+        self.source = source
+        self.limit = limit
+        self.date = date
+        self.json = json
+
     
+    '''
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls.instance = super(RssReader, cls).__new__(cls)
         return cls.instance
+          '''  
 
-    def validation(self):
-        try:         
-            if is_url(url):
-                return url
-            else:
-                raise Exception("Invalid url")
-        except Exception as e:
-            print(e)
-            log.error(e)
-            
-
-    def get_news(source, limit=None):
-        a = feedparser.parse(validation(source))
+    def get_and_parse_news(self):
+        a = feedparser.parse(self.source)
         if a['entries'] and a['status'] == 200:
             print("Feed: ", a['feed']['title'],"\n")
             from bs4 import BeautifulSoup
-            list_of_news = a['entries'][:args.limit[0]] if limit else a['entries']
+            list_of_news = a['entries'][:self.limit[0]] if self.limit else a['entries']
             for news in list_of_news:    
                 print('Title: ', news['title'])
                 print('Date: ', news['published'])
@@ -47,10 +41,3 @@ class RssReader:
                 if 'media_content' in news.keys():
                     print("[2]  ", news['media_content'][0]['url'], '(image)')
                 print("="*90)   
-
-    
-
-    def init_logging():
-        log.basicConfig(format='%(asctime)s %(module)s %(message)s', datefmt='%I:%M:%S', level=log.INFO)
-    
-
