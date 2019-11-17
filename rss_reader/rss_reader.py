@@ -85,24 +85,9 @@ class RSSFeed:
                       f"{entry['summary']}\n\n")
 
 
-def main(args):
+def main():
     """ Main entry point of the app """
 
-    if args.verbose:
-        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
-        logging.info("Verbose output.")
-    else:
-        logging.basicConfig(format="%(levelname)s: %(message)s")
-
-    feed = RSSFeed(source=args.source)
-    feed.get_rss()
-    feed.print_rss(limit=args.limit, is_json=args.json)
-
-    logging.info("Exiting")
-
-
-if __name__ == "__main__":
-    """ This is executed when run from the command line """
     parser = argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
 
     # Required positional argument
@@ -129,8 +114,22 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if args.verbose:
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+        logging.info("Verbose output.")
+    else:
+        logging.basicConfig(format="%(levelname)s: %(message)s")
+
     try:
-        main(args)
+        feed = RSSFeed(source=args.source)
+        feed.get_rss()
+        feed.print_rss(limit=args.limit, is_json=args.json)
     except RSSFeedException as e:
         print(f"{e.message}")
         sys.exit(0)
+
+    logging.info("Exiting")
+
+
+if __name__ == "__main__":
+    main()
