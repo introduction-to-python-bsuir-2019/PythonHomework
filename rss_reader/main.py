@@ -3,12 +3,12 @@ import argparse
 import logging
 import os
 
-from feed_parser import FeedParser
-from printer import Printer
-from exceptions import SourceConnectingError
+from rss_reader.feed_parser import FeedParser
+from rss_reader.printer import Printer
+from rss_reader.exceptions import SourceConnectingError
 
 
-APP_VERSION = '1.0'
+APP_VERSION = '2.0'
 
 
 class RSS_reader:
@@ -71,7 +71,7 @@ def main():
     reader = RSS_reader(cmd_args)
     reader.get_feed_from_source()
     reader.print_feed()
-    
+
 
 if __name__ == "__main__":
     main()

@@ -6,8 +6,8 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from storage import Article
-from exceptions import ParsingError
+from rss_reader.storage import Article
+from rss_reader.exceptions import ParsingError
 
 
 class FeedParser:
