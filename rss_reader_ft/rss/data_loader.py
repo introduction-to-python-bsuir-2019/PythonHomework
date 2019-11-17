@@ -1,6 +1,7 @@
 """Module contains objects related to data loading"""
-import feedparser
 import logging
+
+import feedparser
 
 
 class DataLoader:
@@ -18,6 +19,6 @@ class DataLoader:
                 raise ConnectionError("Incorrect url")
 
         except Exception as ex:
-            logging.error('Error connection', exc_info=False)
+            logging.error(f'Error connection {ex}', exc_info=False)
         logging.info('Get data by URL')
         return data

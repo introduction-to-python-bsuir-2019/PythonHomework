@@ -1,6 +1,8 @@
 """Module contains objects related to rss feed"""
 import logging
+
 from bs4 import BeautifulSoup
+
 
 class RSSFeed:
     """RSSFeed class"""

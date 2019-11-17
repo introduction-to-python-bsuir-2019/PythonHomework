@@ -4,7 +4,7 @@ import logging
 from conversion.json_converter import JsonConverter
 
 
-class PrintData:
+class Output:
     """PrintData class"""
     @staticmethod
     def to_rss_format(rss_feed_dict) -> None:
@@ -25,4 +25,5 @@ class PrintData:
     def to_json_format(rss_feed_dict) -> None:
         """Output data to the console in JSON format"""
         logging.info('Print RSS feed in JSON format')
-        print(JsonConverter(rss_feed_dict).convert_to_format())
+        json_data = JsonConverter(rss_feed_dict).convert_to_format()
+        print(json_data)

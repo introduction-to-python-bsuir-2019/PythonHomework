@@ -1,6 +1,7 @@
 """Module contains objects related to arguments parsing"""
-import argparse
 import logging
+
+import argparse
 
 from app.rss_reader_config import __version__
 
