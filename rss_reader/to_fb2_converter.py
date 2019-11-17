@@ -1,12 +1,15 @@
+"""Module which provides interface of translating news to .fb2."""
 import xml.etree.ElementTree as tree
 import xml.dom.minidom as minidom
+from xml.etree.ElementTree import Element
 
 from image_handler import get_image_as_base64
 
 class FB2:
-	''''''
+	"""Class, which allows to translate news to .fb2 format."""
 
 	def __init__(self):
+		"""Initialize xml-tree."""
 		self.root = tree.Element('FictionBook')
 		self.root.set('xmlns:l', "http://www.w3.org/1999/xlink")
 
@@ -16,13 +19,14 @@ class FB2:
 		self.image_iter = 0
 
 
-	def create_xml_as_string(self):
+	def _get_xml_as_string(self) -> None:
 		return (tree.tostring(self.root)).decode('ascii')
 
 
 	def write_to_file(self, filepath: str) -> None:
+		"""Write xml-tree to file with filepath."""
 		with open(filepath, 'w') as file:
-			file.write(self.create_xml_as_string())
+			file.write(self._get_xml_as_string())
 
 		pretty_string = minidom.parse(filepath).toprettyxml()
 		
@@ -30,7 +34,8 @@ class FB2:
 			file.write(pretty_string)
 
 
-	def _add_image_binary(self, image_url: str, image_name: str):
+	def _add_image_binary(self, image_url: str, image_name: str) -> None:
+		"""Insert binary-data of image to xml-tree."""
 		if image_url == '' or image_url == None:
 			return
 
@@ -40,7 +45,8 @@ class FB2:
 		binary.text = get_image_as_base64(image_url)
 
 
-	def add_description_of_resource(self, title_info, subtitle_info, image_url):
+	def add_description_of_resource(self, title_info: str, subtitle_info: str, image_url: str) -> None:
+		"""Insert description of resource to xml-tree."""
 		title = tree.SubElement(self.body, 'title')
 
 		title_descr = tree.SubElement(title, 'p')
@@ -52,23 +58,27 @@ class FB2:
 		self._add_image(self.body, image_url, 'cover.png')
 
 
-	def _add_tag_p(self, parent, text):
+	def _add_tag_p(self, parent: Element, text: str) -> None:
+		"""Insert <p>{text}</p> in xml-tree with parent-node."""
 		p = tree.SubElement(parent, 'p')
 		p.text = text
 
 
-	def _add_tag_emptyline(self, parent):
+	def _add_tag_emptyline(self, parent: Element) -> None:
+		"""Insert <empty-line/> in xml-tree with parent-node."""
 		tree.SubElement(parent, 'empty-line')
 
 
-	def _add_image(self, parent, img_url, img_name):
+	def _add_image(self, parent: Element, img_url: str, img_name: str) -> None:
+		"""Insert <image l:href="#{img_name}"/> in xml-tree with parent-node."""
 		image = tree.SubElement(parent, 'image')
 		image.set('l:href', '#' + img_name)
 
 		self._add_image_binary(img_url, img_name)
 
 
-	def add_section(self, title_info, date, link, img_link, content):
+	def add_section(self, title_info: str, date: str, link: str, img_link: str, content: str) -> None:
+		"""Insert <section>{}</section> in xml-tree with parent-node."""
 		section = tree.SubElement(self.body, 'section')
 		title = tree.SubElement(section, 'title')
 		
@@ -81,4 +91,3 @@ class FB2:
 		self._add_tag_p(section, content)
 
 		self.image_iter += 1
-

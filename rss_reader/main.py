@@ -1,4 +1,4 @@
-'''Main module of RssReader which starts program.'''
+"""Main module of RssReader which starts program."""
 
 import logging
 from logging import config
@@ -7,7 +7,7 @@ import argparse
 from rss_parser import RssReader
 import caching_news
 
-VERSION = '1.0'
+VERSION = '4.0'
 
 LOGS_FILENAME = "rss_reader.log"
 
@@ -20,13 +20,14 @@ CORRECT_END_LOG = 'END (correct)'
 
 LINK = 'https://news.yahoo.com/rss/'
 # LINK = 'https://www.newsisfree.com/rss/'
+# LINK = 'https://news.tut.by/rss/index.rss'
 
 
 def create_args_parser() -> argparse.ArgumentParser:
-    '''Func which creats parser of arguments of command-line.
-        Return: argparse.ArgumentParser
-
-    '''
+    """Func which creats parser of arguments of command-line.
+    
+    Return: argparse.ArgumentParser
+    """
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.create_args_parser')
     logger.info("Create parser of arguments")
 
@@ -35,13 +36,7 @@ def create_args_parser() -> argparse.ArgumentParser:
 
 
 def init_args(parser: argparse.ArgumentParser) -> None:
-    '''Func which takes parser and adds arguments.
-       -v, --version
-       --json
-       -l, --limit
-       link
-       -V, --verbose 
-    '''
+    """Func which takes parser and adds arguments."""
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.init_args')
     logger.info('Initialize arguments of command-line')
 
@@ -88,8 +83,15 @@ def init_args(parser: argparse.ArgumentParser) -> None:
         Supports LIMIT",
         metavar='PATH'
     )
-
-
+    parser.add_argument(
+        "--to_pdf",
+        type=str,
+        help="Convert news to pdf format.\
+        Convertation to PDF supports only latin resource.\
+        Path must contain exsisting directories\
+        Supports LIMIT. Unsupports non-latin resources.",
+        metavar='PATH'
+    )
 
 
 if __name__ == "__main__":
@@ -118,16 +120,21 @@ if __name__ == "__main__":
         else:
             limit = 0
 
-        if args.json is True:
-            news = rss_reader.get_news_as_json(limit=limit)
-            print(news)
-        elif args.to_fb2 is not None:
-            # rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
-            rss_reader.get_news_as_pdf(limit=limit, filepath='test.pdf')
-        else:
-            news = rss_reader.get_news_as_string(limit=limit)
-            print(news)
-        logger.info(CORRECT_END_LOG)
+        try:
+            if args.json is True:
+                news = rss_reader.get_news_as_json(limit=limit)
+                print(news)
+            elif args.to_fb2 is not None:
+                rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
+            elif args.to_pdf is not None:
+                rss_reader.get_news_as_pdf(limit=limit, filepath=args.to_pdf)
+            else:
+                news = rss_reader.get_news_as_string(limit=limit)
+                print(news)
+            logger.info(CORRECT_END_LOG)
+        except(AttributeError):
+            print("Incorrect link on resource!")
+            logger.info('END (incorrect link)')            
     elif args.date is not None:
         logger.info(f'Getting cashed news by date: {args.date}')
 
