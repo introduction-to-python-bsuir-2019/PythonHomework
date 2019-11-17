@@ -1,9 +1,9 @@
 import argparse
-from RSS import RssAggregator
+from rss_app.RSS import RssAggregator
 import logging
 
 
-__version__="0.1.0"
+__version__="0.2.0"
 
 def get_args():        
     parser=argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
