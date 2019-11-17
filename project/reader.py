@@ -2,7 +2,7 @@ import sys
 import urllib.request
 import urllib.error
 from xml.dom.minidom import parseString
-from html_parser import parse_HTML
+from .html_parser import parse_HTML
 
 
 def output(string, sep=' ', end='\n', flush=False, verbose=True):
