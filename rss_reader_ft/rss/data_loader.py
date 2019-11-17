@@ -1,6 +1,5 @@
 """Module contains objects related to data loading"""
 import logging
-from typing import Dict
 
 import feedparser
 
@@ -11,7 +10,7 @@ class DataLoader:
         """Init DataLoader class"""
         self.url_source: str = url_source
 
-    def upload(self) -> Dict:
+    def upload(self):
         """Method of loading data from a site by URL"""
         try:
             data = feedparser.parse(self.url_source)

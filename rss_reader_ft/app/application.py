@@ -1,13 +1,13 @@
 """Module contains objects related to logs"""
-import sys
 import logging
+import sys
 from typing import Dict
 
-from rss.data_loader import DataLoader
-from rss.rss_feed import RSSFeed
-from rss.print_data import Output
-from app.argument_parser import ArgumentParser
 from app.application_log import ApplicationLog
+from app.argument_parser import ArgumentParser
+from rss.data_loader import DataLoader
+from rss.output import Output
+from rss.rss_feed import RSSFeed
 
 
 class Application:
@@ -29,10 +29,10 @@ class Application:
         logging.info('Transfer data to RSSFeed class')
         feed = RSSFeed(self.dict_args, data)
 
-        rss_data_dict = feed.data_processing()
+        process_data = feed.data_processing()
         logging.info('Get the final output data')
 
         if self.dict_args["json"]:
-            Output.to_json_format(rss_data_dict)
+            Output.to_json_format(process_data )
         else:
-            Output.to_rss_format(rss_data_dict)
+            Output.to_rss_format(process_data )
