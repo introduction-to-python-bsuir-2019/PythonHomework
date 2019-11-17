@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import time
 import logging
 
+
 class NewsReader():
 	'CLass for RSS parsing  '
 	def __init__(self,url,limit = None	):
@@ -62,8 +63,9 @@ class NewsReader():
 		'''Create json output '''
 		logging.info('Make readable json format...')
 		for entry in self.entries[0:self.limit]:
-			json_one =  json.dumps(entry ,indent = 2,ensure_ascii=False)
-			print (json_one)
+			for x in entry:
+				json_one =  json.dumps(x ,indent = 2,ensure_ascii=False)
+				print (json_one)
 			
 	def print_rss(self):
 		logging.info('Show rss in readable format...')		
@@ -78,5 +80,12 @@ class NewsReader():
 
 			print(f"{entry['link']}\n")
 			print(entry['description'])
-			print('-'*80)
+			#Delimiter
+			print("""\
+				    --..,_                     _,.--.
+				       `'.'.                .'`__ o  `;__.
+				          '.'.            .'.'`  '---'`  `
+				            '.`'--....--'`.'
+				              `'--....--'`
+				""")
 

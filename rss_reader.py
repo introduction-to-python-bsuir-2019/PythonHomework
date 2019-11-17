@@ -3,7 +3,7 @@ import feedparser
 import html
 import json
 from bs4 import BeautifulSoup
-from SourseReader import NewsReader
+from PythonHomework.SourseReader import NewsReader
 import logging
 PROJECT_VERSION = 'Version 0.5 : '
 PROJECT_STATUS = 'FIGHTING WITH SUMMARY'
