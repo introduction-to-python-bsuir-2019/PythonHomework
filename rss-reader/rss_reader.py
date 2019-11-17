@@ -41,13 +41,15 @@ class RSSReader:
         if verbose:
             logging.basicConfig(level=logging.INFO)
         logging.info("Logging enabled")
-        logging.info("Getting response from %s" % source)
-        response = feedparser.parse(source)
+        logging.info(f"Getting response from {source}")
+        if 'status' not in (response := feedparser.parse(source.strip())) or len(response.entries) == 0:
+            print(f"Error: Impossible parse RSS Feeds from url '{source}'")
+            exit(0)
 
         if response.status in range(200, 300):
-            logging.info("Status code %d. Getting articles from %s was successful" % (response.status, source))
+            logging.info(f"Status code {response.status}. Getting articles from {source} was successful")
         else:
-            logging.info("Status code %d. Getting articles from %s was unsuccessful" % (response.status, source))
+            logging.info(f"Status code {response.status}. Getting articles from {source} was unsuccessful")
 
         title = self.parse_title(response)
         articles = self.parse_articles(response, limit)
@@ -109,7 +111,7 @@ class RSSReader:
         :rtype: dict or None
         """
         try:
-            logging.info("Successfully get Header of RSS Source: %s" % response.feed.title)
+            logging.info(f"Successfully get Header of RSS Source: {response.feed.title}")
             return {'feed': response.feed.title}
         except KeyError:
             logging.info("Getting header of RSS Source was unsuccessful")
@@ -128,10 +130,10 @@ class RSSReader:
         :return: news articles of limited length
         :rtype: dict
         """
-        logging.info("Start loading articles. Limit: %d" % limit or "None")
+        logging.info(f"Start loading articles. Limit: {limit or 'None'}")
         result = response.entries
         if limit is not None:
-            logging.info("Completed. Loaded %d articles" % min(limit, len(result)))
+            logging.info(f"Completed. Loaded {min(limit, len(result))} articles")
             return result[0:min(limit, len(result))]
         else:
             logging.info("Completed. Loaded all articles")
@@ -150,6 +152,10 @@ def main():
 
     if settings.version:
         print(f'RSS Reader {__version__}')
+
+    if settings.limit < 1:
+        print(f"Error: Impossible parse 0 and less RSS Feeds")
+        exit(0)
 
     RSSReader().execute(settings.source, settings.verbose, settings.limit, settings.json)
 
