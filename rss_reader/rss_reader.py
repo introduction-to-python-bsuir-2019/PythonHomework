@@ -17,6 +17,11 @@ import time
 import logging
 import json
 import bs4
+from datetime import datetime
+import os
+from urllib.parse import urlparse
+import pickle
+
 
 # from colorama import init  # for colorizing https://pypi.org/project/colorama/
 # init(autoreset=True)
@@ -35,6 +40,33 @@ class RSSFeed:
         self.entries = None
         self.raw_rss = None
 
+    def _save_rss_in_file(self):
+        """ Saving rss feed to cache/date/domain.rss """
+        logging.info("Saving rss feed")
+        directory = f"{datetime.now().strftime('%Y%m%d')}"
+        if not os.path.exists(f"cache/{directory}"):
+            logging.info(f"Creating directory /{directory}")
+            os.makedirs(f"cache/{directory}")
+
+        uri = urlparse(self.source)
+        domain_name = f"{uri.netloc}"
+        with open(f"cache/{directory}/{domain_name}.rss", "wb") as f:
+            logging.info(f"Saving entries in file {directory}/{domain_name}.rss")
+            pickle.dump((self.title, self.entries), f)
+
+    def _load_rss_from_file(self, date):
+        """ Loading rss feed from cache/date/domain.rss """
+        logging.info("Loading rss feed")
+        directory = f"{date}"
+        uri = urlparse(self.source)
+        domain_name = f"{uri.netloc}"
+        if not os.path.exists(f"cache/{directory}/{domain_name}.rss"):
+            raise RSSFeedException(message=f"There is no entries for {date}")
+
+        with open(f"cache/{directory}/{domain_name}.rss", "rb") as f:
+            logging.info(f"Loading entries from file {directory}/{domain_name}.rss")
+            self.title, self.entries = pickle.load(f)
+
     def _get_rss_in_json(self, entries=False):
         """ Converts rss feed to json """
         logging.info("Converting rss feed to json")
@@ -45,7 +77,7 @@ class RSSFeed:
             return json.dumps({"feed": self.title, "entries": self.entries},
                               indent=2, ensure_ascii=False)
 
-    def get_rss(self):
+    def _get_rss(self):
         """ Gets rss feed by source """
         logging.info("Getting rss feed")
         response = requests.get(self.source).text
@@ -64,16 +96,22 @@ class RSSFeed:
                 "summary": bs4.BeautifulSoup(entry.summary, "html.parser").text
             })
 
-    def print_rss(self, limit, is_json=False):
+        self._save_rss_in_file()
+
+    def print_rss(self, limit, is_json=False, date=False):
         """ Prints rss feed """
-        logging.info("Printing rss feed")
-        if not self.entries:
-            print("error")
+
+        if date:
+            self._load_rss_from_file(date)
+        else:
+            self._get_rss()
 
         if limit:
             entries = self.entries[:limit]
         else:
             entries = self.entries
+
+        logging.info("Printing rss feed")
 
         if is_json:
             entries = self._get_rss_in_json(entries)
@@ -108,11 +146,14 @@ def main():
     parser.add_argument(
         "--verbose",
         action="count",
-        default=0,
+        default=False,
         help="Outputs verbose status messages")
 
-    # Optional argument which requires a parameter (eg. -d test)
+    # Optional argument which requires a parameter
     parser.add_argument("-l", "--limit", action="store", type=int, dest="limit")
+
+    # Optional argument which requires a parameter
+    parser.add_argument("-d", "--date", action="store", type=int, dest="date")
 
     args = parser.parse_args()
 
@@ -124,8 +165,7 @@ def main():
 
     try:
         feed = RSSFeed(source=args.source)
-        feed.get_rss()
-        feed.print_rss(limit=args.limit, is_json=args.json)
+        feed.print_rss(limit=args.limit, is_json=args.json, date=args.date)
     except RSSFeedException as e:
         print(f"{e.message}")
         sys.exit(0)
