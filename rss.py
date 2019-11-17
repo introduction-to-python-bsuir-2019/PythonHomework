@@ -2,14 +2,14 @@
 Main module. Launches the rss reader and output the result
 """
 import argparse
+import getpass
 import logging
 import sys
-import getpass
-from importlib import import_module
-from contextlib import suppress
 
-from utils.RssInterface import RssException
-from utils import RssInterface
+from importlib import import_module
+
+from .utils.RssInterface import RssException
+from .utils import RssInterface
 
 
 PROG_VERSION = 1.0
