@@ -5,7 +5,11 @@ Version 2
 ```shell
 usage: rss.py [-h] [--verbose] [--limit LIMIT] [--json] [-v] [--width WIDTH]
               url
+OR
 
+python3 -m rss_reader ... (After installing package)
+
+Description:
 Rss reader. Just enter rss url from your favorite site and app will print
 latest news.
 
@@ -55,7 +59,12 @@ Launch:
 ``` python3 setup.py sdist bdist_wheel```
 In the ./dist repo you'll find a .tar and .whl files.
 
-https://drive.google.com/file/d/1RbMYxvpEXTx77Dk61xPkwSChD_jTf0jf/view?usp=sharin
+Wheel package for the second iteration task 
+(maybe is discarded but it works) on the Google Drive:
+```https://drive.google.com/file/d/1RbMYxvpEXTx77Dk61xPkwSChD_jTf0jf/view?usp=sharin```
+
+Actual packages you may find in the './dist' repo if you don't want to generate it manually.
+
 
 
 

@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+#dist/  Need for the final's second iteration task
 downloads/
 eggs/
 .eggs/

@@ -141,6 +141,7 @@ def main() -> None:
         print(f'Unhandled exception!\n{ex}\nExiting...')
     else:
         print(news)
+        logger.debug('Quit application with succeed result')
 
 
 if __name__ == "__main__":
