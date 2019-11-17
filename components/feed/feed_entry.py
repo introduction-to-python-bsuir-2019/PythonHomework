@@ -1,15 +1,25 @@
 import html
+from bs4 import BeautifulSoup
 
 
 class FeedEntry:
 
     def __init__(self, feed):
-        self._title = feed.title
+        self.title = html.unescape(feed.title)
+        self.date = feed.published
+        self.link = feed.link
+        self.description = self._process_description(feed.description)
+        self.links = self._process_links(feed.links)
 
-    @property
-    def title(self):
-        return self._title
+    def _process_links(self, links):
+        def format_links(link, count):
+            return f'[{count}]: {link["href"]} ({link["type"]})\n'
 
-    @title.setter
-    def title(self, title):
-        self.title = html.unescape(title)
+        return ''.join(
+            format_links(link, count) for count, link in enumerate(links, start=1)
+        )
+
+    def _process_description(self, description):
+        return html.unescape(
+            BeautifulSoup(description, 'html.parser').get_text()
+        )

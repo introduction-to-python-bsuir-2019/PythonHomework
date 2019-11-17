@@ -12,13 +12,13 @@ class Parser:
         'limit',
     )
 
-    # @property
-    # def _parser(self):
-    #     return self._parser
-    #
-    # @_parser.setter
-    # def _parser(self, description):
-    #     self._parser = argparse.ArgumentParser(description)
+    @property
+    def parser(self):
+        return self._parser
+
+    @parser.setter
+    def parser(self, description):
+        self._parser = argparse.ArgumentParser(description)
 
     def __init__(self, description, usage):
        self._parser = argparse.ArgumentParser(description=description, usage=usage)

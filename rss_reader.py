@@ -20,7 +20,10 @@ class App(Singleton):
 
 
 def main():
-    App.start()
+    try:
+        App.start()
+    except KeyboardInterrupt:
+        print(f'\nStop reader')
 
 
 if __name__ == "__main__":
