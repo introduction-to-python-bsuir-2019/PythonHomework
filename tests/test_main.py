@@ -61,15 +61,15 @@ class TestMainModule(unittest.TestCase):
         rss_path = f'{os.getcwd()}/rss_reader/rss.py'
         sys.argv = [
             rss_path,
-            './test/data/tut_news.xml',
+            './tests/data/tut_news.xml',
             '--limit', '2',
         ]
 
-        with open('./test/data/help.txt', 'w') as f:
+        with open('./tests/data/help.txt', 'w') as f:
             with redirect_stdout(f):
                main()
 
-        with open('./test/data/help.txt', 'r') as f:
+        with open('./tests/data/help.txt', 'r') as f:
             out_str = f.read()
 
         self.assertEqual(len(out_str), 5352)

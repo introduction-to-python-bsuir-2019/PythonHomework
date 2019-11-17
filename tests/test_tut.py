@@ -16,7 +16,7 @@ from rss_reader.rss import logger_init
 
 class TestMainModule(unittest.TestCase):
     def setUp(self) -> None:
-        url = './test/data/tut_news.xml'
+        url = './tests/data/tut_news.xml'
         self.bot = tut.Bot(url=url, limit=7, logger=logger_init(), width=120)
 
     def test_bot_limit(self):

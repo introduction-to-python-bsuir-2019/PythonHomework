@@ -19,7 +19,7 @@ from rss_reader.utils.RssInterface import RssException
 
 class TestMainModule(unittest.TestCase):
     def setUp(self) -> None:
-        url = './test/data/yahoo_news.xml'
+        url = './tests/data/yahoo_news.xml'
         self.bot = yahoo.Bot(url=url, limit=2, logger=logger_init(), width=120)
 
     def test_bot_limit(self):
@@ -48,14 +48,14 @@ class TestMainModule(unittest.TestCase):
             self.bot = yahoo.Bot(url=url, limit=2, logger=logger_init(), width=120)
 
     def test_main_output_news(self):
-        url = './test/data/yahoo_news.xml'
+        url = './tests/data/yahoo_news.xml'
 
-        with open('./test/data/yahoo.txt', 'w') as f:
+        with open('./tests/data/yahoo.txt', 'w') as f:
             with redirect_stdout(f):
                 self.bot = yahoo.Bot(url=url, limit=2, logger=logger_init(INFO), width=120)
 
-        with open('./test/data/yahoo.txt', 'r') as f:
+        with open('./tests/data/yahoo.txt', 'r') as f:
             out_str = f.read()
 
-        self.assertEqual(len(out_str), 564)
+        self.assertEqual(len(out_str), 565)
         self.assertGreater(out_str.find('INFO'), 4)

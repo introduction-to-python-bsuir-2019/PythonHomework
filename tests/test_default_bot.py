@@ -15,8 +15,8 @@ from rss_reader.bots import default
 
 class TestMainModule(unittest.TestCase):
     def setUp(self) -> None:
-        url_google = './test/data/google_news.xml'
-        url_reddit = './test/data/reddit_news.xml'
+        url_google = './tests/data/google_news.xml'
+        url_reddit = './tests/data/reddit_news.xml'
 
         self.bot_google = default.Bot(url=url_google, limit=10, logger=logger_init(), width=120)
         self.bot_reddit = default.Bot(url=url_reddit, limit=3, logger=logger_init(), width=80)

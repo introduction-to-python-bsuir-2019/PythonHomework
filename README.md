@@ -38,11 +38,9 @@ Use ./pycodestyle.sh to check the code corresponding to `pep8`
 (pycodestyle package must be installed)
 
 ## Testing
-Use 
+Launch
 ```
-nosetests --with-coverage --cover-erase --cover-package=utils --cover-html
-nosetests --with-coverage --cover-erase --cover-package=bots --cover-html
-nosetests --with-coverage --cover-erase --cover-package=rss --cover-html
+./make_tests.sh
 ```
 - to pass test with coverage
 (nose and coverage packages must be installed)

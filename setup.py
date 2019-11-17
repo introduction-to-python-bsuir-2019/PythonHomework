@@ -1,3 +1,6 @@
+"""Utils to export CLI rss_reader module
+using: 'python3 setup.py sdist bdist_wheel'
+"""
 import setuptools
 from rss_reader.rss import PROG_VERSION
 
@@ -13,7 +16,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Nenu1985/PythonHomework",
-    packages=setuptools.find_packages(),
+
+    packages=setuptools.find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
 
     install_requires=['bs4',
                       'html2text',
@@ -21,7 +25,7 @@ setuptools.setup(
                       'terminaltables'],
 
     extras_require={  # Optional
-        'test': ['nose', 'coverage'],
+        'tests': ['nose', 'coverage'],
     },
 
     classifiers=[
@@ -29,5 +33,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: Unix",
     ],
+
+    zip_safe=False,
     python_requires='>=3.7',
 )
