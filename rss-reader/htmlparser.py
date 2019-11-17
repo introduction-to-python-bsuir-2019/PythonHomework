@@ -7,21 +7,29 @@ __all__ = ['Parser']
 class Tag(ABC):
     """
     Abstract class for working with tags as a class structure.
-
     """
-
     def __init__(self, **kwargs):
         for arg, val in kwargs.items():
             self.__setattr__(arg, val)
 
     @abstractmethod
-    def link(self, ind):
+    def link(self):
         """
-        Get string line for output in links section.
+        Get media object source link.
+
+        :return: media object source URL
+        :rtype: str
+        """
+        pass
+
+    @abstractmethod
+    def format_link(self, ind):
+        """
+        Get formatted link to output in the links section.
 
         :param ind: Sequence number in the queue
         :type ind: int
-        :return: string line for output in links section
+        :return: string to output in links section
         :rtype: str
         """
         pass
@@ -29,34 +37,43 @@ class Tag(ABC):
     @abstractmethod
     def __str__(self):
         """
-        Get string line for output tag in description section.
+        Get string to output tag in the description section.
 
-        :return: string line for output tag in description section
+        :return: string to output tag in the description section
         """
         pass
 
 
 class A(Tag):
     """
-    Class for work with tag a (link) as a class struct.
+    Class for work with tag `a` (link) as a class struct.
     """
     href = None
 
     def __str__(self):
         """
-        Get string line for output tag in description section.
+        Get string to output tag in description section.
 
-        :return: string line for output tag in description section
+        :return: string to output tag in the description section
         """
         return "[link %d]"
 
-    def link(self, ind):
+    def link(self):
         """
-        Get string line for output in links section.
+        Get media object source link.
+
+        :return: media object source URL
+        :rtype: str
+        """
+        return self.href
+
+    def format_link(self, ind):
+        """
+        Get formatted link to output in the links section.
 
         :param ind: Sequence number in the queue
         :type ind: int
-        :return: string line for output in links section
+        :return: string to output in the links section
         :rtype: str
         """
         return "[%d]: %s (link)" % (ind, self.href)
@@ -71,22 +88,82 @@ class Img(Tag):
 
     def __str__(self):
         """
-        Get string line for output tag in description section.
+        Get string to output tag in description section.
 
-        :return: string line for output tag in description section
+        :return: string to output tag in the description section
         """
         return f"[Image %d: {self.alt or 'None'}] "
 
-    def link(self, ind):
+    def link(self):
         """
-        Get string line for output in links section.
+        Get media object source link.
+
+        :return: media object source URL
+        :rtype: str
+        """
+        return self.src
+
+    def format_link(self, ind):
+        """
+        Get formatted link to output in the links section.
 
         :param ind: Sequence number in the queue
         :type ind: int
-        :return: string line for output in links section
+        :return: string to output in the links section
         :rtype: str
         """
         return "[%d]: %s (image)" % (ind, self.src)
+
+
+class Article:
+    """
+    News feed object oriented model. Use for work with articles like a class.
+    """
+    def __init__(self):
+        self.title = None
+        self.description = None
+        self.link = None
+        self.pubDate = None
+        self.media = None
+        self.links = None
+
+    @classmethod
+    def from_dict(cls, fields: dict):
+        """
+        An alternative constructor for creating an article model from the dict of the parsed article.
+
+        :param fields: dict with all needed fields for current article
+        :type fields: dict
+        :return: article object with needed data in fields
+        :rtype: Article
+        """
+        obj = cls()
+        for f, v in fields.items():
+            setattr(obj, f, v)
+
+        return obj
+
+    def to_dict(self, fields=None):
+        """
+        Method for getting a dictionary with all fields of self object.
+        You can customize fields by giving a list with needing you fields.
+
+        :param fields: optional parameter to change the content of returned dict
+        :return: dict with all fields
+        """
+        if fields is None:
+            _fields = (
+                'title',
+                'description',
+                'link',
+                'pubDate',
+                'media',
+                'links',
+            )
+        else:
+            _fields = fields
+
+        return {f: getattr(self, f, None) for f in _fields}
 
 
 class HTMLParser:
@@ -102,41 +179,89 @@ class HTMLParser:
     def __init__(self):
         self._stack = []
 
-    def get_json(self, articles, title):
+    def get_json(self, response, limit):
         """
         Method for converting given articles and title of RSS Source to JSON format.
 
-        :param articles: articles for convert to JSON format
-        :param title: title of RSS Source
+        :param response: response struct for parse
+        :param limit: required number of articles to show
+        :type response: dict
+        :type limit: int
         :return: JSON format of given articles with title of RSS Source
         :rtype: str
         """
+        title, articles = self.parse_all(response, limit, False, False)
+
         result = {
             'title': title['feed'],
             'articles': {
-                str(i): self._article_to_dict(articles[i]) for i in range(len(articles))
+                i: articles[i].to_dict(None) for i in range(len(articles))
             }
         }
         return dumps(result)
 
-    def parse_article(self, article):
+    def parse_all(self, response, limit, fill_desc=True, nice_links=True):
         """
-        Method for converting article to dict with given article info in specified format
-        :param article: article for converting to dict in specified format
-        :type article: dict
-        :return: dict with article info in specified format
+        A method of parsing news articles and creating object models for easy access.
+
+        :param response: response struct for parse
+        :param limit: required number of articles to show
+        :param fill_desc: adding formatted links in description or not
+        :param nice_links: return formatted links or not
+        :type response: dict
+        :type limit: int
+        :type fill_desc: bool
+        :type nice_links: bool
+        :return: return a tuple (title, articles).
+            Title is header of RSS Source.
+            Articles is a list of object of type Article was created from parsed feeds
+        :rtype: tuple
         """
-        description, links = self._process_text(article.description, True)
-        return {'title': article.title,
-                'description': description,
-                'link': article.link,
-                'pubDate': article.published
-                }, links
+        raw_articles = self._get_limited_articles(response, limit)
+        nice_articles = [self._article_to_dict(article, fill_desc, nice_links) for article in raw_articles]
+        articles = [Article.from_dict(article) for article in nice_articles]
+        title = self._get_title(response)
+        return title, articles
+
+    @staticmethod
+    def _get_title(response):
+        """
+        Static method for parsing header of RSS Source.
+
+        :param response: response struct for parse
+        :type response: dict
+        :return: header of RSS Source if parsing was successful, else None
+        :rtype: dict or None
+        """
+        try:
+            return {'feed': response.feed.title}
+        except KeyError:
+            return None
+
+    @staticmethod
+    def _get_limited_articles(response, limit):
+        """
+        Method of limiting parsing articles from response struct.
+        If limit is None return articles given length, else return all available articles.
+
+        :param response: response struct for parse
+        :param limit: limit of output news articles
+        :type response: dict
+        :type limit: int or None
+        :return: news articles of limited length
+        :rtype: dict
+        """
+        result = response.entries
+        if limit is not None:
+            return result[0:min(limit, len(result))]
+        else:
+            return result
 
     @staticmethod
     def _get_next_tag(line):
         """
-        Method for getting startpos and endpos of tag in given string line
+        Method for getting startpos and endpos of tag in given string line.
+
         :param line: line with html tag
         :type line: str
         :return: (startpos, endpos) is a position of next tag in line if line have a tag, else None
@@ -153,7 +278,7 @@ class HTMLParser:
         """
         Method for creating Tag struct class from params.
 
-        :param params: info for creating tag.
+        :param params: info for creating tag
         :type params: dict
         :return: tag object if creating was successful, else None
         :rtype: Tag or None
@@ -165,14 +290,14 @@ class HTMLParser:
         except KeyError:
             return None
 
-    def _parse_params_from_line(self, tag_line):
+    def _get_params_from_line(self, tag_line):
         """
         Method for getting all parameters from html tag string line.
         If parameter have a value params save value. Else value is True.
 
-        :param tag_line: line with tag parameters.
+        :param tag_line: line with tag parameters
         :type tag_line: str
-        :return: dict with parsed parameters.
+        :return: dict with parsed parameters
         :rtype: dict
         """
         params = {}
@@ -193,11 +318,11 @@ class HTMLParser:
         """
         Method of cutting all string in quotes \"...\".
 
-        :param tag_line: line with tag info and strings.
+        :param tag_line: line with tag info and strings
         :type tag_line: str
         :return: tuple (strings, tag_line).
             strings is a list with all cutting strings.
-            tag_line is a given string parameter without cutting strings.
+            tag_line is a given string parameter without cutting strings
         :rtype: tuple
         """
         strings = []
@@ -206,18 +331,6 @@ class HTMLParser:
             strings.append(tag_line[start_ind + 1: end_ind - 1])
             tag_line = tag_line[:start_ind] + tag_line[end_ind:]
         return strings, tag_line
-
-    def _get_desc_only(self, line):
-        """
-        Method for getting description on news article without inserts links.
-
-        :param line: description with tags and useless links
-        :type line: str
-        :return: description on news article without useless info. Text description only
-        :rtype: str
-        """
-        description, _ = self._process_text(line, False)
-        return description
 
     def _get_images_from_article(self, article):
         """
@@ -229,19 +342,23 @@ class HTMLParser:
         :rtype: list
         """
         if self._stack is []:
-            self._process_text(article.description, False)
+            self._process_description(article.description, False, False)
         return [obj for obj in self._stack if isinstance(obj, Img)]
 
-    def _process_text(self, description, fill_desc):
+    def _process_description(self, description, fill_desc, nice_links):
         """
-        Method processing
+        Method processing description. Use flags to control result.
+        Flag `fill_desc` adding formatted links in description.
+        Flag `nice_links` return formatted links.
 
         :param description: description of news article with useless info and tags
         :param fill_desc: adding formatted links in description or not
+        :param nice_links: return formatted links or not
         :type description: str
-        :type fill_desc: True
-        :return: tuple (description, links)
-            description is description without useless info and tags. With inserts links or not
+        :type fill_desc: bool
+        :type nice_links: bool
+        :return: tuple (description, links).
+            description is description without useless info and tags. With inserts links or not.
             links is list with formatted strings with links from all created tag objects
         :rtype: tuple
         """
@@ -251,7 +368,7 @@ class HTMLParser:
         while (pos_tag := self._get_next_tag(description)) is not None:
             first_quotes, last_quotes = pos_tag
             full_tag_line = description[first_quotes: last_quotes]
-            parameters = self._parse_params_from_line(full_tag_line)
+            parameters = self._get_params_from_line(full_tag_line)
             obj_tag = self._create_tag(parameters)
             if obj_tag is not None:
                 self._stack.append(obj_tag)
@@ -259,19 +376,28 @@ class HTMLParser:
                     description = description[:first_quotes] + (str(obj_tag) % index_of_tag) + description[last_quotes:]
                 else:
                     description = description[:first_quotes] + description[last_quotes:]
-                links.append(obj_tag.link(index_of_tag))
+
+                if nice_links:
+                    links.append(obj_tag.format_link(index_of_tag))
+                else:
+                    links.append(obj_tag.link())
+
                 index_of_tag += 1
             else:
                 description = description[:first_quotes] + description[last_quotes:]
 
         return description, links
 
-    def _article_to_dict(self, article):
+    def _article_to_dict(self, article, fill_desc, nice_links):
         """
         Method for converting article info into dict of specific format.
 
         :param article: article for converting into dict of specific format
+        :param fill_desc: adding formatted links in description or not
+        :param nice_links: return formatted links or not
         :type article: dict
+        :type fill_desc: bool
+        :type nice_links: bool
         :return: dict of specific format
         :rtype: dict
         """
@@ -285,12 +411,16 @@ class HTMLParser:
                 } for i in range(len(content))
             }
 
-        result = {'title': article.title,
-                  'description': self._get_desc_only(article.description),
-                  'link': article.link,
-                  'pubDate': article.published,
-                  'media': images_from_article_to_dict(article)
-                  }
+        description, links = self._process_description(article.description, fill_desc, nice_links)
+
+        result = {
+            'title': article.title,
+            'description': description,
+            'link': article.link,
+            'pubDate': article.published,
+            'media': images_from_article_to_dict(article),
+            'links': links,
+        }
 
         return result
 
