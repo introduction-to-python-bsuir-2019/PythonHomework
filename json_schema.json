@@ -9,29 +9,41 @@
 			"description": "News' title",
 			"type": "string"
 		},
-		"source":
+		"news":
 		{
-			"description": "A link where you can find according news",
-			"type": "string"
-		},
-		"date":
-		{
-			"description": "Date and time when according news has been posted",
-			"type": "string"
-		},
-		"content":
-		{
-			"description": "Actual news information",
-			"type": "string"
-		},
-		"images": 
-		{
-			"description": "List of links to related images",
+			"description": "Array of all retrieved news",
 			"type": "array",
 			"items":
 			{
+				"type": "object",
+				"properties":
+				{
+					"source":
+					{
+						"description": "A link where you can find according news",
+						"type": "string"
+					},
+				"date":
+				{
+					"description": "Date and time when according news has been posted",
+					"type": "string"
+				},
+			"content":
+			{
+				"description": "Actual news information",
 				"type": "string"
+			},
+			"images": 
+			{
+				"description": "List of links to related images",
+				"type": "array",
+				"items":
+				{
+					"type": "string"
+				}
 			}
-		}
+			
+		},
+		
 	}
 }

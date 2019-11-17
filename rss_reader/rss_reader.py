@@ -17,7 +17,7 @@ def parse_arguments():
     exclusive.add_argument('source',nargs='?',help='RSS URL',default=None)
     return parser.parse_args()
 
-VERSION='v1.1'
+VERSION='v1.2'
 
 class NewsFeed:        
     def __init__(self, link, limit):
@@ -32,6 +32,11 @@ class NewsFeed:
         self.news=[]
         for index, item in (enumerate(newsdict[:min(limit,len(newsdict))]) if limit else enumerate(newsdict)):
             self.news.append(NewsItem(item,news_separated[index]))
+
+    def __add__(self, feed):
+        if self.title==feed.title:
+            self.news=allow_unique(self.news+feed.news)
+        return self
 
 
 class NewsItem:
@@ -56,6 +61,16 @@ class NewsItem:
         print('\nImages: ')
         for number, image in enumerate(self.images):
             print('['+str(number+1)+'] '+image)
+
+
+def allow_unique(list_of_objects):
+    new_list=[]
+    sources=set()
+    for item in list_of_objects:
+        if item.source not in sources:
+            new_list.append(item)
+            sources.add(item.source)
+    return new_list
 
 def ultimately_unescape(text):
     while html.unescape(text)!=text:
@@ -118,7 +133,7 @@ def main():
     if args.limit and args.limit<1:
         raise ValueError('Incorrect limit input (likely to be non-positive)')
     if args.version:
-        print('RSS-reader '+version)
+        print('RSS-reader '+VERSION)
     else:
         if args.verbose:
             logging.basicConfig(level=logging.INFO, 
@@ -127,8 +142,7 @@ def main():
         feed=NewsFeed(args.source, args.limit)
         if args.json:
             news=make_json(feed)
-        print_news(news)
+        print_news(feed)
 
 if __name__=='__main__':
     main()
-
