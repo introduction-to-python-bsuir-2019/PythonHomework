@@ -12,7 +12,7 @@ setup(
     install_requires=['feedparser==5.2.1'],
     python_requires='>=3.8',
     entry_points={
-        "console_scripts": ["rss_reader=App.rss_reader:main"],
+        "console_scripts": ["rss-reader=App.rss_reader:main"],
     }
 
 )
