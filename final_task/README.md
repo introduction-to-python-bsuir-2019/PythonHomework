@@ -1,5 +1,6 @@
-#####JSON structure
-'''
+##### JSON structure
+
+```
 {
   "news": {
     "feed": "Yahoo News - Latest News & Headlines",
@@ -24,4 +25,4 @@
     ]
   }
 }
-'''
+```
