@@ -1,10 +1,10 @@
 #!/usr/local/opt/python/bin/python3.7
 
-import feedparser
 import bs4
+import feedparser
 import typing
 
-from utils.RssInterface import BaseRssBot
+from rss_reader.utils.RssInterface import BaseRssBot
 
 
 class Bot(BaseRssBot):

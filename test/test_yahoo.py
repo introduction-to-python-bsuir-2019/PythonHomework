@@ -11,9 +11,9 @@ import unittest
 from logging import INFO
 from contextlib import redirect_stdout
 
-from rss import logger_init
-from bots import yahoo
-from utils.RssInterface import RssException
+from rss_reader.rss import logger_init
+from rss_reader.bots import yahoo
+from rss_reader.utils.RssInterface import RssException
 
 
 

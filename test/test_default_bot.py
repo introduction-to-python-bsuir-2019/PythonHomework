@@ -8,8 +8,9 @@ google_rss = 'https://news.google.com/news/rss'
 yahoo = 'https://news.yahoo.com/rss/'
 """
 import unittest
-from rss import logger_init
-from bots import default
+
+from rss_reader.rss import logger_init
+from rss_reader.bots import default
 
 
 class TestMainModule(unittest.TestCase):

@@ -1,11 +1,14 @@
-import unittest
+import argparse
 import logging
-from rss import logger_init, get_bot_instance, main
-from bots import yahoo, tut, default
-from unittest.mock import patch, Mock
-from contextlib import redirect_stdout
+from unittest.mock import Mock
+import os
+import unittest
+import sys
 
-from utils.RssInterface import RssException
+from rss_reader.bots import yahoo, tut, default
+from rss_reader.rss import logger_init, get_bot_instance, main, args_parser, PROG_VERSION
+
+from contextlib import redirect_stdout
 
 
 class TestMainModule(unittest.TestCase):
@@ -35,61 +38,38 @@ class TestMainModule(unittest.TestCase):
         bot = get_bot_instance('asfnewsasdffsagoogleyahootututsasfasf', logger)
         self.assertEqual(bot, default.Bot)
 
-    def test_main_raise_exception(self):
-        with self.assertRaises(TypeError):
-            main('asf', 3, logger_init(), 200)
+    def test_args(self):
+        rss_path = f'{os.getcwd()}/rss_reader/rss.py'
+        sys.argv = [
+            rss_path,
+            'https://news.tut.by/rss/index.rss',
+            '--verbose',
+            '--limit', '3',
+            '--json',
+            '--width', '200',
+        ]
+        args = args_parser()
+        self.assertEqual(args.url, 'https://news.tut.by/rss/index.rss'),
+        self.assertEqual(args.verbose, True),
+        self.assertEqual(args.json, True),
+        self.assertEqual(args.limit, 3),
+        self.assertEqual(args.width, 200),
 
-    def test_none_output(self):
+        self.assertEqual(main(), None),
 
-        self.assertEqual(main('asf', 3, 220, False, False), None)
+    def test_version(self):
+        rss_path = f'{os.getcwd()}/rss_reader/rss.py'
+        sys.argv = [
+            rss_path,
+            './test/data/tut_news.xml',
+            '--limit', '2',
+        ]
 
-    def test_json_output(self):
-        self.assertEqual(main('asf', 3, 220, True, False), None)
-
-    def test_verbose_output(self):
-        self.assertEqual(main('asf', 3, 220, True, True), None)
-
-    def test_exc_output(self):
-        mock = Mock()
-        main = mock
-        main('asf', 3, 220, True, True)
-        self.assertTrue(mock.called)
-        self.assertEqual(mock.call_args[0][0], 'asf')
-
-    def test_main_output_json_verbose_on(self):
         with open('./test/data/help.txt', 'w') as f:
             with redirect_stdout(f):
-                main('asf', 3, 220, False, False)
+               main()
 
         with open('./test/data/help.txt', 'r') as f:
             out_str = f.read()
 
-        self.assertEqual(len(out_str), 261)
-        self.assertEqual(out_str.find('not well-formed (invalid token)'), -1)
-
-    def test_main_output_json_on(self):
-        with open('./test/data/help.txt', 'w') as f:
-            with redirect_stdout(f):
-                main('./test/data/tut_news.xml', 3, 220, True, False)
-
-        with open('./test/data/help.txt', 'r') as f:
-            out_str = f.read()
-
-        self.assertEqual(len(out_str), 15081)
-        self.assertEqual(out_str.find('not well-formed (invalid token)'), -1)
-        self.assertEqual(out_str.find('INFO'), -1)
-
-    def test_main_output_news(self):
-        with open('./test/data/help.txt', 'w') as f:
-            with redirect_stdout(f):
-                main('./test/data/tut_news.xml', 3, 220, False, False)
-
-        with open('./test/data/help.txt', 'r') as f:
-            out_str = f.read()
-
-        self.assertEqual(len(out_str), 11643)
-        self.assertEqual(out_str.find('WARNING'), -1)
-        self.assertEqual(out_str.find('INFO'), -1)
-
-
-
+        self.assertEqual(len(out_str), 5352)

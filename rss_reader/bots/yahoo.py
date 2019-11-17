@@ -1,8 +1,6 @@
-from utils.RssInterface import BaseRssBot
 import bs4
 
-from terminaltables import SingleTable
-from colorclass import Color
+from rss_reader.utils.RssInterface import BaseRssBot
 
 
 class Bot(BaseRssBot):

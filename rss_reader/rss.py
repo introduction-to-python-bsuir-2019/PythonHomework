@@ -5,14 +5,13 @@ import argparse
 import getpass
 import logging
 import sys
-
 from importlib import import_module
 
-from .utils.RssInterface import RssException
 from .utils import RssInterface
+from .utils.RssInterface import RssException
+from .utils.DataStructures import ConsoleArgs
 
-
-PROG_VERSION = 1.0
+PROG_VERSION = 2.0
 
 
 def logger_init(level=None):
@@ -49,63 +48,26 @@ def get_bot_instance(url: str, logger: logging.Logger) -> RssInterface:
     :return: Bot class inherited from RssInterface, appropriate to the url
     """
     if url.find('news.yahoo.com/rss') + 1:
-        bot = import_module('bots.yahoo').Bot
+        bot = import_module('rss_reader.bots.yahoo').Bot
         logger.info('Yahoo bot is loaded')
     elif url.find('news.tut.by/rss') + 1:
-        bot = import_module('bots.tut').Bot
+        bot = import_module('rss_reader.bots.tut').Bot
         logger.info('Tut.by bot is loaded')
     else:
-        bot = import_module('bots.default').Bot
+        bot = import_module('rss_reader.bots.default').Bot
         logger.info('Default bot is loaded')
     return bot
 
 
-def main(url: str, limit: int, width: int, json: bool, verbose: bool) -> None:
-    """
-     Main func calls rss reader
-
-    :param url: news rss url
-    :param limit: limit of printed news
-    :param width: width of the screen to print the news
-    :param json: bool flag to print in json format
-    :param verbose: bool flag to set logger level
-    :return: None
-    """
-
-    # Logger initialisation depends on verbose param
-    if verbose:
-        logger = logger_init(level=logging.DEBUG)
-    else:
-        logger = logger_init()
-
-    logger.info(f'Lets start! Url={url}')
-
-    # Get appropriate to the url bot class
-    bot = get_bot_instance(url, logger)
-
-    try:
-        rss_reader = bot(url=url, limit=limit, logger=logger, width=width)
-        if json:
-            news = rss_reader.get_json()
-        else:
-            news = rss_reader.get_news()
-    except RssException as ex:
-        print(ex.args[0])
-
-    except Exception as ex:
-        print(f'Unhandled exception!\n{ex}\nExiting...')
-    else:
-        print(news)
-
-
-if __name__ == "__main__":
+def args_parser() -> ConsoleArgs:
+    """Parsing console args and returning args class"""
 
     PARSER = argparse.ArgumentParser(
         description='''
-                Rss reader.
-                Just enter rss url from your favorite site and app will print
-                latest news.
-                '''
+                    Rss reader.
+                    Just enter rss url from your favorite site and app will print
+                    latest news.
+                    '''
     )
 
     PARSER.add_argument('url', type=str,
@@ -138,4 +100,48 @@ if __name__ == "__main__":
 
     ARGS = PARSER.parse_args()
 
-    main(url=ARGS.url, limit=ARGS.limit, width=ARGS.width, json=ARGS.json, verbose=ARGS.verbose)
+    return ConsoleArgs(
+        url=ARGS.url,
+        limit=ARGS.limit,
+        width=ARGS.width,
+        json=ARGS.json,
+        verbose=ARGS.verbose,
+    )
+
+
+def main() -> None:
+    """
+     Main func calls rss reader
+
+    :return: None
+    """
+    # url: str, limit: int, width: int, json: bool, verbose: bool
+    args = args_parser()
+    # Logger initialisation depends on verbose param
+    if args.verbose:
+        logger = logger_init(level=logging.DEBUG)
+    else:
+        logger = logger_init()
+
+    logger.info(f'Lets start! Url={args.url}')
+
+    # Get appropriate to the url bot class
+    bot = get_bot_instance(args.url, logger)
+
+    try:
+        rss_reader = bot(url=args.url, limit=args.limit, logger=logger, width=args.width)
+        if args.json:
+            news = rss_reader.get_json()
+        else:
+            news = rss_reader.get_news()
+    except RssException as ex:
+        print(ex.args[0])
+
+    except Exception as ex:
+        print(f'Unhandled exception!\n{ex}\nExiting...')
+    else:
+        print(news)
+
+
+if __name__ == "__main__":
+    main()

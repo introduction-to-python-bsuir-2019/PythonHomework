@@ -1,8 +1,9 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
-from typing import Union, Dict, List, Iterable, Optional, Any
 import json
 import feedparser
 import logging
+from typing import Union, Dict, List, Iterable, Optional, Any
+
 import bs4
 from textwrap import wrap
 from terminaltables import SingleTable

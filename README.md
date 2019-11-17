@@ -1,7 +1,7 @@
 # Rss reader hometask for EpamTrainee
 Python RSS-reader.
 
-Version 1
+Version 2
 ```shell
 usage: rss.py [-h] [--verbose] [--limit LIMIT] [--json] [-v] [--width WIDTH]
               url
@@ -46,6 +46,10 @@ nosetests --with-coverage --cover-erase --cover-package=rss --cover-html
 ```
 - to pass test with coverage
 (nose and coverage packages must be installed)
+
+## Version 2: Distribution
+Utility is wrapped into distribution package with setuptools.
+This package exports CLI utility named rss-reader.
 
 
 
