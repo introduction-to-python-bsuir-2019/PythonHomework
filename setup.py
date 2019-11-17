@@ -1,6 +1,4 @@
 from setuptools import setup, find_packages
-from os import path
-
 
 with open('README.md', 'r') as f:
     long_description = f.read()
@@ -16,10 +14,8 @@ setup(
     author_email='vilikdf@gmail.com',
     packages=find_packages(),
     python_requires='>=3.8',
-    install_requires=['feedparser', 'bs4'],  # Optional
-
-
-    entry_points={  # Optional
+    install_requires=['feedparser', 'bs4'],
+    entry_points={
         'console_scripts': ['rss-reader=rss.rss_reader:main'],
     }
 )

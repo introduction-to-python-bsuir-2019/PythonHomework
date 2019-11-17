@@ -4,12 +4,12 @@ import argparse
 import logging
 import sys
 
-from news import RssReader
+from rss.news import RssReader
 
 VERSION = "1.0"
 
 
-def add_args(parser) -> parser:
+def add_args(parser):
     """Add arguments and return new parser."""
 
     parser.add_argument('source', help='RSS URL', type=str)

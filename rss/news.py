@@ -130,6 +130,7 @@ class RssReader():
 
         logging.info('Get text of description')
         text = soup.text
+        text.replace('&#39;', "'")
         if not text:
             text = 'Nothing'
 
