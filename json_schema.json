@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  type": "object",
+  "title": "News feed json schema",
+  "required": [
+        "Feed",
+        "Items"
+      ],
+  "properties": {
+	"Feed": {
+	  "type": "string",
+	  "title": "Feed",
+	  "description": "The title of the feed"
+	},
+	"Items": {
+	  "type": "array",
+	  "title": "News",
+	  "items": {
+		"type": "object",
+		"title": "news",
+		"required": [
+             "title",
+              "description",
+              "link",
+              "pubDate",
+              "source"
+            ],
+		"properties": {
+		  "title": {
+			"type": "string",
+			"title": "Title",
+			"description": "The title of the news"
+		  },
+		  "description": {
+			"type": "string",
+			"title": "Description",
+			"description": "The description of the news"
+		  },
+		  "link": {
+			"type": "string",
+			"title": "Link",
+			"description": "The origin link of the news"
+		  },
+		  "pubDate": {
+			"type": "string",
+			"title": "Date",
+			"description": "The date this news was published"
+		  },
+		  "source": {
+			"type": "object",
+			"title": "Links inside the description",
+			"required": [
+                  "images_links",
+                  "href_links",
+                  "video_links"
+                ],
+			"properties": {
+			  "images_links": {
+				"type": "array",
+				"title": "Images links",
+				"items": {
+				  "type": "string",
+				  "title": "Image link",
+				  "description": "The source of the image"
+				}
+			 },
+			  "href_links": {
+				"type": "array",
+				"title": "Hyper references",
+				"items": {
+				  "type": "string",
+				  "title": "URL link",
+				  "description": "The source of the hyper reference"
+				}
+			  },
+			  "video_links": {
+				"type": "array",
+				"title": "Video links",
+				"items": {
+				  "type": "string",
+				  "title": "Video link",
+				  "description": "The source of the video"
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

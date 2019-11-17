@@ -132,34 +132,40 @@ def find_videos(args, soup):
 
 
 def main():
-    args = set_argparse()
-    if args.verbose:
-        logging.basicConfig(format='%(asctime)s %(funcName)s %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG)
+    try:
+        args = set_argparse()
+        if args.verbose:
+            logging.basicConfig(format='%(asctime)s %(funcName)s %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG)
 
-    logging.info('Application started. RSS source is %s', args.source)
-    NewsFeed = feedparser.parse(args.source)
+        logging.info('Application started. RSS source is %s', args.source)
+        NewsFeed = feedparser.parse(args.source)
+        if NewsFeed.bozo == 1:
+            raise Exception('The feed is not well-formed XML')
+        # if 'status' not in NewsFeed:
+        #    raise Exception('An error happened such that the feed does not contain an HTTP response')
+        if args.limit < 0 or args.limit > len(NewsFeed.entries):
+            args.limit = len(NewsFeed.entries)
 
-    if args.limit == -1:
-        args.limit = len(NewsFeed.entries)
+        news = []
+        logging.info('Begin processing each news')
+        for i in range(args.limit):
+            logging.info('Parsing news number %s', i+1)
+            entry = NewsFeed.entries[i]
+            soup = html.unescape(BeautifulSoup(entry['summary'], "html.parser"))
+            images_links = find_images(args, soup)
+            href_links = find_href(args, soup)
+            video_links = find_videos(args, soup)
+            links = {'images_links': images_links, 'href_links': href_links, 'video_links': video_links}
+            news.append(Item(html.unescape(entry['title']), entry['published'], entry['link'], html.unescape(soup.text), links))
+            logging.info('News number %s has parsed', i+1)
 
-    news = []
-    logging.info('Begin processing each news')
-    for i in range(args.limit):
-        logging.info('Parsing news number %s', i+1)
-        entry = NewsFeed.entries[i]
-        soup = html.unescape(BeautifulSoup(entry['summary'], "html.parser"))
-        images_links = find_images(args, soup)
-        href_links = find_href(args, soup)
-        video_links = find_videos(args, soup)
-        links = {'images_links': images_links, 'href_links': href_links, 'video_links': video_links}
-        news.append(Item(html.unescape(entry['title']), entry['published'], entry['link'], soup.text, links))
-        logging.info('News number %s has parsed', i+1)
-
-    newsFeed = News_Feed(NewsFeed.feed.title, news)
-    newsFeed.print_feed(args.json)
-    logging.info('Application completed')
-
-
+        newsFeed = News_Feed(NewsFeed.feed.title, news)
+        newsFeed.print_feed(args.json)
+        logging.info('Application completed')
+        
+    except Exception as e:
+        print(e)
+        
 if __name__ == '__main__':
 
     main()
