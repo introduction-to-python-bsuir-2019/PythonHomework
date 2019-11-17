@@ -1,4 +1,5 @@
 import feedparser
+import sys
 from components.feed.feed_entry import FeedEntry
 from components.feed.feed_formatter import FeedFormatter
 
@@ -12,15 +13,18 @@ class Feed:
         self._entities_list = []
         self._feeds_title = ''
 
+        if args.verbose :
+            sys.exit('[--verbose] did\'t implement yet')
+
         self._parse_feeds()
 
     def show_feeds(self):
-        formatted_feeds = FeedFormatter.generate_output(
-            self._entities_list, self._limit, self._is_json
+        FeedFormatter.is_json = self._is_json
+        output = FeedFormatter.generate_output(
+            self._entities_list, self._limit, self._feeds_title
         )
 
-        print('Feed: {0}\n\n{1}'.format(self._feeds_title, formatted_feeds))
-
+        print(output)
 
     def _parse_feeds(self):
         feeds = feedparser.parse(self._url)

@@ -8,6 +8,6 @@ class Verbose(ArgumentsAbstract):
 
     def add_argument(self):
         self._parser.add_argument(
-            '--verbose', action='store_true', help='Outputs verbose status messages'
+            '--verbose', default=False, action='store_true', help='Outputs verbose status messages'
         )
 
