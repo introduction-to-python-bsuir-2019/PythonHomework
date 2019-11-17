@@ -48,5 +48,8 @@ class RssReader(object):
         Session = sessionmaker(bind=engine)
         return Session()
 
-    def __repr__(self):
+    def get_news(self, date):
+        pass
+        
+    def __str__(self):
         pass

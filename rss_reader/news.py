@@ -17,7 +17,7 @@ class News(Base):
     description = Column(String)
     media_content = Column(String)
 
-    def __init__(self, feed, title, date, description, link, media_content):
+    def __init__(self, feed, title, date, link, description, media_content):
         self.feed = feed
         self.title = title
         self.date = date
@@ -25,5 +25,9 @@ class News(Base):
         self.description = description
         self.media_content = media_content
 
-    def __repr__():
-        pass
+    def __str__(self):
+        return 'Feed: %s\nTitle: %s\nDate: %s\nLink: %s\n\n%s\n\nLinks:\n[1] %s (feed)\n[2] %s (image)\n' % \
+            (self.feed, self.title, self.date, self.link, self.description, self.link, self.media_content)
+
+    def __call__(self):
+        return self.feed, self.title, self.date, self.link, self.description, self.media_content
