@@ -1,17 +1,16 @@
+"""Application entry point module"""
 from app.application import Application
-import logging as log
+import logging
 
 
-def main():
-    """
-    main
-    """
+def main() -> None:
+    """The main entry point of the application"""
     try:
-        Application.init_config_log()
         app = Application()
         app.run_app()
     except Exception as ex:
-        log.error(f'Error \n Close application.', exc_info=False)
+        logging.error('Error. Close application.', exc_info=False)
+        print(ex)
 
 
 if __name__ == '__main__':

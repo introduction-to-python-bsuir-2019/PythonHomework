@@ -1,1 +1,2 @@
-__all__ = ['app', "conversion", "rss", ]
+"""Сonnected modules"""
+__all__ = ['app', 'conversion', 'rss', ]

@@ -1,41 +1,35 @@
-import argparse as argp
-import logging as log
+"""Module contains objects related to logs"""
 import sys
 
-from rss import rss_feed
+from rss.data_loader import DataLoader
+from rss.rss_feed import RSSFeed
+from app.argument_parser import ArgumentParser
+from app.application_log import ApplicationLog
+from rss.print_data import PrintData
 
 
 class Application:
-    """app class"""
+    """Application class"""
 
     def __init__(self):
-        """Parsing arguments"""
-        parser = argp.ArgumentParser(description='Python command-line RSS reader.')
-        parser.add_argument('source', help='Enter the link to the information portal(RSS url)', type=str)
-        parser.add_argument('--version', help='Print version info', action='version', version='1.0')
-        parser.add_argument('--json', help='Print result as JSON in stdout', action='store_true')
-        parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
-        parser.add_argument('--limit', help='Limit news topics if this parameter is provided', type=int)
-        self.dict_args = vars(parser.parse_args())
-        log.info(f'Init class Application')
+        """Init Application class"""
+        self.dict_args = ArgumentParser.parse_args()
 
-    @staticmethod
-    def init_config_log():
-        log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
-                        level=log.INFO)
-        log.info(f'The init_config_log method worked')
+    def run_app(self) -> None:
+        """Мethod sets application behavior"""
+        ApplicationLog.setup_logs()
 
-    def run_app(self):
-        log.info(f'Run app')
-        feed = rss_feed.RSSFeed(self.dict_args)
-        feed.receiving_rss_data()
-        feed.rss_data_processing()
+        data = DataLoader(self.dict_args['source']).upload()
+
+        feed = RSSFeed(self.dict_args, data)
+
+        rss_data_dict = feed.data_processing()
+
         if self.dict_args["verbose"]:
-            feed.print_log()
-            log.info(f'Close application')
+            ApplicationLog.print_log()
             sys.exit(1)
+
         if self.dict_args["json"]:
-            feed.convert_rss_to_json()
+            PrintData.to_json_format(rss_data_dict)
         else:
-            feed.print_rss()
-        log.info(f'The run_app method worked')
+            PrintData.to_rss_format(rss_data_dict)
