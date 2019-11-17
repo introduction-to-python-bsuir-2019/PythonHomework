@@ -8,6 +8,7 @@ setuptools.setup(
     version='1.0',
     author='Andrei Antnoiuk',
     author_email='andriei.antoniuk@gmail.com',
+    url = ' https://github.com/nil-anders/PythonHomework/tree/FinalHomeWork/PythonFinalTask ' ,
     packages=setuptools.find_packages(),
     python_requires='>=3.7',
     entry_points = {
