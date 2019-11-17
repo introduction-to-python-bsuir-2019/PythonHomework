@@ -1,4 +1,6 @@
 # Pure Python RSS Reader [PythonHomework]
+<center><img src="https://iluravikabinet.ee/wp-content/uploads/2017/06/rss-logo.png" width="250" height="250" /></center>
+
 Python version: v3.8
 
 Current version: v0.2
