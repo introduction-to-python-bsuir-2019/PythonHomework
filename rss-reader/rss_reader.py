@@ -1,15 +1,19 @@
-import argparse
 import logging as log
 import json
 import feedparser
 from validator_collection.checkers import is_url
 
 
-class Executor:
-    def __init__(self):
+class RssReader:
+    def __init__(self, source):
         pass
     
-    def validation(url):
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(RssReader, cls).__new__(cls)
+        return cls.instance
+
+    def validation(self):
         try:         
             if is_url(url):
                 return url
@@ -44,16 +48,7 @@ class Executor:
                     print("[2]  ", news['media_content'][0]['url'], '(image)')
                 print("="*90)   
 
-    def adding_arguments():
-        parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
-        parser.add_argument('source', metavar='source', type=str, help='RSS URL')
-        parser.add_argument('--version', action='version', version='ver 1.1', help='Print version info')
-        parser.add_argument('--limit', metavar='LIMIT', nargs=1, type=int)
-        parser.add_argument('--verbose', action='store_true')
-        parser.add_argument('--json', action='store_true')
-        parser.add_argument('--date', nargs=1, type=int)
-        log.info("Argument initialization")
-        return parser
+    
 
     def init_logging():
         log.basicConfig(format='%(asctime)s %(module)s %(message)s', datefmt='%I:%M:%S', level=log.INFO)
