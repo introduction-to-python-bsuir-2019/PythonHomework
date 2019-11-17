@@ -8,11 +8,14 @@ RSS reader is a command-line utility which receives RSS URL and prints results i
 
 Utility provides the following interface:
 
-positional arguments:
+- positional arguments:
+
 |argument|description|
 |---|---|
-|link | Link on RSS resource
-optional arguments:
+|link | Link on RSS resource|
+
+- optional arguments:
+
 |argument|description|
 |---|---|
 |-h, --help     |       show this help message and exit
@@ -22,5 +25,5 @@ optional arguments:
 |  --date DATE      |     Argument, which allows to get !cashed! news by date. Format: YYYYMMDD
 |  -V, --verbose     |    Print all logs in stdout
 |  --to_fb2 PATH    |     Convert news to fb2 format. Path must contain exsisting directories Supports LIMIT
-|  --to_pdf PATH   |      Convert news to pdf format. Convertation to PDF supports only latin resource. Path must contain exsisting directories Supports LIMIT. Unsupports non-latin resources.
+|  --to_pdf PATH   |      Convert news to pdf format. Convertation to PDF supports only latin resource. Path must contain exsisting directories Supports LIMIT. Unsupports non-latin resources.|
 
