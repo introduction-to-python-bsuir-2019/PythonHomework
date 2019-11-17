@@ -1,13 +1,15 @@
-import importlib
 import argparse
-import os
+import importlib
 
-from .arguments.version import Version
 
 class Parser:
 
     _arguments_list = (
+        'source',
         'version',
+        'json',
+        'verbose',
+        'limit',
     )
 
     # @property
@@ -18,17 +20,14 @@ class Parser:
     # def _parser(self, description):
     #     self._parser = argparse.ArgumentParser(description)
 
-    def __init__(self, description, **kwargs):
-       self._parser = argparse.ArgumentParser(description)
+    def __init__(self, description, usage, **kwargs):
+       self._parser = argparse.ArgumentParser(description=description, usage=usage)
        self.init_arguments()
        self._parser.parse_args()
 
     def init_arguments(self):
-        Version(self._parser).add_argument()
-        # for argument in self._arguments_list:
-        #     module = importlib.import_module(
-        #         '.arguments.version', '.'
-        #     )
-        #     argument_class = getattr(module, argument)
-        #     instance = argument_class(self._parser).add_argument()
+        for argument in self._arguments_list:
+            module = importlib.import_module('components.parser.arguments')
+            argument_class = getattr(module, argument[0].upper() + argument[1:])
+            argument_class(self._parser).add_argument()
 
