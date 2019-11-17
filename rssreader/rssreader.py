@@ -8,15 +8,6 @@ import sys
 import json
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("source", help="RSS URL", type=str)
-parser.add_argument("--version", action='version', version='%(prog)s '+'v 1.2', help="Print version info", )
-parser.add_argument("--json", help="Print result as JSON in stdout", action="store_true")
-parser.add_argument("--verbose", help="Outputs verbose status messages", action="store_true")
-parser.add_argument("--limit", type=int, help="Limit news topics if this parameter provided")
-args = parser.parse_args()
-
-
 def making_log(operation, message, file='loglist.log'):
     """func can do 2 ops, if 1 to write if 0 to read"""
     if bool(operation):
@@ -58,7 +49,19 @@ def news_parsing():
             making_log(1, "Iteration closed with code 0(all_goods)")
             break
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("source", help="RSS URL", type=str)
+    parser.add_argument("--version", action='version', version='%(prog)s ' + 'v 1.2', help="Print version info", )
+    parser.add_argument("--json", help="Print result as JSON in stdout", action="store_true")
+    parser.add_argument("--verbose", help="Outputs verbose status messages", action="store_true")
+    parser.add_argument("--limit", type=int, help="Limit news topics if this parameter provided")
+    args = parser.parse_args()
+    news_parsing()
+    if args.verbose:
+        making_log(0, '')
 
-news_parsing()
-if args.verbose:
-    making_log(0, '')
+
+if __name__ == '__main__':
+    main()
+
