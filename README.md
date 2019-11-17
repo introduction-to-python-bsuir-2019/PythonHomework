@@ -38,7 +38,8 @@ Use ./pycodestyle.sh to check the code corresponding to `pep8`
 (pycodestyle package must be installed)
 
 ## Testing
-Launch
+Tests are available at `https://github.com/Nenu1985/PythonHomework`
+Launching:
 ```
 ./make_tests.sh
 ```
@@ -46,8 +47,14 @@ Launch
 (nose and coverage packages must be installed)
 
 ## Version 2: Distribution
-Utility is wrapped into distribution package with setuptools.
+Utility wrapes into distribution package with setuptools.
 This package exports CLI utility named rss-reader.
+
+To generate distribution package (setuptool and wheel must be installed):
+Launch:
+``` python3 setup.py sdist bdist_wheel```
+In the ./dist repo you'll find a .tar and .whl files.
+
 
 
 
