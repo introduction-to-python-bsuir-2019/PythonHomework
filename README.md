@@ -5,12 +5,10 @@ RSS reader is a command-line utility that receives [RSS](wikipedia.org/wiki/RSS)
 ## Install
  For install come to the root of repository and type:
 ``` shell
-pip3 install
-```,
+pip3 install . ``` ,
 
 or  ``` shell
-pip3 install -r requirements.txt && python3 setup.py install
-```
+pip3 install -r requirements.txt && python3 setup.py install```
 
 ## Using
 
