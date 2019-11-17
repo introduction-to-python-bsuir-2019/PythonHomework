@@ -1,26 +1,24 @@
-from arg import *
-from news import * 
-import version
+from rss_reader import arg
+from rss_reader import news 
+from rss_reader import version
+import logging
 
 def main():
-	if args.version:
+	if arg.args.version:
 		print("Current version: " + version.version)
 
-	if (args.verbose):
-		print(80*"_")
-		print("\nverbose::Receiving and processing news")
-		print(80*"_")
+	if (arg.args.verbose):
+		logging.basicConfig(format = u' %(levelname)-8s [%(asctime)s] %(message)s', level = logging.INFO)
 
-	news = grab_news(args.URL)
+	captured_news = news.grab_news(arg.args.URL)
 
-	if (args.json):
-		if (args.verbose):
-			print(80*"_")
-			print("\nverbose::Write news to json file")
-			print(80*"_")
-		write_to_json(news)
+	if (arg.args.json):
+		logging.info("Write news to json file")
+		news.write_to_json(captured_news)
 	else:
-		show_news(news)
+		logging.info("Print news to outstream")
+		news.show_news(captured_news)
+	logging.info("The program is successfully completed")
 
 if __name__ == '__main__':
 	main()

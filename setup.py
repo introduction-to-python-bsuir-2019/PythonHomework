@@ -28,6 +28,6 @@ setuptools.setup(
         ],
 
     },
-    install_requires=['feedparser', 'argparse'],
+    install_requires=["bs4", "feedparser", "argparse"],
     python_requires='>=3.7',
 )
