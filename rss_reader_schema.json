@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Feed json schema",
+    "description": "JSON schema used by rss_news to print RSS feed news in stdout.",
+    "properties": {
+        "feed": {
+            "type": "string",
+            "title": "Feed",
+            "description": "Title of the RSS feed."
+        },
+        "news": {
+            "type": "array",
+            "title": "News",
+            "items": {
+                "type": "object",
+                "title": "News",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "title": "Title",
+                        "description": "Title of the news."
+                    },
+                    "published": {
+                        "type": "string",
+                        "title": "Published",
+                        "description": "Date and time of publication of the news."
+                    },
+                    "link": {
+                        "type": "string",
+                        "title": "Link",
+                        "description": "Link of the news."
+                    },
+                    "text": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Description text of the news."
+                    },
+                    "links": {
+                        "type": "array",
+                        "title": "Links and images used in news description.",
+                        "items": {
+                            "type": "object",
+                            "title": "News",
+                            "properties": {
+                                "link": {
+                                    "type": "string",
+                                    "title": "Link",
+                                    "description": "Link to adress or image."
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "title": "Type",
+                                    "description": "Type of link"
+                                }
+                            },
+                            "required": [
+                                "link",
+                                "type"
+                            ],
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "required": [
+                        "title",
+                        "published",
+                        "link",
+                        "text",
+                        "links"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "feed",
+        "news"
+    ],
+    "additionalProperties": false
+}
