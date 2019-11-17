@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from os import path
 from setuptools import find_packages, setup
@@ -13,6 +13,6 @@ setup(
     author="Sergey Kornilov",
     author_email="info@ksn.by",
     packages=find_packages(),
-    requires=["argparse", "bs4", "requests", "termcolor"],
-    scripts=["rss_reader.py"],
+    install_requires=["argparse", "bs4", "requests", "termcolor"],
+    scripts=["bin/rss-reader"],
 )
