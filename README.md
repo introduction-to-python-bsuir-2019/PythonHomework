@@ -16,7 +16,7 @@
 
 # TODO
 -   [x] [Iteration 1] One-shot command-line RSS reader.
--   [ ] [Iteration 2] Distribution
+-   [x] [Iteration 2] Distribution
 -   [ ] [Iteration 3] News caching
 -   [ ] [Iteration 4] Format converter
 -   [ ] * [Iteration 5] Output colorization
