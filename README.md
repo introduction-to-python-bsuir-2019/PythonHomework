@@ -20,4 +20,4 @@ optional arguments:
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
   ```
-  
+  JSON scheme is described in `json_schema.json`
