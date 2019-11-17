@@ -3,8 +3,8 @@
 import feedparser
 import logging
 
-from article import Article
-from json_format import JsonFormat
+from .article import Article
+from .json_format import JsonFormat
 
 
 class Reader:
