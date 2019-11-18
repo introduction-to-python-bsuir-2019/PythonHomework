@@ -16,7 +16,7 @@ HEADER_TABLE_NAME = 'date_'
 
 
 def _convert_date_to_YYYYMMDD(date : str) -> str:
-	"""Convert date from xml-format to YYYYMMDD."""
+	"""Convert date, which got by feedparser from xml-format to YYYYMMDD."""
 	logger = logging.getLogger(MODULE_LOGGER_NAME + '.convert_date_to_YYYYMMDD')
 	logger.info('Converting date to YYYYMMDD format')
 

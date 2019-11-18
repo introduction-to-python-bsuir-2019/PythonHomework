@@ -1,8 +1,8 @@
 """Main module of RssReader which starts program."""
 
 import logging
-from logging import config
 import argparse
+from logging import config
 
 from rss_parser import RssReader
 import caching_news
@@ -18,14 +18,14 @@ CORRECT_END_LOG = 'END (correct)'
 
 # LINK = 'https://www.reddit.com/.rss'
 
-LINK = 'https://news.yahoo.com/rss/'
+# LINK = 'https://news.yahoo.com/rss/'
 # LINK = 'https://www.newsisfree.com/rss/'
 # LINK = 'https://news.tut.by/rss/index.rss'
 
 
 def create_args_parser() -> argparse.ArgumentParser:
     """Func which creats parser of arguments of command-line.
-    
+
     Return: argparse.ArgumentParser
     """
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.create_args_parser')
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     elif args.link is not None:
         logger.info('Entrance to get news case')
 
-        rss_reader = RssReader(link=LINK)
+        rss_reader = RssReader(link=args.link)
 
         if args.limit is not None:
             limit = args.limit
@@ -132,9 +132,9 @@ if __name__ == "__main__":
                 news = rss_reader.get_news_as_string(limit=limit)
                 print(news)
             logger.info(CORRECT_END_LOG)
-        except(AttributeError):
+        except AttributeError:
             print("Incorrect link on resource!")
-            logger.info('END (incorrect link)')            
+            logger.info('END (incorrect link)')
     elif args.date is not None:
         logger.info(f'Getting cashed news by date: {args.date}')
 
