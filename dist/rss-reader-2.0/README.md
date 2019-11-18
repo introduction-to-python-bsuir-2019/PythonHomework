@@ -65,13 +65,6 @@ Wheel package for the second iteration task
 
 Actual packages you may find in the './dist' repo if you don't want to generate it manually.
 
-Installing: 
-```python3 -m pip install ./dist/rss_reader-2.0-py3-none-any.whl```
-OR
-```
-python3 -m pip install -r requirements.txt
-pip install ./dist/rss-reader-2.0.tar.gz
-```
 
 
 
