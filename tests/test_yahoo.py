@@ -16,7 +16,6 @@ from rss_reader.bots import yahoo
 from rss_reader.utils.RssInterface import RssException
 
 
-
 class TestMainModule(unittest.TestCase):
     def setUp(self) -> None:
         url = './tests/data/yahoo_news.xml'
@@ -26,21 +25,21 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(self.bot.limit, 2)
 
     def test_bot_feed(self):
-        self.assertEqual(self.bot.news.get('feed'), 'Yahoo News - Latest News & Headlines')
+        self.assertEqual(self.bot.news.feed, 'Yahoo News - Latest News & Headlines')
 
     def test_bot_news_count(self):
-        self.assertEqual(len(self.bot.news.get('items')), 2)
+        self.assertEqual(len(self.bot.news.items), 2)
 
     def test_bot_json_length(self):
-        self.assertEqual(len(self.bot.get_json()), 5422)
+        self.assertEqual(len(self.bot.get_json()), 3336)
 
     def test_bot_reddit_news_length(self):
         self.assertEqual(len(self.bot.get_news()), 5951)
 
     def test_human_text(self):
-        item = self.bot.news.get('items')[0]
-        self.assertEqual(item.get('title'), 'Israel kills Islamic Jihad commander, rockets rain from Gaza')
-        self.assertEqual(len(item.get('human_text')), 1035)
+        item = self.bot.news.items[0]
+        self.assertEqual(item.title, 'Israel kills Islamic Jihad commander, rockets rain from Gaza')
+        self.assertEqual(len(self.bot._parse_news_item(item)), 1035)
 
     def test_raising_exception(self):
         url = 'asdf'
@@ -57,5 +56,5 @@ class TestMainModule(unittest.TestCase):
         with open('./tests/data/yahoo.txt', 'r') as f:
             out_str = f.read()
 
-        self.assertEqual(len(out_str), 565)
+        self.assertEqual(len(out_str), 599)
         self.assertGreater(out_str.find('INFO'), 4)
