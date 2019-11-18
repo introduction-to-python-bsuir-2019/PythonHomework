@@ -12,7 +12,7 @@
 	<item>
 		<title>Sun</title>
 		<link>https://news.good.by/wild/1.html</link>
-		<description>The sun is shining</description>
+		<description><a href="https://news.good.by/wild/1.html"><img src="https://img.good.by/n/reuters/0c/a/meksika_1.jpg"></img>The sun is shining</a></description>
 		<atom:author>
 			<atom:name>Meduza</atom:name>
 			<atom:uri>https://meduza.io/</atom:uri>
@@ -26,27 +26,27 @@
 	<item>
 		<title>Birds</title>
 		<link>https://news.good.by/wild/2.html</link>
-		<description>The birds are signing</description>
+		<description><p>The birds are signing<a href="https://news.good.by/wild/2.html"><img src="https://img.good.by/n/reuters/0c/a/meksika_2.jpg"></img></a></p></description>
 		<atom:author>
 			<atom:name>Meduza</atom:name>
 			<atom:uri>https://meduza.io/</atom:uri>
 		</atom:author>
 		<category domain="https://news.good.by/world/">World</category>
-		<enclosure url="https://img.good.by/n/reuters/0c/a/meksika_2.jpg" type="image/jpeg" length="232938" />
+		<enclosure url="https://img.good.by/n/reuters/0c/a/meksika_22.jpg" type="image/jpeg" length="232938" />
 		<guid isPermaLink="true">https://news.good.by/world/2.html</guid>
 		<pubDate>Thu, 31 Oct 2019 18:42:00 +0300</pubDate>
-		<media:content url="https://img.good.by/n/reuters/0c/a/meksika_2.jpg" type="image/jpeg" medium="image" height="800" width="1200" fileSize="232938" />
+		<media:content url="https://img.good.by/n/reuters/0c/a/meksika_22.jpg" type="image/jpeg" medium="image" height="800" width="1200" fileSize="232938" />
 	</item>
 	<item>
 		<title>Animals</title>
 		<link>https://news.good.by/wild/3.html</link>
-		<description>The animals are jumping</description>
+		<description><p>The animals are jumping</p><p><a href="https://news.good.by/wild/3.html"><img src="https://img.good.by/n/reuters/0c/a/meksika_3.jpg"></img></a></p></description>
 		<atom:author>
 			<atom:name>Meduza</atom:name>
 			<atom:uri>https://meduza.io/</atom:uri>
 		</atom:author>
 		<category domain="https://news.good.by/world/">World</category>
-		<enclosure url="https://img.good.by/n/reuters/0c/a/meksika_3.jpg" type="image/jpeg" length="232938" />
+		<enclosure url="https://img.good.by/n/reuters/0c/a/meksika_43.jpg" type="image/jpeg" length="232938" />
 		<guid isPermaLink="true">https://news.good.by/world/3.html</guid>
 		<pubDate>Mon, 29 Oct 2019 14:42:00 +0300</pubDate>
 		<media:content url="https://img.good.by/n/reuters/0c/a/meksika_3.jpg" type="image/jpeg" medium="image" height="800" width="1200" fileSize="232938" />

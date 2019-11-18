@@ -5,7 +5,7 @@ import unittest
 import os
 import sqlite3
 from datetime import datetime
-import copy
+from pathlib import Path
 
 from rssreader.news import News
 from rssreader.feed import Feed
@@ -32,16 +32,19 @@ class CacheTestCase(unittest.TestCase):
         self.feed.news.append(self.second_news)
 
         self.db_name = 'test_rss.db'
-        self.db_path = os.getcwd()
-        self.db = os.path.join(self.db_path, self.db_name)
+        self.db_path = Path().cwd()
+        self.db = self.db_path.joinpath(self.db_name)
 
         # clean up
-        if os.path.isfile(self.db):
-            os.remove(self.db)
+        if self.db.is_file():
+            self.db.unlink()
 
-    def test_add(self):
+    def tearDown(self) -> None:
+        self.db.unlink()
+
+    def test_add(self) -> None:
         """Test storing into cache"""
-        self.cache = Cache(self.db_name, self.db_path)
+        self.cache = Cache(self.db_path, self.db_name)
         self.assertTrue(os.path.isfile(self.db), 'Cache DB has not been created!')
 
         self.cache.add(self.feed)
@@ -68,16 +71,16 @@ class CacheTestCase(unittest.TestCase):
                     result[i])
 
         # load into cache one more time
-        self.cache = Cache(self.db_name, self.db_path)
+        self.cache = Cache(self.db_path, self.db_name)
         self.cache.add(self.feed)
 
         # As this data already exist in cache, no news is added
         cursor.execute('select count(*) from news')
         self.assertEqual(2, cursor.fetchone()[0])
 
-    def test_load(self):
+    def test_load(self) -> None:
         """Test retrieving data from cache"""
-        self.cache = Cache(self.db_name, self.db_path)
+        self.cache = Cache(self.db_path, self.db_name)
         self.cache.add(self.feed)
 
         # create a new clean feed
@@ -104,6 +107,6 @@ class CacheTestCase(unittest.TestCase):
         with self.assertRaises(sqlite3.ProgrammingError) as cm:
             self.cache.load(self.feed)
 
-    def open_connection(self):
-        self.cache = Cache(self.db_name, self.db_path)
+    def open_connection(self) -> None:
+        self.cache = Cache(self.db_path, self.db_name)
         self.connection = sqlite3.connect(f'file:{self.db}?mode=rw', uri=True)

@@ -4,6 +4,8 @@ import html
 import json
 from typing import Dict, List
 from datetime import datetime, date
+from pathlib import Path
+import mimetypes
 
 import feedparser
 from bs4 import BeautifulSoup
@@ -54,11 +56,40 @@ class Feed(BaseClass):
         """Add a news into feed"""
         self.news.append(News(title, published, published_dt, link, description, hrefs))
 
-    def request(self) -> None:
+    def request(self, storage: Path) -> None:
         """Request RSS data from URL"""
         data = feedparser.parse(self.url)
         self._parse(data)
-        self.cache()
+        self.cache(storage)
+
+    @staticmethod
+    def _extract_links(description: BeautifulSoup) -> List[Dict]:
+        """Manually parse description to obtain links"""
+        lst = []
+        # add hrefs
+        for a in description.find_all('a'):
+            try:
+                url = a['href']
+                if url:
+                    # if mime-type can be determined, base type "text" is used
+                    lst.append({'type': mimetypes.guess_type(url)[0] or 'text', 'href': url})
+                else:
+                    logging.info('Attribute "href" is empty - the item is skipped')
+            except KeyError:
+                logging.info('Tag "a" does not have an attribute "href" - the item is skipped')
+
+        # add images
+        for img in description.find_all('img'):
+            try:
+                url = img['src']
+                if url:
+                    # if mime-type can be determined, base type "image" is used
+                    lst.append({'type': mimetypes.guess_type(url)[0] or 'image', 'href': url})
+                else:
+                    logging.info('Attribute "src" is empty - the item is skipped')
+            except KeyError:
+                logging.info('Tag "img" does not have an attribute "src" - the item is skipped')
+        return lst
 
     def _parse(self, data: feedparser.FeedParserDict) -> None:
         """Parses the RSS data to load feed"""
@@ -73,16 +104,16 @@ class Feed(BaseClass):
         # Create a list of news based on feed entries. All news are processed to be stored in local cache later.
         logging.info('Iterate over feed to process each news')
         for n in data.entries:
+            parsed_description = BeautifulSoup(n.description, "html.parser")
             self.add_news(
                 html.unescape(n.title), n.published, datetime(*n.published_parsed[:6]), n.link,
-                html.unescape(BeautifulSoup(n.description, "html.parser").text),
-                [{'type': d.type, 'href': d.href} for d in n.links]
+                html.unescape(parsed_description.text), self._extract_links(parsed_description)
             )
 
-    def load_from_cache(self) -> None:
+    def load_from_cache(self, storage: Path) -> None:
         """Load cached news"""
-        Cache().load(self)
+        Cache(cache_dir=storage).load(self)
 
-    def cache(self) -> None:
+    def cache(self, storage: Path) -> None:
         """Cache news"""
-        Cache().add(self)
+        Cache(cache_dir=storage).add(self)

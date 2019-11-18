@@ -1,19 +1,18 @@
 """Module implements local cache for feeds"""
-import os
 import logging
 import sqlite3
-import pathlib
+from pathlib import Path
 import json
-from datetime import date
+from contextlib import closing
 
 import rssreader
 
 
 class Cache(rssreader.base.BaseClass):
     """Class to work with cache. Implementation is based on using sqlite3."""
-    def __init__(self, db_name: str = None, db_path: str = None) -> None:
-        """Initialize cache. Home directory is used to store db file. Default db name is rssreader.db"""
-        self.db = os.path.join(db_path or pathlib.Path.home().as_posix(), db_name or 'rssreader.db')
+    def __init__(self, cache_dir: Path, db_name: Path = None, ) -> None:
+        """Initialize cache. Default db name is cache.db"""
+        self.db = cache_dir.joinpath(db_name or 'cache.db')
         try:
             self._connection = sqlite3.connect(f'file:{self.db}?mode=rw', uri=True)
         except sqlite3.OperationalError:
@@ -95,40 +94,39 @@ class Cache(rssreader.base.BaseClass):
 
     def add(self, feed: "rssreader.feed.Feed") -> None:
         """Add feed data into cache"""
-        logging.info('Add feed data into cache')
+        with closing(self._connection) as connection:
+            logging.info('Add feed data into cache')
 
-        feed_id = self._get_feed_id(feed.url)
-        if not feed_id:
-            feed_id = self._insert_feed(feed)
-        logging.info(f'Feed id is {feed_id}')
+            feed_id = self._get_feed_id(feed.url)
+            if not feed_id:
+                feed_id = self._insert_feed(feed)
+            logging.info(f'Feed id is {feed_id}')
 
-        self._insert_news(feed, feed_id)
-        self._connection.commit()
-        self._connection.close()
+            self._insert_news(feed, feed_id)
+            connection.commit()
 
     def load(self, feed: "rssreader.feed.Feed") -> None:
         """
         Retrieve feed data from cache
         """
-        logging.info('Load data from cache')
-        cursor = self._connection.cursor()
+        with closing(self._connection) as connection:
+            logging.info('Load data from cache')
+            cursor = connection.cursor()
 
-        # load feed data
-        logging.info('Load feed info from DB')
-        cursor.execute('select id, title, encoding from feed where url = (?)', (feed.url,))
-        row = cursor.fetchone()
-        if row:
-            logging.info('Load news data from DB')
-            feed_id, feed.title, feed.encoding = row
-            cursor.execute('select title, published, published_dt, link, description, hrefs '
-                           'from news '
-                           'where feed_id = (?) and published_dt >= (?) '
-                           'order by published_dt desc limit ifnull((?), -1)',
-                           (feed_id, feed.published_from, feed.limit,))
+            # load feed data
+            logging.info('Load feed info from DB')
+            cursor.execute('select id, title, encoding from feed where url = (?)', (feed.url,))
+            row = cursor.fetchone()
+            if row:
+                logging.info('Load news data from DB')
+                feed_id, feed.title, feed.encoding = row
+                cursor.execute('select title, published, published_dt, link, description, hrefs '
+                               'from news '
+                               'where feed_id = (?) and published_dt >= (?) '
+                               'order by published_dt desc limit ifnull((?), -1)',
+                               (feed_id, feed.published_from, feed.limit,))
 
-            for row in cursor.fetchall():
-                feed.add_news(row[0], row[1], row[2], row[3], row[4], json.loads(row[5]))
-        else:
-            logging.info('This url does not exist in local cache.')
-
-        self._connection.close()
+                for row in cursor.fetchall():
+                    feed.add_news(row[0], row[1], row[2], row[3], row[4], json.loads(row[5]))
+            else:
+                logging.info('This url does not exist in local cache.')

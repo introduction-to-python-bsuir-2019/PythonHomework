@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime
 import io
 from contextlib import redirect_stdout
+from pathlib import Path
 
 import feedparser
 
@@ -33,17 +34,19 @@ class FeedTestCase(unittest.TestCase):
         with open('tests/correct.rss', 'r') as fd:
             self.correct_rss = fd.read()
 
-    def test_request(self):
+    def test_request(self) -> None:
         """
         Test that rss file is parsed
         """
+        cache_dir = Path().cwd()
         self.feed.limit = 10
         self.feed.news = []
         self.feed.url = self.correct_rss
-        self.feed.request()
+        self.feed.request(cache_dir)
         self.assertEqual(3, len(self.feed.news))
+        cache_dir.joinpath('cache.db').unlink()
 
-    def test__parse_all(self):
+    def test__parse_all(self) -> None:
         """
         All news from the feed are parsed
         """
@@ -83,7 +86,7 @@ class FeedTestCase(unittest.TestCase):
             with self.subTest(i=i):
                 self.assertEqual(standards[i].get_json_dict(), self.feed.news[i].get_json_dict())
 
-    def test__parse_one(self):
+    def test__parse_one(self) -> None:
         """
         Limit argument does not impact on parsing - all news are parsed.
         """
@@ -93,7 +96,7 @@ class FeedTestCase(unittest.TestCase):
         self.feed._parse(data)
         self.assertEqual(3, len(self.feed.news))
 
-    def test__parse_err(self):
+    def test__parse_err(self) -> None:
         """feed.bozo attribute is set to 1. That means that feed is not well-formed."""
         with open('tests/incorrect.rss', 'r') as fd:
             self.incorrect_rss = fd.read()
@@ -102,7 +105,7 @@ class FeedTestCase(unittest.TestCase):
         with self.assertRaises(Exception) as cm:
             self.feed._parse(data)
 
-    def test_get_json(self):
+    def test_get_json(self) -> None:
         """
         Feed is converted into json
         """
@@ -114,7 +117,7 @@ class FeedTestCase(unittest.TestCase):
                    'jpg"\n                }\n            ]\n        }\n    ]\n}'
         self.assertEqual(standard, self.feed.get_json())
 
-    def test_get_text(self):
+    def test_get_text(self) -> None:
         """
         Feed is converted into text. This text is displayed into console.
         """
@@ -123,14 +126,14 @@ class FeedTestCase(unittest.TestCase):
                    'Everything is ok\n\nLinks:\n[0]: https://img.dummy.xz/pic1.jpg (image/jpeg))\n'
         self.assertEqual(standard, self.feed.get_text())
 
-    def test_add_news(self):
+    def test_add_news(self) -> None:
         """New news is added"""
         init_len = len(self.feed.news)
         self.feed.add_news('Third news', 'Thu, 31 Oct 2019 10:22:00 +0300', datetime(2019, 10, 31, 10, 22, 0),
                            'https://dummy.xz/3', 'I trust you', [])
         self.assertEqual(init_len + 1, len(self.feed.news))
 
-    def test_print_json_ok(self):
+    def test_print_json_ok(self) -> None:
         """
         Feed is printed (in stdout) in json format
         """
@@ -139,7 +142,7 @@ class FeedTestCase(unittest.TestCase):
                 self.feed.print(True)
             self.assertEqual(self.feed.get_json()+'\n', buf.getvalue())
 
-    def test_print_text_ok(self):
+    def test_print_text_ok(self) -> None:
         """
         Feed is printed (in stdout) as text
         """
@@ -148,7 +151,7 @@ class FeedTestCase(unittest.TestCase):
                 self.feed.print(False)
             self.assertEqual(self.feed.get_text()+'\n', buf.getvalue())
 
-    def test_print_err(self):
+    def test_print_err(self) -> None:
         """
         Exception is raised as there is no news
         """
