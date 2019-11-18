@@ -6,6 +6,7 @@ import re
 import json
 import feedparser
 import logging
+import jsonpickle
 
 def parse_arguments():
     parser=argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
@@ -97,7 +98,7 @@ def retrieve_news(link, limit):
     logging.info('Retrieving news...')
     feed=feedparser.parse(link)
     soup=requests.get(link).text
-    soup=BeautifulSoup(soup,"html5lib")
+    soup=BeautifulSoup(soup,html.parser)
     news_separated=soup('item')
     logging.info('News retrieved, converting to readable format...')
     print('\nSource: '+feed['feed']['title'])
@@ -109,20 +110,23 @@ def retrieve_news(link, limit):
 
 def make_json(news):
     logging.info('Converting to JSON...')
-    return json.dumps({'title': news.title,
-                       'news': [{'news title': item.title,
-                                 'source': item.source,
-                                 'date': item.date,
-                                 'content': item.content,
-                                 'images': item.images} for item in news.news]},ensure_ascii=False)
+    jsonpickle.set_encoder_options('json', ensure_ascii=False)
+    return jsonpickle.encode(news)
             
 def print_news(news):
     try:
-        print('\nSource: '+news.title)
-        for item in news.news:
+        for source in news:
+            print('\nSource: '+source.title)
+        for item in source.news:
             item.show_fields()
     except (AttributeError, TypeError):
-        print(news)
+        print(hide_object_info(news))
+
+def hide_object_info(news):
+    while '"py/object": ' in news:
+        cutfrom=news.find('"py/object": ')
+        news=news.replace(news[cutfrom:news.find(',',cutfrom)+2],'',1)
+    return news
 
 def main():
     args=parse_arguments()
@@ -139,9 +143,9 @@ def main():
             logging.basicConfig(level=logging.INFO, 
                                 format='%(asctime)s - %(message)s',
                                 datefmt='%H:%M:%S')
-        feed=NewsFeed(args.source, args.limit)
+        feed=[NewsFeed(args.source, args.limit)]
         if args.json:
-            news=make_json(feed)
+            feed=make_json(feed)
         print_news(feed)
 
 if __name__=='__main__':
