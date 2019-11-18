@@ -8,8 +8,10 @@ class NewsItem:
     Class which define characteristics of the News item.
     """
 
+    _iter_number = 1
+
     # TODO: add description of the news item
-    def __init__(self, title, link, date, image, links):
+    def __init__(self, title, link, date, images, links):
         """
         Initialise fields of the class.
         :param title: title of the news item.
@@ -21,38 +23,40 @@ class NewsItem:
         self.title = title
         self.link = link
         self.date = date
-        if image is not None:
-            self.image = image
+        if images is not None:
+            self.images = images
         else:
-            self.image = Image('', '')
+            self.images = list()
         self.links = links
 
-    def get_title(self):
+    def get_images(self):
         """
-        Get title of the news item
-        :return: title of the news item.
+        Get sting which describe all images, connected with that news item.
+        :return: string with describing of all images.
         """
-        return self.title
-
-    def get_link(self):
-        """
-        Get link in which that page is situated.
-        :return: link, where that page if situated.
-        """
-        return self.link
+        res_str = ""
+        if self.images is not None:
+            for image in self.images[1:]:
+                if image is not None:
+                    res_str = res_str + "\n[{0}]: {1}\t (image)".\
+                        format(self._iter_number, image.image_link)
+                    self._iter_number += 1
+                    res_str = res_str + "\n"
+            return res_str
+        else:
+            return None
 
     def get_links(self):
         """
         Get string which describes all links, connected with that news item.
         :return: string with describing of all links.
         """
-        iter_number = 1
         res_str = ""
         if self.links is not None:
             for link in self.links:
                 if link is not None:
-                    res_str = res_str + "\n[{0}]: {1}\t (link)".format(iter_number, link)
-                    iter_number += 1
+                    res_str = res_str + "\n[{0}]: {1}\t (link)".format(self._iter_number, link)
+                    self._iter_number += 1
             res_str = res_str + "\n"
         else:
             res_str = "There are no links"
@@ -65,8 +69,10 @@ class NewsItem:
                "[Image title: {3}]\n" \
                "Image link: {4}\n" \
                "Links: {5}\n" \
-               .format(self.title, self.link, self.date,
-                       self.image.image_title, self.image.image_link, self.get_links())
+            .format(self.title, self.link, self.date,
+                    self.images[0].image_title if self.images[0] is not None else "",
+                    self.images[0].image_link if self.images[0] is not None else "",
+                    self.get_links() + (self.get_images() if self.get_images() is not None else ""))
 
     def convert_to_json(self):
         """
@@ -74,8 +80,10 @@ class NewsItem:
         :return: dict, which describe own JSON format of the news.
         """
         return {'News_Item': {'Title': self.title, 'Date': self.date, 'Link': self.link,
-                              'Image Title': self.image.image_title, 'Image link': self.image.image_link,
-                              'Links': self.get_links()}
+                              'Image Title': self.images[0].image_title if self.images[0] is not None else "",
+                              'Image link': self.images[0].image_link if self.images[0] is not None else "",
+                              'Links': self.get_links() + (self.get_images()
+                                                           if self.get_images() is not None else "")}
                 }
 
     def get_json_representation(self):
@@ -88,6 +96,6 @@ class NewsItem:
     # TODO: Normal output
     def __repr__(self):
         return "NewsItem {" \
-               "title = {0} \n" \
-               "link = {1}.\n }"\
+               "title = {0}, " \
+               "link = {1}. }" \
             .format(self.title, self.link)

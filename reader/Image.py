@@ -20,10 +20,10 @@ class Image:
         return "Link: {0} (image)".format(self.image_link)
 
     def __str__(self):
-        return "\n[Image: {0}]".format(self.image_title)
+        return "[Image: {0}]".format(self.image_title)
 
     def __repr__(self):
         return "Image {" \
-               "image_title = {0}, \n" \
-               "image_link = {1}. \n" \
+               "image_title = {0}," \
+               "image_link = {1}." \
                "}".format(self.image_title, self.image_link)
