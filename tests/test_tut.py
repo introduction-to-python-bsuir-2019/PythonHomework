@@ -23,13 +23,13 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(self.bot.limit, 7)
 
     def test_bot_feed(self):
-        self.assertEqual(self.bot.news.get('feed'), 'TUT.BY: Новости ТУТ - Главные новости')
+        self.assertEqual(self.bot.news.feed, 'TUT.BY: Новости ТУТ - Главные новости')
 
     def test_bot_news_count(self):
-        self.assertEqual(len(self.bot.news.get('items')), 7)
+        self.assertEqual(len(self.bot.news.items), 7)
 
     def test_bot_json_length(self):
-        self.assertEqual(len(self.bot.get_json()), 34377)
+        self.assertEqual(len(self.bot.get_json()), 18116)
 
     def test_bot_reddit_news_length(self):
         self.assertEqual(len(self.bot.get_news()), 20006)

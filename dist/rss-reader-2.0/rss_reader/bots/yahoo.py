@@ -1,26 +1,26 @@
 import bs4
 
 from rss_reader.utils.RssInterface import BaseRssBot
-from ..utils.DataStructures import NewsItem
+
 
 class Bot(BaseRssBot):
 
-    def _parse_news_item(self, news_item: NewsItem) -> str:
+    def _parse_news_item(self, news_item: dict) -> None:
         """
         Forms a human readable string from news_item and adds it to the news_item dict
         :param news_item: news_item content
-        :return: human readable news content
+        :return: extend news_item dict with human readable news content
         """
 
         out_str = ''
-        out_str += f"\nTitle: {news_item.title}\n" \
-                   f"Date: {news_item.published}\n" \
-                   f"Link: {news_item.link}\n"
+        out_str += f"\nTitle: {news_item.get('title', '')}\n" \
+                   f"Date: {news_item.get('published', '')}\n" \
+                   f"Link: {news_item.get('link', '')}\n"
 
-        html = bs4.BeautifulSoup(news_item.html, "html.parser")
+        html = bs4.BeautifulSoup(news_item.get('html'), "html.parser")
 
-        links = news_item.links
-        imgs = news_item.imgs
+        links = news_item.get('links')
+        imgs = news_item.get('imgs')
 
         for tag in html.descendants:
             if tag.name == 'a':
@@ -43,4 +43,4 @@ class Bot(BaseRssBot):
         out_str += '\n'.join([f'[{i + 1}]: {link} (link)' for i, link in enumerate(links)]) + '\n'
         out_str += '\n'.join([f'[{i + len(links) + 1}]: {link} (image)' for i, link in enumerate(imgs)]) + '\n'
 
-        return out_str
+        news_item['human_text'] = out_str

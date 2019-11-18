@@ -25,13 +25,13 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(self.bot_google.limit, 10)
 
     def test_bot_feed(self):
-        self.assertEqual(self.bot_google.news.get('feed'), 'Top stories - Google News')
+        self.assertEqual(self.bot_google.news.feed, 'Top stories - Google News')
 
     def test_bot_news_count(self):
-        self.assertEqual(len(self.bot_google.news.get('items')), 10)
+        self.assertEqual(len(self.bot_google.news.items), 10)
 
     def test_bot_json_length(self):
-        self.assertEqual(len(self.bot_google.get_json()), 66635)
+        self.assertEqual(len(self.bot_google.get_json()), 31210)
 
     def test_bot_reddit_news_length(self):
         self.assertEqual(len(self.bot_google.get_news()), 45755)
@@ -40,13 +40,13 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(self.bot_reddit.limit, 3)
 
     def test_bot_reddit_feed(self):
-        self.assertEqual(self.bot_reddit.news.get('feed'), 'World News')
+        self.assertEqual(self.bot_reddit.news.feed, 'World News')
 
     def test_bot_reddit_news_count(self):
-        self.assertEqual(len(self.bot_reddit.news.get('items')), 3)
+        self.assertEqual(len(self.bot_reddit.news.items), 3)
 
     def test_bot_reddit_json_length(self):
-        self.assertEqual(len(self.bot_reddit.get_json()), 5069)
+        self.assertEqual(len(self.bot_reddit.get_json()), 2759)
 
     def test_bot_reddit_news_length(self):
         self.assertEqual(len(self.bot_reddit.get_news()), 5549)

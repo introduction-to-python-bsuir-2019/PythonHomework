@@ -1,14 +1,12 @@
-from abc import ABCMeta, abstractmethod
-import bs4
+from abc import ABCMeta, abstractmethod, abstractproperty
 import json
-from typing import Union, Dict, List
-
-import logging
 import feedparser
-from terminaltables import SingleTable
-from textwrap import wrap
+import logging
+from typing import Union, Dict, List, Iterable, Optional, Any
 
-from ..utils.DataStructures import NewsItem, News
+import bs4
+from textwrap import wrap
+from terminaltables import SingleTable
 
 
 class RssException(Exception):
@@ -30,10 +28,8 @@ class RssBotInterface(metaclass=ABCMeta):
         self.url = url
         self.screen_width = width
         feed = self._parse_raw_rss()
-        # self.news = self._get_news_as_dict(feed)  # news as dict
-        self.news = self._get_news(feed)
+        self.news = self._get_news_as_dict(feed)  # news as dict
         self.logger.info(f'Bot initialization is completed')
-        self.human_text = ''
 
     @abstractmethod
     def get_news(self) -> str:
@@ -59,6 +55,14 @@ class RssBotInterface(metaclass=ABCMeta):
 
         Result stores into internal attribute self.feed
         :return: None
+        """
+
+    @abstractmethod
+    def _get_news_as_dict(self, feed: feedparser.FeedParserDict) -> Dict[str, Union[str, List[str]]]:
+        """
+        Returns str containing formatted news from internal attr self.feed
+
+        :return: str with news
         """
 
     @abstractmethod
@@ -111,11 +115,11 @@ class BaseRssBot(RssBotInterface):
 
         :return: str with news
         """
-        table = [['Feed', f"Title: {self.news.feed}\nLink: {self.news.link}"]]
-        news_items = self.news.items
+        table = [['Feed', f"{self.news.get('feed', '')}\n"]]
+        news_items = self.news.get('items')
         for n, item in enumerate(news_items):
             # table.append([1, item.get('human_text')])
-            initial_news_item = self._parse_news_item(item)
+            initial_news_item = item.get('human_text', '')
             splitted_by_paragraphs = initial_news_item.split('\n')
             for i, line in enumerate(splitted_by_paragraphs):
                 if len(line) > self.screen_width:
@@ -135,49 +139,47 @@ class BaseRssBot(RssBotInterface):
 
         return table_inst.table
 
-    def _get_news(self, feed: feedparser.FeedParserDict) -> News:
+    def _get_news_as_dict(self, feed: feedparser.FeedParserDict) \
+            -> Dict[str, Union[str, List[str]]]:
         """
         Returns str containing formatted news from internal attr self.feed
 
         :return: str with news
         """
-        news_items = []
+        news = {'feed': feed.get('feed', '').get('title', ''),
+                'items': []}
 
-        for i, item in enumerate(feed.get('items', '')[:self.limit]):
-            news_items.append(NewsItem(
-                title=item.get('title', ''),
-                link=item.get('link', ''),
-                published=item.get('published', ''),
-                imgs=[img.get('url', '') for img in item.get('media_content', '')],
-                links=[link.get('href') for link in item.get('links', '')],
-                html=item.get('summary', ''),
-            ))
+        for i, item in enumerate(feed.get('items')[:self.limit]):
+            news_item = {
+                'title': item.get('title', ''),
+                'link': item.get('link', ''),
+                'published': item.get('published', ''),
+                'imgs': [img.get('url', '') for img in item.get('media_content', '')],
+                'links': [link.get('href', '') for link in item.get('links', '')],
+                'html': item.get('summary', '')
+            }
+            self._parse_news_item(news_item)
+            news['items'].append(news_item)
 
-        news = News(
-            feed=feed.get('feed', '').get('title', ''),
-            link=feed.get('feed', '').get('link', ''),
-            items=news_items,
-        )
-        self.logger.info(f'_get_news(): Feedparser object is converted into news_item obj with Default news')
-
+        self.logger.info(f'Feedparser object is converted into dictionary')
         return news
 
-    def _parse_news_item(self, news_item: NewsItem) -> str:
+    def _parse_news_item(self, news_item: Dict[str, Union[str, List[str]]]) -> None:
         """
         Forms a human readable string from news_item and adds it to the news_item dict
         :param news_item: news_item content
         :return: extend news_item dict with human readable news content
         """
-        self.logger.info(f'Extending {news_item.title}')
+        self.logger.info(f'Extending {news_item.get("title", "")}')
         out_str = ''
-        out_str += f"\nTitle: {news_item.title}\n" \
-                   f"Date: {news_item.published}\n" \
-                   f"Link: {news_item.link}\n"
+        out_str += f"\nTitle: {news_item.get('title', '')}\n" \
+                   f"Date: {news_item.get('published', '')}\n" \
+                   f"Link: {news_item.get('link', '')}\n"
 
-        html = bs4.BeautifulSoup(news_item.html, "html.parser")
+        html = bs4.BeautifulSoup(news_item.get('html', ''), "html.parser")
 
-        links = news_item.links
-        imgs = news_item.imgs
+        links = news_item.get('links', '')
+        imgs = news_item.get('imgs', '')
 
         for tag in html.descendants:
             if tag.name == 'a':
@@ -199,4 +201,4 @@ class BaseRssBot(RssBotInterface):
         out_str += '\n'.join([f'[{i + 1}]: {link} (link)' for i, link in enumerate(links)]) + '\n'
         out_str += '\n'.join([f'[{i + len(links) + 1}]: {link} (image)' for i, link in enumerate(imgs)]) + '\n'
 
-        return out_str
+        news_item['human_text'] = out_str
