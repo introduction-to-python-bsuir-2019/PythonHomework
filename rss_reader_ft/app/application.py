@@ -33,6 +33,6 @@ class Application:
         logging.info('Get the final output data')
 
         if self.dict_args["json"]:
-            Output.to_json_format(process_data )
+            Output.to_json_format(process_data)
         else:
-            Output.to_rss_format(process_data )
+            Output.to_rss_format(process_data)
