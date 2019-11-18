@@ -3,6 +3,7 @@ import bs4
 from rss_reader.utils.RssInterface import BaseRssBot
 from ..utils.DataStructures import NewsItem
 
+
 class Bot(BaseRssBot):
 
     def _parse_news_item(self, news_item: NewsItem) -> str:
