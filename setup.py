@@ -15,6 +15,6 @@ setup(
     url="https://github.com/ZayJob/PythonHomework/tree/finalTask",
     entry_points={
         'console_scripts':
-            ['rss-reader = %s.rss_reader:main' % config.__package__]
+            ['rss-reader = rss_reader_ft.rss_reader:main']
     }
 )
