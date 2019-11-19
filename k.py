@@ -1,6 +1,7 @@
 import feedparser
 import argparse
 import json
+"""import section"""
 
 version = 0.1
 parser = argparse.ArgumentParser()
@@ -9,20 +10,24 @@ parser.add_argument("-l", "--lim", help="outputs the latest X(int)articles. can 
 parser.add_argument("-o", "--output", help="outputs news to file", action="store_true")
 args = parser.parse_args()
 limit = args.lim
+"""ALL MUST GO. I might try to pull an if __main__()"""
 
 
 def captureFeed(url):
+    """Not actually used and just takes up space"""
+
     feed = feedparser.parse(args.URL)
     return feed
 
 
 def fileOutput():
+    """Outputs a json dump of feed.entries to a file that is called "news.txt".works """
+
     open("news.txt", "w").close()
     feed = captureFeed(args.URL)
     f = open("news.txt", "w+")
-    for n in feed.entries:
-        input1 = json.dumps(feed.entries)
-        f.write(input1)
+    input1 = json.dumps(feed.entries)
+    f.write(input1)
     f.close()
 
 
@@ -35,29 +40,30 @@ def standardOutput():
 
 
 def limitedOutput(limit):
-    """This is what happens when there is only  parameter on limmit"""
     feed = captureFeed(args.URL)
     try:
-        for i in range(int(limit)):
-            T = str(feed.entries[i].title)
-            P = feed.entries[i].published
-            L = feed.entries[i].link
+        for Index in range(int(limit)):
+            T = str(feed.entries[Index].title)
+            P = feed.entries[Index].published
+            L = feed.entries[Index].link
             print("Title:  ", T.replace("&#39;", "'"), "\nDate:   ",
                   P, "\nLinks:  ", L, "\n")
         print("your limit was: ", limit)
     except IndexError:
         print("no")
+    """Output if the user uses the --limit args, protected by indexError"""
 
 
 if limit:
     limitedOutput(limit)
 else:
     standardOutput()
-print(args.output)
+
 if args.output:
     feed = captureFeed(args.URL)
     fileOutput()
 
+"""Has to go away from the global score. could try to put it into a main()"""
 
 """
 I have created the bare minimal working rss reader.
