@@ -1,7 +1,7 @@
 """Module contains objects related to printing data"""
 import logging
 
-from conversion.json_converter import JsonConverter
+from rss_reader_ft.conversion.json_converter import JsonConverter
 
 
 class Output:

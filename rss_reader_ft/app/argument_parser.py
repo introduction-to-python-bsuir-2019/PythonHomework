@@ -4,7 +4,7 @@ from typing import Dict
 
 import argparse
 
-from app.rss_reader_config import __version__
+from rss_reader_ft.config import __version__
 
 
 class ArgumentParser:

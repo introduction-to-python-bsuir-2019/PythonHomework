@@ -3,11 +3,11 @@ import logging
 import sys
 from typing import Dict
 
-from app.application_log import ApplicationLog
-from app.argument_parser import ArgumentParser
-from rss.data_loader import DataLoader
-from rss.output import Output
-from rss.rss_feed import RSSFeed
+from rss_reader_ft.app.application_log import ApplicationLog
+from rss_reader_ft.app.argument_parser import ArgumentParser
+from rss_reader_ft.rss.data_loader import DataLoader
+from rss_reader_ft.rss.output import Output
+from rss_reader_ft.rss.rss_feed import RSSFeed
 
 
 class Application:

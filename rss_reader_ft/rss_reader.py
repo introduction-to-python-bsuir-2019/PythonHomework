@@ -1,8 +1,8 @@
 """Application entry point module"""
 import logging
 
-from app.application import Application
-from app.application_log import ApplicationLog
+from rss_reader_ft.app.application import Application
+from rss_reader_ft.app.application_log import ApplicationLog
 
 
 def main() -> None:

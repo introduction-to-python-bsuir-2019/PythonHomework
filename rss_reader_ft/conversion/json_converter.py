@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Dict
 
-from conversion.format_converter import FormatConverter
+from rss_reader_ft.conversion.format_converter import FormatConverter
 
 
 class JsonConverter(FormatConverter):
