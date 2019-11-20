@@ -41,7 +41,7 @@ def logger_init(level=None):
     return logger
 
 
-def get_bot_instance(url: str, logger: logging.Logger) -> RssInterface:
+def get_bot_instance(url: str, logger: logging.Logger) -> RssInterface.BaseRssBot:
     """
     Choosing an appropriate bot to the url
     :param url: url, contained rss feed

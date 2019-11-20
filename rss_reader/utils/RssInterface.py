@@ -31,7 +31,7 @@ class RssBotInterface(metaclass=ABCMeta):
         self.screen_width = width
         feed = self._parse_raw_rss()
         # self.news = self._get_news_as_dict(feed)  # news as dict
-        self.news = self._get_news(feed)
+        self.news = self._feed_to_news(feed)
         self.logger.info(f'Bot initialization is completed')
         self.human_text = ''
 
@@ -41,6 +41,14 @@ class RssBotInterface(metaclass=ABCMeta):
         Returns str containing formatted news from internal attr self.feed
 
         :return: str with news
+        """
+
+    @abstractmethod
+    def _feed_to_news(self, feed: feedparser.FeedParserDict) -> News:
+        """
+        Converts FeedParserDict obj to News obj
+
+        :return: News
         """
 
     def get_json(self) -> str:
@@ -62,7 +70,7 @@ class RssBotInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def _parse_news_item(self, news_item: Dict[str, Union[str, List[str]]]):
+    def _parse_news_item(self, news_item: NewsItem):
         pass
 
 
@@ -135,7 +143,7 @@ class BaseRssBot(RssBotInterface):
 
         return table_inst.table
 
-    def _get_news(self, feed: feedparser.FeedParserDict) -> News:
+    def _feed_to_news(self, feed: feedparser.FeedParserDict) -> News:
         """
         Returns str containing formatted news from internal attr self.feed
 

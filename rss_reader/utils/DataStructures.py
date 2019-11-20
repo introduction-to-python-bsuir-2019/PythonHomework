@@ -68,7 +68,7 @@ class News:
     """
     feed: str = attr.ib()
     link: str = attr.ib()
-    items: typing.List[NewsItem] = attr.ib()
+    items: typing.Sequence[NewsItem] = attr.ib()
 
     def to_json(self):
         return self.__dict__

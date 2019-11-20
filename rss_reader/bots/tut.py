@@ -16,7 +16,7 @@ class TutNewItem(NewsItem):
 
 class Bot(BaseRssBot):
 
-    def _get_news(self, feed: feedparser.FeedParserDict) -> News:
+    def _feed_to_news(self, feed: feedparser.FeedParserDict) -> News:
         """
         Returns str containing formatted news from internal attr self.feed
 
