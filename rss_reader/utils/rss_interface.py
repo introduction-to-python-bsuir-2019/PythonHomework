@@ -1,11 +1,8 @@
 from abc import ABCMeta, abstractmethod
 import bs4
-from datetime import date, datetime
+from datetime import datetime
 import json
-from json import JSONEncoder
 from pathlib import Path
-import pickle
-from typing import Union, Dict, List
 
 import logging
 import feedparser
@@ -14,43 +11,8 @@ from textwrap import wrap
 
 from ..utils.data_structures import NewsItem, News
 from ..utils.decorators import call_save_news_after_method
-
-# datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
-# date(2019, 12, 15)
-# datetime.strptime(duration, '%HH').time().strftime('%H:%M')
-
-
-class PythonObjectEncoder(JSONEncoder):
-    def default(self, obj):
-        return {'_python_object': pickle.dumps(obj).decode('latin1')}
-
-
-def as_python_object(dct):
-    try:
-        return pickle.loads(dct['_python_object'].encode('latin1'))
-    except KeyError:
-        return dct
-
-
-class RssException(Exception):
-    """
-    Custom Exception class raised by RssBots classes
-    """
-    pass
-
-
-class RssValueException(ValueError):
-    """
-    Custom Exception class raised by RssBots classes
-    """
-    pass
-
-
-class RssNewsException(ValueError):
-    """
-    Custom Exception class raised by RssBots classes
-    """
-    pass
+from ..utils.exceptions import RssException, RssNewsException, RssValueException
+from ..utils.json_encoder_patch import as_python_object, PythonObjectEncoder
 
 
 class RssBotInterface(metaclass=ABCMeta):
