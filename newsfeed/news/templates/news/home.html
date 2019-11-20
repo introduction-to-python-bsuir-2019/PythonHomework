@@ -1,7 +1,11 @@
 {% extends 'news/base.html' %}
-
 {% block content %}
-    {% for post in posts %}
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-8">
+
+            {% for post in posts %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="#">
             <div class="media-body">
@@ -35,4 +39,38 @@
         <!--</div>-->
     {% endif %}
 
+        </div>
+        <div class="col-md-4">
+          <div class="content-section">
+            <h3>Our Sidebar</h3>
+            <p class='text-muted'>Some additional buttons
+                <form class="form-group" action="{% url 'remove-news' %}" method="GET">
+                    <button class="btn btn-outline-info" type="submit">
+                        Clear News
+                    </button>
+
+                </form>
+
+                <form class="form-group" action="{% url 'to-pdf' posts %}" method="GET">
+
+                    <button class="btn btn-outline-info" type="submit">
+                        Import all to pdf.
+                    </button>
+
+                </form>
+
+
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Announcements</li>
+                <li class="list-group-item list-group-item-light">Calendars</li>
+                <li class="list-group-item list-group-item-light">etc</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+    </div>
+
+        <!--</div>-->
+</main>
 {% endblock content %}
