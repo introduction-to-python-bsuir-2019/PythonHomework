@@ -16,7 +16,8 @@ Utility provides the following interface:
     * --date     .. Return cached news from the specified day. Format is YYYYMMDD.
     * --to-html  .. Convert news into html format and save a file to the specified path.
     * --to-fb2   .. Convert news into FictionBook format and save a file to the specified path.
-
+    * --colorize .. Print the result in colorized mode
+ 
 
 There are several notes:
   * in case of using `--json` argument utility converts the news into JSON format. JSON schema is described in feed_json_schema.json. 

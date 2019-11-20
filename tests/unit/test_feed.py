@@ -124,7 +124,7 @@ class FeedTestCase(unittest.TestCase):
         standard = 'Feed: Dummy news\n\nTitle: First news\nDate: Thu, 30 Oct 2019 10:22:00 +0300\n' \
                    'Link: https://dummy.xz/1\n\n' \
                    'Everything is ok\n\nLinks:\n[0]: https://img.dummy.xz/pic1.jpg (image/jpeg))\n'
-        self.assertEqual(standard, self.feed.get_text())
+        self.assertEqual(standard, self.feed.get_text(paint=lambda t, c=None: t))
 
     def test_add_news(self) -> None:
         """New news is added"""
@@ -139,7 +139,7 @@ class FeedTestCase(unittest.TestCase):
         """
         with io.StringIO() as buf:
             with redirect_stdout(buf):
-                self.feed.print(True)
+                self.feed.print(True, paint=lambda t, c=None: t)
             self.assertEqual(self.feed.get_json()+'\n', buf.getvalue())
 
     def test_print_text_ok(self) -> None:
@@ -148,8 +148,8 @@ class FeedTestCase(unittest.TestCase):
         """
         with io.StringIO() as buf:
             with redirect_stdout(buf):
-                self.feed.print(False)
-            self.assertEqual(self.feed.get_text()+'\n', buf.getvalue())
+                self.feed.print(False, paint=lambda t, c=None: t)
+            self.assertEqual(self.feed.get_text(paint=lambda t, c=None: t)+'\n', buf.getvalue())
 
     def test_print_err(self) -> None:
         """

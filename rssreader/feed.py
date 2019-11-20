@@ -2,7 +2,7 @@
 import logging
 import html
 import json
-from typing import Dict, List
+from typing import Dict, List, Callable
 from datetime import datetime, date
 from pathlib import Path
 import mimetypes
@@ -40,16 +40,16 @@ class Feed(BaseClass):
         """Return feed in json format"""
         return json.dumps(self, cls=FeedEncoder, indent=4, ensure_ascii=False).encode(self.encoding).decode()
 
-    def get_text(self) -> str:
+    def get_text(self, paint: Callable[[str, str], str]) -> str:
         """Return feed data in textual form"""
-        delimiter = '{0}\n'.format('-' * 50)
-        result = delimiter.join([n.get_text() for n in self.news[:self.limit]])
-        return f'Feed: {self.title}\n\n{result}'
+        delimiter = paint('{0}\n'.format('-' * 50), 'cyan')
+        result = delimiter.join([n.get_text(paint) for n in self.news[:self.limit]])
+        return f'{paint("Feed:", "green")} {self.title}\n\n{result}'
 
-    def print(self, to_json: bool) -> None:
+    def print(self, to_json: bool, paint: Callable[[str, str], str]) -> None:
         """"Prints the feed into stdout. If to_json is true, data are converted into JSON format."""
         logging.info(''.join(['Print the feed as ', 'json' if to_json else 'text']))
-        print(self.get_json() if to_json else self.get_text())
+        print(self.get_json() if to_json else self.get_text(paint))
 
     def add_news(self, title: str, published: str, published_dt: datetime, link: str, description: str,
                  hrefs: List[Dict]) -> None:

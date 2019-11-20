@@ -1,6 +1,6 @@
 """Module contains objects related to news"""
 import logging
-from typing import List, Dict
+from typing import List, Dict, Callable
 from datetime import date
 
 from rssreader.base import BaseClass
@@ -23,11 +23,13 @@ class News(BaseClass):
         logging.info(f'Convert links of news description ({self.link}) into string')
         return ''.join([f'[{i}]: {link["href"]} ({link["type"]})\n' for i, link in enumerate(self.hrefs)])
 
-    def get_text(self) -> str:
+    def get_text(self, paint: Callable[[str, str], str]) -> str:
         """Returns instance data in human-readable text format"""
         logging.info(f'Convert news ({self.link}) attributes into string')
-        return f'Title: {self.title}\nDate: {self.published}\nLink: {self.link}\n\n{self.description}\n\n' \
-               f'Links:\n{self._get_hrefs_text()}'
+        return f'{paint("Title:", "yellow")} {self.title}\n' \
+               f'{paint("Date:", "yellow")} {self.published}\n' \
+               f'{paint("Link:", "yellow")} {self.link}\n\n{self.description}\n\n' \
+               f'{paint("Links:")}\n{self._get_hrefs_text()}'
 
     def get_json_dict(self) -> Dict:
         """Returns required instance attributes as dictionary later to be used for json creating"""

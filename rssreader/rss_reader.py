@@ -5,6 +5,8 @@ import sys
 from datetime import datetime, date
 from pathlib import Path
 
+from termcolor import colored
+
 from rssreader import conf
 from rssreader.base import BaseClass
 from rssreader.feed import Feed
@@ -15,7 +17,7 @@ class Application(BaseClass):
     """Main application class"""
 
     def __init__(self) -> None:
-        """Initialize an application"""
+        """Initialize an application based on passed parameters"""
         self._parse_args()
 
         self._init_verbose_mode()
@@ -57,6 +59,7 @@ class Application(BaseClass):
         group.add_argument('--to-fb2', dest='to_fb2',
                            help="Convert news to FictionBook2 format and save a file to the specified path.",
                            type=valid_file_path)
+        parser.add_argument('--colorize', help="Print the result in colorized mode", action='store_true')
         self.settings = parser.parse_args()
 
     def _init_storage(self):
@@ -90,7 +93,9 @@ class Application(BaseClass):
         elif self.settings.to_fb2:
             FB2Converter(self.cache_dir, Path(self.settings.to_fb2)).perform(feed)
         else:
-            feed.print(self.settings.json)
+            feed.print(
+                self.settings.json,
+                paint=lambda text, color=None: colored(text, color, attrs=['bold']) if self.settings.colorize else text)
 
 
 def main() -> None:
