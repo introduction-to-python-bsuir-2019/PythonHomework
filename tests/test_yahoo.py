@@ -13,7 +13,7 @@ from contextlib import redirect_stdout
 
 from rss_reader.rss import logger_init
 from rss_reader.bots import yahoo
-from rss_reader.utils.RssInterface import RssException
+from rss_reader.utils.rss_interface import RssException
 
 
 class TestMainModule(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(len(self.bot.get_json()), 3336)
 
     def test_bot_reddit_news_length(self):
-        self.assertEqual(len(self.bot.get_news()), 5951)
+        self.assertEqual(len(self.bot.print_news()), 5951)
 
     def test_human_text(self):
         item = self.bot.news.items[0]

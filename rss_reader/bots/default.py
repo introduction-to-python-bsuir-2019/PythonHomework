@@ -1,4 +1,4 @@
-from ..utils.RssInterface import BaseRssBot
+from ..utils.rss_interface import BaseRssBot
 
 
 class Bot(BaseRssBot):

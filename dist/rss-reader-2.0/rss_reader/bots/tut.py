@@ -4,7 +4,7 @@ import bs4
 import feedparser
 import typing
 
-from rss_reader.utils.RssInterface import BaseRssBot
+from rss_reader.utils.rss_interface import BaseRssBot
 
 
 class Bot(BaseRssBot):

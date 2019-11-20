@@ -133,7 +133,7 @@ def main() -> None:
         if args.json:
             news = rss_reader.get_json()
         else:
-            news = rss_reader.get_news()
+            news = rss_reader.print_news()
     except RssException as ex:
         print(ex.args[0])
 

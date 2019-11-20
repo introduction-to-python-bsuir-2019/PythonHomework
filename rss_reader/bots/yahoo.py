@@ -1,7 +1,7 @@
 import bs4
 
-from rss_reader.utils.RssInterface import BaseRssBot
-from ..utils.DataStructures import NewsItem
+from rss_reader.utils.rss_interface import BaseRssBot
+from ..utils.data_structures import NewsItem
 
 
 class Bot(BaseRssBot):

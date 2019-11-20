@@ -34,7 +34,7 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(len(self.bot_google.get_json()), 31210)
 
     def test_bot_reddit_news_length(self):
-        self.assertEqual(len(self.bot_google.get_news()), 45755)
+        self.assertEqual(len(self.bot_google.print_news()), 45755)
 
     def test_bot_reddit_limit(self):
         self.assertEqual(self.bot_reddit.limit, 3)
@@ -49,7 +49,7 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(len(self.bot_reddit.get_json()), 2759)
 
     def test_bot_reddit_news_length(self):
-        self.assertEqual(len(self.bot_reddit.get_news()), 5549)
+        self.assertEqual(len(self.bot_reddit.print_news()), 5549)
 
 
 

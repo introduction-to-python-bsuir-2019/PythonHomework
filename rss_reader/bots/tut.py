@@ -4,8 +4,8 @@ import bs4
 import feedparser
 import typing
 
-from rss_reader.utils.RssInterface import BaseRssBot
-from ..utils.DataStructures import NewsItem, News
+from rss_reader.utils.rss_interface import BaseRssBot
+from ..utils.data_structures import NewsItem, News
 
 
 @attr.s

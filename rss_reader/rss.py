@@ -7,11 +7,11 @@ import logging
 import sys
 from importlib import import_module
 
-from .utils import RssInterface
-from .utils.RssInterface import RssException
-from .utils.DataStructures import ConsoleArgs
+from .utils import rss_interface
+from .utils.rss_interface import RssException
+from .utils.data_structures import ConsoleArgs
 
-PROG_VERSION = 2.0
+PROG_VERSION = 3.0
 
 
 def logger_init(level=None):
@@ -41,7 +41,7 @@ def logger_init(level=None):
     return logger
 
 
-def get_bot_instance(url: str, logger: logging.Logger) -> RssInterface.BaseRssBot:
+def get_bot_instance(url: str, logger: logging.Logger) -> rss_interface.BaseRssBot:
     """
     Choosing an appropriate bot to the url
     :param url: url, contained rss feed
@@ -133,7 +133,7 @@ def main() -> None:
         if args.json:
             news = rss_reader.get_json()
         else:
-            news = rss_reader.get_news()
+            news = rss_reader.print_news()
     except RssException as ex:
         print(ex.args[0])
 

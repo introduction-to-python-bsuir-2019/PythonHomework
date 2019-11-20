@@ -1,6 +1,10 @@
 from abc import ABCMeta, abstractmethod
 import bs4
+from datetime import date, datetime
 import json
+from json import JSONEncoder
+from pathlib import Path
+import pickle
 from typing import Union, Dict, List
 
 import logging
@@ -8,10 +12,41 @@ import feedparser
 from terminaltables import SingleTable
 from textwrap import wrap
 
-from ..utils.DataStructures import NewsItem, News
+from ..utils.data_structures import NewsItem, News
+from ..utils.decorators import call_save_news_after_method
+
+# datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
+# date(2019, 12, 15)
+# datetime.strptime(duration, '%HH').time().strftime('%H:%M')
+
+
+class PythonObjectEncoder(JSONEncoder):
+    def default(self, obj):
+        return {'_python_object': pickle.dumps(obj).decode('latin1')}
+
+
+def as_python_object(dct):
+    try:
+        return pickle.loads(dct['_python_object'].encode('latin1'))
+    except KeyError:
+        return dct
 
 
 class RssException(Exception):
+    """
+    Custom Exception class raised by RssBots classes
+    """
+    pass
+
+
+class RssValueException(ValueError):
+    """
+    Custom Exception class raised by RssBots classes
+    """
+    pass
+
+
+class RssNewsException(ValueError):
     """
     Custom Exception class raised by RssBots classes
     """
@@ -24,6 +59,8 @@ class RssBotInterface(metaclass=ABCMeta):
     and internal parser's methods for particular cases of each bot
     """
 
+    STORAGE = Path.cwd().joinpath('storage')
+
     def __init__(self, url: str, limit: int, width: int, logger: logging.Logger):
         self.limit = limit
         self.logger = logger
@@ -33,12 +70,11 @@ class RssBotInterface(metaclass=ABCMeta):
         # self.news = self._get_news_as_dict(feed)  # news as dict
         self.news = self._feed_to_news(feed)
         self.logger.info(f'Bot initialization is completed')
-        self.human_text = ''
 
     @abstractmethod
-    def get_news(self) -> str:
+    def print_news(self) -> str:
         """
-        Returns str containing formatted news from internal attr self.feed
+        Returns str containing formatted news
 
         :return: str with news
         """
@@ -51,6 +87,7 @@ class RssBotInterface(metaclass=ABCMeta):
         :return: News
         """
 
+    @call_save_news_after_method
     def get_json(self) -> str:
         """
         Return json formatted news
@@ -58,7 +95,50 @@ class RssBotInterface(metaclass=ABCMeta):
         :return: json formatted string
         """
         self.logger.info(f'Returning news in JSON format')
+        # a = json.dumps(self.news, cls=PythonObjectEncoder, indent=4)
+        # b = json.loads(a, object_hook=as_python_object)
+
         return json.dumps(self.news, indent=4)
+
+    def _store_as_json(self) -> None:
+
+        # Create a storage folder if there is no so far
+        Path.mkdir(self.STORAGE, exist_ok=True)
+
+        file_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
+
+        with open(file_path, 'w') as file_to_store_news:
+            json.dump(self.news,
+                      file_to_store_news,
+                      cls=PythonObjectEncoder,
+                      indent=4)
+
+    def _load_news(self, news_date: str):
+        """
+        Load new from storage in print them in stdout
+
+        :param date: date string in %Y%m%d format
+        :return:
+        """
+        # Check if the news_date with correct format:
+        try:
+            datetime.strptime(news_date, '%Y%m%d')
+        except ValueError:
+            raise RssValueException('Incorrect date format. Use %Y%m%d format (ex: 20191120)!')
+
+        news_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
+
+        # Check if the file exists
+        if not Path.is_file(news_path):
+            raise RssNewsException('There is no news with that date. Sorry.')
+
+        # Load news
+        with open(news_path, 'r') as file_with_news:
+            news_from_storage = file_with_news.read()
+
+        self.news = json.loads(news_from_storage, object_hook=as_python_object)
+
+        self.print_news()
 
     @abstractmethod
     def _parse_raw_rss(self) -> feedparser.FeedParserDict:
@@ -113,9 +193,10 @@ class BaseRssBot(RssBotInterface):
                          )
         return feed
 
-    def get_news(self) -> str:
+    @call_save_news_after_method
+    def print_news(self) -> str:
         """
-        Returns str containing formatted news from internal attr self.feed
+        Returns str containing formatted news
 
         :return: str with news
         """

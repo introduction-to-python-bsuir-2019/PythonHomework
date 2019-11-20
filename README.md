@@ -1,7 +1,7 @@
 # Rss reader hometask for EpamTrainee
 Python RSS-reader.
 
-Version 2
+Version 3
 ```shell
 usage: rss.py [-h] [--verbose] [--limit LIMIT] [--json] [-v] [--width WIDTH]
               url
@@ -72,7 +72,7 @@ OR
 python3 -m pip install -r requirements.txt
 pip install ./dist/rss-reader-2.0.tar.gz
 ```
-
+## Version 3: News cashing
 
 
 

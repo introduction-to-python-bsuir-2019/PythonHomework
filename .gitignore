@@ -113,3 +113,6 @@ venv.bak/
 cover/
 tests/data/help.txt
 tests/data/yahoo.txt
+
+# news storage
+rss_reader/storage
