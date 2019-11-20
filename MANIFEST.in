@@ -1,2 +1,3 @@
 include requirements.txt
-include rss_reader_schema.json
+include rss_news_schema.json
+include cache_db.json

@@ -3,12 +3,6 @@ from setuptools import setup
 from rss_reader import config
 
 
-def parse_requirements(filename):
-    """ Load requirements from a pip requirements file."""
-    install_requires = (require.strip() for require in open(filename))
-    return [require for require in install_requires if require and not require.startswith("#")]
-
-
 setup(
     name=config.NAME,
     version=config.VERSION,
@@ -24,7 +18,6 @@ setup(
     ],
     python_requires='>=3.8',
     include_package_data=True,
-    install_requires=parse_requirements('requirements.txt'),
     entry_points={
         'console_scripts': [
             f'{config.NAME} = {config.PACKAGE}.rss_reader:run'

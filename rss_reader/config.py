@@ -1,5 +1,6 @@
 """Сontain application properties."""
 NAME = 'rss-reader'
-JSON_SCHEMA = 'rss_reader_schema.json'
+CACHE_DB = 'cache_db.json'
+JSON_SCHEMA = 'rss_news_schema.json'
 PACKAGE = 'rss_reader'
 VERSION = '0.2'

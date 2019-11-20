@@ -1,5 +1,8 @@
 """Contain application containers."""
+from datetime import datetime
 from typing import Dict, Generator, List
+
+from tinydb_serialization import Serializer
 
 
 class DictionaryValues:
@@ -15,13 +18,15 @@ class DictionaryValues:
             yield dictionary.values()
 
 
-class FormatSpaces:
-    """Provide a string with one space between words."""
+class DateTimeSerializer(Serializer):
+    """Encode and decode object 'datetime' for TinyDB."""
 
-    def __init__(self, string: str) -> None:
-        """Initialze DictionaryValues class."""
-        self.string = string
+    OBJ_CLASS = datetime  # The class this serializer handles
 
-    def __str__(self) -> str:
-        """Return a string with one space between words."""
-        return ' '.join(self.string.split())
+    def encode(self, date_obj):
+        """Encode 'datetime' object to serializable object in TinyDB."""
+        return date_obj.strftime('%Y-%m-%dT%H:%M:%S')
+
+    def decode(self, date_str):
+        """Decode serializable object in TinyDB to 'datetime' object."""
+        return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S')

@@ -1,10 +1,13 @@
 """Application main module."""
 import argparse
 import logging
+from datetime import datetime
 from sys import exit
 
-from rss_reader.rss_news import RSSNews
-from rss_reader.config import NAME, PACKAGE, VERSION
+from rss_reader.cache_storage import ReadCache, WriteCache
+from rss_reader.config import NAME, VERSION
+from rss_reader.display_news import DisplayNewsText, DisplayNewsJson
+from rss_reader.source_parser import SourceParser
 
 
 class RSSReader:
@@ -15,7 +18,8 @@ class RSSReader:
         self.arguments = self._parse_arguments()
         if self.arguments.verbose:
             self._init_verbose()
-        logging.info('Initialze RSS reader. Parameters: source = {0}; json = {1}; verbose = {2}; limit = {3}'.format(
+        logging.info('Successful initialze RSS reader')
+        logging.info('Application arguments: source = {0}; json = {1}; verbose = {2}; limit = {3}'.format(
                 self.arguments.source,
                 self.arguments.json,
                 self.arguments.verbose,
@@ -24,6 +28,12 @@ class RSSReader:
     @staticmethod
     def _parse_arguments() -> None:
         """Parse application arguments."""
+        def _cache_date(cache_date: str) -> datetime:
+            try:
+                return datetime.strptime(cache_date, '%Y%m%d')
+            except ValueError:
+                raise argparse.ArgumentTypeError(f'Incorrect cache date: {cache_date}')
+
         argument_parser = argparse.ArgumentParser(prog=NAME, description='Pure Python command-line RSS reader.')
         argument_parser.add_argument('source',
                                      help='RSS URL',
@@ -41,6 +51,9 @@ class RSSReader:
         argument_parser.add_argument('--limit',
                                      help='Limit news topics if this parameter provided',
                                      type=int)
+        argument_parser.add_argument('--date',
+                                     help=r'Display cached news for the specified date (date format - \'YYYYmmDD\')',
+                                     type=_cache_date)
         return argument_parser.parse_args()
 
     @staticmethod
@@ -54,11 +67,38 @@ class RSSReader:
         """Run RSS reader application."""
         logging.info('Run RSS reader')
         try:
-            rss_parser = RSSNews(self.arguments.source, self.arguments.limit, self.arguments.json)
-            rss_parser.display_news()
+            self.execute_rss_reader()
         except Exception as error:
             logging.info(error)
-            exit('RSS reader has completed unsuccessfully')
+            exit('RSS reader has beed completed unsuccessfully')
+        else:
+            logging.info('RSS reader has beed completed successfully')
+
+    def execute_rss_reader(self) -> None:
+        """Execute RSS reader application."""
+        logging.info('Data acquisition has been started')
+        if self.arguments.date:
+            read_cache = ReadCache(self.arguments.source, self.arguments.date)
+            cache_data = read_cache.read_cache()
+            logging.info('News reading from cache has been completed successfully')
+            display_data = read_cache.format_data(cache_data)
+        else:
+            source_parser = SourceParser(self.arguments.source)
+            source_data = source_parser.get_source_data()
+            source_parser.parse_source_data(source_data)
+            display_data = source_parser.news_data
+            logging.info('Cache writing has been started')
+            WriteCache(source_parser.cache_data).cache_news_list()
+            logging.info('Cache writing has been finished')
+        logging.info('Data acquisition has been finished')
+        logging.info('Start display news from a RSS URL')
+        if self.arguments.json:
+            display_news = DisplayNewsJson(display_data, self.arguments.limit)
+        else:
+            display_news = DisplayNewsText(display_data, self.arguments.limit)
+        display_news.set_news_limit()
+        display_news.print_news()
+        logging.info('End display news from a RSS URL')
 
 
 def run() -> None:
