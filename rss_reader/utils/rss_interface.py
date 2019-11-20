@@ -9,7 +9,7 @@ import feedparser
 from terminaltables import SingleTable
 from textwrap import wrap
 
-from ..utils.data_structures import NewsItem, News
+from ..utils.data_structures import NewsItem, News, ConsoleArgs
 from ..utils.decorators import call_save_news_after_method
 from ..utils.exceptions import RssException, RssNewsException, RssValueException
 from ..utils.json_encoder_patch import as_python_object, PythonObjectEncoder
@@ -23,14 +23,22 @@ class RssBotInterface(metaclass=ABCMeta):
 
     STORAGE = Path.cwd().joinpath('storage')
 
-    def __init__(self, url: str, limit: int, width: int, logger: logging.Logger):
-        self.limit = limit
+    def __init__(self, args: ConsoleArgs, logger: logging.Logger):
+
         self.logger = logger
-        self.url = url
-        self.screen_width = width
-        feed = self._parse_raw_rss()
-        # self.news = self._get_news_as_dict(feed)  # news as dict
-        self.news = self._feed_to_news(feed)
+        self.logger.debug(f'Bot initialization starts')
+        self.limit = args.limit
+        self.screen_width = args.width
+
+        if not args.date:  # Load news from url
+            self.logger.debug(f'Downloading news from {args.url}')
+            self.url = args.url
+            feed = self._parse_raw_rss()
+            self.news = self._feed_to_news(feed)
+        else:  # load from storage
+            self.logger.debug(f'Loading news from storage')
+            self.news = self._load_news(args.date)
+
         self.logger.info(f'Bot initialization is completed')
 
     @abstractmethod
@@ -75,32 +83,34 @@ class RssBotInterface(metaclass=ABCMeta):
                       cls=PythonObjectEncoder,
                       indent=4)
 
-    def _load_news(self, news_date: str):
+    @classmethod
+    def _load_news(cls, news_date: str) -> News:
         """
-        Load new from storage in print them in stdout
+        Load new from storage and convert them into NEWS class
 
         :param date: date string in %Y%m%d format
-        :return:
+        :return: NEWS object with loaded news
         """
         # Check if the news_date with correct format:
         try:
-            datetime.strptime(news_date, '%Y%m%d')
+            news_date = datetime.strptime(news_date, '%Y%m%d')
+            news_date = news_date.strftime('%Y%m%d')
         except ValueError:
             raise RssValueException('Incorrect date format. Use %Y%m%d format (ex: 20191120)!')
 
-        news_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
+        news_path = cls.STORAGE.joinpath(f'{news_date}')
 
         # Check if the file exists
         if not Path.is_file(news_path):
-            raise RssNewsException('There is no news with that date. Sorry.')
+            existing_files = '\n'.join([x.name for x in news_path.parent.glob('*')])
+            raise RssNewsException(f'There is no news with {news_date} date. Sorry. We have only these:\n'
+                                   f'\t{existing_files}\n')
 
         # Load news
         with open(news_path, 'r') as file_with_news:
             news_from_storage = file_with_news.read()
 
-        self.news = json.loads(news_from_storage, object_hook=as_python_object)
-
-        self.print_news()
+        return json.loads(news_from_storage, object_hook=as_python_object)
 
     @abstractmethod
     def _parse_raw_rss(self) -> feedparser.FeedParserDict:

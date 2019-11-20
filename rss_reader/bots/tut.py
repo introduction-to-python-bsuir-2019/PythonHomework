@@ -46,7 +46,7 @@ class Bot(BaseRssBot):
 
         return news
 
-    def _parse_news_item(self, news_item: NewsItem) -> str:
+    def _parse_news_item(self, news_item: TutNewItem) -> str:
         """
         Forms a human readable string from news_item and adds it to the news_item dict
         :param news_item: news_item content

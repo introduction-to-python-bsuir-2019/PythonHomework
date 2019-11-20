@@ -8,7 +8,7 @@ import sys
 from importlib import import_module
 
 from .utils import rss_interface
-from .utils.rss_interface import RssException
+from .utils.rss_interface import RssException, RssValueException, RssNewsException
 from .utils.data_structures import ConsoleArgs
 
 PROG_VERSION = 3.0
@@ -97,6 +97,10 @@ def args_parser() -> ConsoleArgs:
                         default=120,
                         type=int,
                         )
+    PARSER.add_argument('--date',
+                        help='Date of stored news you want to see in format %Y%m%d',
+                        default='',
+                        type=str)
 
     ARGS = PARSER.parse_args()
 
@@ -106,6 +110,7 @@ def args_parser() -> ConsoleArgs:
         width=ARGS.width,
         json=ARGS.json,
         verbose=ARGS.verbose,
+        date=ARGS.date,
     )
 
 
@@ -129,14 +134,17 @@ def main() -> None:
     bot = get_bot_instance(args.url, logger)
 
     try:
-        rss_reader = bot(url=args.url, limit=args.limit, logger=logger, width=args.width)
+        rss_reader = bot(args=args, logger=logger)
         if args.json:
             news = rss_reader.get_json()
         else:
             news = rss_reader.print_news()
     except RssException as ex:
-        print(ex.args[0])
-
+        print(f'RssException: {ex.args[0]}')
+    except RssValueException as ex:
+        print(f'RssValueException: {ex.args[0]}')
+    except RssNewsException as ex:
+        print(f'RssNewsException: {ex.args[0]}')
     except Exception as ex:
         print(f'Unhandled exception!\n{ex}\nExiting...')
     else:

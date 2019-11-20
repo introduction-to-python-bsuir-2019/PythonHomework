@@ -28,6 +28,7 @@ class ConsoleArgs:
     : verbose: bool flag to set logger level
     """
     url: str = attr.ib()
+    date: str = attr.ib(default='')
     limit: int = attr.ib(default=10)
     width: int = attr.ib(default=120)
     json: bool = attr.ib(default=False)
