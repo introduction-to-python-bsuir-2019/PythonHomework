@@ -25,9 +25,9 @@ class News(Base):
         self.description = description
         self.media_content = media_content
 
-    def __str__(self):
-        return 'Feed: %s\nTitle: %s\nDate: %s\nLink: %s\n\n%s\n\nLinks:\n[1] %s (feed)\n[2] %s (image)\n' % \
-            (self.feed, self.title, self.date, self.link, self.description, self.link, self.media_content)
+    def __str__(self, json=None):
+        return 'Feed: %s\nTitle: %s\nDate: %s\nLink: %s\n\n%s\n\nLinks:\n[1] %s --feed\n[2] %s --image\n' % \
+            (self.feed, self.title, self.date, self.link, self.description, self.link, self.media_content if self.media_content else 'There is no')
 
     def __call__(self):
         return self.feed, self.title, self.date, self.link, self.description, self.media_content

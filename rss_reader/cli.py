@@ -10,7 +10,9 @@ def main():
     args = parser.parse_args()
     init_logging(args.verbose)
     validation(args.source)
-    RssReader(args.source, args.limit, args.date, args.json).get_and_parse_news()
+    rss = RssReader(args.source, args.limit, args.date, args.json)
+    rss.get_and_parse_news()
+    
 
 
 def adding_arguments():

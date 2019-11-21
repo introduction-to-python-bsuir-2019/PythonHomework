@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from time import mktime
 from sqlalchemy.orm import sessionmaker
 from .news import News, engine, Base
-
+from .json_formatter import Json
 
 class RssReader(object):
     def __init__(self, source, limit, date, json):
@@ -13,6 +13,7 @@ class RssReader(object):
         self.limit = limit
         self.date = date
         self.json = json
+        self.news_to_print = []
         Base.metadata.create_all(engine)
 
     def get_and_parse_news(self):
@@ -36,7 +37,10 @@ class RssReader(object):
                                    feed['link'],
                                    text_of_the_feed,
                                    feed['media_content'][0]['url'])
-                session.add(feed_object)
+
+                self.news_to_print.append(feed_object)
+                if not session.query(News).filter(News.title==feed['title']).first():
+                    session.add(feed_object)
         else:
             raise ConnectionError
         logging.info('All news are cached')
@@ -48,8 +52,13 @@ class RssReader(object):
         Session = sessionmaker(bind=engine)
         return Session()
 
-    def get_news(self, date):
+    def get_cached_news(self, date):
         pass
+        
+        
+    def print_news(self):
+        for feed in self.news_to_print:
+            print(feed)
         
     def __str__(self):
         pass
