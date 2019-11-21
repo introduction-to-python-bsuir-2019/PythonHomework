@@ -19,7 +19,7 @@ class RSSreader:
         self.logger = logger
 
     def get_feed(self):
-        """ Returns read feed """
+        """ Returns parsed feed and caches it"""
 
         news_feed = feedparser.parse(self.args.get_args().url)
         for entry in news_feed.entries[:self.args.get_args().limit]:
@@ -59,6 +59,7 @@ class RSSreader:
         feed['Published'] = entry.published
         feed['Summary'] = BeautifulSoup(entry.summary, "html.parser").text
         feed['Link'] = entry.link
+        feed['Url'] = self.args.get_args().url
         return feed
 
     def cache_news_json(self, entry):
@@ -72,7 +73,7 @@ class RSSreader:
             os.mkdir(directory_path)
 
         file_path = directory_path + date + '.json'
-        print('FILE_PATH!:', file_path)
+        # print('FILE_PATH!:', file_path)
 
         feed = self.to_json(entry)
         news = list()
@@ -98,15 +99,23 @@ class RSSreader:
         # file_path += os.path.sep + 'cache' + os.path.sep + self.args.get_args().date + '.json'
         file_path = 'cache' + os.path.sep + self.args.get_args().date + '.json'
         print('FILE_PATH:', file_path)
+        cached_news = list()
         try:
             with open(file_path) as rf:
                 news = json.load(rf)
-                return news[:self.args.get_args().limit]
+                for new in news:
+                    if new['Url'] == self.args.get_args().url:
+                        cached_news.append(new)
+                if not cached_news:
+                    # News with such url have not been found
+                    raise FileNotFoundError
+                return cached_news[:self.args.get_args().limit]
         except FileNotFoundError:
-            print('There are no news with such date')
+            print('There are no cached news with such date by this url')
         except json.JSONDecodeError:
             # Empty json file
-            print('There are no news with such date')
+            # Or no news by needed url
+            print('There are no cached news with such date by this url')
         return False
 
     def print_cached_feed(self, cached_feed):
