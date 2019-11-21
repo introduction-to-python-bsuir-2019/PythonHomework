@@ -25,6 +25,21 @@
 
     {% if is_paginated %}
         <!--<div class="pagination">-->
+        {% if request.GET.query %}
+
+        <center>
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page=1&query={{ request.GET.query }}&q={{ posts }}">First</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.previous_page_number }}&query={{ request.GET.query }}&q={{ posts }}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+                <a class="btn btn-info mb-4 mr-2" href="#">{{ page_obj.number }}</a>
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.next_page_number }}&query={{ request.GET.query }}&q={{ posts }}">{{ page_obj.next_page_number }}</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages }}&query={{ request.GET.query }}&q={{ posts }}">Last</a>
+            {% endif %}
+        </center>
+
+        {% else %}
         <center>
             {% if page_obj.has_previous %}
                 <a class="btn btn-outline-info mb-4 mr-2" href="?page=1&q={{ posts }}">First</a>
@@ -36,6 +51,8 @@
                 <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages }}&q={{ posts }}">Last</a>
             {% endif %}
         </center>
+
+        {% endif %}
         <!--</div>-->
     {% endif %}
 

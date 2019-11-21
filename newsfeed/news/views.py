@@ -141,10 +141,14 @@ class SearchResultView(ListView):
     context_object_name = 'posts'
     ordering = ['-pubDate']
     paginate_by = 10
+    #
+    # class Meta:
+    #     ordering = ['-id']
 
     def get_queryset(self):
         query = self.request.GET.get('query')
 
+        print(query)
         query = self.model.objects.filter(
             Q(description__icontains=query) |
             Q(pubDate__icontains=query) |
