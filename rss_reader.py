@@ -1,6 +1,6 @@
 import logging
 import argparse
-from PythonHomework.SourseReader import NewsReader
+from SourseReader import NewsReader
 
 PROJECT_VERSION = 'Version 1.1 : '
 PROJECT_STATUS = 'FIGHTING WITH SUMMARY'
@@ -29,7 +29,7 @@ def Main():
 
 	if args.json:
 		news.parse_rss()
-		news.make_json()
+		print(news.make_json())
 		print('-'*80)
 
 	else:

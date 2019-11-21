@@ -31,7 +31,7 @@ class NewsReader():
 		self.entries = []
 		logging.info('Working with entry...')
 		for entry in rss.entries:
-			soup = bs4(entry['description'])
+			soup = bs4(entry['description'],'lxml')
 			links = ''
 			for link in soup.findAll('a'):
 				links +=f"{link.get('href')}\n"
@@ -59,10 +59,19 @@ class NewsReader():
 	def make_json(self):
 		'''Create json output '''
 		logging.info('Make readable json format...')
-		for entry in self.entries[0:self.limit]:
-			for key in entry:
-				json_one =  json.dumps(key ,indent = 2,ensure_ascii=False)
-				print (json_one)
+		for feed in self.entries[0:self.limit]:
+			return json.dumps({
+				"item": {
+					"link": feed['link'],
+					"body": {
+						 "title": feed['title'],
+						 "date": feed['date'],
+						 "links": feed['links'],
+						 "image": feed['image'],
+						 "description": feed['description']
+					}
+				}
+			}, indent=4)
 
 			
 	def print_rss(self):
