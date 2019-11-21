@@ -29,7 +29,7 @@ import argparse
 import logging
 from colorama import Fore, Style
 
-from .format_converter import PdfNewsConverter, HTMLNewsConverter  # no dot here -> not worked properly
+from format_converter import PdfNewsConverter, HTMLNewsConverter  # no dot here -> not worked properly
 
 
 PROJECT_VERSION = '1.5'
@@ -87,11 +87,16 @@ class NewsReader:
 
         items = dict()
         items.setdefault('title', ' ')
+        items.setdefault('title_image', '')
         useful_tags = ['title', 'pubDate', 'link', 'description']
 
         for head_el in tree[0]:
             if head_el.tag == 'title':
                 items['title'] = head_el.text
+            if head_el.tag == 'image':
+                for el in head_el:
+                    if el.tag == 'url':
+                        items['title_image'] = el.text
 
         for num, item in enumerate(tree.iter('item')):
 
@@ -240,7 +245,6 @@ class NewsReader:
         data = cursor.fetchall()
 
         headers = list(map(lambda x: x[0], cursor.description))
-        print(headers)
 
         result = dict()
         for index, row in enumerate(data):
@@ -434,108 +438,115 @@ class NewsReader:
         return json_result
 
 
-# feed = NewsReader('https://news.yahoo.com/rss/', limit=10, caching=True)
-# items = feed.read_by_date_sql('20191112')
+# feed = NewsReader('https://news.tut.by/rss/index.rss', limit=10)
+feed = NewsReader('https://news.yahoo.com/rss/', limit=10)
 
-# print(items)
+# items = feed.read_by_date_sql('20191112')
+# print(feed.items)
+
+pdf = PdfNewsConverter(feed.items)
+pdf.add_all_news()
+pdf.output('news.pdf', 'F')
+
+# print(feed.items)
 # feed.fancy_output(items)
 
 # print(items)
 
-def get_items(news, date):
-    """
-    If date is not Null read data from
-    sql database, else return simple python dictionary
-
-    :param news: NewsReader class
-    :param date: given data (if there is one)
-    :return:
-    """
-
-    if date:
-        items = news.read_by_date_sql(date)
-    else:
-        items = news.items
-
-    return items
-
-
-def get_parser():
-    """
-    Creates parser using argparse module
-
-    :return: args from CLI
-    """
-
-    parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
-
-    parser.add_argument('source', type=str, help='RSS URL')
-
-    parser.add_argument('--version', help='Print version info', action='store_true')
-    parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
-    parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
-    parser.add_argument('--caching', help='Cache news if chosen', action='store_true')
-    parser.add_argument('--colorful', help='Colorize output', action='store_true')
-
-    # TODO: add flags to output logs
-    parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
-    parser.add_argument('--date', type=str, help='Reads cashed news by date. And output them')
-
-    parser.add_argument('--to-pdf', type=str,
-                        help='Read rss by url and write it into pdf. Print file name as input')
-    parser.add_argument('--to-html', type=str,
-                        help='Read rss by url and write it into html. Print file name as input')
-
-    args = parser.parse_args()
-
-    return args
-
-
-def main_logic(args):
-    """
-    Depending on arguments use NewsReader class
-
-    :param args: arguments from CLI
-    :return:
-    """
-
-    if args.version:
-        print(PROJECT_VERSION)
-        print(PROJECT_DESCRIPTION)
-
-    if args.verbose:
-        logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s',
-                            level=logging.DEBUG)
-
-    news = NewsReader(url=args.source,
-                      limit=args.limit,
-                      caching=args.caching,
-                      colorful=args.colorful)
-
-    items = get_items(news, args.date)
-
-    if args.json:
-
-        print(news.to_json(items=items))
-    elif args.to_pdf:
-
-        pdf = PdfNewsConverter(items)
-        pdf.add_all_news()
-        pdf.output(args.to_pdf, 'F')
-    elif args.to_html:
-
-        html_converter = HTMLNewsConverter(items)
-        html_converter.output(args.to_html)
-    else:
-
-        news.fancy_output(items)
-
-
-def main():
-    args = get_parser()
-
-    main_logic(args)
-
-
-if __name__ == '__main__':
-    main()
+# def get_items(news, date):
+#     """
+#     If date is not Null read data from
+#     sql database, else return simple python dictionary
+#
+#     :param news: NewsReader class
+#     :param date: given data (if there is one)
+#     :return:
+#     """
+#
+#     if date:
+#         items = news.read_by_date_sql(date)
+#     else:
+#         items = news.items
+#
+#     return items
+#
+#
+# def get_parser():
+#     """
+#     Creates parser using argparse module
+#
+#     :return: args from CLI
+#     """
+#
+#     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
+#
+#     parser.add_argument('source', type=str, help='RSS URL')
+#
+#     parser.add_argument('--version', help='Print version info', action='store_true')
+#     parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
+#     parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
+#     parser.add_argument('--caching', help='Cache news if chosen', action='store_true')
+#     parser.add_argument('--colorful', help='Colorize output', action='store_true')
+#
+#     # TODO: add flags to output logs
+#     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+#     parser.add_argument('--date', type=str, help='Reads cashed news by date. And output them')
+#
+#     parser.add_argument('--to-pdf', type=str,
+#                         help='Read rss by url and write it into pdf. Print file name as input')
+#     parser.add_argument('--to-html', type=str,
+#                         help='Read rss by url and write it into html. Print file name as input')
+#
+#     args = parser.parse_args()
+#
+#     return args
+#
+#
+# def main_logic(args):
+#     """
+#     Depending on arguments use NewsReader class
+#
+#     :param args: arguments from CLI
+#     :return:
+#     """
+#
+#     if args.version:
+#         print(PROJECT_VERSION)
+#         print(PROJECT_DESCRIPTION)
+#
+#     if args.verbose:
+#         logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s',
+#                             level=logging.DEBUG)
+#
+#     news = NewsReader(url=args.source,
+#                       limit=args.limit,
+#                       caching=args.caching,
+#                       colorful=args.colorful)
+#
+#     items = get_items(news, args.date)
+#
+#     if args.json:
+#
+#         print(news.to_json(items=items))
+#     elif args.to_pdf:
+#
+#         pdf = PdfNewsConverter(items)
+#         pdf.add_all_news()
+#         pdf.output(args.to_pdf, 'F')
+#     elif args.to_html:
+#
+#         html_converter = HTMLNewsConverter(items)
+#         html_converter.output(args.to_html)
+#     else:
+#
+#         news.fancy_output(items)
+#
+#
+# def main():
+#     args = get_parser()
+#
+#     main_logic(args)
+#
+#
+# if __name__ == '__main__':
+#     main()

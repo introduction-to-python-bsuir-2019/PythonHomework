@@ -35,6 +35,9 @@ class PdfNewsConverter(FPDF):
         super(PdfNewsConverter, self).__init__()
 
         self.items = items
+        self.add_font('ArialNew',
+                      fname=os.path.join('fonts', 'arial.ttf'),
+                      uni='True')
 
     def header(self):
         """
@@ -44,12 +47,13 @@ class PdfNewsConverter(FPDF):
         """
 
         self.set_top_margin(-10)
-        self.set_font('Times', 'I', 8)
+        self.set_font('ArialNew')
+        # self.set_font('Arial', 'I', 8)
         self.cell(100)
         self.ln(20)
 
         try:
-            header = self.items['title']
+            header = self.change_encoding(self.items['title'])
         except KeyError:
             header = ''
 
@@ -64,7 +68,8 @@ class PdfNewsConverter(FPDF):
         """
 
         self.set_y(-15)
-        self.set_font('Times', 'I', 8)
+        # self.set_font('Arial', 'I', 8)
+        self.set_font('ArialNew')
 
         self.cell(0, 10,
                   'Page number ' + str(self.page_no()),
@@ -108,8 +113,10 @@ class PdfNewsConverter(FPDF):
         :return: new-encoded text
         """
 
-        return str(txt).encode('latin-1',
-                               'replace').decode('latin-1')
+        return str(txt).encode('KOI8-R',
+                               'replace').decode('KOI8-R')
+
+        # return str(txt)
 
     def add_news_page(self, item):
         """
@@ -129,24 +136,28 @@ class PdfNewsConverter(FPDF):
         image_link = item['imageLink']
         image_description = item['imageDescription']
 
-        self.set_font('Times', 'I', 14)
+        # self.set_font('Arial', 'I', 14)
+        self.set_font('ArialNew')
         self.multi_cell(w=0, h=10,
                         txt=title, align='C')
 
-        self.set_font('Times', 'I', 10)
+        # self.set_font('Arial', 'I', 10)
+        self.set_font('ArialNew')
         self.multi_cell(w=0, h=10,
                         txt=f'Date: {pub_date}', align='C')
 
         self.multi_cell(w=0, h=10,
                         txt=f'Link: {link}', align='C')
 
-        self.set_font('Times', '', 12)
+        # self.set_font('Arial', '', 12)
+        self.set_font('ArialNew')
         self.multi_cell(w=0, h=5,
                         txt=description, align='L')
 
         self.put_image(image_link)
 
-        self.set_font('Times', 'I', 10)
+        # self.set_font('Arial', 'I', 10)
+        self.set_font('ArialNew')
         self.multi_cell(w=0, h=5,
                         txt=f'Image description: {image_description}',
                         align='C')
@@ -163,7 +174,7 @@ class PdfNewsConverter(FPDF):
         self.add_page()
 
         for el, plot in self.items.items():
-            if el != 'title':
+            if el != 'title' and el != 'title_image':
                 self.add_news_page(plot)
 
 

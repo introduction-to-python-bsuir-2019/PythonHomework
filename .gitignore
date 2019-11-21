@@ -108,12 +108,12 @@ venv.bak/
 .news_feed.egg-info/
 
 #project files
-.news_feed/*.csv
-.news_feed/*.jpg
-.news_feed/*.png
-.news_feed/*.pdf
-.news_feed/*.html
-.news_feed/*.sql*
+news_feed/**/*.csv
+news_feed/**/*.jpg
+news_feed/**/*.png
+news_feed/**/*.pdf
+news_feed/**/*.html
+news_feed/**/*.sql*
 
 
 # mypy
