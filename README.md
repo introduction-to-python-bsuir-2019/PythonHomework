@@ -43,4 +43,10 @@ optional arguments:
   }
 ]
 ```
+### Cashing
+The news is saved to the database when news output commands are executed. MongoDB is used as a database management system.
+When the --date parameter is used, news is downloaded from the database by the entered date and the entered RSS link.
 
+Features:
+* The --limit parameter affects the amount of data loaded into the database.
+* Date must be written in the yearmonthday (example - 19991113) format. 

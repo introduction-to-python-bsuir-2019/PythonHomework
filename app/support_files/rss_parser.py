@@ -36,14 +36,16 @@ class Parser:
     def parse_feed(self, items_limit: int = -1) -> Feed:
         """
         Parse the RSS file.
-        :param items_limit: Limit count of returned items
+        :param items_limit: Limit count of returned items.
         """
         data = feedparser.parse(self.url)
-        if data.bozo != 0 or data.status != 200:
+        if data.bozo != 0:
+            raise ConnectionError("Some problems with connection")
+        if data.status != 200:
             raise ConnectionError("Invalid url")
         feed = data.get("feed", {})
         feed_data = apply_field_mapping(FEED_FIELD_MAPPING, feed)
-        feed = Feed(**feed_data)
+        feed_data["rss_link"] = self.url
         items_data = [apply_field_mapping(ITEM_FIELD_MAPPING, item)
                       for item in data.get("entries", [])[:items_limit]]
         for item_data in items_data:
@@ -51,6 +53,7 @@ class Parser:
             item_data["img_links"] = [link.get("src") for link in soup.find_all("img") if link.get("src")]
             item_data["description"] = soup.text
 
+        feed = Feed(**feed_data)
         feed.items = [Item(**item_data) for item_data in items_data]
         return feed
 

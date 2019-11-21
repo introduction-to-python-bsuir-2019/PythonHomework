@@ -6,7 +6,7 @@ import functools
 import json
 import dataclasses
 from typing import List
-from time import strftime, altzone
+from time import strftime, altzone, mktime, localtime
 
 from app.support_files.dtos import Feed
 
@@ -29,14 +29,16 @@ class Converter:
         :return: Converted data.
         """
         strings = []
-        separator = "-" * str_len
+        out_separator = "*" * str_len
+        in_separator = "-" * str_len
         for feed in self.__feeds:
-            strings.append(separator)
+            strings.append(out_separator)
             strings.append(f"Feed: {feed.title}")
             for item in feed.items:
-                strings.append(separator)
+                strings.append(in_separator)
                 strings.append(f"Author: {item.author}")
-                strings.append(f"Published: {strftime('%a, %d %b %Y %X', item.published_parsed)} {altzone / 3600}")
+                published = localtime(mktime(tuple(item.published_parsed)) - altzone)
+                strings.append(f"Published: {strftime('%a, %d %b %Y %X', published)} {-altzone / 3600}")
                 strings.append("\n")
                 strings.append(f"Title: {item.title}")
                 strings.append(f"Description: {item.description}")
@@ -45,9 +47,8 @@ class Converter:
                 strings.append("Image links:")
                 for img_link in item.img_links:
                     strings.append(f"{img_link}")
-                strings.append(separator)
-                strings.append("\n")
-        strings.pop()
+                strings.append(in_separator)
+            strings.append(out_separator)
 
         strings = map(lambda s: textwrap.fill(s, width=str_len) + "\n", strings)
 

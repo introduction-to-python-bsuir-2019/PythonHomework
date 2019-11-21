@@ -1,7 +1,13 @@
 """
 This module contains class for fork with RSS.
 """
-from app.support_files import rss_parser, args_parser, format_converter, app_logger
+from app.support_files import (
+    rss_parser,
+    args_parser,
+    format_converter,
+    app_logger,
+    database,
+    exeptions)
 
 
 class Reader:
@@ -18,8 +24,9 @@ class Reader:
         _args = args_parser.get_args()
         logger.disabled = not _args.verbose
         logger.info("Program started")
-        logger.info(f"Parsing {_args.source} started")
-        parser = rss_parser.Parser(_args.source)
+        source = _args.source.rstrip("/")
+        logger.info(f"Parsing {source} started")
+        parser = rss_parser.Parser(source)
 
         limit = _args.limit
         to_json = _args.json
@@ -28,12 +35,28 @@ class Reader:
             print("The limit must be -1 or greater than 0")
             return None
 
-        try:
-            feed = parser.parse_feed(limit)
-        except ConnectionError as err:
-            print(err)
-            return None
-        logger.info(f"Parsing {_args.source} finished")
+        logger.info("Connecting with database")
+        db = database.DB()
+        if _args.date is None:
+            try:
+                feed = parser.parse_feed(limit)
+            except ConnectionError as err:
+                print(err)
+                return None
+            logger.info(f"Parsing {source} finished")
+
+            logger.info("Loading parsed data to database")
+            db.insert_feed(feed)
+        else:
+            logger.info("Load data from database")
+            try:
+                feed = db.find_feed_by_link_and_date(source, _args.date, limit)
+            except exeptions.FindFeedError as err:
+                print(err)
+                return None
+            except exeptions.DateError as err:
+                print(err)
+                return None
 
         len_each_line = _args.length
         if len_each_line < 60:
@@ -46,7 +69,7 @@ class Reader:
         else:
             logger.info("Data is converted to console format and printing is started")
             print(converter.to_console_format(str_len=len_each_line))
-        logger.info("Printing is stoped")
+        logger.info("Printing is stopped")
 
 
 if __name__ == "__main__":
