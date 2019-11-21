@@ -10,13 +10,13 @@ class RssException(Exception):
 
 class RssValueException(ValueError):
     """
-    Custom Exception class raised by RssBots classes
+    Custom Exception raised if date format is incorrect
     """
     pass
 
 
 class RssNewsException(ValueError):
     """
-    Custom Exception class raised by RssBots classes
+    Custom Exception class raised if no news by date
     """
     pass

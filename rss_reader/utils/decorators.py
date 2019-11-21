@@ -10,6 +10,6 @@ def call_save_news_after_method(method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         output = method(self, *args, **kwargs)
-        self._store_as_json()
+        self._store_news()
         return output
     return wrapper

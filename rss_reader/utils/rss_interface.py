@@ -13,6 +13,7 @@ from ..utils.data_structures import NewsItem, News, ConsoleArgs
 from ..utils.decorators import call_save_news_after_method
 from ..utils.exceptions import RssException, RssNewsException, RssValueException
 from ..utils.json_encoder_patch import as_python_object, PythonObjectEncoder
+from ..utils.sqlite import RssDB
 
 
 class RssBotInterface(metaclass=ABCMeta):
@@ -49,14 +50,6 @@ class RssBotInterface(metaclass=ABCMeta):
         :return: str with news
         """
 
-    @abstractmethod
-    def _feed_to_news(self, feed: feedparser.FeedParserDict) -> News:
-        """
-        Converts FeedParserDict obj to News obj
-
-        :return: News
-        """
-
     @call_save_news_after_method
     def get_json(self) -> str:
         """
@@ -70,12 +63,24 @@ class RssBotInterface(metaclass=ABCMeta):
 
         return json.dumps(self.news, indent=4)
 
-    def _store_as_json(self) -> None:
+    @abstractmethod
+    def _feed_to_news(self, feed: feedparser.FeedParserDict) -> News:
+        """
+        Converts FeedParserDict obj to News obj
+
+        :return: News
+        """
+
+    def _store_news(self) -> None:
 
         # Create a storage folder if there is no so far
         Path.mkdir(self.STORAGE, exist_ok=True)
+        db = RssDB(self.logger)
+        db._insert_news(self.news)
 
-        file_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
+        for item in self.news.items:
+            item.published
+            file_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
 
         with open(file_path, 'w') as file_to_store_news:
             json.dump(self.news,
