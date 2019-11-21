@@ -21,10 +21,15 @@ def index(request):
 def add_to_news_database(items, model):
     info_all = list()
     rss_title = "no title"
+    rss_image = 'no image'
 
     for id_num, item in items.items():
         if id_num == 'title':
             rss_title = item
+
+        elif id_num == 'title_image':
+            rss_image = item
+            print(rss_image)
         else:
             try:
                 date = NewsReader.get_date(item['pubDate'])
@@ -34,6 +39,7 @@ def add_to_news_database(items, model):
                              pubDate=str(date),
                              title=html.unescape(item['title']),
                              rss_title=rss_title,
+                             rss_image=rss_image,
                              rss_hash=hash(rss_title),
                              link=item['link'],
                              description=item['description'],
@@ -88,6 +94,11 @@ class PostListView(ListView):
     ordering = ['-pubDate']
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q')
+        return context
+
 
 class DatePostListView(ListView):
     model = NewsInfo
@@ -101,6 +112,11 @@ class DatePostListView(ListView):
 
         return query
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q')
+        return context
+
 
 class RSSPostListView(ListView):
     model = NewsInfo
@@ -113,12 +129,18 @@ class RSSPostListView(ListView):
 
         return query
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q')
+        return context
+
 
 class SearchResultView(ListView):
     model = NewsInfo
     template_name = 'news/home.html'
     context_object_name = 'posts'
     ordering = ['-pubDate']
+    paginate_by = 10
 
     def get_queryset(self):
         query = self.request.GET.get('query')
@@ -132,6 +154,11 @@ class SearchResultView(ListView):
 
         return query
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q')
+        return context
+
 
 class PdfView(View):
 
@@ -141,6 +168,7 @@ class PdfView(View):
 
         names = list(map(lambda x: x[:x.find('>')], names))
 
+        print(names)
         return names
 
     def get(self, request, posts):

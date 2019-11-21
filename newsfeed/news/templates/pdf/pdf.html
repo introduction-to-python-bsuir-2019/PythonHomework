@@ -159,10 +159,7 @@
                     <!--<img class="article-img" src="#">-->
                     <div class="">
                         <div class="article-metadata">
-                            <a class="" href="{{ post.rss_hash }}">{{ post.rss_title }}</a>
-                            <a class="" href="{{ post.date_id }}">
-                                <small class="">{{ post.pubDate|date:"F j, Y" }}</small>
-                            </a>
+                            <small class="">{{ post.pubDate|date:"F j, Y" }}</small>
                         </div>
                         <h2><a class="" href="#">{{ post.title }}</a></h2>
                         <img class="article-img" src="{{ post.imageLink }}" alt="{{ post.imageDescription }}">

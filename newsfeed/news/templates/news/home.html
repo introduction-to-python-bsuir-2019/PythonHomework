@@ -7,7 +7,7 @@
 
             {% for post in posts %}
         <article class="media content-section">
-            <img class="rounded-circle article-img" src="#">
+            <img class="rounded-circle article-img" src="{{ post.rss_image }}" alt="{{ post.rss_image }}">
             <div class="media-body">
                 <div class="article-metadata">
                     <a class="mr-2" href="{% url 'news-by-rss' post.rss_hash %}">{{ post.rss_title }}</a>
@@ -27,13 +27,13 @@
         <!--<div class="pagination">-->
         <center>
             {% if page_obj.has_previous %}
-                <a class="btn btn-outline-info mb-4 mr-2" href="?page=1">First</a>
-                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page=1&q={{ posts }}">First</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.previous_page_number }}&q={{ posts }}">{{ page_obj.previous_page_number }}</a>
             {% endif %}
                 <a class="btn btn-info mb-4 mr-2" href="#">{{ page_obj.number }}</a>
             {% if page_obj.has_next %}
-                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages  }}">Last</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.next_page_number }}&q={{ posts }}">{{ page_obj.next_page_number }}</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages }}&q={{ posts }}">Last</a>
             {% endif %}
         </center>
         <!--</div>-->
@@ -54,7 +54,7 @@
                 <form class="form-group" action="{% url 'to-pdf' posts %}" method="GET">
 
                     <button class="btn btn-outline-info" type="submit">
-                        Import all to pdf.
+                        Export to PDF
                     </button>
 
                 </form>

@@ -26,7 +26,7 @@ urlpatterns = [
     path('home/remove',
          remove_news,
          name='remove-news'),
-    path('render/pdf/<posts>',
+    path('render/pdf/<str:posts>',
          PdfView.as_view(),
          name='to-pdf')
 ]
