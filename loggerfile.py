@@ -7,6 +7,6 @@ formatter = logging.Formatter('%(asctime)s %(app_name)s : %(message)s')
 syslog.setFormatter(formatter)
 logger.setLevel(logging.INFO)
 logger.addHandler(syslog)
+logging.basicConfig(filename="loggs.log", level=logging.DEBUG)
 
 logger = logging.LoggerAdapter(logger, extra)
-logger.info('Testing')
