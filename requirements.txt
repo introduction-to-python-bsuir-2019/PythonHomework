@@ -1,4 +1,4 @@
 feedparser>=6.0.0b1  # rss parsing
 requests  # http requests
 bs4 # for xml and html
-# colorama  # colored output
+colorama  # colored output https://pypi.org/project/colorama/

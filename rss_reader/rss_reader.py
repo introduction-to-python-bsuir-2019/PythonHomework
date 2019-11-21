@@ -22,10 +22,7 @@ from urllib.parse import urlparse
 import feedparser
 import requests
 import bs4
-
-
-# from colorama import init  # for colorizing https://pypi.org/project/colorama/
-# init(autoreset=True)
+from colorama import Fore
 
 
 class RSSFeedException(Exception):
@@ -101,7 +98,7 @@ class RSSFeed:
 
         self._save_rss_in_file()
 
-    def print_rss(self, limit, is_json=False):
+    def print_rss(self, limit=None, is_json=False, colorize=False):
         """ Prints rss feed """
 
         if limit:
@@ -115,12 +112,20 @@ class RSSFeed:
             entries = self._get_rss_in_json(entries)
             print(entries)
         else:
-            print(f"Feed: {self.title}\n")
-            for entry in entries:
-                print(f"Title: {entry['title']}\n"
-                      f"Date: {entry['date']}\n"
-                      f"Link: {entry['link']}\n\n"
-                      f"{entry['summary']}\n\n")
+            if colorize:
+                print(f"{Fore.RED}Feed:{Fore.RESET} {self.title}\n")
+                for entry in entries:
+                    print(f"{Fore.GREEN}Title:{Fore.RESET} {entry['title']}\n"
+                          f"{Fore.MAGENTA}Date:{Fore.RESET} {entry['date']}\n"
+                          f"{Fore.BLUE}Link:{Fore.RESET} {entry['link']}\n\n"
+                          f"{entry['summary']}\n\n")
+            else:
+                print(f"Feed: {self.title}\n")
+                for entry in entries:
+                    print(f"Title: {entry['title']}\n"
+                          f"Date: {entry['date']}\n"
+                          f"Link: {entry['link']}\n\n"
+                          f"{entry['summary']}\n\n")
 
 
 def main():
@@ -141,6 +146,7 @@ def main():
         help="Outputs verbose status messages")
     parser.add_argument("-l", "--limit", action="store", type=int, dest="limit")
     parser.add_argument("-d", "--date", action="store", type=int, dest="date")
+    parser.add_argument("-c", "--colorize", action="store_true", help="Print colorized result in stdout")
 
     args = parser.parse_args()
 
@@ -153,7 +159,7 @@ def main():
     try:
         feed = RSSFeed(source=args.source)
         feed.get_rss(date=args.date)
-        feed.print_rss(limit=args.limit, is_json=args.json)
+        feed.print_rss(limit=args.limit, is_json=args.json, colorize=args.colorize)
     except RSSFeedException as ex:
         print(f"{ex.message}")
         sys.exit(0)
