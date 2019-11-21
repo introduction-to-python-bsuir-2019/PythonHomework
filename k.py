@@ -8,21 +8,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument("URL", help="This is the full adress of the rss feed.use ' ' ")
 parser.add_argument("-l", "--lim", help="outputs the latest X(int)articles. can be run without lim to get all articles")
 parser.add_argument("-o", "--output", help="outputs news to file", action="store_true")
+parser.add_argument("-j", "--json", help="outputs a jsonDump", action="store_true")
 args = parser.parse_args()
 limit = args.lim
 """ALL MUST GO. I might try to pull an if __main__()"""
 
 
-def captureFeed(url):
-    """Not actually used and just takes up space"""
-
+def captureFeed(URL):
+    """Gets a feed fo everything to use"""
     feed = feedparser.parse(args.URL)
     return feed
 
 
 def fileOutput():
     """Outputs a json dump of feed.entries to a file that is called "news.txt".works """
-
     open("news.txt", "w").close()
     feed = captureFeed(args.URL)
     f = open("news.txt", "w+")
@@ -37,6 +36,12 @@ def standardOutput():
     for article in feed.entries:
         print("Title:  ", article.title.replace("&#39;", "'"), "\nDate:   ",
               article.published, "\nLinks:  ", article.link, "\n")
+
+
+def jsonOutput():
+    """Outputs a json Dump to the console"""
+    feed = captureFeed(args.URL)
+    print(json.dumps(feed.entries))
 
 
 def limitedOutput(limit):
@@ -56,12 +61,15 @@ def limitedOutput(limit):
 
 if limit:
     limitedOutput(limit)
+elif args.json:
+    jsonOutput()
 else:
     standardOutput()
 
 if args.output:
     feed = captureFeed(args.URL)
     fileOutput()
+
 
 """Has to go away from the global score. could try to put it into a main()"""
 
