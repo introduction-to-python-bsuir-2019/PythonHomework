@@ -65,7 +65,8 @@ class RSSreader:
         """ Saves all printed news in JSON format (path = 'cache/{publication_date}.json')"""
 
         date = dateparser.parse(entry.published, fuzzy=True).strftime('%Y%m%d')
-        directory_path = os.path.abspath(os.path.dirname('app')) + os.path.sep + 'cache' + os.path.sep
+        # directory_path = os.path.abspath(os.path.dirname('app')) + os.path.sep + 'cache' + os.path.sep
+        directory_path = 'cache' + os.path.sep
         if not os.path.exists(directory_path):
             self.logger.info('Creating directory')
             os.mkdir(directory_path)
@@ -93,8 +94,9 @@ class RSSreader:
 
     def get_cached_json_news(self):
         """ Returns the list of cached news with date from arguments """
-        file_path = os.path.abspath(os.path.dirname('app'))
-        file_path += os.path.sep + 'cache' + os.path.sep + self.args.get_args().date + '.json'
+        # file_path = os.path.abspath(os.path.dirname('app'))
+        # file_path += os.path.sep + 'cache' + os.path.sep + self.args.get_args().date + '.json'
+        file_path = 'cache' + os.path.sep + self.args.get_args().date + '.json'
         print('FILE_PATH:', file_path)
         try:
             with open(file_path) as rf:
