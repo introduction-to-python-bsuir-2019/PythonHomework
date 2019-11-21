@@ -1,10 +1,11 @@
 from setuptools import setup, find_packages
-from os import path
+import os
 
-here = path.abspath(path.dirname(__file__))
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
@@ -18,9 +19,11 @@ setup(
     author='Dydyshko Andrey',
     author_email='dydyshko1999@gmail.com',
     keywords='simple rss reader',
+    include_package_data=True,
     packages=find_packages(),
+    # packages=['app', 'app.cache'],
     python_requires='>=3.8',
-    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4'],
+    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'python-dateutil'],
     entry_points={
         'console_scripts': [
             'rss-reader=app.__main__:main',

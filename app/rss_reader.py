@@ -5,6 +5,7 @@
 from app.argparser import ArgParser
 from app.RSSreader import RSSreader
 import logging
+import dateutil.parser as dateparser
 
 
 def main():
@@ -18,11 +19,33 @@ def main():
     else:
         logger = logging.getLogger()
 
-    rss_reader = RSSreader(arguments, logger)
-    feed = rss_reader.get_feed()
+    logger.info('Start')
 
     if args.version:
         print(args.version)
+        logger.info('Exit')
+
+    rss_reader = RSSreader(arguments, logger)
+
+    if args.date:
+        try:
+            dateparser.parse(args.date, fuzzy=True).strftime('%Y%m%d')
+        except dateparser._parser.ParserError:
+            print('Invalid date format')
+            logger.info('Exit')
+            return
+        cached_feed = rss_reader.get_cached_json_news()
+        if cached_feed:
+            print('Cached news', args.date)
+            if args.json:
+                rss_reader.print_cached_feed_json(cached_feed)
+            else:
+                rss_reader.print_cached_feed(cached_feed)
+        logger.info('Exit')
+        return
+
+    feed = rss_reader.get_feed()
+
     if args.json:
         rss_reader.print_feed_json(feed)
     else:

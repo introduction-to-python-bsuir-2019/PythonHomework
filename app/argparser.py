@@ -46,6 +46,12 @@ class ArgParser:
             action='store_true',
             help='Prints all logs in stdout'
         )
+        argparser.add_argument(
+            '--date',
+            type=str,
+            help='It should take a date in %Y%m%d format. For example: --date 20191020'
+                 'The new from the specified day will be printed out. If the news are not found error will be returned.'
+        )
         args = argparser.parse_args()
         return args
 
