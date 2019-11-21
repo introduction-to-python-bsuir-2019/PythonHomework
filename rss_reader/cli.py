@@ -11,7 +11,7 @@ def main():
     init_logging(args.verbose)
     validation(args.source)
     rss = RssReader(args.source, args.limit, args.date, args.json)
-    rss.get_and_parse_news()
+    rss.get_news()
     
 
 
@@ -22,7 +22,7 @@ def adding_arguments():
     parser.add_argument('--limit', metavar='LIMIT', nargs=1, type=int)
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--json', action='store_true')
-    parser.add_argument('--date', nargs=1, type=int)
+    parser.add_argument('--date', nargs=1, type=str)
     return parser
 
 
