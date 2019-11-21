@@ -1,11 +1,8 @@
-import argparse
-import feedparser
-import html
-import json
-from bs4 import BeautifulSoup
-from PythonHomework.SourseReader import NewsReader
 import logging
-PROJECT_VERSION = 'Version 0.5 : '
+import argparse
+from PythonHomework.SourseReader import NewsReader
+
+PROJECT_VERSION = 'Version 1.1 : '
 PROJECT_STATUS = 'FIGHTING WITH SUMMARY'
 
 
