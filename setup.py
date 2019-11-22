@@ -11,5 +11,8 @@ setuptools.setup(name='adzemreader',
                 classifiers=["Programming Language :: Python :: 3",
                             "Operating System :: OS Independent"],
                 python_requires='>=3.5',
-                entry_points={'console_scripts': ['rssreader=rss_reader.rss_reader:main']})       
+                entry_points={'console_scripts': ['rssreader=rss_reader.rss_reader:main']},
+                install_requires=['bs4',
+                                 'feedparser',
+                                 'jsonpickle'])       
 
