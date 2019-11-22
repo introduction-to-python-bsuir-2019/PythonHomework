@@ -14,6 +14,7 @@ from ..utils.decorators import call_save_news_after_method
 from ..utils.exceptions import RssException, RssNewsException, RssValueException
 from ..utils.json_encoder_patch import as_python_object, PythonObjectEncoder
 from ..utils.sqlite import RssDB
+from ..utils.rss_utils import parse_date_from_console
 
 
 class RssBotInterface(metaclass=ABCMeta):
@@ -76,8 +77,10 @@ class RssBotInterface(metaclass=ABCMeta):
         # Create a storage folder if there is no so far
         Path.mkdir(self.STORAGE, exist_ok=True)
         db = RssDB(self.logger)
-        db._insert_news(self.news)
+        db.insert_news(self.news)
 
+        # clear DB object
+        del db
         for item in self.news.items:
             item.published
             file_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
@@ -88,8 +91,7 @@ class RssBotInterface(metaclass=ABCMeta):
                       cls=PythonObjectEncoder,
                       indent=4)
 
-    @classmethod
-    def _load_news(cls, news_date: str) -> News:
+    def _load_news(self, news_date: str) -> News:
         """
         Load new from storage and convert them into NEWS class
 
@@ -97,13 +99,13 @@ class RssBotInterface(metaclass=ABCMeta):
         :return: NEWS object with loaded news
         """
         # Check if the news_date with correct format:
-        try:
-            news_date = datetime.strptime(news_date, '%Y%m%d')
-            news_date = news_date.strftime('%Y%m%d')
-        except ValueError:
-            raise RssValueException('Incorrect date format. Use %Y%m%d format (ex: 20191120)!')
+        news_date = parse_date_from_console(news_date)
 
-        news_path = cls.STORAGE.joinpath(f'{news_date}')
+        db = RssDB(self.logger)
+
+        loaded_news = db.load_news(news_date)
+
+        news_path = self.STORAGE.joinpath(f'{news_date}')
 
         # Check if the file exists
         if not Path.is_file(news_path):
