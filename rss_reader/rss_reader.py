@@ -70,14 +70,7 @@ class RssReader(object):
         with create_session() as s:
             date_for_find = [datetime.strptime(date_of_feed, '%Y%m%d').date() for date_of_feed in self.date]
             self.news_to_print = s.query(News).filter(func.DATE(News.date) == date_for_find[0]).all()
-            self.print_news()
-        
-    def get_news(self):
-        if self.date:
-            self.get_cached_news()
-        else:
-            self.get_and_parse_news()
-        self.get_news_to_print()
+            self.print_news()        
             
     def get_news_to_print(self):
         with create_session() as s:
@@ -98,6 +91,11 @@ class RssReader(object):
     def print_news(self):
         for feed in self.news_to_print:
             print(feed)
+            print('='*50)
     
-    def __str__(self):
-        pass
+    def __call__(self):
+        if self.date:
+            self.get_cached_news()
+        else:
+            self.get_and_parse_news()
+        self.get_news_to_print()
