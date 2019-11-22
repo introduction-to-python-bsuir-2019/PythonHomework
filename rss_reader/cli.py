@@ -12,7 +12,7 @@ def main():
     validation(args.source)
     rss = RssReader(args.source, args.limit, args.date, args.json)
     rss.get_news()
-    rss.print_news()
+    #rss.print_news()
 
 
 def adding_arguments():
