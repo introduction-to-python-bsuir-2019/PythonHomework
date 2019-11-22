@@ -22,7 +22,7 @@
                     },
                     "published": {
                         "type": "string",
-                        "title": "Published",
+                        "title": "Date",
                         "description": "Date and time of publication of the news."
                     },
                     "link": {

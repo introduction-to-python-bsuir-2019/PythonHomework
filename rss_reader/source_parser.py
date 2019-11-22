@@ -1,8 +1,11 @@
 """Contain all news parse related objects."""
+import logging
+import urllib
 from datetime import datetime
 from html import unescape
-from logging import info as logging_info
 from operator import itemgetter
+from pathlib import Path
+from urllib.parse import urlparse
 
 from typing import Dict, List, Optional, Union
 
@@ -23,28 +26,19 @@ class SourceParser:
         self.__empty_published = datetime.now()
         self.__news = {'title': '', 'published': '', 'link': '', 'text': '', 'links': []}
         self.__cache_news = {'source': source, 'feed': '', 'id': '', 'date': self.__empty_published, 'news': {}}
-        self.__coversation_news = {'title': '', 'published': '', 'link': '', 'description': []}
-        self.news_data = {'feed': '', 'news': []}
         self.cache_data = []
-        self.conversion_data = {'feed': '', 'news': []}
 
     def parse_source_data(self, source_data: FeedParserDict) -> None:
         """Parse RSS source link data into a dictionary with feed title and list of news."""
-        def add_feed_title() -> None:
-            """Add feed title to parser data structures."""
-            self.news_data.update({'feed': feed_title})
-            self.__cache_news.update({'feed': feed_title})
-            self.conversion_data.update({'feed': feed_title})
-
-        def add_news_display_data() -> Dict[str, Union[str, datetime, Dict[str, Union[str, List[Dict[str, str]]]]]]:
-            """Add news display data to parser data structures."""
+        def return_news() -> Dict[str, Union[str, datetime, Dict[str, Union[str, List[Dict[str, str]]]]]]:
+            """Return news data structures."""
             news = self.__news.copy()
             news.update({'title': title,
                          'published': published,
                          'link': link,
                          'text': unescape(' '.join(element for element in description.text)),
-                         'links': description.links})
-            news_list.append(news)
+                         'links': description.links,
+                         'description': description.structure})
             return news
 
         def add_news_cache_data() -> None:
@@ -55,57 +49,44 @@ class SourceParser:
                 cashe_date = parser.parse(published).replace(tzinfo=None)
             except ValueError:
                 cache_update.update({'date': self.__empty_published})
-                pass
             else:
                 cache_update.update({'date': cashe_date})
             finally:
                 cache_news.update(cache_update)
                 self.cache_data.append(cache_news)
 
-        def add_news_conversion_data() -> None:
-            """Add news conversion data to parser data structures."""
-            conversion_news = self.__coversation_news.copy()
-            conversion_news.update({'title': title,
-                                    'published': published,
-                                    'link': link,
-                                    'description': description.structure})
-            conversion_list.append(conversion_news)
-
-        logging_info('Start parse RSS source data')
+        logging.info('Start parse RSS source data')
         feed_title = unescape(source_data.get('feed', {}).get('title', ''))
-        add_feed_title()
-        news_list = []
-        conversion_list = []
+        self.__cache_news.update({'feed': feed_title})
         for item in sorted(source_data.get('entries', []), key=itemgetter('published'), reverse=True):
             title = unescape(item.get('title', ''))
-            link = item.get('link', '')
+            link = urllib.parse.quote(item.get('link', ''), safe=':/')
             published = item.get('published', '')
             cache_id = item.get('id', '')
-            description = DescriptionParser()
+            description = DescriptionParser(link)
             description.parse_description(item.get('description'))
-            news = add_news_display_data()
+            news = return_news()
             add_news_cache_data()
-            add_news_conversion_data()
-            logging_info(f'Successful get {len(news_list)} RSS news items from RSS feed')
-        self.news_data.update({'news': news_list})
-        self.conversion_data.update({'news': conversion_list})
-        logging_info('RSS news has been parsed successfuly')
+        logging.info('RSS news has been parsed successfuly')
 
     def get_source_data(self) -> FeedParserDict:
         """Parse source link RSS into dictionary."""
         source_data = parse(self.__source)
         if source_data.bozo == 1:
             raise RSSReaderParseException('Invalid or inaccessible RSS URL')
-        logging_info('Successful get RSS data from RSS URL')
+        logging.info('Successful get RSS data from RSS URL')
         return source_data
 
 
 class DescriptionParser:
     """Class parse news description."""
 
-    def __init__(self) -> None:
+    def __init__(self, news_link: str) -> None:
         """Initialze RSS description parser."""
-        self.__element = {'text': '', 'type': '', 'link': '', 'number': 0}
+        self.__element = {'text': '', 'type': '', 'link': ''}
+        self._news_link = news_link
+        link_parse = urlparse(news_link)
+        self._host_name = f'{link_parse.scheme}://{link_parse.hostname}'
         self.links = []
         self.text = []
         self.structure = []
@@ -130,20 +111,36 @@ class DescriptionParser:
 
     def __parse_description_tag(self, tag: Tag, tag_link: str, tag_type: str) -> None:
         """Parse link or image tag to well-formed text and add link or image link to list of links."""
+        def control_last_link() -> None:
+            """Remove last link if it led to an image embedded in this link."""
+            last_link = self.links.pop()
+            if not (last_link.type == 'link' and last_link.link == link):
+                self.links.append(last_link)
+
+        def get_tag_link() -> None:
+            """Return tag link."""
+            link = urllib.parse.quote(attrs_dict.get(tag_link, ''), safe=':/')
+            if not link or self._news_link == link:
+                return None
+            elif not urlparse(link).hostname:
+                link = '{0}{1}'.format(self._host_name, str(Path(link)))
+            return link
+
         attrs_dict = dict(tag.attrs)
-        link = attrs_dict.get(tag_link, '')
-        link = link if link else 'Empty URL'
+        link = get_tag_link()
+        if not link:
+            return
+        if tag_type == 'img':
+            control_last_link()
         self.links.append({'link': link, 'type': tag_type})
         tag_number = len(self.links)
-        tag_title = attrs_dict.get('title', '')
-        tag_string = str(tag.string or '')
-        tag_text = '{0} {1}'.format(self.format_string(tag_title),
-                                    self.format_string(tag_string)).strip()
+        tag_text = self.format_string(str(tag.string or '')).strip()
         self.text.append('{0}{1}'.format(f'[{tag_type} {tag_number}',
                                          f': {tag_text}][{tag_number}]' if tag_text else ']'))
-        self.__update_structure({'text': tag_text, 'type': tag_type, 'number': tag_number, 'link': link})
+        self.__update_structure({'text': tag_text, 'type': tag_type, 'link': link})
 
     def __update_structure(self, element_structure: Dict[str, Union[str, int]]) -> None:
+        """Update description structure."""
         element = self.__element.copy()
         element.update(element_structure)
         self.structure.append(element)
