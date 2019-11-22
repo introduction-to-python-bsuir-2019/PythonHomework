@@ -3,7 +3,9 @@ This module contains classes for fetching and representing RSS
 """
 
 import feedparser
-import rss_reader.image as image
+import time
+import news_date
+import image as image
 from bs4 import BeautifulSoup
 from html import unescape
 
@@ -14,29 +16,31 @@ class News:
     This class represents news collection
     """
 
-    def __init__(self, url, count):
+    def __init__(self, source, count=-1):
         self.count = count
-        self.url = url
+        self.source = source
         self.feed = ''
         self.items = []
 
     def parse_news(self):
         """
         This method gets and parses RSS
-        :return: None
+        :return: list of NewsItem instances
         """
-        data = feedparser.parse(self.url)
+        data = feedparser.parse(self.source)
         if data['bozo']:
             raise ValueError("Wrong URL address or there is no access to the Internet")
         self.feed = data['feed'].get('title', None)
         entries = data['entries'] if self.count < 0 else data['entries'][:self.count]
         for entry in entries:
+            print(entry)
             title = unescape(entry.get('title', 'No title'))
-            date = entry.get('published', 'Unknown')
+            date = entry.get('published_parsed') or entry.get('updated_parsed') or news_date.get_current_date_tuple()
             link = entry.get('link', 'No link')
             html = entry.get('summary', None)
             content = NewsContent.get_content_from_html(html)
             self.items.append(NewsItem(title, date, link, content))
+        return self.items
 
     def __str__(self):
         result = f'\nFeed: {self.feed}\n\n'
@@ -49,14 +53,23 @@ class News:
         This method converts News object to JSON format
         :return: dict
         """
-        news_items = []
-        for item in self.items:
-            images = [{'link': img.link, 'alt': img.alt} for img in item.content.images_links]
-            links = [link for link in item.content.other_links]
-            content = {'text': item.content.text, 'images': images, 'links': links}
-            news_item = {'title': item.title, 'date': item.date, 'source': item.link, 'content': content}
-            news_items.append(news_item)
-        return {'news': {'feed': self.feed, 'items': news_items}}
+        json_news_items = [item.to_json() for item in self.items]
+        return {'news': {'feed': self.feed, 'items': json_news_items}, 'source': self.source}
+
+    @staticmethod
+    def from_json(json_object):
+        """
+        This method gets news from JSON object
+        :param json_object: news in JSON format
+        :return: News object
+        """
+        if json_object:
+            json_news = json_object.get('news', None)
+            if json_news:
+                news = News(json_news.get('source', ''))
+                news.items = [NewsItem.from_json(item) for item in json_news.get('items', [])]
+                news.feed = json_news.get('feed', '')
+                return news
 
     def get_count(self):
         """
@@ -78,8 +91,27 @@ class NewsItem:
         self.link = link
         self.content = content
 
+    def to_json(self):
+        """
+        This method converts NewsItem object to JSON format
+        :return: dict
+        """
+        return {'title': self.title, 'date': self.date, 'source': self.link, 'content': self.content.to_json()}
+
+    @staticmethod
+    def from_json(json_obj):
+        """
+        This method gets NewsItem object from JSON
+        :param json_obj: dict
+        :return: NewsItem
+        """
+        if json_obj:
+            return NewsItem(json_obj.get('title', ''), tuple(json_obj.get('date', [])),
+                            json_obj.get('source', ''), NewsContent.from_json(json_obj.get('content')))
+
     def __str__(self):
-        return f'Title: {self.title}\nDate: {self.date}\nLink: {self.link}\n\n{self.content}'
+        date = time.strftime("%a, %-d %b %Y %H:%M:%S %z", self.date)
+        return f'Title: {self.title}\nDate: {date}\nLink: {self.link}\n\n{self.content}'
 
 
 class NewsContent:
@@ -108,6 +140,24 @@ class NewsContent:
                 images_links.append(image.Image(src, alt))
         other_links = [link['href'] for link in soup.find_all('a') if link.get('href', None)]
         return NewsContent(text, images_links, other_links)
+
+    def to_json(self):
+        """
+        This method converts NewsContent object to JSON format
+        :return: dict
+        """
+        return {'text': self.text, 'images': [img.to_json() for img in self.images_links], 'links': self.other_links}
+
+    @staticmethod
+    def from_json(json_obj):
+        """
+        This method gets NewsContent object from JSON
+        :param json_obj: dict
+        :return: NewsContent
+        """
+        if json_obj:
+            images = [image.Image.from_json(img_json) for img_json in json_obj.get('images', [])]
+            return NewsContent(json_obj.get('text', ''), images, json_obj.get('links', []))
 
     def __str__(self):
         result = ''
