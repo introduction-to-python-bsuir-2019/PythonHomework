@@ -4,8 +4,8 @@ This module contains classes for fetching and representing RSS
 
 import feedparser
 import time
-import news_date
-import image as image
+import rss_reader.news_date as news_date
+import rss_reader.image as image
 from bs4 import BeautifulSoup
 from html import unescape
 
@@ -33,7 +33,6 @@ class News:
         self.feed = data['feed'].get('title', None)
         entries = data['entries'] if self.count < 0 else data['entries'][:self.count]
         for entry in entries:
-            print(entry)
             title = unescape(entry.get('title', 'No title'))
             date = entry.get('published_parsed') or entry.get('updated_parsed') or news_date.get_current_date_tuple()
             link = entry.get('link', 'No link')

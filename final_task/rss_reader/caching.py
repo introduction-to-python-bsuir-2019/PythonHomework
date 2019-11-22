@@ -1,7 +1,7 @@
 import os
 import json
-import news_date
-import news
+import rss_reader.news_date as news_date
+import rss_reader.news as news
 
 
 class Cache:

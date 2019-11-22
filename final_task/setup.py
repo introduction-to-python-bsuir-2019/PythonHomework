@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='rss_reader',
-    version='2.0',
+    version='3.0',
     author='Polina Pashkovskaya',
     author_email='polly.pashkovskaya@gmail.com',
     url='https://github.com/pashkovskaya/PythonHomework/tree/final_task/final_task',

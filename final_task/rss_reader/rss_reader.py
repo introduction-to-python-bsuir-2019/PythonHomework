@@ -6,11 +6,11 @@ import sys
 import argparse
 import json
 import logging
-import caching
-import news_date
+import rss_reader.news_date as news_date
 from pathlib import Path
 from inspect import currentframe, getframeinfo
-from news import News
+from rss_reader.news import News
+from rss_reader.caching import Cache
 
 current_version = "1.0"
 log_file_name = 'rss_reader.log'
@@ -90,7 +90,7 @@ def main():
         stream_handler = logging.StreamHandler(sys.stdout)
         logger.addHandler(stream_handler)
 
-    cache = caching.Cache(os.path.join(get_project_directory_path(), data_dir_name, cache_file_name))
+    cache = Cache(os.path.join(get_project_directory_path(), data_dir_name, cache_file_name))
     try:
         cache.load()
     except Exception as exc:
