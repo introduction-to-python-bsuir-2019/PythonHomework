@@ -1,5 +1,6 @@
 """Module which works with iamges."""
 import logging
+import os
 
 import requests
 import base64
@@ -38,5 +39,7 @@ def get_image_as_base64(image_url: str) -> str:
 
 	with open(TEMP_IMG_NAME, 'rb') as img:
 		encode_str = base64.b64encode(img.read())
+
+	os.remove(TEMP_IMG_NAME)
 
 	return encode_str.decode('ascii')

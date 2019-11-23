@@ -206,7 +206,7 @@ class RssReader:
 		return feed + DEN + news
 
 
-	def get_news_as_json(self, limit: int=0) -> str:
+	def get_news_as_json(self, limit: int=0, filepath: str='') -> str:
 		"""Get news as json-string.
 
 		Takes a limit:int - limit of news, which will be returned.
@@ -221,7 +221,11 @@ class RssReader:
 		news[KEYWORD_FEED] = self._get_feed_title()
 		news['news'] = news_list
 
-		return json.dumps(news, indent=4)
+		if filepath == '':
+			return json.dumps(news, indent=4, ensure_ascii=False).encode('utf8').decode()
+		else:
+			with open(filepath, 'w') as file:
+				file.write(json.dumps(news, indent=4, ensure_ascii=False).encode('utf8').decode())
 
 
 	def get_news_as_fb2(self, filepath: str, limit: int=0) -> None:
@@ -268,7 +272,10 @@ class RssReader:
 		news_list = self._get_news_as_list(limit)
 
 		pdf = to_pdf_converter.PDF()
-		pdf.set_meta_info(self._get_feed_title(), self._get_feed_image_url())
+		pdf.add_font('FreeSans', '', 'FreeSans.ttf', uni=True)
+
+		title = self._get_feed_title()
+		pdf.set_meta_info('', self._get_feed_image_url())
 
 		for piece_of_news in news_list:
 			pdf.add_piece_of_news(	title=piece_of_news[KEYWORD_TITLE],

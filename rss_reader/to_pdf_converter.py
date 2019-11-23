@@ -13,12 +13,6 @@ MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.to_pdf_converter'
 TITLE_IMG_NAME = 'title.png'
 
 
-def _convert_to_latin_1(string: str) -> str:
-	"""Convert to latin-1 encoding."""
-	return string.encode('cp1252', 'replace').decode('latin1')
-	# return string
-
-
 class PDF(FPDF):
 	"""Class, which allows to translate news to .pdf format."""
 
@@ -29,10 +23,14 @@ class PDF(FPDF):
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.set_meta_info')
 		logger.info('Set information of rss-resource')
 
-		self.title = _convert_to_latin_1(title)
+		self.title = title
 		self.title_img_url = title_img_url
 
 		self.iter = 0
+
+
+	# def set_custom_font(self):
+	# 	self.add_font('FreeSans', '', 'FreeSans.ttf', uni=True)
 
 
 	def _garbage_collect(self) -> None:
@@ -99,9 +97,9 @@ class PDF(FPDF):
 			save_image_by_url(self.title_img_url, TITLE_IMG_NAME)
 			self.image(TITLE_IMG_NAME, 10, 8, 33)
 
-		self.set_font("Arial", 'B', size=12)
+		self.set_font("FreeSans", size=12)
 		self.cell(100)
-		self.cell(0, 5, txt=self.title, ln=1)
+		self.cell(0, 5, txt=self.title)
 
 		self.ln(10)
 
@@ -113,7 +111,7 @@ class PDF(FPDF):
 
 		self.set_y(-10)
  
-		self.set_font('Arial', 'I', 8)
+		self.set_font('FreeSans', size=8)
 
 		page = 'Page ' + str(self.page_no()) + '/{nb}'
 		self.cell(0, 10, page, 0, 0, 'C')
@@ -124,8 +122,8 @@ class PDF(FPDF):
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._add_title_of_news')
 		logger.info('Insert title of piece of news')
 
-		self.set_font('Times', 'B', size=13)
-		self.multi_cell(0,10, txt=_convert_to_latin_1(title))
+		self.set_font('FreeSans', size=13)
+		self.multi_cell(0,10, txt=title, align='C')
 
 
 	def _add_date_of_news(self, date: str) -> None:
@@ -133,8 +131,8 @@ class PDF(FPDF):
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._add_date_of_news')
 		logger.info('Insert date of piece of news')
 
-		self.set_font('Times', size=12)
-		self.multi_cell(0,10, txt=_convert_to_latin_1(date))
+		self.set_font('FreeSans', size=12)
+		self.multi_cell(0,10, txt=date)
 
 
 	def _add_link_of_news(self, link: str) -> None:
@@ -142,8 +140,8 @@ class PDF(FPDF):
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._add_link_of_news')
 		logger.info('Insert link of piece of news')
 
-		self.set_font('Arial','I', size=11)
-		self.multi_cell(0,10, txt=_convert_to_latin_1(link))
+		self.set_font('FreeSans', size=11)
+		self.multi_cell(0,10, txt=link)
 
 
 	def _add_content_of_news(self, content: str) -> None:
@@ -151,8 +149,8 @@ class PDF(FPDF):
 		logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._add_content_of_news')
 		logger.info('Insert content of piece of news')
 
-		self.set_font('Times', size=12)
-		self.multi_cell(0,10, txt=_convert_to_latin_1(content))
+		self.set_font('FreeSans', size=12)
+		self.multi_cell(0,10, txt=content)
 
 
 	def _add_img_of_news(self, img_url: str) -> None:
@@ -161,7 +159,7 @@ class PDF(FPDF):
 		logger.info('Insert image of piece of news')
 
 		save_image_by_url(img_url, 'temp' + str(self.iter) + '.png')
-		self.image('temp' + str(self.iter) + '.png')
+		self.image('temp' + str(self.iter) + '.png', x=50, y=None, w=100, h=0)
 
 		self.iter += 1
 
@@ -173,6 +171,7 @@ class PDF(FPDF):
 		
 		self.alias_nb_pages()
 		self.add_page()
+		# self.add_font('FreeSans', '', 'FreeSans.ttf', uni=True)
 
 		self._add_title_of_news(title)
 		self._add_date_of_news(date)
