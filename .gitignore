@@ -114,3 +114,4 @@ venv.bak/
 *.ttf
 *.db
 *.log
+*.pkl
