@@ -5,7 +5,7 @@ from datetime import datetime
 from operator import itemgetter
 from typing import Any, Dict, List, Union
 
-from tinydb import TinyDB, Query
+import tinydb
 from tinydb_serialization import SerializationMiddleware
 from tqdm import tqdm
 
@@ -19,16 +19,17 @@ class CacheStorage:
 
     def __init__(self, source: str) -> None:
         """Initialze cache storage."""
-        self.source = source
-        self.cache_db = self._init_cache_db()
-        logging.info('Successful initialze RSS cache database')
+        def init_cache_db() -> tinydb.database.Table:
+            """Initialze TinyDB and return source table."""
+            if os.path.isfile(CACHE_DB):
+                serialization = SerializationMiddleware()
+                serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+                cache_db = tinydb.TinyDB(CACHE_DB, storage=serialization)
+                return cache_db.table(source)
 
-    def _init_cache_db(self) -> TinyDB:
-        """Initialze TinyDB."""
-        if os.path.isfile(CACHE_DB):
-            serialization = SerializationMiddleware()
-            serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
-            return TinyDB(CACHE_DB, storage=serialization)
+        self.source = source
+        self.db_table = init_cache_db()
+        logging.info('Successful initialze RSS cache database')
 
 
 class WriteCache(CacheStorage):
@@ -44,8 +45,8 @@ class WriteCache(CacheStorage):
         """Verify cache data and cache news list to cache DB."""
         def add_to_change() -> None:
             """Add news to insert or update items in cache DB."""
-            search = Query()
-            search_items = self.cache_db.search((search.source == self.source) & (search.id == news_id))
+            search = tinydb.Query()
+            search_items = self.db_table.search((search.source == self.source) & (search.id == news_id))
             if search_items and not next(iter(search_items)).get('news') == news_data.get('news', ''):
                 news_update.append(news_data)
             elif not search_items:
@@ -53,10 +54,10 @@ class WriteCache(CacheStorage):
 
         def add_changes_to_database() -> None:
             """Add news changes to cache DB."""
-            self.cache_db.insert_multiple(news_insert)
-            search = Query()
+            self.db_table.insert_multiple(news_insert)
+            search = tinydb.Query()
             for news in news_update:
-                self.cache_db.update(
+                self.db_table.update(
                     news,
                     (search.source == self.source) & (search.id == news.get('id', ''))
                 )
@@ -94,8 +95,8 @@ class ReadCache(CacheStorage):
 
     def read_cache(self) -> Dict[Any, Any]:
         """Read cache data from 'date' to the end of the 'date' day."""
-        search = Query()
-        news_cache = self.cache_db.search(
+        search = tinydb.Query()
+        news_cache = self.db_table.search(
             (search.source == self.source) &
             ((self.date <= search.date) & (search.date <= self.get_end_of_the_period(self.date)))
         )

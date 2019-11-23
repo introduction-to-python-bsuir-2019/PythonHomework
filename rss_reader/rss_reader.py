@@ -4,6 +4,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Union
 from sys import exit
 
 from rss_reader.cache_storage import ReadCache, WriteCache
@@ -71,11 +72,14 @@ class RSSReader:
                                      help=r'Display cached news for the specified date (date format - \'YYYYmmDD\')',
                                      type=validate_date)
         argument_parser.add_argument('--to-html', dest='to_html',
-                                     help="Convert news to HTML format and save '.html' file the specified path.",
+                                     help="Convert news to HTML format and save '.html' file to the specified path.",
                                      type=validate_file_path)
         argument_parser.add_argument('--to-pdf', dest='to_pdf',
                                      help="Convert news to PDF format and save '.pdf' file to the specified path.",
                                      type=validate_file_path)
+        argument_parser.add_argument('--colorize',
+                                     help="Print text result in colorized mode",
+                                     action='store_true')
         return argument_parser.parse_args()
 
     @staticmethod
@@ -98,38 +102,56 @@ class RSSReader:
 
     def execute_rss_reader(self) -> None:
         """Execute RSS reader application."""
+        def get_news_data() -> List[Dict[str, Union[str, datetime, Dict[str, Union[str, List[Dict[str, str]]]]]]]:
+            """Get news data from souce or from cache."""
+            if self.arguments.date:
+                read_cache = ReadCache(self.arguments.source, self.arguments.date)
+                cache_data = read_cache.read_cache()
+                logging.info('News reading from cache has been completed successfully')
+            else:
+                source_parser = SourceParser(self.arguments.source)
+                source_data = source_parser.get_source_data()
+                source_parser.parse_source_data(source_data)
+                cache_data = source_parser.cache_data
+            return cache_data
+
+        def display_news_data() -> None:
+            """Display news data in text or JSON formats."""
+            display_data = format_to_display(news_data)
+            if self.arguments.json:
+                display_news = DisplayNewsJson(display_data, self.arguments.colorize)
+            else:
+                display_news = DisplayNewsText(display_data, self.arguments.colorize)
+            display_news.print_news()
+
+        def cache_news_data() -> None:
+            """Cache news data to database."""
+            WriteCache(self.arguments.source, cache_data).cache_news_list()
+
+        def convert_news_data() -> None:
+            """Cache news data to database."""
+            conversion_data = format_to_convert(news_data)
+            converter = Converter(conversion_data, self.arguments.to_html, self.arguments.to_pdf)
+            converter.convert_news()
+
         logging.info('Data obtain has been started')
-        if self.arguments.date:
-            read_cache = ReadCache(self.arguments.source, self.arguments.date)
-            cache_data = read_cache.read_cache()
-            logging.info('News reading from cache has been completed successfully')
-        else:
-            source_parser = SourceParser(self.arguments.source)
-            source_data = source_parser.get_source_data()
-            source_parser.parse_source_data(source_data)
-            logging.info('Cache writing has been started')
-            cache_data = source_parser.cache_data
-            WriteCache(self.arguments.source, source_parser.cache_data).cache_news_list()
-            logging.info('Cache writing has been finished')
+        cache_data = get_news_data()
         logging.info('Data obtain has been finished')
         if not cache_data:
             print('No news in the selected source with specified application parameters')
             return
-        cache_data = cache_data[:self.arguments.limit]
+        news_data = cache_data[:self.arguments.limit]
         logging.info('Start display news from a RSS URL')
-        display_data = format_to_display(cache_data)
-        if self.arguments.json:
-            display_news = DisplayNewsJson(display_data)
-        else:
-            display_news = DisplayNewsText(display_data)
-        display_news.print_news()
+        display_news_data()
         logging.info('End display news from a RSS URL')
         if self.arguments.to_html or self.arguments.to_pdf:
             logging.info('Start converting news')
-            conversion_data = format_to_convert(cache_data)
-            converter = Converter(conversion_data, self.arguments.to_html, self.arguments.to_pdf)
-            converter.convert_news()
+            convert_news_data()
             logging.info('End converting news')
+        if not self.arguments.date:
+            logging.info('Cache writing has been started')
+            cache_news_data()
+            logging.info('Cache writing has been finished')
 
 
 def run() -> None:

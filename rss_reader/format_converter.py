@@ -1,14 +1,15 @@
 """Contain all RSS news convert related objects."""
 import logging
 import os
-import urllib
 import shutil
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-from urllib import request as urlrequest
 
-from xhtml2pdf import pisa
+import requests
+from PIL import Image
 from tqdm import tqdm
+from xhtml2pdf import pisa
 from yattag import Doc, indent
 
 from rss_reader.config import FONTS
@@ -25,6 +26,7 @@ class Converter:
         self.html_path = html_path
         self.pdf_path = pdf_path
         self.img_folder = None
+        self.png_extension = '.png'
 
     def convert_news(self):
         """Convert news to the selected format."""
@@ -53,9 +55,11 @@ class Converter:
                     size: 21cm 200cm;
                     @frame content_frame {
                         left: 10pt;
-                        width: 585pt;
+                        right: 10pt;
+                        width: 575pt;
                         top: 10pt;
-                        height: 5660pt;
+                        down: 10pt;
+                        height: 5650pt;
                     }
                 }
                 @font-face {
@@ -101,13 +105,13 @@ class Converter:
         def download_image() -> str:
             """Вownloads picture from the link."""
             link = item.get('link', '')
-            image_path = f'{self.img_folder}/image_link_{news_number}_{link_number}'
-            try:
-                urlrequest.urlretrieve(link, image_path)
-            except urllib.error.HTTPError:
-                return None
-            else:
+            image_path = f'{self.img_folder}/image_link_{news_number}_{link_number}{self.png_extension}'
+            response = requests.get(link)
+            if response.status_code == 200:
+                Image.open(BytesIO(response.content)).convert("RGBA").save(image_path)
                 return image_path
+            else:
+                return None
 
         doc, tag, text = Doc().tagtext()
         create_image_folder()

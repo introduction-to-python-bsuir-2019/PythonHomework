@@ -2,9 +2,11 @@
 import json as jsonmodule
 import logging
 import os
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
+import colorama
 import jsonschema
+from colorama import Fore
 
 from rss_reader.config import JSON_SCHEMA
 from rss_reader.containers import DictionaryValues
@@ -14,30 +16,42 @@ from rss_reader.exceptions import RSSNewsJSONSchemaException
 class DisplayNewsText:
     """Class display news in text format."""
 
-    def __init__(self, news_data: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]]) -> None:
+    def __init__(self, news_data: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]],
+                 colorize: Optional[bool] = False) -> None:
         """Initialze news displaing."""
         self._news_data = news_data
+        self._colorize = colorize
+        colorama.init()
 
     def print_news(self) -> None:
         """Print news in text format."""
-        news_text = 'Feed: {0}:\n\n'.format(self._news_data.get('feed', ''))
+        news_text = self._get_news_feed(self._news_data.get('feed', ''))
         for number, news in enumerate(self._news_data.get('news', []), start=1):
             news_text += self._get_news_text(number, news)
         print(news_text.rstrip())
         logging.info('All news have been printed in stdout in text format')
 
-    @staticmethod
-    def _get_news_text(number: int, news: Dict[str, Union[str, List[Dict[str, str]]]]) -> str:
+    def _get_news_feed(self, feed_title: str) -> str:
+        """Format news feed title to correct text string."""
+        return '{0}Feed: {2}:{1}\n\n'.format(
+            Fore.GREEN if self._colorize else Fore.RESET,
+            Fore.RESET,
+            feed_title)
+
+    def _get_news_text(self, number: int, news: Dict[str, Union[str, List[Dict[str, str]]]]) -> str:
         """Format news to correct text string."""
         links_values = DictionaryValues(news.get('links', {}))
 
-        return '[News: {0}]\nTitle: {1}\nDate: {2}\nLink: {3}\n\n{4}\n\nLinks:\n{5}\n\n'.format(
+        return '{7}[News: {0}]{6}\nTitle: {1}\nDate: {2}\nLink: {3}\n\n{4}\n\n{8}Links:{6}\n{5}\n\n'.format(
             number,
             news.get('title', ''),
             news.get('published', ''),
             news.get('link', ''),
             news.get('text', ''),
-            ''.join(f'[{number}]: {link} ({key})\n' for number, (link, key) in enumerate(links_values, start=1)))
+            ''.join(f'[{number}]: {link} ({key})\n' for number, (link, key) in enumerate(links_values, start=1)),
+            Fore.RESET,
+            Fore.RED if self._colorize else Fore.RESET,
+            Fore.CYAN if self._colorize else Fore.RESET)
 
 
 class DisplayNewsJson:

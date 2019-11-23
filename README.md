@@ -16,6 +16,7 @@ Utility should provide the following interface:
    + --date DATE    - Display news for the specified day, reading them from the cache. DATE format: YYYYmmDD
    + --to-html PATH - Convert news to HTML format. Specify the path to the file in PATH
    + --to-pdf PATH  - Convert news to PDF format. Specify the path to the file in PATH
+   + --colorize     - Print text result in colorized mode
 
 Argument description:
 + In case of using --json argument your utility should convert the news into JSON format. You should come up with the JSON structure on you own and describe it in the README.md file for your repository or in a separate documentation file.
