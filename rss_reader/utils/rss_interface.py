@@ -73,23 +73,12 @@ class RssBotInterface(metaclass=ABCMeta):
         """
 
     def _store_news(self) -> None:
-
-        # Create a storage folder if there is no so far
-        Path.mkdir(self.STORAGE, exist_ok=True)
+        """Method stores news to DB"""
         db = RssDB(self.logger)
         db.insert_news(self.news)
 
         # clear DB object
         del db
-        for item in self.news.items:
-            item.published
-            file_path = self.STORAGE.joinpath(f'{datetime.now().strftime("%Y%m%d")}')
-
-        with open(file_path, 'w') as file_to_store_news:
-            json.dump(self.news,
-                      file_to_store_news,
-                      cls=PythonObjectEncoder,
-                      indent=4)
 
     def _load_news(self, news_date: str) -> News:
         """
@@ -105,19 +94,15 @@ class RssBotInterface(metaclass=ABCMeta):
 
         loaded_news = db.load_news(news_date)
 
-        news_path = self.STORAGE.joinpath(f'{news_date}')
+        # Delete DB object
+        del db
 
-        # Check if the file exists
-        if not Path.is_file(news_path):
-            existing_files = '\n'.join([x.name for x in news_path.parent.glob('*')])
-            raise RssNewsException(f'There is no news with {news_date} date. Sorry. We have only these:\n'
-                                   f'\t{existing_files}\n')
-
-        # Load news
-        with open(news_path, 'r') as file_with_news:
-            news_from_storage = file_with_news.read()
-
-        return json.loads(news_from_storage, object_hook=as_python_object)
+        # return news
+        return News(
+            feed=f'Stored news from date: {news_date}',
+            link=db._DB,
+            items=loaded_news,
+        )
 
     @abstractmethod
     def _parse_raw_rss(self) -> feedparser.FeedParserDict:
@@ -129,7 +114,13 @@ class RssBotInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def _parse_news_item(self, news_item: NewsItem):
+    def _parse_news_item(self, news_item: NewsItem) -> str:
+        """
+        Forms a human readable string from news_item and adds it to the news_item dict
+
+        :param news_item: news_item content
+        :return: human readable news content
+        """
         pass
 
 

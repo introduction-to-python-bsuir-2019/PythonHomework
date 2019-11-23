@@ -3,12 +3,12 @@ Module is for storing and loading news via sqlite3
 """
 import dataset
 from pathlib import Path
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from dateutil.parser import parse
 from functools import partial
 from itertools import repeat
 import sqlite3
-from typing import Tuple
+from typing import Tuple, List
 import time
 from sqlite3 import Error
 
@@ -18,7 +18,7 @@ from sqlite3 import Error
 
 from ..utils.data_structures import News, NewsItem
 from ..utils.exceptions import RssNewsException
-from ..utils.rss_utils import get_date
+from ..utils.rss_utils import get_date, parse_date_from_console, dict_factory
 
 
 class RssDB:
@@ -52,14 +52,14 @@ class RssDB:
                                     news_id integer NOT NULL, 
                                     FOREIGN KEY (news_id) REFERENCES news (id)
                                 );"""
-
+    _sql_create_idx_links_ref = 'CREATE UNIQUE INDEX IF NOT EXISTS idx_links_ref on links (ref);'
     _sql_create_imgs_table = """CREATE TABLE IF NOT EXISTS imgs (
                                         id integer PRIMARY KEY AUTOINCREMENT,
                                         ref text NOT NULL,
                                         news_id integer NOT NULL, 
                                         FOREIGN KEY (news_id) REFERENCES news (id)
                                     );"""
-
+    _sql_create_idx_imgs_ref = 'CREATE UNIQUE INDEX IF NOT EXISTS idx_imgs_ref on imgs (ref);'
     def __init__(self, logger):
         self.logger = logger
         self.connection = partial(sqlite3.connect, self._DB)
@@ -74,6 +74,8 @@ class RssDB:
             cur.execute(self._sql_create_idx_news_link)
             cur.execute(self._sql_create_links_table)
             cur.execute(self._sql_create_imgs_table)
+            cur.execute(self._sql_create_idx_links_ref)
+            cur.execute(self._sql_create_idx_imgs_ref)
             cur.close()
 
     @staticmethod
@@ -132,8 +134,55 @@ class RssDB:
 
         self.logger.debug('News are successfully stored into the DB')
 
-    def load_news(self, date: date):
+    def load_news(self, date_str: str) -> List[NewsItem]:
+        news_from_tables = []
+
+        sql_retrieve_news_query = """
+                    SELECT 
+                        news.id as newsId, 
+                        news.title, news.link, news.published, news.html,
+                        news.feed_id as feedID,
+                        links.ref as linkRef,
+                        imgs.ref as imgRef
+                    FROM news 
+                    JOIN links ON news.id = links.news_id
+                    JOIN imgs ON news.id = imgs.news_id
+                    WHERE published >= ? AND published < ?
+                    """
+
         with self.connection() as conn:
-            with conn as cur:
-                date
-                cur.execute('SELECT * from news WHERE published >= ? AND published < ?', )
+            conn.row_factory = dict_factory
+            cur = conn.cursor()
+            news_date = get_date(date_str)
+            date_tomorrow = news_date + timedelta(days=1)
+
+            cur.execute(sql_retrieve_news_query, (news_date, date_tomorrow))
+
+            for news in cur.fetchall():
+                news_from_tables.append(news)
+            cur.close()
+
+        news_ids = {a['newsId'] for a in news_from_tables}
+        news_items_output = []
+        for news_id in news_ids:
+            links = {item.get('linkRef', '') for item in news_from_tables if item.get('newsId', -1) == news_id}
+            imgs = {item.get('imgRef', '') for item in news_from_tables if item.get('newsId', -1) == news_id}
+            news_item = next(item for item in news_from_tables if item.get('newsId', -1) == news_id)
+
+            news_items_output.append(
+                NewsItem(
+                    title=news_item.get('title', ''),
+                    link=news_item.get('link', ''),
+                    html=news_item.get('html', ''),
+                    published=get_date(news_item.get('published')).strftime('%Y%m%d'),
+                    links=list(links),
+                    imgs=list(imgs)
+                )
+            )
+        return news_items_output
+
+
+
+
+
+
