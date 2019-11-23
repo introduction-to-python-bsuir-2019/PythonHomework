@@ -102,3 +102,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Media & results files
+*.fb2
+*.json
+*.pdf
+*.bmp
+*.png
+*.jpg
+*.jpeg
+*.ttf
+*.db
+*.log
