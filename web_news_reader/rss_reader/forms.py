@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+import feedparser
 
 FORMATS = (
     (1, ("Read on website")),
@@ -30,3 +31,15 @@ class SettingsForm(forms.Form):
 		if new_limit.isdigit():
 			return new_limit
 		raise ValidationError('Limit is must be integer!')
+
+
+	def clean_link(self):
+		new_link = self.cleaned_data['link']
+
+		try:
+			rss = feedparser.parse(new_link)
+			rss.feed.title
+		except AttributeError:
+			raise ValidationError('Incorrect link')
+
+		return new_link
