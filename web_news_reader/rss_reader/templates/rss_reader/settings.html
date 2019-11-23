@@ -1,0 +1,35 @@
+{% extends 'rss_reader/base_rss_reader.html' %}
+
+
+{% block content %}
+
+
+<form action="{% url 'settings_url' %}" method="post">
+	{% csrf_token %}
+
+	{% for field in form %}
+
+		<div class="form-group">
+			{% if field.errors %}
+
+				<div class="alert alert-danger">
+					{{ field.errors }}
+				</div>
+
+			{% endif %}
+
+
+			{{ field.label }}
+			{{ field }}
+
+		</div>
+
+	{% endfor %}
+
+<button type="submit" class="btn btn-success">Get news</button>
+
+	
+</form>
+
+
+{% endblock %}
