@@ -8,7 +8,7 @@ import logging
 import html
 import json
 import feedparser
-from bs4 import BeautifulSoup                              # спросить про одинаковые новости (дублировать ти не)
+from bs4 import BeautifulSoup
 import cacher
 
 def init_cli_parser():
@@ -153,7 +153,7 @@ def main():
             logger.info(f"started fetching data from cache..")
             news = cacher.get_cached_news(cursor, args.date)
             if len(news) == 0:
-                raise ValueError
+                raise IndexError
             news = news[:args.limit if args.limit else len(news)]
         except ValueError:
             if not args.verbose:
@@ -161,11 +161,18 @@ def main():
             logger.error(f"invalid date")
             logger.info(f"end of work -->|")
             return
+        except IndexError:
+            if not args.verbose:
+                print("no news for this date")
+            logger.info(f"no news for this date")
+            logger.info(f"end of work -->|")
+            return
 
     if args.source:
         logger.info(f"started fetching data (url - {args.source})..")
         try:
             news = parse_news(args.source)
+            logger.info(f"started caching data..")
             cacher.cache_news(connection, cursor, news)
             news = news[:args.limit if args.limit else len(news)]
         except ValueError:

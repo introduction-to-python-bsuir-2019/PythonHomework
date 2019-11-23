@@ -26,3 +26,19 @@
   }
 }
 ```
+
+##### Cache description
+
+News received from feed is cached through database is being created locally.
+
+The database consists of the only file named "cache.db". It has the following structure:
+
+     |  id  | feed | title | pub_date | pub_parsed | link | description | hrefs 
+-----|------|------|-------|----------|------------|------|-------------|--------
+post |  ..  | ...  |  ...  |   ...    |    ...     | ...  |     ...     |   ...    
+
+All fields except "id" have text type. ID field plays a role of post primary key.
+
+Hrefs field is composed of all post links including image links and image descriptions.
+Usual references section and one for image links are separated by --|-- sequence. 
+Items in one section are separated by -+- sequence. And -|- is for dividing link, it's type and image description.

@@ -1,5 +1,5 @@
 """
-this module provides tools for caching cache_news
+this module provides tools for caching news
 
 it includes functions for work with database and support ones
 """
@@ -26,9 +26,14 @@ def cache_news(connection_obj, cursor_obj, news):
     """
     for post in news:
         cursor_obj.execute(
-            '''INSERT INTO cache (feed, title, pub_date, pub_parsed, link, description, hrefs) VALUES (?, ?, ?, ?, ?, ?, ?)''',
+            '''SELECT id FROM cache WHERE feed=? AND title=? AND pub_date=? AND pub_parsed=? AND link=? AND description=? AND hrefs=?''',
             (post['feed'], post['title'], post['pub_date'], post['pub_parsed'], post['link'], post['description'], hrefs_to_text(post['hrefs']))
         )
+        if cursor_obj.fetchone() is None:
+            cursor_obj.execute(
+                '''INSERT INTO cache (feed, title, pub_date, pub_parsed, link, description, hrefs) VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                (post['feed'], post['title'], post['pub_date'], post['pub_parsed'], post['link'], post['description'], hrefs_to_text(post['hrefs']))
+            )
     connection_obj.commit()
 
     return
