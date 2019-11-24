@@ -23,7 +23,7 @@ class RssParser():
         for entry in entries:
             title = entry.get('title')
             date = entry.get('published')
-            link = entry.get('link')
+            url = entry.get('link')
             links = []
             link_data = namedtuple('link', 'id url type')
             link_id = 0
@@ -43,23 +43,38 @@ class RssParser():
                 my_link = link_data(link_id, my_image, 'image')
                 links.append(my_link)
                 link_id += 1
-            article = namedtuple('article', 'title date link description links')
-            my_article = article(title, date, link, description, links)
+            article = namedtuple('article', 'title date url description links')
+            my_article = article(title, date, url, description, links)
             self.news.append(my_article)
         result = ''
         result += f'\nFeed: {self.feed}\n\n'
-        for news in self.news:
-            result += f'Title: {news.title}\nDate: {news.date}\nLink: {news.link}\n\n'
-            for l in news.links:
+        for article in self.news:
+            result += f'Title: {article.title}\nDate: {article.date}\nLink: {article.url}\n\n'
+            for l in article.links:
                 if l.type == 'image':
                     result += f'[image {l.id + 1} : {l[1].alt}][{l.id + 1}]'
-                    result += f'{news.description}\n\n'
-            for l in news.links:
+                    result += f'{article.description}\n\n'
+            for l in article.links:
                 if l.type == 'image':
                     result += f'[{l.id + 1}]: {l[1].url} ({l.type})\n'
                 else:
                     result += f'[{l.id + 1}]: {l.url} ({l.type})\n'
         return result
 
+    def feed_to_json(self):
+        json_news_objects = [recursive_to_json(news_obj) for news_obj in self.news]
+        return {'news': {'feed': self.feed, 'news_objects': json_news_objects}, 'url': self.url}
 
+
+def recursive_to_json(obj):
+    _json = {}
+    if isinstance(obj, tuple):
+        obj_data = obj._asdict()
+        for data in obj_data:
+            if isinstance(obj_data[data], tuple):
+                _json[data] = (recursive_to_json(obj_data[data]))
+            else:
+                print(obj_data[data])
+            _json[data] = (obj_data[data])
+    return _json
 

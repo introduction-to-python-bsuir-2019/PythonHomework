@@ -3,6 +3,7 @@ from rss_parser import RssParser
 
 current_version = 0.1
 
+
 def main():
     parser = argparse.ArgumentParser(description='Brand new euseand''s RSS-parser written in Python')
     parser.version = current_version
@@ -14,5 +15,9 @@ def main():
     args = parser.parse_args()
     print(args)
 
-    my_parser = RssParser(args.source)
-    print(my_parser.parse_rss())
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        print(e, is_error=True)
