@@ -42,28 +42,89 @@ class RssDB:
                                     link text NOT NULL,
                                     published timestamp NOT NULL,
                                     html text NOT NULL,
-                                    feed_id integer NOT NULL, 
+                                    feed_id integer NOT NULL,
                                     FOREIGN KEY (feed_id) REFERENCES feeds (id)
                                     );"""
     _sql_create_idx_news_link = 'CREATE UNIQUE INDEX IF NOT EXISTS idx_news_link on news (link);'
     _sql_create_links_table = """CREATE TABLE IF NOT EXISTS links (
                                     id integer PRIMARY KEY AUTOINCREMENT,
                                     ref text NOT NULL,
-                                    news_id integer NOT NULL, 
+                                    news_id integer NOT NULL,
                                     FOREIGN KEY (news_id) REFERENCES news (id)
                                 );"""
     _sql_create_idx_links_ref = 'CREATE UNIQUE INDEX IF NOT EXISTS idx_links_ref on links (ref);'
     _sql_create_imgs_table = """CREATE TABLE IF NOT EXISTS imgs (
                                         id integer PRIMARY KEY AUTOINCREMENT,
                                         ref text NOT NULL,
-                                        news_id integer NOT NULL, 
+                                        news_id integer NOT NULL,
                                         FOREIGN KEY (news_id) REFERENCES news (id)
                                     );"""
     _sql_create_idx_imgs_ref = 'CREATE UNIQUE INDEX IF NOT EXISTS idx_imgs_ref on imgs (ref);'
+
     def __init__(self, logger):
         self.logger = logger
         self.connection = partial(sqlite3.connect, self._DB)
         self._init_empty_db()
+
+    def insert_news(self, news: News):
+        """Store current news into DB"""
+
+        feed_id, feed_title = self._get_feed_id(news)
+        self.logger.debug(f'News are storing with feed id {feed_id}: {feed_title}')
+
+        # When received feed_id  we store every news_item with a separate cursor connection
+        # to avoid connection overtime while performing queries with big amount of data
+        for news_item in news.items:
+            self._store_news_item(news_item, feed_id)
+
+        self.logger.debug('News are successfully stored into the DB')
+
+    def load_news(self, date_str: str) -> List[NewsItem]:
+        news_from_tables = []
+
+        sql_retrieve_news_query = """
+                    SELECT
+                        news.id as newsId,
+                        news.title, news.link, news.published, news.html,
+                        news.feed_id as feedID,
+                        links.ref as linkRef,
+                        imgs.ref as imgRef
+                    FROM news
+                    JOIN links ON news.id = links.news_id
+                    JOIN imgs ON news.id = imgs.news_id
+                    WHERE published >= ? AND published < ?
+                    """
+
+        with self.connection() as conn:
+            conn.row_factory = dict_factory
+            cur = conn.cursor()
+            news_date = get_date(date_str)
+            date_tomorrow = news_date + timedelta(days=1)
+
+            cur.execute(sql_retrieve_news_query, (news_date, date_tomorrow))
+
+            for news in cur.fetchall():
+                news_from_tables.append(news)
+            cur.close()
+
+        news_ids = {a['newsId'] for a in news_from_tables}
+        news_items_output = []
+        for news_id in news_ids:
+            links = {item.get('linkRef', '') for item in news_from_tables if item.get('newsId', -1) == news_id}
+            imgs = {item.get('imgRef', '') for item in news_from_tables if item.get('newsId', -1) == news_id}
+            news_item = next(item for item in news_from_tables if item.get('newsId', -1) == news_id)
+
+            news_items_output.append(
+                NewsItem(
+                    title=news_item.get('title', ''),
+                    link=news_item.get('link', ''),
+                    html=news_item.get('html', ''),
+                    published=get_date(news_item.get('published')).strftime('%Y%m%d'),
+                    links=list(links),
+                    imgs=list(imgs)
+                )
+            )
+        return news_items_output
 
     def _init_empty_db(self):
         """Init DB in a case of empty DB"""
@@ -120,69 +181,3 @@ class RssDB:
             news_imgs = list(zip(news_item.imgs, repeat(news_id)))
             cur.executemany('REPLACE INTO imgs(ref, news_id) VALUES (?, ?)', news_imgs)
             cur.close()
-
-    def insert_news(self, news: News):
-        """Store current news into DB"""
-
-        feed_id, feed_title = self._get_feed_id(news)
-        self.logger.debug(f'News are storing with feed id {feed_id}: {feed_title}')
-
-        # When received feed_id  we store every news_item with a separate cursor connection
-        # to avoid connection overtime while performing queries with big amount of data
-        for news_item in news.items:
-            self._store_news_item(news_item, feed_id)
-
-        self.logger.debug('News are successfully stored into the DB')
-
-    def load_news(self, date_str: str) -> List[NewsItem]:
-        news_from_tables = []
-
-        sql_retrieve_news_query = """
-                    SELECT 
-                        news.id as newsId, 
-                        news.title, news.link, news.published, news.html,
-                        news.feed_id as feedID,
-                        links.ref as linkRef,
-                        imgs.ref as imgRef
-                    FROM news 
-                    JOIN links ON news.id = links.news_id
-                    JOIN imgs ON news.id = imgs.news_id
-                    WHERE published >= ? AND published < ?
-                    """
-
-        with self.connection() as conn:
-            conn.row_factory = dict_factory
-            cur = conn.cursor()
-            news_date = get_date(date_str)
-            date_tomorrow = news_date + timedelta(days=1)
-
-            cur.execute(sql_retrieve_news_query, (news_date, date_tomorrow))
-
-            for news in cur.fetchall():
-                news_from_tables.append(news)
-            cur.close()
-
-        news_ids = {a['newsId'] for a in news_from_tables}
-        news_items_output = []
-        for news_id in news_ids:
-            links = {item.get('linkRef', '') for item in news_from_tables if item.get('newsId', -1) == news_id}
-            imgs = {item.get('imgRef', '') for item in news_from_tables if item.get('newsId', -1) == news_id}
-            news_item = next(item for item in news_from_tables if item.get('newsId', -1) == news_id)
-
-            news_items_output.append(
-                NewsItem(
-                    title=news_item.get('title', ''),
-                    link=news_item.get('link', ''),
-                    html=news_item.get('html', ''),
-                    published=get_date(news_item.get('published')).strftime('%Y%m%d'),
-                    links=list(links),
-                    imgs=list(imgs)
-                )
-            )
-        return news_items_output
-
-
-
-
-
-

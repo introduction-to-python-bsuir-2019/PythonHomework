@@ -98,7 +98,11 @@ def args_parser() -> ConsoleArgs:
                         type=int,
                         )
     PARSER.add_argument('--date',
-                        help='Date of stored news you want to see in format %Y%m%d',
+                        help='Date of stored news you want to see. Format: %Y%m%d',
+                        default='',
+                        type=str)
+    PARSER.add_argument('--to_pdf',
+                        help='Convert and store news you are looking for to pdf',
                         default='',
                         type=str)
 
@@ -111,6 +115,7 @@ def args_parser() -> ConsoleArgs:
         json=ARGS.json,
         verbose=ARGS.verbose,
         date=ARGS.date,
+        to_pdf=ARGS.to_pdf
     )
 
 

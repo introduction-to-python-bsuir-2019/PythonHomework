@@ -15,6 +15,7 @@ from ..utils.exceptions import RssException, RssNewsException, RssValueException
 from ..utils.json_encoder_patch import as_python_object, PythonObjectEncoder
 from ..utils.sqlite import RssDB
 from ..utils.rss_utils import parse_date_from_console
+from ..utils.pdf import PdfWriter
 
 
 class RssBotInterface(metaclass=ABCMeta):
@@ -40,7 +41,8 @@ class RssBotInterface(metaclass=ABCMeta):
         else:  # load from storage
             self.logger.debug(f'Loading news from storage')
             self.news = self._load_news(args.date)
-
+        if args.to_pdf:
+            self._print_news_to_pdf(args.to_pdf)
         self.logger.info(f'Bot initialization is completed')
 
     @abstractmethod
@@ -50,6 +52,10 @@ class RssBotInterface(metaclass=ABCMeta):
 
         :return: str with news
         """
+
+    def _print_news_to_pdf(self, path_to_pdf: str) -> None:
+        pdf_writer = PdfWriter()
+        pdf_writer.html2pdf(self.news, path_to_pdf)
 
     @call_save_news_after_method
     def get_json(self) -> str:
@@ -74,6 +80,8 @@ class RssBotInterface(metaclass=ABCMeta):
 
     def _store_news(self) -> None:
         """Method stores news to DB"""
+        if self.news.feed.find('Stored news from date') >= 0:
+            return
         db = RssDB(self.logger)
         db.insert_news(self.news)
 
@@ -93,9 +101,6 @@ class RssBotInterface(metaclass=ABCMeta):
         db = RssDB(self.logger)
 
         loaded_news = db.load_news(news_date)
-
-        # Delete DB object
-        del db
 
         # return news
         return News(

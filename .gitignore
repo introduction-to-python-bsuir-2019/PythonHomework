@@ -117,3 +117,11 @@ tests/data/yahoo.txt
 # news storage
 rss_reader/storage
 rss_reader/sqlite3.db
+
+# pdf
+*.pdf
+
+# Unused files
+rss_reader/utils/dejavu_font/DejaVuSansCondensed.cw127.pkl
+rss_reader/utils/dejavu_font/DejaVuSansCondensed.pkl
+rss_reader/utils/no_imagepng.png
