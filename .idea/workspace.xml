@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0226338d-3a13-4922-828e-85ee018d61c6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/rssConverter/HtmlConverter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/rssConverter/ImageDownloader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/rssConverter/New.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/rssConverter/New.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/rssConverter/RssConverter.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/rssConverter/RssConverter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/rssConverter/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/rssConverter/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

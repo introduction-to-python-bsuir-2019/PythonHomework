@@ -1,6 +1,7 @@
 import argparse
 import logging
 import app
+import os
 from datetime import datetime
 from app.rssConverter.RssConverter import RssConverter
 from app.rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDateOrURL
@@ -55,6 +56,17 @@ Please check it and try again'.format(ex.url, ex.date))
         logger.info("Something has gone wrong. Exception is  {0}".format(ex))
     else:
         logger.info("Everything have worked without problems")
+
+
+def creating_image_dir():
+    current_dir = os.getcwd()
+    image_path = os.path.join(current_dir, 'images')
+    if not os.path.exists(image_path):
+        os.makedirs(image_path)
+        print("create folder with path {0}".format(image_path))
+    else:
+        print("folder exists {0}".format(image_path))
+    return image_path
 
 
 def set_logger(log_file):
