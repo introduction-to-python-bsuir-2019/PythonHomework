@@ -8,7 +8,7 @@ import sys
 from importlib import import_module
 
 from .utils import rss_interface
-from .utils.rss_interface import RssException, RssValueException, RssNewsException
+from .utils.exceptions import RssException, RssValueException, RssNewsException
 from .utils.data_structures import ConsoleArgs
 
 PROG_VERSION = 3.0
@@ -103,6 +103,10 @@ def args_parser() -> ConsoleArgs:
                         type=str)
     PARSER.add_argument('--to_pdf',
                         help='Convert and store news you are looking for to pdf',
+                        default='',
+                        type=str)
+    PARSER.add_argument('--to_html',
+                        help='Convert and store news you are looking for to html',
                         default='',
                         type=str)
 

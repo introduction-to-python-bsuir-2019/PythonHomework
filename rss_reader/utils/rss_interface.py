@@ -11,8 +11,7 @@ from textwrap import wrap
 
 from ..utils.data_structures import NewsItem, News, ConsoleArgs
 from ..utils.decorators import call_save_news_after_method
-from ..utils.exceptions import RssException, RssNewsException, RssValueException
-from ..utils.json_encoder_patch import as_python_object, PythonObjectEncoder
+from ..utils.exceptions import RssException
 from ..utils.sqlite import RssDB
 from ..utils.rss_utils import parse_date_from_console
 from ..utils.pdf import PdfWriter
@@ -54,8 +53,8 @@ class RssBotInterface(metaclass=ABCMeta):
         """
 
     def _print_news_to_pdf(self, path_to_pdf: str) -> None:
-        pdf_writer = PdfWriter()
-        pdf_writer.html2pdf(self.news, path_to_pdf)
+        pdf_writer = PdfWriter(self.logger)
+        pdf_writer.store_news(self.news, path_to_pdf)
 
     @call_save_news_after_method
     def get_json(self) -> str:
@@ -65,8 +64,6 @@ class RssBotInterface(metaclass=ABCMeta):
         :return: json formatted string
         """
         self.logger.info(f'Returning news in JSON format')
-        # a = json.dumps(self.news, cls=PythonObjectEncoder, indent=4)
-        # b = json.loads(a, object_hook=as_python_object)
 
         return json.dumps(self.news, indent=4)
 
