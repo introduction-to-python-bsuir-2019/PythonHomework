@@ -1,0 +1,12 @@
+version: '3.0'
+services:
+  app:
+    build:
+      .
+    container_name: rss_reader
+    stdin_open: true
+    tty: true
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"

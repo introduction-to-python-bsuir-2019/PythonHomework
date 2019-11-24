@@ -1,8 +1,19 @@
 ## It is a one-shot command-line RSS reader by Zviger.
 ### Installation
-```text
 Clone this repository and run setup.py file with parameters "install --user"
+or
+Download docker [https://docs.docker.com/] and docker-compose [https://docs.docker.com/compose/install/]
+after this run command:
+```text
+docker-compose up -d
 ```
+and
+```text
+docker exec -it rss_reader bash
+```
+Fine!
+
+Now you can write in the docker console "rss_reader" with some parameters
 ### User interface
 ```text
 usage: frbz.py [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] source

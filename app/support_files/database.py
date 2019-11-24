@@ -17,7 +17,7 @@ class DB:
     """
 
     def __init__(self) -> None:
-        client = MongoClient()
+        client = MongoClient("mongodb://mongo:27017/")
         self._db = client["feed_db"]
         self._collection = self._db["feed_collection"]
 
