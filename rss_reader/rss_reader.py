@@ -15,9 +15,14 @@ def main():
 	if (arg.args.json):
 		logging.info("Write news to json file")
 		news.write_to_json(captured_news)
+		news.caching_news(captured_news)
 	else:
 		logging.info("Print news to outstream")
-		news.show_news(captured_news)
+		if arg.args.date:
+			news.find_news_in_cache()
+		else:
+			news.caching_news(captured_news)
+			news.show_news(captured_news)
 	logging.info("The program is successfully completed")
 
 if __name__ == '__main__':

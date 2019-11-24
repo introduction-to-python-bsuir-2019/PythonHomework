@@ -1,10 +1,13 @@
 import feedparser
 import logging
 import re
+import os
 import html
 import json
+import pickle
 from rss_reader import arg
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 class News():
 	def __init__(self, feed, link, title, date, text, images):
@@ -48,6 +51,49 @@ class News():
 		self.show_date()
 		self.show_text()
 		self.show_images()
+
+def caching_news(news):
+    if os.name == "posix":
+        owner_name = os.getlogin()
+        file_path = "/home/" + owner_name + "/.cashed_news"
+    else:
+        file_path = """C:\\news.rss"""
+
+    with open(file_path, "ab") as output:
+        for i in news:
+            pickle.dump(i, output, pickle.HIGHEST_PROTOCOL)
+        logging.info("Dump news to the cache file on your machine")
+
+def recashing_news():
+    if os.name == "posix":
+        owner_name = os.getlogin()
+        file_path = "/home/" + owner_name + "/.cashed_news"
+    else:
+        file_path = """C:\\news.rss"""
+
+    with open(file_path, "rb") as input:
+        while True:
+            try:
+                yield pickle.load(input)
+            except EOFError:
+                break
+
+def compare_dates(newsdate):
+    news_date = datetime.strptime(newsdate[5:len(newsdate)-15], "%d %b %Y")
+    news_date = str(news_date)[:10]
+    requared_date = arg.args.date
+    requared_date = requared_date[0:4] + "-" + requared_date[4:6] + "-" + requared_date[6:8]
+    return news_date == requared_date
+
+def find_news_in_cache():
+    isNewsFind = False
+    for i in recashing_news():
+        if compare_dates(i.date):
+            i.show()
+            print(80*"_", end = "\n\n")
+            isNewsFind = True
+    if not isNewsFind:
+        print("Nothing found :(")
 
 def write_to_json(news):
     prepared_news = []
@@ -106,9 +152,9 @@ def get_Text(str):
 	return str
 
 def clean_text(text):
-  cleanr = re.compile("<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});")
-  cleantext = re.sub(cleanr, '', text)
-  return cleantext
+    cleanr = re.compile("<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});")
+    cleantext = re.sub(cleanr, '', text)
+    return cleantext
 
 def grab_news(URL):
 	logging.info("Assemble news from URL")
