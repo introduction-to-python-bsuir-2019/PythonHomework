@@ -1,5 +1,5 @@
 """
-Python RSS reader v0.8
+Python RSS reader
 
 Designed to download news from the entered url.
 
@@ -8,95 +8,120 @@ Opportunities:
     * Conversion to JSON
     * Logging
     * Limiting articles
+    * Caching news feeds in SQLite database
 
 For information enter
-    "python rss_reader.py --help"
+    "python rss_reader.py -h"
 in terminal to find more information.
 
 """
+__package__ = 'rss-reader'
 
-__version__ = "v0.8"
-
+import datetime
+import json
 import logging
 import feedparser
 import argparse
 
 from htmlparser import *
+from storage_controller import *
 
 
 class RSSReader:
-    def execute(self, source, verbose, limit, as_json):
+    def __call__(self, source, limit, as_json, date):
         """
         Procedure executing program. Get additional setting parameters and running.
 
         :param source: URL for downloading news articles
-        :param verbose: output the logs of program
-        :param limit: limit of output news articles
+        :param limit: limit news topics if this parameter provided
         :param as_json: show news articles as JSON
+        :param date: print cached articles by date
         :type source: str
-        :type verbose: bool
         :type limit: int
         :type as_json: bool
+        :type date: str
         """
-        if verbose:
-            logging.basicConfig(level=logging.INFO)
-        logging.info("Logging enabled")
-        logging.info(f"Getting response from {source}")
+        if limit and limit < 1:
+            print(f"Error: Impossible parse 0 and less RSS Feeds")
+            exit(0)
+
+        if not date:
+            logging.info("Start loading articles from RSS source")
+            articles = self._get_articles_from_url(source, limit)
+            logging.info("Completed. Saving articles in cache")
+            count = StorageController().save(source, articles['articles'], articles['title'])
+            logging.info(f"Completed. {count} articles was saved in cache")
+        else:
+            logging.info("Start loading from cache")
+            try:
+                logging.info("Check date format")
+                datetime.datetime.strptime(date, "%Y%m%d")
+            except ValueError:
+                print(f"Error format date {date}. Need '%Y%m%d'")
+                exit(0)
+            logging.info("Date is correct. Start loading by date")
+            articles = StorageController().load(source, date, limit)
+
+        logging.info("All articles was successfully loaded")
+
+        if as_json:
+            self.json_print(articles)
+        else:
+            self.sample_print(articles)
+
+    @staticmethod
+    def _get_articles_from_url(source, limit):
+        logging.info("Completed. Check the availability of URL.")
+
         if 'status' not in (response := feedparser.parse(source.strip())) or len(response.entries) == 0:
             print(f"Error: Impossible parse RSS Feeds from url '{source}'")
             exit(0)
 
+        logging.info("Completed. Check status code of response.")
+
         if response.status in range(200, 300):
-            logging.info(f"Status code {response.status}. Getting articles from {source} was successful")
+            logging.info(f"Status code {response.status}. Getting articles from '{source}' was successful")
         else:
-            logging.info(f"Status code {response.status}. Getting articles from {source} was unsuccessful")
+            print(f"Error connecting with URL '{source.strip()}' with status code {response.status}.")
+            exit(0)
 
-        if as_json:
-            self.json_print(response, limit)
-        else:
-            self.sample_print(response, limit)
+        return Parser.parse(response, limit)
 
     @staticmethod
-    def json_print(response, limit):
-        """
-        Procedure for output articles in JSON format.
-
-        :param response: response struct for parse
-        :param limit: required number of articles to show
-        :type response: dict
-        :type limit: int
-        """
-        logging.info("Start creating JSON format of feeds")
-        data = Parser.get_json(response, limit)
-        logging.info("Completed. Printing..")
-        print(data)
-
-    @staticmethod
-    def sample_print(response, limit):
+    def sample_print(articles):
         """
         Procedure for sample output of news articles.
 
-        :param response: response struct for parse
-        :param limit: required number of articles to show
-        :type response: dict
-        :type limit: int
+        :param articles: dict with title and list of news articles
+        :type articles: dict
         """
-        title, articles = Parser.parse_all(response, limit)
-        logging.info("Start creating readable format of feeds")
-        if title is not None:
-            print(f"Feed: {title['feed']}\n")
+        logging.info("Start sample output")
 
-        for article in articles:
-            logging.info("Parsing article..")
+        if (title := articles.get('title', None)) is not None:
+            print(f"Feed: {title}\n")
 
-            print(f"Title: {article.title}\n"
-                  f"Date: {article.pubDate}\n"
-                  f"Link: {article.link}\n\n"
-                  f"{article.description}\n\n"
+        for article in articles['articles']:
+            print(f"Title: {article['title']}\n"
+                  f"Date: {article['pubDate']}\n"
+                  f"Link: {article['link']}\n\n"
+                  f"{article['description']}\n\n"
                   f"Links:")
-            for link in article.links:
+            for link in article['links']:
                 print(link)
             print('################################################################################')
+
+    @staticmethod
+    def json_print(articles):
+        """
+        Procedure for output articles in JSON format.
+
+        :param articles: dict with title and list of news articles
+        :type articles: dict
+        """
+        logging.info("Converting all articles to JSON")
+        data = json.dumps(articles)
+        logging.info("Completed. Output JSON")
+        print(data)
 
 
 def main():
@@ -106,17 +131,21 @@ def main():
     parser.add_argument('--json', action='store_true', help='Print result as JSON in stdout')
     parser.add_argument('--verbose', action='store_true', help='Outputs verbose status messages')
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+    parser.add_argument('--date', type=str, help='Print cached articles by date')
 
     settings = parser.parse_args()
 
     if settings.version:
-        print(f'RSS Reader {__version__}')
+        print(f'RSS Reader {__import__(__package__).__version__}')
 
-    if settings.limit < 1:
-        print(f"Error: Impossible parse 0 and less RSS Feeds")
-        exit(0)
+    if settings.verbose:
+        logging.basicConfig(level=logging.INFO)
+        logging.info("Logging enabled")
 
-    RSSReader().execute(settings.source, settings.verbose, settings.limit, settings.json)
+    RSSReader()(settings.source,
+                settings.limit,
+                settings.json,
+                settings.date)
 
 
 if __name__ == '__main__':
