@@ -42,5 +42,11 @@ class ArgumentParser:
             help='Limit news topics if this parameter is provided',
             type=int
         )
+        parser.add_argument(
+            '--date',
+            help='The cashed news can be read with it. The new from the specified day will be printed out.\
+                  If the news are not found return an error.',
+            type=int
+        )
         logging.info('Parsed arguments')
         return vars(parser.parse_args())

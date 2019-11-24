@@ -1,5 +1,7 @@
 """Module contains objects related to rss feed"""
 import logging
+import datetime
+import time
 from typing import TypedDict, Dict, List
 
 from bs4 import BeautifulSoup
@@ -10,7 +12,6 @@ class RSSFeed:
     def __init__(self, dict_args, data):
         """Init RSSFeed class"""
         self.rss_url: str = dict_args['source']
-        self.limit: int = dict_args['limit']
         self.rss_feed: TypedDict = data
         self.news: List = []
         self.rss_feed_dict: Dict = {}
@@ -22,14 +23,12 @@ class RSSFeed:
         as well as processing the limit parameter
         """
         self.rss_feed_dict.update({
+            "_id": int(time.time()),
             "Feed": self.rss_feed.feed.title,
-            "Url": self.rss_url
+            "Url": self.rss_url,
+            "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")
         })
         logging.info('Update rss_feed_dict(Add Feed and Url)')
-
-        if self.limit is not None:
-            self.rss_feed.entries = self.rss_feed.entries[:self.limit]
-        logging.info('We take the amount of news equal to the limit')
 
         for entry in self.rss_feed.entries:
             soup = BeautifulSoup(entry.summary, features="html.parser")

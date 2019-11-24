@@ -19,7 +19,7 @@ class Output:
             print(f'Links:\n[1] {entry["Links"]["Source_link"]} (link)')
 
             for count, img_link in enumerate(entry["Links"]["Img_links"]):
-                print(f'[{count + 2}] {img_link} (image)') #2 this a shift
+                print(f'[{count + 2}] {img_link} (image)')  # 2 this a shift
 
     @staticmethod
     def to_json_format(rss_feed_dict) -> None:
