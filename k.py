@@ -6,12 +6,18 @@ import json
 version = 0.1
 parser = argparse.ArgumentParser()
 parser.add_argument("URL", help="This is the full adress of the rss feed.use ' ' ")
-parser.add_argument("-l", "--lim", help="outputs the latest X(int)articles. can be run without lim to get all articles")
+parser.add_argument("-l", "--lim", help="outputs the latest X articles. can be run without lim to get all articles")
 parser.add_argument("-o", "--output", help="outputs news to file", action="store_true")
 parser.add_argument("-j", "--json", help="outputs a jsonDump", action="store_true")
+parser.add_argument("-d","-date", help="caches the data and makes a file named by the time right now")
+parser.add_argument("-c","--con", help="converts the output to some specified format like .pdf and .html")
 args = parser.parse_args()
 limit = args.lim
 """ALL MUST GO. I might try to pull an if __main__()"""
+
+
+def cacheDate():
+    print("a")
 
 
 def captureFeed(URL):
@@ -69,9 +75,7 @@ else:
 if args.output:
     feed = captureFeed(args.URL)
     fileOutput()
-
-
-"""Has to go away from the global score. could try to put it into a main()"""
+    """Has to go away from the global score. could try to put it into a main()"""
 
 """
 I have created the bare minimal working rss reader.
