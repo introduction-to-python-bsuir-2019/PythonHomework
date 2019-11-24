@@ -16,7 +16,9 @@ Fine!
 Now you can write in the docker console "rss_reader" with some parameters
 ### User interface
 ```text
-usage: frbz.py [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] source
+usage: rss_reader [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] [--date DATE] source
+
+It is a python command-line rss reader
 
 positional arguments:
   source                RSS URL
@@ -29,6 +31,8 @@ optional arguments:
   --verbose             Print result as JSON in stdout
   --json                Outputs verbose status messages
   --length LENGTH       Sets the length of each line of news output
+  --date DATE           Search past news by date in format yeardaymonth (19991311)
+
 ```
 
 ### Json structure

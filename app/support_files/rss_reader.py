@@ -37,7 +37,7 @@ class Reader:
 
         logger.info("Connecting with database")
         db = database.DB()
-        if _args.date is None:
+        if _args.date == "":
             try:
                 feed = parser.parse_feed(limit)
             except ConnectionError as err:
