@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import re
+import os
 
 from urllib.request import Request
 from urllib.request import urlopen
@@ -40,6 +41,13 @@ def parsargument():
         default=1,
         help='Limit news topics if this parameter provided'
     )
+    parser.add_argument(
+        '--date',
+        type=str,
+        action='store',
+        nargs=1,
+        help='Print news by date. Enter date in format YYYYMMDD'
+    )
     return parser.parse_args()
 
 
@@ -49,6 +57,13 @@ def get_rss(url):
     logging.info('Read our request to rss')
     rss = urlopen(req).read()
     return rss
+
+
+def get_num_date(date: str):
+    date = date.split()
+    month = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "June": "06", "July": "07", "Aug": "08",
+             "Sept": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
+    return date[3] + month[date[2]] + date[1]
 
 
 class RssFeed:
@@ -110,40 +125,102 @@ class RssFeed:
 
     def print_news(self):
         """This method print feed"""
-        feed = self.soup.title.string
-        print("\nFeed: " + feed + "\n")
-        for number in range(0, len(self.title)):
-            print('Title: ' + self.title[number])
-            print('Date: ' + self.date[number])
-            print('Link: ' + self.link[number])
-            print('\nNews: ' + self.description[number])
-            if self.image_link[number]:
-                print('\nImage link: ')
-                print('\n'.join(self.image_link[number]))
-                print('\n\n')
-            else:
-                logging.info(' Feed #' + str(number) + ' doesn\'t has image')
-                print('\nImage link: None\n\n')
-        logging.info("All news are printed")
+        right = self.args.source[8:].find('/')
+        name = self.args.source[8:right + 8] + '.json'
+        if os.path.isfile(name):
+            f = open(name, 'r+')
+            data = json.load(f)
+            for number in range(0, len(self.title)):
+                flag = True
+                for dates in data['news']:
+                    if dates['Date'] == self.date[number]:
+                        flag = False
+                if flag:
+                    data['news'].append({'Title': self.title[number],
+                                         'Date': self.date[number],
+                                         'Link': self.link[number],
+                                         'Feed': self.description[number],
+                                         'Image link': self.image_link[number]
+                                         })
+            f.close()
+            f = open(name, 'w')
+            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+            f.close()
+        else:
+            f = open(name, 'w')
+            newsJson = json.dumps({'title': self.soup.find('title').string,
+                                   'news': [{'Title': self.title[number],
+                                             'Date': self.date[number],
+                                             'Link': self.link[number],
+                                             'Feed': self.description[number],
+                                             'Image link': self.image_link[number]
+                                             } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4)
+            f.write(newsJson)
+            f.close()
+        if self.args.json:
+            print(json.dumps({'title': self.soup.find('title').string,
+                              'news': [{'Title': self.title[number],
+                                        'Date': self.date[number],
+                                        'Link': self.link[number],
+                                        'Feed': self.description[number],
+                                        'Image link': self.image_link[number]
+                                        } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4))
+        else:
+            feed = self.soup.title.string
+            print("\nFeed: " + feed + "\n")
+            for number in range(0, len(self.title)):
+                print('Title: ' + self.title[number])
+                print('Date: ' + self.date[number])
+                print('Link: ' + self.link[number])
+                print('\nNews: ' + self.description[number])
+                if self.image_link[number]:
+                    print('\nImage link: ')
+                    print('\n'.join(self.image_link[number]))
+                    print('\n\n')
+                else:
+                    logging.info(' Feed #' + str(number) + ' doesn\'t has image')
+                    print('\nImage link: None\n\n')
+            logging.info("All news are printed")
 
-    def print_json(self):
-        print(json.dumps({'title': self.soup.find('title').string,
-                          'news': [{'Title': self.title[number],
-                                    'Date': self.date[number],
-                                    'Link': self.link[number],
-                                    'Feed': self.description[number],
-                                    'Image link': self.image_link[number]
-                                    } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4))
+
+def print_date():
+    right = parsargument().source[8:].find('/')
+    name = parsargument().source[8:right + 8] + '.json'
+    logging.info('Get cache news from ' + name)
+    logging.info('Check if this file ' + name + ' was create')
+    if os.path.isfile(name):
+        logging.info(name + ' was create!')
+        f = open(name, 'r+')
+        data = json.load(f)
+        logging.info('Print news from cache file')
+        for news in data['news']:
+            if get_num_date(news['Date']) == str(parsargument().date[0]):
+                print('Title: ' + news['Title'])
+                print('Date: ' + news['Date'])
+                print('Link: ' + news['Link'])
+                print('\nNews: ' + news['Feed'])
+                if news['Image link']:
+                    print('\nImage link: ')
+                    print('\n'.join(news['Image link']))
+                    print('\n\n')
+                else:
+                    print('\nImage link: None\n\n')
+        f.close()
+    else:
+        logging.info(name + 'was not create(')
+        print('No cache')
 
 
 def get_news():
     """This function get information from rss page and print int cmd"""
     logging.info("Start parsing feeds")
-    news = RssFeed()
-    news.get_feed()
-    if news.args.json:
-        news.print_json()
+    if parsargument().date and len(parsargument().date[0]) is not 8:
+        print("Enter date in format %YYYYMMDD")
+    if parsargument().date and len(parsargument().date[0]) is 8:
+        print_date()
     else:
+        news = RssFeed()
+        news.get_feed()
         news.print_news()
 
 
