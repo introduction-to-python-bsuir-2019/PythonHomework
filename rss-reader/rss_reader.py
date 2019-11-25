@@ -25,7 +25,7 @@ import argparse
 
 from htmlparser import *
 from storage_controller import *
-from output_controller import *
+from outputcontroller import *
 
 
 class RSSReader:

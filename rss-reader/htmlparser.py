@@ -84,6 +84,8 @@ class Img(Tag):
     """
     src = None
     alt = None
+    width = None
+    height = None
 
     def __str__(self):
         """
@@ -91,7 +93,7 @@ class Img(Tag):
 
         :return: string to output tag in the description section
         """
-        return "[Image {}: {} ] ".format('{}', self.alt)
+        return "[Image {}: {}] ".format('{}', self.alt)
 
     def link(self):
         """
@@ -263,7 +265,7 @@ class HTMLParser:
             tag_line = tag_line[:start_ind] + tag_line[end_ind:]
         return strings, tag_line
 
-    def _process_description(self, desc):
+    def _process_description(self, desc, fill_desc=True, fill_links=True):
         """
         Method processing description. Return description of specific format.
 
@@ -284,9 +286,14 @@ class HTMLParser:
             obj_tag = self._create_tag(parameters)
             if obj_tag is not None:
                 self._tags.append(obj_tag)
-                desc = desc[:first_quotes] + (str(obj_tag).format(index_of_tag)) + desc[last_quotes:]
-                links.append(obj_tag.format_link(index_of_tag))
-
+                if fill_desc:
+                    desc = desc[:first_quotes] + str(obj_tag).format(index_of_tag) + desc[last_quotes:]
+                else:
+                    desc = desc[:first_quotes] + desc[last_quotes:]
+                if fill_links:
+                    links.append(obj_tag.format_link(index_of_tag))
+                else:
+                    links.append(obj_tag.link())
                 index_of_tag += 1
             else:
                 desc = desc[:first_quotes] + desc[last_quotes:]
@@ -303,24 +310,27 @@ class HTMLParser:
         :rtype: dict
         """
 
-        description, links = self._process_description(article.description)
+        dec_description, dec_links = self._process_description(article.description)
+        description, links = self._process_description(article.description, False, False)
 
         images = [obj for obj in self._tags if isinstance(obj, Img)]
 
-        media = {
-            str(i): {
-                'src': images[i].src,
-                'alt': images[i].alt
-            } for i in range(len(images))
-        }
+        media = [
+            {"src": image.src,
+             "alt": image.alt,
+             "width": image.width,
+             "height": image.height} for image in images
+        ]
 
         result = {
             'title': article.title,
             'description': description,
+            'dec_description': dec_description,
             'link': article.link,
             'pubDate': article.published,
             'media': media,
             'links': links,
+            'dec_links': dec_links,
         }
 
         return result
