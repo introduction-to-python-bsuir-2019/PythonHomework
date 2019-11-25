@@ -2,7 +2,8 @@
 
 import argparse
 import logging
-from RSSHandle import RssHandler
+from rss_reader.RSSHandle import RssHandler
+
 
 def main():
     parser = argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
@@ -39,7 +40,6 @@ def main():
     rss_object = RssHandler(args.source)
 
     rss_object.output(args.json, args.limit)
-
 
 
 if __name__ == '__main__':

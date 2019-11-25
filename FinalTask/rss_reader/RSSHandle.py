@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 import feedparser
+import sqlite3
 import logging
 import json
+from datetime import datetime
 
 
 class SetEncoder(json.JSONEncoder):
@@ -13,8 +15,8 @@ class SetEncoder(json.JSONEncoder):
 
 class RssHandler:
 
-    def __init__(self, rss: str):
-        self.rss = rss
+    def __init__(self, url: str):
+        self.url = url
         self.feed = None
         self.feed_dict = {}
         self.json_feed = None
@@ -24,7 +26,7 @@ class RssHandler:
 
     def url_handler(self):
         """Takes URL and return rss object"""
-        self.feed = feedparser.parse(self.rss)
+        self.feed = feedparser.parse(self.url)
         logging.info("RSS-Feed was parsed.")
 
     def rss_dict(self):
@@ -76,3 +78,32 @@ Source link: {elem['src_link']}
             logging.info('Printing JSON object created from RSS-Feed in stdout.')
             self.to_json(limit)
             print(self.json_feed)
+
+
+class CacheControl:
+
+    def __init__(self):
+        self.conn = None
+        self.cursor = None
+
+    def connect_db(self):
+        logging.info('Connecting to the cache database.')
+        self.conn = sqlite3.connect('newscache.db')
+        self.cursor = conn.cursor()
+
+    def create_table(self, name):
+        """Creates table with feed name"""
+        self.connect_db()
+        self.cursor.execute(f"""CREATE TABLE {name}
+                                (title text, pubDate text, content text, src_link text,
+                                 other_links text, media_links text)""")
+        self.conn.commit()
+        self.conn.close()
+
+    def insert_values(self, name, values):
+        """Inserts values into the table"""
+        self.connect_db()
+        self.cursor.execute(f"""INSERT INTO {name}
+                                VALUES {values}""")
+        self.conn.commit()
+        self.conn.close()
