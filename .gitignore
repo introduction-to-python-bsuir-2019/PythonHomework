@@ -61,3 +61,5 @@ venv.bak/
 .mypy_cache/
 .idea/
 *.sqlite3
+*.html
+*.pdf
