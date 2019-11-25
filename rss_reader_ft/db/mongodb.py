@@ -69,7 +69,7 @@ class MongoDatabase:
             news_feed = self.feed_collection.find_one(
                 {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}
             )
-            if 0 < limit <= news_feed["News"]:
+            if 0 < limit <= len(news_feed["News"]):
                 news_feed["News"] = news_feed["News"][:limit]
             return news_feed
         else:
@@ -79,6 +79,6 @@ class MongoDatabase:
             if news_feed is None:
                 print('Nothing found for a given date')
             else:
-                if 0 < limit <= news_feed["News"]:
+                if 0 < limit <= len(news_feed["News"]):
                     news_feed["News"] = news_feed["News"][:limit]
             return news_feed
