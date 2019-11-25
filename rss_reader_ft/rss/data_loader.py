@@ -6,7 +6,7 @@ import feedparser
 
 class DataLoader:
     """DataLoader class"""
-    def __init__(self, url_source):
+    def __init__(self, url_source: str):
         """Init DataLoader class"""
         self.url_source: str = url_source
 

@@ -1,2 +1,2 @@
 """Сonnected modules"""
-__all__ = ['app', 'conversion', 'rss', ]
+__all__ = ['app', 'conversion', 'rss', 'db', ]

@@ -12,8 +12,7 @@ def main() -> None:
         app = Application()
         app.run_app()
     except Exception as ex:
-        logging.error('Error. Close application.', exc_info=False)
-        print(ex)
+        logging.error(f'Error {ex}. Close application.', exc_info=False)
 
 
 if __name__ == "__main__":

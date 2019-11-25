@@ -9,7 +9,7 @@ class ApplicationLog:
         """Method that sets logger configuration parameters"""
         logging.basicConfig(
             filename="apps.log",
-            filemode="a",
+            filemode="w",
             format="%(asctime)s - %(levelname)s - %(message)s",
             datefmt='%Y-%m-%d %H:%M:%S',
             level=logging.INFO

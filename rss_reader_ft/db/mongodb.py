@@ -1,16 +1,14 @@
 """Module contains objects related to work database"""
 import datetime
 import logging
-from typing import Dict
+from typing import Dict, Any
 
 import pymongo
-
-from rss_reader_ft.db.mongodb_config import *
 
 
 class MongoDatabase:
     """MongoDatabase class"""
-    def __init__(self):
+    def __init__(self, URL_CONNECTION: str, DB_NAME: str, COLLECTION_NAME: str):
         """Init MongoDatabase class"""
         self.url_connection: str = URL_CONNECTION
         self.db_name: str = DB_NAME
@@ -25,12 +23,12 @@ class MongoDatabase:
         except ConnectionError as ex:
             logging.error('Error connection to database')
 
-    def _check_news_feed(self, data) -> bool:
+    def _check_news_feed(self, data: Dict[str, Any]) -> bool:
         """Method for checking if an object is in the database"""
         return self.feed_collection.find(
             {"Feed": data["Feed"], "Url": data["Url"], "Date_Parsed": data["Date_Parsed"]}).count() == 0
 
-    def _update_news_feed(self, new_news_feed) -> None:
+    def _update_news_feed(self, new_news_feed: Dict[str, Any]) -> None:
         """
         Method for updating old news in the database
         when parsing a news feed again
@@ -51,7 +49,7 @@ class MongoDatabase:
                                          "Date_Parsed": old_news_feed["Date_Parsed"]},
                                         {"$set": {"News": update_old_news_feed}})
 
-    def cache_news_feed(self, data) -> None:
+    def cache_news_feed(self, data: Dict[str, Any]) -> None:
         """Method for caching data.
         In which we determine whether the object exists and select an update or add
         """
@@ -61,7 +59,7 @@ class MongoDatabase:
             self._update_news_feed(data)
         logging.info('Сached data')
 
-    def get_news(self, limit, date, source) -> Dict:
+    def get_news(self, limit: int, date: int, source: str) -> Dict:
         """Method for finding news in a database and issuing them according to parameters"""
         if date is None and limit is None:
             return self.feed_collection.find_one(

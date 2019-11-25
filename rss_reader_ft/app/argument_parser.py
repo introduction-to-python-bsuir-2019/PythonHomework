@@ -1,7 +1,6 @@
 """Module contains objects related to arguments parsing"""
 import logging
 from typing import Dict
-
 import argparse
 
 from rss_reader_ft.config import __version__
@@ -47,6 +46,16 @@ class ArgumentParser:
             help='The cashed news can be read with it. The new from the specified day will be printed out.\
                   If the news are not found return an error.',
             type=int
+        )
+        parser.add_argument(
+            '--to-html',
+            help='Print result as JSON in stdout',
+            action='store_true'
+        )
+        parser.add_argument(
+            '--to-pdf',
+            help='Print result as JSON in stdout',
+            action='store_true'
         )
         logging.info('Parsed arguments')
         return vars(parser.parse_args())

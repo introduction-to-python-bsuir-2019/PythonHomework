@@ -107,3 +107,6 @@ venv.bak/
 #logging
 .idea
 apps.log
+
+#file
+News_feed.html
