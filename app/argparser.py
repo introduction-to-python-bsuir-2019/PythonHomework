@@ -52,6 +52,12 @@ class ArgParser:
             help='It should take a date in %Y%m%d format. For example: --date 20191020'
                  'The new from the specified day will be printed out. If the news are not found error will be returned.'
         )
+        argparser.add_argument(
+            '--to-pdf',
+            dest='to_pdf',
+            type=str,
+            help='It should take the path of the directory where new PDF file will be saved'
+        )
         args = argparser.parse_args()
         return args
 

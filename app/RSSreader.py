@@ -15,17 +15,17 @@ class RSSreader:
     """ Reads news from RSS url and prints them """
 
     def __init__(self, args, logger):
-        self.args = args
+        self.args = args.get_args()
         self.logger = logger
 
     def get_feed(self):
         """ Returns parsed feed and caches it"""
 
-        news_feed = feedparser.parse(self.args.get_args().url)
-        for entry in news_feed.entries[:self.args.get_args().limit]:
+        news_feed = feedparser.parse(self.args.url)
+        for entry in news_feed.entries[:self.args.limit]:
             self.cache_news_json(entry)
         self.logger.info('News has been cached')
-        return news_feed.entries[:self.args.get_args().limit]
+        return news_feed.entries[:self.args.limit]
 
     def print_feed(self, entries):
         """ Prints feed in stdout """
@@ -59,7 +59,7 @@ class RSSreader:
         feed['Published'] = entry.published
         feed['Summary'] = BeautifulSoup(entry.summary, "html.parser").text
         feed['Link'] = entry.link
-        feed['Url'] = self.args.get_args().url
+        feed['Url'] = self.args.url
         return feed
 
     def cache_news_json(self, entry):
@@ -96,20 +96,20 @@ class RSSreader:
     def get_cached_json_news(self):
         """ Returns the list of cached news with date from arguments """
         # file_path = os.path.abspath(os.path.dirname('app'))
-        # file_path += os.path.sep + 'cache' + os.path.sep + self.args.get_args().date + '.json'
-        file_path = 'cache' + os.path.sep + self.args.get_args().date + '.json'
+        # file_path += os.path.sep + 'cache' + os.path.sep + self.args.date + '.json'
+        file_path = 'cache' + os.path.sep + self.args.date + '.json'
         print('FILE_PATH:', file_path)
         cached_news = list()
         try:
             with open(file_path) as rf:
                 news = json.load(rf)
                 for new in news:
-                    if new['Url'] == self.args.get_args().url:
+                    if new['Url'] == self.args.url:
                         cached_news.append(new)
                 if not cached_news:
                     # News with such url have not been found
                     raise FileNotFoundError
-                return cached_news[:self.args.get_args().limit]
+                return cached_news[:self.args.limit]
         except FileNotFoundError:
             print('There are no cached news with such date by this url')
         except json.JSONDecodeError:
