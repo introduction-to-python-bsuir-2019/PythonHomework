@@ -15,6 +15,7 @@ from ..utils.exceptions import RssException
 from ..utils.sqlite import RssDB
 from ..utils.rss_utils import parse_date_from_console
 from ..utils.pdf import PdfWriter
+from ..utils.html_writer import HtmlWriter
 
 
 class RssBotInterface(metaclass=ABCMeta):
@@ -42,6 +43,8 @@ class RssBotInterface(metaclass=ABCMeta):
             self.news = self._load_news(args.date)
         if args.to_pdf:
             self._print_news_to_pdf(args.to_pdf)
+        if args.to_html:
+            self._print_news_to_html(args.to_html)
         self.logger.info(f'Bot initialization is completed')
 
     @abstractmethod
@@ -55,6 +58,10 @@ class RssBotInterface(metaclass=ABCMeta):
     def _print_news_to_pdf(self, path_to_pdf: str) -> None:
         pdf_writer = PdfWriter(self.logger)
         pdf_writer.store_news(self.news, path_to_pdf)
+
+    def _print_news_to_html(self, path_to_pdf: str) -> None:
+        html_writer = HtmlWriter(self.logger)
+        html_writer.store_news(self.news, path_to_pdf)
 
     @call_save_news_after_method
     def get_json(self) -> str:

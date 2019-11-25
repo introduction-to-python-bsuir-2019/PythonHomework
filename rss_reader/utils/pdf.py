@@ -9,7 +9,7 @@ import tempfile
 
 from ..utils.IConverter import IConverter
 from ..utils.data_structures import News
-from ..utils.exceptions import RssException
+from ..utils.exceptions import RssException, RssValueException
 
 
 class PdfWriter(IConverter):
@@ -126,9 +126,12 @@ class PdfWriter(IConverter):
         except Exception as ex:
             self.logger.error('Temp file store error')
             raise RssException(f'Error while creating a temp file to store news img\n{ex}')
-
-        with open(path, 'wb') as f:
-            f.write(urllib.request.urlopen(tag.attrs.get('src', '')).read())
+        try:
+            with open(path, 'wb') as f:
+                f.write(urllib.request.urlopen(tag.attrs.get('src', '')).read())
+        except ValueError as ex:
+            self.logger.error(f'PDF Error while downloading an image {tag.attrs.get("src", "")}:\n{ex}')
+            raise RssValueException('Check img url')
 
         self.pdf.image(path.as_posix(), w=0, h=0)
         self.pdf.ln(self.row_space)

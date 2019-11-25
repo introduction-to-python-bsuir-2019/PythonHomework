@@ -119,7 +119,7 @@ class RssDB:
                     title=news_item.get('title', ''),
                     link=news_item.get('link', ''),
                     html=news_item.get('html', ''),
-                    published=get_date(news_item.get('published')).strftime('%Y%m%d'),
+                    published=get_date(news_item.get('published')).strftime('%Y-%m-%d %H:%M:%S'),
                     links=list(links),
                     imgs=list(imgs)
                 )

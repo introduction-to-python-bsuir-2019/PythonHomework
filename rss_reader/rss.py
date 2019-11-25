@@ -119,7 +119,8 @@ def args_parser() -> ConsoleArgs:
         json=ARGS.json,
         verbose=ARGS.verbose,
         date=ARGS.date,
-        to_pdf=ARGS.to_pdf
+        to_pdf=ARGS.to_pdf,
+        to_html=ARGS.to_html,
     )
 
 

@@ -118,8 +118,9 @@ tests/data/yahoo.txt
 rss_reader/storage
 rss_reader/sqlite3.db
 
-# pdf
+# pdf & html files
 *.pdf
+*.html
 
 # Unused files
 rss_reader/utils/dejavu_font/DejaVuSansCondensed.cw127.pkl

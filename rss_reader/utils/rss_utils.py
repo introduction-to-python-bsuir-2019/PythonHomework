@@ -4,6 +4,7 @@ from .exceptions import RssValueException
 
 
 def get_date(date_str: str) -> date:
+    """Date parser from string. If error - returns now() date"""
     try:
         news_date = parse(date_str)
     except ValueError as ex:
@@ -12,7 +13,7 @@ def get_date(date_str: str) -> date:
 
 
 def parse_date_from_console(news_date: str) -> date:
-    """Checkeing input date format and return date object"""
+    """Checking input date format and return date object"""
 
     # Check if the news_date with correct format:
     try:
