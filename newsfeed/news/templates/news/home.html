@@ -76,13 +76,14 @@
 
                 </form>
 
+                <form class="form-group" action="{% url 'to-fb2' posts %}" method="GET">
 
-              <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
-                <li class="list-group-item list-group-item-light">Announcements</li>
-                <li class="list-group-item list-group-item-light">Calendars</li>
-                <li class="list-group-item list-group-item-light">etc</li>
-              </ul>
+                    <button class="btn btn-outline-info" type="submit">
+                        Export to FB2
+                    </button>
+
+                </form>
+
             </p>
           </div>
         </div>
