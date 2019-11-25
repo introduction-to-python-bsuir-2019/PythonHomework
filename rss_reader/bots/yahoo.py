@@ -1,3 +1,4 @@
+"""Yahoo specified rss parser bot"""
 import bs4
 
 from rss_reader.utils.rss_interface import BaseRssBot
@@ -5,6 +6,7 @@ from ..utils.data_structures import NewsItem
 
 
 class Bot(BaseRssBot):
+    """Yahoo specified rss parser bot"""
 
     def _parse_news_item(self, news_item: NewsItem) -> str:
         """

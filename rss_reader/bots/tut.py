@@ -1,4 +1,4 @@
-#!/usr/local/opt/python/bin/python3.7
+"""Tut.by specified rss parser bot"""
 import attr
 import bs4
 import feedparser
@@ -8,13 +8,15 @@ from rss_reader.utils.rss_interface import BaseRssBot
 from ..utils.data_structures import NewsItem, News
 
 
-@attr.s
+@attr.s(frozen=True)
 class TutNewItem(NewsItem):
+    """Extended NewsItem class to store tags and authors"""
     tags: typing.List[str] = attr.ib()
     authors: typing.List[str] = attr.ib()
 
 
 class Bot(BaseRssBot):
+    """Tut.by specified rss parser bot"""
 
     def _feed_to_news(self, feed: feedparser.FeedParserDict) -> News:
         """
