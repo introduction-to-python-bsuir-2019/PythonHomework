@@ -1,8 +1,6 @@
 """
 Module is for storing and loading news via sqlite3
 """
-import dataset
-from pathlib import Path
 from datetime import datetime, date, timedelta
 from dateutil.parser import parse
 from functools import partial
@@ -140,7 +138,7 @@ class RssDB:
             cur.close()
 
     @staticmethod
-    def _sql_insert_feed(feed_title: str, feed_link: str = '') -> str:
+    def _sql_insert_feed(feed_title: str, feed_link: str = '') -> Tuple[str, Tuple[str, str]]:
         return f'REPLACE INTO feeds(title, link) VALUES (?, ?)', (feed_title, feed_link)
 
     def _get_feed_id(self, news: News) -> Tuple[int, str]:
@@ -163,7 +161,7 @@ class RssDB:
             cur.close()
         return feed_id, feed_title
 
-    def _store_news_item(self, news_item: NewsItem, feed_id: id):
+    def _store_news_item(self, news_item: NewsItem, feed_id: int):
         news_date = get_date(news_item.published)
 
         with self.connection() as conn:

@@ -12,16 +12,16 @@ def get_date(date_str: str) -> date:
     return news_date
 
 
-def parse_date_from_console(news_date: str) -> date:
+def parse_date_from_console(news_date_str: str) -> str:
     """Checking input date format and return date object"""
 
     # Check if the news_date with correct format:
     try:
-        news_date = datetime.strptime(news_date, '%Y%m%d')
-        news_date = news_date.strftime('%Y%m%d')
+        news_date = datetime.strptime(news_date_str, '%Y%m%d')
+        news_date_str_out = news_date.strftime('%Y%m%d')
     except ValueError:
         raise RssValueException('Incorrect date format. Use %Y%m%d format (ex: 20191120)!')
-    return news_date
+    return news_date_str_out
 
 
 def dict_factory(cursor, row):

@@ -1,7 +1,6 @@
 attrs==19.3.0
 bs4==0.0.1
 coverage==4.5.4
-dataset==1.1.2
 feedparser==5.2.1
 fpdf==1.7.2
 html2text==2019.9.26
