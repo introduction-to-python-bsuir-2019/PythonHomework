@@ -9,6 +9,7 @@ Opportunities:
     * Logging
     * Limiting articles
     * Caching news feeds in SQLite database
+    * Converting to PDF and HTML formats
 
 For information enter
     "python rss_reader.py -h"
@@ -18,28 +19,33 @@ in terminal to find more information.
 __package__ = 'rss-reader'
 
 import datetime
-import json
 import logging
 import feedparser
 import argparse
 
 from htmlparser import *
 from storage_controller import *
+from output_controller import *
 
 
 class RSSReader:
-    def __call__(self, source, limit, as_json, date):
+    def __call__(self, source, limit, date, **kwargs):
         """
         Procedure executing program. Get additional setting parameters and running.
 
         :param source: URL for downloading news articles
         :param limit: limit news topics if this parameter provided
-        :param as_json: show news articles as JSON
         :param date: print cached articles by date
+        :param kwargs: optional parameter for control behavior of method.
+            Use one from this parameters:
+            * to_json: bool - output in JSON or not
+            * to_pdf: str - string filename for output
+            * to_html: str - string filename for output
+            Default sample output
         :type source: str
         :type limit: int
-        :type as_json: bool
         :type date: str
+        :type kwargs: dict
         """
         if limit and limit < 1:
             print(f"Error: Impossible parse 0 and less RSS Feeds")
@@ -64,10 +70,7 @@ class RSSReader:
 
         logging.info("All articles was successfully loaded")
 
-        if as_json:
-            self.json_print(articles)
-        else:
-            self.sample_print(articles)
+        OutputController.print(articles, **kwargs)
 
     @staticmethod
     def _get_articles_from_url(source, limit):
@@ -87,42 +90,6 @@ class RSSReader:
 
         return Parser.parse(response, limit)
 
-    @staticmethod
-    def sample_print(articles):
-        """
-        Procedure for sample output of news articles.
-
-        :param articles: dict with title and list of news articles
-        :type articles: dict
-        """
-        logging.info("Start sample output")
-
-        if (title := articles.get('title', None)) is not None:
-            print(f"Feed: {title}\n")
-
-        for article in articles['articles']:
-            print(f"Title: {article['title']}\n"
-                  f"Date: {article['pubDate']}\n"
-                  f"Link: {article['link']}\n\n"
-                  f"{article['description']}\n\n"
-                  f"Links:")
-            for link in article['links']:
-                print(link)
-            print('################################################################################')
-
-    @staticmethod
-    def json_print(articles):
-        """
-        Procedure for output articles in JSON format.
-
-        :param articles: dict with title and list of news articles
-        :type articles: dict
-        """
-        logging.info("Converting all articles to JSON")
-        data = json.dumps(articles)
-        logging.info("Completed. Output JSON")
-        print(data)
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -132,8 +99,16 @@ def main():
     parser.add_argument('--verbose', action='store_true', help='Outputs verbose status messages')
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
     parser.add_argument('--date', type=str, help='Print cached articles by date')
+    parser.add_argument('--to-pdf', type=str, help='Print result as PDF in entered file')
+    parser.add_argument('--to-html', type=str, help='Print result as HTML in entered file')
 
     settings = parser.parse_args()
+
+    output = {
+        'to_json': settings.json,
+        'to_pdf': settings.to_pdf,
+        'to_html': settings.to_html,
+    }
 
     if settings.version:
         print(f'RSS Reader {__import__(__package__).__version__}')
@@ -144,8 +119,8 @@ def main():
 
     RSSReader()(settings.source,
                 settings.limit,
-                settings.json,
-                settings.date)
+                settings.date,
+                **output)
 
 
 if __name__ == '__main__':
