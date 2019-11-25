@@ -29,7 +29,9 @@ import argparse
 import logging
 from colorama import Fore, Style
 
-from format_converter import PdfNewsConverter, HTMLNewsConverter  # no dot here -> not worked properly
+from format_converter import (PdfNewsConverter,
+                              FB2NewsConverter,
+                              HTMLNewsConverter)  # no dot here -> not worked properly
 
 
 PROJECT_VERSION = '1.5'
@@ -444,9 +446,13 @@ feed = NewsReader('https://news.yahoo.com/rss/', limit=10)
 # items = feed.read_by_date_sql('20191112')
 # print(feed.items)
 
-pdf = PdfNewsConverter(feed.items)
-pdf.add_all_news()
-pdf.output('news.pdf', 'F')
+# pdf = PdfNewsConverter(feed.items)
+# pdf.add_all_news()
+# pdf.output('news.pdf', 'F')
+
+fb2 = FB2NewsConverter(feed.items)
+
+fb2.output('news.fb2')
 
 # print(feed.items)
 # feed.fancy_output(items)

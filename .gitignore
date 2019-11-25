@@ -115,6 +115,8 @@ news_feed/**/*.pdf
 news_feed/**/*.html
 news_feed/**/*.sql*
 
+*.pkl
+*.fb2
 
 # mypy
 .mypy_cache/

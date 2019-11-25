@@ -2,6 +2,7 @@ from fpdf import FPDF
 
 from PIL import Image
 import requests
+import base64
 from io import BytesIO
 import os
 
@@ -176,6 +177,174 @@ class PdfNewsConverter(FPDF):
         for el, plot in self.items.items():
             if el != 'title' and el != 'title_image':
                 self.add_news_page(plot)
+
+
+class FB2NewsConverter:
+    """
+    Easy-to-use fb2 rss news converter
+
+    """
+
+    def __init__(self, items):
+        self.items = items
+
+    one_news_template = """
+<body>
+    <section id="{sectionId}">
+        <title>
+            <p>{title}</p>
+        </title>
+        <p><image l:href="#{imageLink}"/></p>  
+        
+        <p><emphasis>{pubDate}</emphasis></p>
+                
+        <p>{description}</p>
+        <p><emphasis>{imageDescription}</emphasis></p>
+        
+        <p>Source:</p>
+    </section>
+</body>
+<binary id="{imageLink}" content-type="image/jpeg">{image}</binary>
+    """
+
+    def add_one_news(self, item):
+        """
+        Add one news into one_news_template
+
+        :param item: news in dict
+        :return: filled template
+        """
+
+        item = {key: self.change_encoding(value)
+                for key, value in item.items()}
+
+        title = item['title']
+        pub_date = item['pubDate']
+        link = item['link']
+        description = item['description']
+        image_link = item['imageLink']
+        image_description = item['imageDescription']
+        binary_image = FB2NewsConverter.get_binary_image(image_link)
+
+        template = self.one_news_template.format(
+            sectionId=hash(title),
+            title=title,
+            pubDate=pub_date,
+            # link=link,
+            description=description,
+            imageLink=str(hash(image_link)) + '.jpg',
+            imageDescription=image_description,
+            image=binary_image
+        )
+
+        return template
+
+    @staticmethod
+    def change_encoding(txt):
+        """
+        Changes encoding to fpdf compatible
+
+        :param txt: Text to encode
+        :return: new-encoded text
+        """
+
+        return str(txt).encode('KOI8-R',
+                               'replace').decode('KOI8-R')
+
+    @staticmethod
+    def create_fb2_template():
+        """
+        Starting and ending of fb2 template
+
+        :return: starting and ending of template
+        """
+
+        fb2_start = """<?xml version="1.0" encoding="utf-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+        """
+
+        fb2_end = """
+</FictionBook>
+        """
+
+        return fb2_start, fb2_end
+
+    @staticmethod
+    def create_fb2_description(title):
+        """
+        Fb2 description part
+
+        :param title: title of rss source
+        :return: description of fb2
+        """
+
+        fb2_description = f"""
+            <description>
+                <title-info>
+                    <genre>home_entertain</genre>
+                    <book-title>{title}</book-title>
+                    <author>
+                        <last-name>RSS</last-name>
+                    </author>
+                </title-info>
+                <document-info>
+                    <version>1.0</version>
+                </document-info>
+            </description>
+        """
+
+        return fb2_description
+
+    @staticmethod
+    def get_binary_image(image_link):
+        """
+        Returns description by link as base64 string
+
+        :param image_link: link to image
+        :return: image as base64 string
+        """
+
+        try:
+            response = requests.get(image_link)
+        except requests.exceptions.MissingSchema:
+            return ''
+
+        image = response.content
+        image_bytes = base64.b64encode(image)
+
+        return image_bytes.decode('UTF-8')
+
+    def add_all_news(self):
+        """
+        Add all news into fb2 template
+
+        :return: return resulting fb2 template
+        """
+
+        fb2_start, fb2_end = self.create_fb2_template()
+
+        for key, plot in self.items.items():
+            if key == 'title':
+                fb2_start += self.create_fb2_description(plot)
+            elif key != 'title_image':
+                fb2_start += self.add_one_news(plot)
+
+        res_fb2 = fb2_start + fb2_end
+
+        return res_fb2
+
+    def output(self, path):
+        """
+        Outputs resulting fb2 into file
+
+        :param path: path into which we should add res fb2
+        :return: None
+        """
+
+        res_fb2 = self.add_all_news()
+
+        with open(path, 'w') as file:
+            file.write(res_fb2)
 
 
 class HTMLNewsConverter:
