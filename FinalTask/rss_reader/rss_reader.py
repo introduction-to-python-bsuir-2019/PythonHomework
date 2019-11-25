@@ -1,4 +1,5 @@
 import argparse
+import json
 from rss_parser import RssParser
 
 current_version = 0.1
@@ -13,11 +14,22 @@ def main():
     parser.add_argument("--verbose", help="Output verbose status messages", action="store_true")
     parser.add_argument("--limit", help="Limit news topics if this parameter provided", type=int)
     args = parser.parse_args()
-    print(args)
+    if args.version:
+        print(f'Current version: {current_version}')
+        exit()
+    if args.limit:
+        limit = args.limit
+    else:
+        limit = 10
+    verbose = args.verbose
+    my_parser = RssParser(args.source, limit, verbose)
+    if args.json:
+        my_parser.parse_rss()
+        print(json.dumps(my_parser.feed_to_json(), indent=1))
+    else:        
+        print(my_parser.parse_rss())
+    
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        print(e, is_error=True)
+    main()

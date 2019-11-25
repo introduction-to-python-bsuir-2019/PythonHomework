@@ -7,11 +7,12 @@ class RssParser():
     """
     Class to parse RSS-news
     """
-    def __init__(self, url, limit):
+    def __init__(self, url, limit, verbose):
         self.url = url
         self.limit = limit
         self.feed = ''
         self.news = []
+        self.verbose = verbose
 
     def parse_rss(self):
         rss_feed = feedparser.parse(self.url)
@@ -21,7 +22,7 @@ class RssParser():
         else:
             entries = rss_feed.entries
         for entry in entries:
-            title = entry.get('title')
+            title = (entry.get('title'))
             date = entry.get('published')
             url = entry.get('link')
             links = []
@@ -49,7 +50,7 @@ class RssParser():
         result = ''
         result += f'\nFeed: {self.feed}\n\n'
         for article in self.news:
-            result += f'Title: {article.title}\nDate: {article.date}\nLink: {article.url}\n\n'
+            result += f'Title: {article.title}\nDate: {article.date}\nUrl: {article.url}\n\n'
             for l in article.links:
                 if l.type == 'image':
                     result += f'[image {l.id + 1} : {l[1].alt}][{l.id + 1}]'
@@ -59,6 +60,7 @@ class RssParser():
                     result += f'[{l.id + 1}]: {l[1].url} ({l.type})\n'
                 else:
                     result += f'[{l.id + 1}]: {l.url} ({l.type})\n'
+            result += f'\n'
         return result
 
     def feed_to_json(self):
@@ -73,8 +75,6 @@ def recursive_to_json(obj):
         for data in obj_data:
             if isinstance(obj_data[data], tuple):
                 _json[data] = (recursive_to_json(obj_data[data]))
-            else:
-                print(obj_data[data])
             _json[data] = (obj_data[data])
     return _json
 
