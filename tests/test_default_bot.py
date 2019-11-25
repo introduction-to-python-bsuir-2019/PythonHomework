@@ -11,6 +11,7 @@ import unittest
 
 from rss_reader.rss import logger_init
 from rss_reader.bots import default
+from rss_reader.utils.data_structures import ConsoleArgs
 
 
 class TestMainModule(unittest.TestCase):
@@ -18,8 +19,17 @@ class TestMainModule(unittest.TestCase):
         url_google = './tests/data/google_news.xml'
         url_reddit = './tests/data/reddit_news.xml'
 
-        self.bot_google = default.Bot(url=url_google, limit=10, logger=logger_init(), width=120)
-        self.bot_reddit = default.Bot(url=url_reddit, limit=3, logger=logger_init(), width=80)
+        args = ConsoleArgs(
+            url=url_google,
+            limit=10,
+        )
+        args_reddit = ConsoleArgs(
+            url=url_reddit,
+            limit=3,
+        )
+
+        self.bot_google = default.Bot(args, logger=logger_init())
+        self.bot_reddit = default.Bot(args_reddit, logger=logger_init())
 
     def test_bot_limit(self):
         self.assertEqual(self.bot_google.limit, 10)
@@ -49,7 +59,7 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(len(self.bot_reddit.get_json()), 2759)
 
     def test_bot_reddit_news_length(self):
-        self.assertEqual(len(self.bot_reddit.print_news()), 5549)
+        self.assertEqual(len(self.bot_reddit.print_news()), 6155)
 
 
 

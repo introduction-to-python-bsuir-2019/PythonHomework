@@ -14,12 +14,17 @@ from contextlib import redirect_stdout
 from rss_reader.rss import logger_init
 from rss_reader.bots import yahoo
 from rss_reader.utils.rss_interface import RssException
-
+from rss_reader.utils.data_structures import ConsoleArgs
 
 class TestMainModule(unittest.TestCase):
     def setUp(self) -> None:
         url = './tests/data/yahoo_news.xml'
-        self.bot = yahoo.Bot(url=url, limit=2, logger=logger_init(), width=120)
+        args = ConsoleArgs(
+            url=url,
+            limit=2,
+            width=120,
+        )
+        self.bot = yahoo.Bot(args, logger=logger_init())
 
     def test_bot_limit(self):
         self.assertEqual(self.bot.limit, 2)
@@ -43,15 +48,24 @@ class TestMainModule(unittest.TestCase):
 
     def test_raising_exception(self):
         url = 'asdf'
+        args = ConsoleArgs(
+            url=url,
+            limit=2,
+            width=120,
+        )
         with self.assertRaises(RssException):
-            self.bot = yahoo.Bot(url=url, limit=2, logger=logger_init(), width=120)
+            self.bot = yahoo.Bot(args, logger=logger_init())
 
     def test_main_output_news(self):
         url = './tests/data/yahoo_news.xml'
-
+        args = ConsoleArgs(
+            url=url,
+            limit=2,
+            width=120,
+        )
         with open('./tests/data/yahoo.txt', 'w') as f:
             with redirect_stdout(f):
-                self.bot = yahoo.Bot(url=url, limit=2, logger=logger_init(INFO), width=120)
+                self.bot = yahoo.Bot(args, logger=logger_init(INFO))
 
         with open('./tests/data/yahoo.txt', 'r') as f:
             out_str = f.read()

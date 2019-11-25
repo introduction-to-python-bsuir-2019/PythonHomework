@@ -116,7 +116,7 @@ tests/data/yahoo.txt
 
 # news storage
 rss_reader/storage
-rss_reader/sqlite3.db
+*sqlite3.db
 
 # pdf & html files
 *.pdf

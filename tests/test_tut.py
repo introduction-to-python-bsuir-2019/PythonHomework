@@ -11,13 +11,18 @@ import unittest
 
 from rss_reader.bots import tut
 from rss_reader.rss import logger_init
+from rss_reader.utils.data_structures import ConsoleArgs
 
 
 
 class TestMainModule(unittest.TestCase):
     def setUp(self) -> None:
         url = './tests/data/tut_news.xml'
-        self.bot = tut.Bot(url=url, limit=7, logger=logger_init(), width=120)
+        args = ConsoleArgs(
+            url=url,
+            limit=7,
+        )
+        self.bot = tut.Bot(args, logger=logger_init())
 
     def test_bot_limit(self):
         self.assertEqual(self.bot.limit, 7)

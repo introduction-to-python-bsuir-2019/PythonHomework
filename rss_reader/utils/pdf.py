@@ -13,13 +13,15 @@ from ..utils.exceptions import RssException, RssValueException
 
 
 class PdfWriter(IConverter):
+
+    djvu_font_path = Path('utils/dejavu_font/DejaVuSansCondensed.ttf')
+
     def __init__(self, logger: Logger):
         self.row_space = 5
         self.font_size = 10
         self.page_width = 162
         self.pdf = FPDF()
-        self.pdf.add_font('DejaVu', '', Path('utils/dejavu_font/DejaVuSansCondensed.ttf').as_posix(), uni=True)
-        self.pdf.set_font('DejaVu', '', self.font_size)
+        self._set_djvu_font()
         self.pdf.add_page()
         super().__init__(logger)
 
@@ -135,6 +137,14 @@ class PdfWriter(IConverter):
 
         self.pdf.image(path.as_posix(), w=0, h=0)
         self.pdf.ln(self.row_space)
+
+    def _set_djvu_font(self):
+        """Method to add a new font with utf-8"""
+        try:
+            self.pdf.add_font('DejaVu', '', self.djvu_font_path, uni=True)
+            self.pdf.set_font('DejaVu', '', self.font_size)
+        except RuntimeError as ex:
+            raise RssValueException(f'Try to use another font ttf file.\n{ex}')
 
     def _text_color_blue(self) -> None:
         """Set blue text color"""
