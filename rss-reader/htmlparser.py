@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 import html
+import datetime
 
 __all__ = ['Parser']
 
@@ -156,18 +157,19 @@ class HTMLParser:
 
         return {'title': title, 'articles': articles}
 
-    @staticmethod
-    def _clear_from_html(article):
+    def _clear_from_html(self, elem):
         """
         Method to clear html escapes from all fields of article.
 
-        :param article: article to clear from HTML escapes
+        :param elem: article to clear from HTML escapes
         :return: clean article
         """
-        for k, v in article.items():
-            article[k] = html.unescape(v)
-
-        return article
+        if type(elem) == str:
+            return html.unescape(elem)
+        elif type(elem) == dict:
+            return {k: self._clear_from_html(v) for k, v in elem.items()}
+        elif type(elem) == list:
+            return [self._clear_from_html(el) for el in elem]
 
     @staticmethod
     def _get_limited_articles(response, limit):
@@ -322,12 +324,17 @@ class HTMLParser:
              "height": image.height} for image in images
         ]
 
+        try:
+            date = datetime.datetime(*article.published_parsed[:6]).strftime("%a, %d %b %Y %H:%M")
+        except (AttributeError, ValueError):
+            date = 'None'
+
         result = {
             'title': article.title,
             'description': description,
             'dec_description': dec_description,
             'link': article.link,
-            'pubDate': article.published,
+            'pubDate': date,
             'media': media,
             'links': links,
             'dec_links': dec_links,
