@@ -9,6 +9,9 @@ import xhtml2pdf.pisa as pisa
 
 
 class Render:
+    """
+        Renders pdf for PdfViews view
+    """
 
     @staticmethod
     def fetch_resources(uri, rel):
@@ -18,20 +21,12 @@ class Render:
         :param str uri: path or url to image or font resource
         :returns: path to local resource file.
         :rtype: str
-        :raises: :exc:`~easy_pdf.exceptions.UnsupportedMediaPathException`
         """
         if settings.STATIC_URL and not uri.startswith('http'):
             path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, ""))
             path = path.replace("\\", "/")
         else:
             path = uri
-
-        # if not os.path.isfile(path):
-        #     raise UnsupportedMediaPathException(
-        #         "media urls must start with {} or {}".format(
-        #             settings.MEDIA_ROOT, settings.STATIC_ROOT
-        #         )
-        #     )
 
         return path
 

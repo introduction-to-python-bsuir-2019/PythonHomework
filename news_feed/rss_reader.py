@@ -25,7 +25,7 @@ import sqlite3
 
 import argparse
 import logging
-from colorama import Fore, Style
+from colorama import init, Fore, Style
 
 from .format_converter import (PdfNewsConverter,
                                FB2NewsConverter,
@@ -34,6 +34,7 @@ from .format_converter import (PdfNewsConverter,
 from xml.etree.ElementTree import ParseError
 from sqlite3 import OperationalError
 
+init(convert=True)
 
 PROJECT_VERSION = '2.0'
 PROJECT_DESCRIPTION = ''
@@ -97,6 +98,7 @@ class NewsReader:
 
         try:
             tree = ET.fromstring(result)
+            logging.info('Rss was loaded.')
         except ParseError:
             raise RssNotFoundError('No rss on page.')
 
@@ -195,6 +197,7 @@ class NewsReader:
                   'description': news['description'],
                   'imageLink': news['imageLink'],
                   'imageDescription': news['imageDescription']})
+            logging.info('News where cached')
         except sqlite3.IntegrityError:
             logging.warning('You have tried to add the same row into database')
 
@@ -214,6 +217,7 @@ class NewsReader:
 
         try:
             conn = sqlite3.connect('database.sqlite')
+            logging.info('Database was connected')
         except OperationalError:
             raise NoNewsInCacheError('Add news in cache')
 
@@ -225,6 +229,7 @@ class NewsReader:
                 FROM news
                 WHERE dateId=:date
             """, (date, ))
+            logging.info('News where added')
         except OperationalError:
             raise NoNewsInCacheError('Add news to cache')
 
