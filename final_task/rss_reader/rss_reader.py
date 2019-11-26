@@ -6,13 +6,13 @@ import sys
 import argparse
 import json
 import logging
+import rss_reader.html_converter as html_converter
 import rss_reader.news_date as news_date
-from pathlib import Path
-from inspect import currentframe, getframeinfo
+from rss_reader.os_funcs import create_directory, get_project_directory_path
 from rss_reader.news import News
 from rss_reader.caching import Cache
 
-current_version = "1.0"
+current_version = "3.0"
 log_file_name = 'rss_reader.log'
 data_dir_name = 'data'
 cache_file_name = 'cache.json'
@@ -41,26 +41,6 @@ def print_message(message, is_error=False):
         print(f'rss-reader: info: {message}')
 
 
-def get_project_directory_path():
-    """
-    This function returns path to project directory
-    :return: str
-    """
-    return Path(getframeinfo(currentframe()).filename).resolve().parent
-
-
-def create_directory(path, name):
-    """
-    This function creates directory
-    :param path: path to directory (str)
-    :param name: new directory name (str)
-    :return: None
-    """
-    if os.path.exists(path):
-        path = os.path.join(path, name)
-        if not os.path.exists(path):
-            os.mkdir(path)
-
 def main():
     """
     This function parse program arguments, gets and outputs RSS news and makes logs
@@ -76,6 +56,7 @@ def main():
     parser.add_argument('--verbose', help='Output verbose status messages', action="store_true")
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided', default=-1)
     parser.add_argument('--date', type=str, help='Get news by date (date format: "yyyymmdd")', default='')
+    parser.add_argument('--to-html', type=str, help='Convert news to HTML format', default=None, metavar='PATH')
 
     args = parser.parse_args()
 
@@ -105,7 +86,7 @@ def main():
             rss_news = cache.get_news(args.source, args.date, args.limit)  # try
             if not rss_news:
                 is_error = True
-                message = f'There is no news in cache published {args.date}'
+                message = f'There are no news in cache published {args.date}'
                 logger.info(message)
                 if not args.verbose:
                     print_message(message)
@@ -131,8 +112,15 @@ def main():
             print_json(rss_news, 2)
             logger.info(f'{rss_news.get_count()} news were displayed in the console in json format')
         else:
-            print(rss_news)
-            logger.info(f'{rss_news.get_count()} news were displayed in the console')
+            if args.to_html:
+                try:
+                    html_converter.convert_news_to_html(rss_news, args.to_html)
+                    logger.info(f'{rss_news.get_count()} news were converted to HTML ({args.to_html})')
+                except Exception as e:
+                    logger.error(e)
+            else:
+                print(rss_news)
+                logger.info(f'{rss_news.get_count()} news were displayed in the console')
 
     try:
         cache.dump()

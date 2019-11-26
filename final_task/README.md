@@ -3,7 +3,7 @@
 <h5>Utility interface</h5>
 
 <pre>
-usage: rss_reader.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] source
+usage: rss_reader.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] [--to-html PATH] source
 
 Pure Python command-line RSS rss_reader.
 
@@ -17,6 +17,7 @@ optional arguments:
   --verbose      Output verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
   --date DATE    Get news by date (date format: "yyyymmdd")
+  --to-html PATH  Convert news to HTML format
 </pre>
 
 <h5>JSON structure</h5>

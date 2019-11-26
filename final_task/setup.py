@@ -11,7 +11,8 @@ setuptools.setup(
     url='https://github.com/pashkovskaya/PythonHomework/tree/final_task/final_task',
     packages=setuptools.find_packages(),
     python_requires='>=3.8',
-    entry_points = {
+    install_requires=['jinja2', 'requests', 'bs4', 'feedparser', 'lxml'],
+    entry_points={
         'console_scripts': ['rss-reader=rss_reader.rss_reader:main'],
     }
 )

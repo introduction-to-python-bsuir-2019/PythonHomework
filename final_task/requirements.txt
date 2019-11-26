@@ -1,2 +1,4 @@
+jinja2
+requests
 beautifulsoup4
-feedparser
+lxml

@@ -3,7 +3,6 @@ This module contains classes for fetching and representing RSS
 """
 
 import feedparser
-import time
 import rss_reader.news_date as news_date
 import rss_reader.image as image
 from bs4 import BeautifulSoup
@@ -109,7 +108,7 @@ class NewsItem:
                             json_obj.get('source', ''), NewsContent.from_json(json_obj.get('content')))
 
     def __str__(self):
-        date = time.strftime("%a, %-d %b %Y %H:%M:%S %z", self.date)
+        date = news_date.get_date_pretty_str(self.date)
         return f'Title: {self.title}\nDate: {date}\nLink: {self.link}\n\n{self.content}'
 
 
@@ -117,10 +116,10 @@ class NewsContent:
     """
     This class represent news content like text and links to images
     """
-    def __init__(self, text, images_links, other_links):
+    def __init__(self, text, images, links):
         self.text = text
-        self.images_links = images_links
-        self.other_links = other_links
+        self.images = images
+        self.links = links
 
     @staticmethod
     def get_content_from_html(html):
@@ -131,21 +130,23 @@ class NewsContent:
         """
         soup = BeautifulSoup(html, 'lxml')
         text = soup.text
-        images_links = []
+        images = []
         for img in soup.find_all('img'):
-            src = img.get('src', 'Unknown')
+            src = img.get('src', None)
             alt = img.get('alt', '')
             if src:
-                images_links.append(image.Image(src, alt))
-        other_links = [link['href'] for link in soup.find_all('a') if link.get('href', None)]
-        return NewsContent(text, images_links, other_links)
+                link_parts = src.split('http')
+                src = 'http' + link_parts[-1]
+                images.append(image.Image(src, alt))
+        links = [link['href'] for link in soup.find_all('a') if link.get('href', None)]
+        return NewsContent(text, images, links)
 
     def to_json(self):
         """
         This method converts NewsContent object to JSON format
         :return: dict
         """
-        return {'text': self.text, 'images': [img.to_json() for img in self.images_links], 'links': self.other_links}
+        return {'text': self.text, 'images': [img.to_json() for img in self.images], 'links': self.links}
 
     @staticmethod
     def from_json(json_obj):
@@ -160,20 +161,20 @@ class NewsContent:
 
     def __str__(self):
         result = ''
-        link_index = len(self.other_links)
+        link_index = len(self.links)
 
-        for img in self.images_links:
+        for img in self.images:
             link_index += 1
             result += f'[image {link_index}: {img.alt}][{link_index}]'
 
         result += f'{self.text}\n\n\nLinks:\n'
 
         link_index = 1
-        for link in self.other_links:
+        for link in self.links:
             result += f'[{link_index}]: {link} (link)\n'
             link_index += 1
 
-        for img in self.images_links:
+        for img in self.images:
             result += f'[{link_index}]: {img.link} (image)\n'
             link_index += 1
 

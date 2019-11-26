@@ -1,3 +1,6 @@
+"""
+THis module provides tools for news caching
+"""
 import os
 import json
 import rss_reader.news_date as news_date
@@ -32,7 +35,7 @@ class Cache:
 
     def get_news(self, source, date, count):
         """
-        This function retrieves count news from cache by source an date
+        This function retrieves count news from cache by source and date
         :param source: str
         :param date: str
         :param count: int
@@ -47,26 +50,20 @@ class Cache:
 
     def load(self):
         """
-        This method loads cache content from file into self.content
+        This method loads cache content from file into cache content
         :return: None
         """
-        try:
-            if not os.path.exists(self.path):
-                with open(self.path, 'w') as cache_file:
-                    cache_file.write("{}")
-            else:
-                with open(self.path, 'r') as cache_file:
-                    self.content = json.load(cache_file)
-        except Exception as e:
-            raise e
+        if not os.path.exists(self.path):
+            with open(self.path, 'w') as cache_file:
+                cache_file.write("{}")
+        else:
+            with open(self.path, 'r') as cache_file:
+                self.content = json.load(cache_file)
 
     def dump(self):
         """
-        This method writes cache content from self.content to file
+        This method writes cache content to file
         :return: None
         """
-        try:
-            with open(self.path, 'w') as cache_file:
-                json.dump(self.content, cache_file, indent=2)
-        except Exception as e:
-            raise e
+        with open(self.path, 'w') as cache_file:
+            json.dump(self.content, cache_file, indent=2)
