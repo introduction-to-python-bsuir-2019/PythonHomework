@@ -17,6 +17,8 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.8',
+    install_requires=['bs4', 'colorama', 'feedparser', 'jsonschema', 'Pillow', 'python-dateutil', 
+                      'requests', 'tinydb', 'tinydb-serialization', 'tqdm', 'xhtml2pdf', 'yattag'],
     include_package_data=True,
     entry_points={
         'console_scripts': [
