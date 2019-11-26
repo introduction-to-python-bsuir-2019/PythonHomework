@@ -1,7 +1,7 @@
 attrs==19.3.0
 bs4==0.0.1
 coverage==4.5.4
-feedparser==5.2.1
+feedparser==5.2.1s
 fpdf==1.7.2
 nose==1.3.7
 python-dateutil==2.8.1

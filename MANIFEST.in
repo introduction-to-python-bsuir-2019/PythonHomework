@@ -1,0 +1,10 @@
+include requirements.txt
+include *.sh
+include *.txt
+include config.cfg
+include mypy.ini
+recursive-include dist *.gz
+recursive-include dist *.whl
+recursive-include rss_reader *.ttf
+recursive-include tests *.py
+recursive-include tests *.xml

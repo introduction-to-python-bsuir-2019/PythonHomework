@@ -2,14 +2,19 @@
 using: 'python3 setup.py sdist bdist_wheel'
 """
 import setuptools
-from rss_reader.rss import PROG_VERSION
+# from rss_reader.rss import PROG_VERSION
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+def get_install_requires():
+    with open('requirements.txt') as f:
+        return f.read()
+        return [req.strip() for req in f]
+
 setuptools.setup(
     name="rss-reader",  # Replace with your own username
-    version=str(PROG_VERSION),
+    version=str(4.0),
     author="Andrey Nenuzhny",
     author_email="nenuzhny85@gmail.com",
     description="Rss reader Epam task",
@@ -19,14 +24,7 @@ setuptools.setup(
 
     packages=setuptools.find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
 
-    install_requires=['attrs',
-                      'bs4',
-                      'feedparser',
-                      'fpdf',
-                      'lxml',
-                      'python-dateutil',
-                      'terminaltables',
-                      ],
+    install_requires=get_install_requires(),
 
     extras_require={  # Optional
         'tests': ['nose', 'coverage'],
