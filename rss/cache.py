@@ -14,7 +14,7 @@ class Cache:
 
     def __init__(self):
         logging.info("Cache initialization")
-        self.db_file_name = 'cache.txt'
+        self.db_file_name = 'cache.db'
 
     def _create_key(self, date: str, url: str) -> str:
         """Create key for db"""
@@ -96,7 +96,7 @@ class Cache:
 
         logging.info('Start printing cached news')
         news_number = 1
-        #if self.list_of_news consists of 1 element
+        # if self.list_of_news consists of 1 element
         if type(list_of_news) == dict:
             print('№', news_number)
             self._print_entries(list_of_news)
