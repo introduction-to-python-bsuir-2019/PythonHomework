@@ -60,8 +60,9 @@ class Bot(BaseRssBot):
         out_str += f"\nTitle: {news_item.title}\n" \
                    f"Date: {news_item.published}\n" \
                    f"Link: {news_item.link}\n"
-        out_str += f"Authors: {', '.join(news_item.authors)}\n"
-        out_str += f"Tags: {', '.join(news_item.tags)}\n"
+        if type(news_item) == TutNewItem:
+            out_str += f"Authors: {', '.join(news_item.authors)}\n"
+            out_str += f"Tags: {', '.join(news_item.tags)}\n"
 
         html = bs4.BeautifulSoup(news_item.html, "html.parser")
 

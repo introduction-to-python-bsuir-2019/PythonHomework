@@ -157,8 +157,8 @@ def main() -> None:
         print(f'RssValueException: {ex.args[0]}')
     except RssNewsException as ex:
         print(f'RssNewsException: {ex.args[0]}')
-    # except Exception as ex:
-    #     print(f'Unhandled exception!\n{ex}\nExiting...')
+    except Exception as ex:
+        print(f'Unhandled exception!\n{ex}\nExiting...')
     else:
         print(news)
         logger.debug('Quit application with succeed result')
