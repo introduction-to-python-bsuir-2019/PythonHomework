@@ -6,6 +6,7 @@
 You can install utility if you have python3.6 and higher.
 
 Example of installation:
+    
     $ git clone https://github.com/Elaskinok/PythonHomework.git --branch rss_reader
     $ cd PythonHomework/
     $ pip3 install .
@@ -13,8 +14,10 @@ Example of installation:
 After installation you may to call application everywhere, where ever you are.
 
 For running Rss Reader you should enter command:
+
     $ rss-reader
 or
+    
     $ rss-reader --help
 (These are the same ways)
  
