@@ -1,4 +1,4 @@
-#One-shot command-line RSS reader
+# One-shot command-line RSS reader
 ###Interface
 usage: rss_reader.py  [-h] [--version] [--json] [--verbose] [--limit LIMIT]
                      url
