@@ -17,6 +17,10 @@ To view the help for running project go to **PythonHomework** folder and execute
 
 `python3 rss_reader.py --help`
 
+### SQLite3
+This application uses SQLite3 database to cache all downloaded news articles.
+If you use '--date YYYYMMDD' the application will load news articles from the DB with the date after the given date.
+
 ## Tests
 For run unittest go to **PythonHomework** folder and execute the command:
 
