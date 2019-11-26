@@ -31,7 +31,7 @@ news_item = Template('''
             {{img}}
         {% endfor %}
         </div>
-        <div>
+        <div style="word-wrap: break-word;">
             <h4>{{date}}</h4>
             <p>
                 {{text}}

@@ -35,7 +35,7 @@ def convert_news_to_html(news, path):
 
 def download_images(news_item, path_to_dir, item_index):
     """
-    THis function downloads images from internet
+    THis function downloads images from Internet
     :param news_item: NewsItem class instance
     :param path_to_dir: path to destination directory (str)
     :param item_index: news_item index in news object (int)
