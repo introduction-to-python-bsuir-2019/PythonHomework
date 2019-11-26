@@ -4,7 +4,7 @@ RSS reader is a command-line utility which receives RSS URL and prints results i
 
 Utility provides the following interface:
 
-usage: rss_reader.py [-h] [--version] [--json] [--verbose] [--limit LIMIT]
+usage: rss_reader.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE]
                      source
 
 Pure Python command-line RSS reader.
@@ -18,3 +18,4 @@ optional arguments:
   --json         Print result as JSON in stdout
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
+  --date DATE    print news topics for a specific date    
