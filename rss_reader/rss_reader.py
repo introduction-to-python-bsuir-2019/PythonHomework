@@ -2,6 +2,7 @@ import argparse
 from bs4 import BeautifulSoup
 from datetime import datetime
 import feedparser
+from fpdf import FPDF
 from functools import reduce
 import html
 import jsonpickle
@@ -132,6 +133,30 @@ def insert_cache(cache_files, cache):
         with open('cache/'+date+'.json','w') as cache:
             cache.write(jsonpickle.encode(cached_content))
 
+def make_fb2(news):
+    '''Creates an .fb2 file that contains news designed for output'''
+    logging.info('Creating an FB2 file...')
+    filename=os.path.join(os.path.expanduser('~/Desktop'),datetime.now().strftime('%H%M%S%b%d%Y'))
+    with open(filename+'.fb2','w') as filer:
+        filer.write('<?xml version="1.0" encoding="UTF-8"?><FictionBook><description></description><body>')
+        try:
+            for source in news:
+                filer.write('<title><p>Source: '+source.title+'</p></title>')
+                for item in source.news:
+                    filer.write('<title><p>'+item.title+'</p></title>')
+                    filer.write('<p>Posted at: '+item.date+'</p>')
+                    filer.write('<p>'+item.content+'</p>')
+                    filer.write('<p><strong>Source: '+item.source+'</strong></p>')
+                    filer.write('<p>Related images: ')
+                    for image in item.images:
+                        filer.write('<p>'+image+'</p>')
+                    filer.write('</p>')
+            filer.write('</body></FictionBook>')
+        except TypeError:
+            for source in news:
+                filer.write('<p>'+source+'</p>')
+        filer.write('</body></FictionBook>')
+
 def make_json(news):
     '''Converts news to JSON format'''
     logging.info('Converting to JSON...')
@@ -141,7 +166,7 @@ def make_json(news):
 def make_html(news):
     '''Creates an .html file that contains news designed for output'''
     logging.info('Creating an HTML file...')
-    filename=os.path.join(os.path.expanduser('~/Desktop'),datetime.now().strftime('%H%M%b%d%Y'))
+    filename=os.path.join(os.path.expanduser('~/Desktop'),datetime.now().strftime('%H%M%S%b%d%Y'))
     with open(filename+'.html','w') as filer:
         filer.write('<html>\n<head></head><body>')
         try:
@@ -169,7 +194,8 @@ def parse_arguments():
     parser.add_argument('--json',action='store_true', help='Print result as JSON in stdout')
     parser.add_argument('--verbose',action='store_true',help='Outputs verbose status messages')
     parser.add_argument('--limit', type=int,action='store',help='Limit news topics if this parameter provided')
-    parser.add_argument('--to-html', action='store_true',help='Creates an .html file with news designed for printing')
+    parser.add_argument('--to-html', action='store_true',help='Creates an .html file with news designed to be printed')
+    parser.add_argument('--to-fb2', action='store_true', help='Creates an .fb2 file with news designed to be printed')
     exclusive.add_argument('--version',action='store_true',help='Print version info')
     exclusive.add_argument('source',nargs='?',help='RSS URL',default=None)
     exclusive.add_argument('--date', type=str, action='store', help='Print news posted at a certain date')
@@ -263,6 +289,8 @@ def main():
             feed=make_json(feed)
         if args.to_html:
             make_html(feed)
+        if args.to_fb2:
+            make_fb2(feed)
         print_news(feed)
 
 if __name__=='__main__':
