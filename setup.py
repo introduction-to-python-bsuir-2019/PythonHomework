@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="rss-reader",
+    name="rss-reader-kiselevich-anton",
     version="1.0",
     author="Anton Kiselevich",
     author_email="kiselevichanton@gmail.com",
