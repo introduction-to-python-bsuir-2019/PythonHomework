@@ -119,7 +119,7 @@ class RSSReader:
             """Display news data in text or JSON formats."""
             display_data = format_to_display(news_data)
             if self.arguments.json:
-                display_news = DisplayNewsJson(display_data, self.arguments.colorize)
+                display_news = DisplayNewsJson(display_data)
             else:
                 display_news = DisplayNewsText(display_data, self.arguments.colorize)
             display_news.print_news()
