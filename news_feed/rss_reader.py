@@ -22,23 +22,33 @@ import xml.etree.ElementTree as ET
 
 import json
 import csv
-import pandas as pd
 import sqlite3
 
 import argparse
 import logging
 from colorama import Fore, Style
 
-from format_converter import (PdfNewsConverter,
-                              FB2NewsConverter,
-                              HTMLNewsConverter)  # no dot here -> not worked properly
+from .format_converter import (PdfNewsConverter,
+                               FB2NewsConverter,
+                               HTMLNewsConverter)  # no dot here -> not worked properly
+
+from xml.etree.ElementTree import ParseError
+from sqlite3 import OperationalError
 
 
-PROJECT_VERSION = '1.5'
+PROJECT_VERSION = '2.0'
 PROJECT_DESCRIPTION = ''
 
 
 class NewsNotFoundError(FileNotFoundError):
+    pass
+
+
+class NoNewsInCacheError(OperationalError):
+    pass
+
+
+class RssNotFoundError(ParseError):
     pass
 
 
@@ -75,7 +85,7 @@ class NewsReader:
             request = requests.get(self.url)
         except requests.exceptions.MissingSchema:
             logging.warning(f'Invalid URL: {self.url}. Paste items by yourself.')
-            return None
+            raise
 
         if not request.ok:
             raise requests.exceptions.InvalidURL(f'You URL is invalid. Status code: {request.status_code}')
@@ -85,7 +95,11 @@ class NewsReader:
         logging.info(f'Status code: {request.status_code}')  # TODO: create understandable error status output
 
         result = request.text
-        tree = ET.fromstring(result)
+
+        try:
+            tree = ET.fromstring(result)
+        except ParseError:
+            raise RssNotFoundError('No rss on page.')
 
         items = dict()
         items.setdefault('title', ' ')
@@ -134,41 +148,6 @@ class NewsReader:
         logging.info('Dictionary from rss-feed was created')
 
         return items
-
-    @staticmethod
-    def _cash_news(news, dir='news_cash'):
-        """
-        Cashes news into csv format by publication date
-        into given directory
-
-        :param news: dictionary of given news
-        :param dir: directory into which we save news
-        :return: None
-        """
-
-        date = NewsReader.get_date(news['pubDate'])
-        date = ''.join(str(date).split('-'))
-
-        values = list(news.values())
-        column_names = list(news.keys())
-
-        data_temp = pd.DataFrame(data=[values], columns=column_names)
-
-        if not os.path.exists(dir):
-            os.mkdir(dir)
-
-        path = os.path.join(dir, date + '.csv')
-
-        if os.path.isfile(path):  # If file exists -> load it into dataframe
-            data = pd.read_csv(path)
-        else:
-            data = pd.DataFrame(columns=column_names)
-
-        is_unique = data_temp.isin(data['title']).sum().sum()
-
-        if not is_unique:
-            data = data.append(data_temp)
-            data.to_csv(path, index=False)
 
     @staticmethod
     def _cash_news_sql(news, connection, dir='news_cash'):
@@ -234,62 +213,34 @@ class NewsReader:
         :return: dictionary of news
         """
 
-        conn = sqlite3.connect('database.sqlite')
+        try:
+            conn = sqlite3.connect('database.sqlite')
+        except OperationalError:
+            raise NoNewsInCacheError('Add news in cache')
 
         cursor = conn.cursor()
 
-        cursor.execute("""
-            SELECT *
-            FROM news
-            WHERE dateId=:date
-        """, (date, ))
+        try:
+            cursor.execute("""
+                SELECT *
+                FROM news
+                WHERE dateId=:date
+            """, (date, ))
+        except OperationalError:
+            raise NoNewsInCacheError('Add news to cache')
 
         data = cursor.fetchall()
 
         headers = list(map(lambda x: x[0], cursor.description))
 
-        result = dict()
+        items = dict()
         for index, row in enumerate(data):
-            result.setdefault(index, dict())
+            items.setdefault(index, dict())
 
-            result[index] = dict(zip(headers, row))
+            items[index] = dict(zip(headers, row))
 
         cursor.close()
         conn.close()
-
-        return result
-
-    @staticmethod
-    def read_by_date(date, dir='news_cash'):
-        """
-        Reads news from csv by given date
-        from given directory
-
-        :param date: news date
-        :param dir: directory from which we get news
-        :return: dictionary of news
-        """
-
-        dates = os.listdir(dir)
-
-        if date + '.csv' not in dates:
-            raise NewsNotFoundError('There is no chased news with such date')
-
-        path = os.path.join(dir, date + '.csv')
-        with open(path, 'r', encoding='UTF-8') as file:
-            csv_reader = csv.reader(file, delimiter=',',
-                                    quotechar='"')
-
-            header = list()
-            items = dict()
-            for index, row in enumerate(csv_reader):
-                if index == 0:
-                    header = row
-                    continue
-
-                items.setdefault(index, list())
-
-                items[index] = dict(zip(header, row))
 
         return items
 
@@ -419,7 +370,7 @@ class NewsReader:
         for key, value in items.items():
             if key == 'title':
                 print(f'Feed: {value}')
-            else:
+            elif key != 'title_image':
                 print(self.news_text(value))
 
             print(yellow + '_' * 100 + reset)
@@ -440,119 +391,104 @@ class NewsReader:
         return json_result
 
 
-# feed = NewsReader('https://news.tut.by/rss/index.rss', limit=10)
-feed = NewsReader('https://news.yahoo.com/rss/', limit=10)
+def get_items(news, date):
+    """
+    If date is not Null read data from
+    sql database, else return simple python dictionary
 
-# items = feed.read_by_date_sql('20191112')
-# print(feed.items)
+    :param news: NewsReader class
+    :param date: given data (if there is one)
+    :return:
+    """
 
-# pdf = PdfNewsConverter(feed.items)
-# pdf.add_all_news()
-# pdf.output('news.pdf', 'F')
+    if date:
+        items = news.read_by_date_sql(date)
+    else:
+        items = news.items
 
-fb2 = FB2NewsConverter(feed.items)
+    return items
 
-fb2.output('news.fb2')
 
-# print(feed.items)
-# feed.fancy_output(items)
+def get_parser():
+    """
+    Creates parser using argparse module
 
-# print(items)
+    :return: args from CLI
+    """
 
-# def get_items(news, date):
-#     """
-#     If date is not Null read data from
-#     sql database, else return simple python dictionary
-#
-#     :param news: NewsReader class
-#     :param date: given data (if there is one)
-#     :return:
-#     """
-#
-#     if date:
-#         items = news.read_by_date_sql(date)
-#     else:
-#         items = news.items
-#
-#     return items
-#
-#
-# def get_parser():
-#     """
-#     Creates parser using argparse module
-#
-#     :return: args from CLI
-#     """
-#
-#     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
-#
-#     parser.add_argument('source', type=str, help='RSS URL')
-#
-#     parser.add_argument('--version', help='Print version info', action='store_true')
-#     parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
-#     parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
-#     parser.add_argument('--caching', help='Cache news if chosen', action='store_true')
-#     parser.add_argument('--colorful', help='Colorize output', action='store_true')
-#
-#     # TODO: add flags to output logs
-#     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
-#     parser.add_argument('--date', type=str, help='Reads cashed news by date. And output them')
-#
-#     parser.add_argument('--to-pdf', type=str,
-#                         help='Read rss by url and write it into pdf. Print file name as input')
-#     parser.add_argument('--to-html', type=str,
-#                         help='Read rss by url and write it into html. Print file name as input')
-#
-#     args = parser.parse_args()
-#
-#     return args
-#
-#
-# def main_logic(args):
-#     """
-#     Depending on arguments use NewsReader class
-#
-#     :param args: arguments from CLI
-#     :return:
-#     """
-#
-#     if args.version:
-#         print(PROJECT_VERSION)
-#         print(PROJECT_DESCRIPTION)
-#
-#     if args.verbose:
-#         logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s',
-#                             level=logging.DEBUG)
-#
-#     news = NewsReader(url=args.source,
-#                       limit=args.limit,
-#                       caching=args.caching,
-#                       colorful=args.colorful)
-#
-#     items = get_items(news, args.date)
-#
-#     if args.json:
-#
-#         print(news.to_json(items=items))
-#     elif args.to_pdf:
-#
-#         pdf = PdfNewsConverter(items)
-#         pdf.add_all_news()
-#         pdf.output(args.to_pdf, 'F')
-#     elif args.to_html:
-#
-#         html_converter = HTMLNewsConverter(items)
-#         html_converter.output(args.to_html)
-#     else:
-#
-#         news.fancy_output(items)
-#
-#
-# def main():
-#     args = get_parser()
-#
-#     main_logic(args)
-#
-#
-# if __name__ == '__main__':
-#     main()
+    parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
+
+    parser.add_argument('source', type=str, help='RSS URL')
+
+    parser.add_argument('--version', help='Print version info', action='store_true')
+    parser.add_argument('--json', help='Print result as json in stdout', action='store_true')
+    parser.add_argument('--verbose', help='Output verbose status messages', action='store_true')
+    parser.add_argument('--caching', help='Cache news if chosen', action='store_true')
+    parser.add_argument('--colorful', help='Colorize output', action='store_true')
+
+    # TODO: add flags to output logs
+    parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+    parser.add_argument('--date', type=int, help='Reads cashed news by date. And output them')
+
+    parser.add_argument('--to-pdf', type=str,
+                        help='Read rss by url and write it into pdf. Print file name as input')
+    parser.add_argument('--to-html', type=str,
+                        help='Read rss by url and write it into html. Print file name as input')
+    parser.add_argument('--to-fb2', type=str,
+                        help='Read rss by url and write it into fb2. Print file name as input')
+
+    args = parser.parse_args()
+
+    return args
+
+
+def main_logic(args):
+    """
+    Depending on arguments use NewsReader class
+
+    :param args: arguments from CLI
+    :return:
+    """
+
+    if args.version:
+        print(PROJECT_VERSION)
+        print(PROJECT_DESCRIPTION)
+
+    if args.verbose:
+        logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s',
+                            level=logging.DEBUG)
+
+    news = NewsReader(url=args.source,
+                      limit=args.limit,
+                      caching=args.caching,
+                      colorful=args.colorful)
+
+    items = get_items(news, args.date)
+
+    if args.json:
+
+        print(news.to_json(items=items))
+    elif args.to_pdf:
+
+        pdf = PdfNewsConverter(items)
+        pdf.add_all_news()
+        pdf.output(args.to_pdf, 'F')
+    elif args.to_html:
+
+        html_converter = HTMLNewsConverter(items)
+        html_converter.output(args.to_html)
+    elif args.to_fb2:
+        fb2_converter = FB2NewsConverter(items)
+        fb2_converter.output(args.to_fb2)
+    else:
+        news.fancy_output(items)
+
+
+def main():
+    args = get_parser()
+
+    main_logic(args)
+
+
+if __name__ == '__main__':
+    main()

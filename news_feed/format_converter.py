@@ -6,6 +6,8 @@ import base64
 from io import BytesIO
 import os
 
+import news_feed
+
 
 def silent_remove(path):
     """
@@ -35,9 +37,11 @@ class PdfNewsConverter(FPDF):
 
         super(PdfNewsConverter, self).__init__()
 
+        path = os.path.join(os.path.dirname(news_feed.__file__), 'fonts', 'arial.ttf')
+
         self.items = items
         self.add_font('ArialNew',
-                      fname=os.path.join('fonts', 'arial.ttf'),
+                      fname=path,
                       uni='True')
 
     def header(self):
@@ -445,7 +449,7 @@ class HTMLNewsConverter:
         for el, plot in self.items.items():
             if el == 'title':
                 res_html_start += self.create_title(plot)
-            else:
+            elif el != 'title_image':
                 res_html_start += self.add_one_news(plot)
 
         res_html = res_html_start + res_html_end

@@ -10,6 +10,7 @@ setup(
     description='News aggregator',
     long_description=long_description,
     long_description_content_type='text/markdown',
+    # package_dir={'': 'news_feed'},
 
     py_modules=['news_feed.rss_reader', 'news_feed.format_converter'],
     author='Vadim Titko',
@@ -22,13 +23,17 @@ setup(
         "Operating System :: OS Independent"
     ],
 
+    package_data={'news_feed': ['news_feed/fonts/arial.ttf']},
+    include_package_data=True,
+
     entry_points={
         'console_scripts': [
             'rss_reader = news_feed.rss_reader:main'
         ]
     },
 
-    install_requires=['lxml>=4.3.0', 'requests', 'pandas'],
+    install_requires=['lxml>=4.3.0', 'requests', 'colorama',
+                      'Pillow', 'PyPDF2', 'Django', 'xhtml2pdf'],
     python_requires='>=3.6'
 )
 
