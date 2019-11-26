@@ -1,13 +1,13 @@
 """Main module of RssReader which starts program."""
-import sys, os
-
-PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
-
-sys.path.append(PACKAGE_PATH)
+import sys
+import os
 
 import logging
 import argparse
 from logging import config
+
+PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(PACKAGE_PATH)
 
 from rss_parser import RssReader
 import caching_news
@@ -99,7 +99,7 @@ def init_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def config_logger(logger : logging.Logger) -> None:
+def config_logger(logger: logging.Logger) -> None:
     fh = logging.FileHandler(LOGS_FPATH)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
@@ -134,20 +134,20 @@ def main() -> None:
         else:
             limit = 0
 
-        # try:
-        if args.json is True:
-            news = rss_reader.get_news_as_json(limit=limit)
-            print(news)
-        elif args.to_fb2 is not None:
-            rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
-        elif args.to_pdf is not None:
-            rss_reader.get_news_as_pdf(limit=limit, filepath=args.to_pdf)
-        else:
-            news = rss_reader.get_news_as_string(limit=limit)
-            print(news)
-        logger.info(CORRECT_END_LOG)
-        # except AttributeError:
-            # print("Incorrect link on resource!")
+        try:
+            if args.json is True:
+                news = rss_reader.get_news_as_json(limit=limit)
+                print(news)
+            elif args.to_fb2 is not None:
+                rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
+            elif args.to_pdf is not None:
+                rss_reader.get_news_as_pdf(limit=limit, filepath=args.to_pdf)
+            else:
+                news = rss_reader.get_news_as_string(limit=limit)
+                print(news)
+            logger.info(CORRECT_END_LOG)
+        except AttributeError:
+            print("Incorrect link on resource!")
         logger.info('END (incorrect link)')
     elif args.date is not None:
         logger.info(f'Getting cashed news by date: {args.date}')

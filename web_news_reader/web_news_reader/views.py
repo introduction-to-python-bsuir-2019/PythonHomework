@@ -3,4 +3,4 @@ from django.http import HttpResponse
 
 
 def base_page(request):
-	return render(request, 'base.html')
+    return render(request, 'base.html')

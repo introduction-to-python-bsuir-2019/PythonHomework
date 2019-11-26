@@ -1,6 +1,7 @@
 """Tests must be called from root project's directory."""
 import unittest
-import sys, os
+import sys
+import os
 
 import requests
 
@@ -16,27 +17,24 @@ INCORRECT_IMG_LINK = 'qwerty'
 
 
 class TestImageHandle(unittest.TestCase):
-	
-	def setUp(self):
-		pass
 
+    def setUp(self):
+        pass
 
-	def tearDown(self):
-		pass
+    def tearDown(self):
+        pass
 
+    def test_save_image_by_url(self):
+        try:
+            save_image_by_url(INCORRECT_IMG_LINK, '')
+        except Exception as exception:
+            self.assertEqual(type(exception), requests.exceptions.MissingSchema)
 
-	def test_save_image_by_url(self):
-		try:
-			save_image_by_url(INCORRECT_IMG_LINK, '')
-		except Exception as exception:
-			self.assertEqual(type(exception), requests.exceptions.MissingSchema)
-
-
-	def test_get_image_as_base64(self):
-		encoding_str = get_image_as_base64(CORRECT_IMG_LINK)
-		self.assertIsNotNone(encoding_str)
-		self.assertIsNotNone(base64.b64decode(encoding_str))
+    def test_get_image_as_base64(self):
+        encoding_str = get_image_as_base64(CORRECT_IMG_LINK)
+        self.assertIsNotNone(encoding_str)
+        self.assertIsNotNone(base64.b64decode(encoding_str))
 
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()
