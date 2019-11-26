@@ -8,7 +8,7 @@ RSS reader is a command-line utility which receives RSS URL and prints results i
 
 You have two ways to work with app:
 
-- [Desktop-Console-Utility](rss_reader/)
+- [Desktop-Console-Utility](rssreader/)
 - [Web-Application](web_news_reader/)
 
 ## Information about installation contained in the README of each of the implementations. 
