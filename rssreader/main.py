@@ -25,7 +25,7 @@ CORRECT_END_LOG = 'END (correct)'
 
 # LINK = 'https://news.yahoo.com/rss/'
 # LINK = 'https://www.newsisfree.com/rss/'
-LINK = 'https://news.tut.by/rss/index.rss'
+# LINK = 'https://news.tut.by/rss/index.rss'
 
 
 def create_args_parser() -> argparse.ArgumentParser:
@@ -127,7 +127,7 @@ def main() -> None:
     elif args.link is not None:
         logger.info('Entrance to get news case')
 
-        rss_reader = RssReader(link=LINK)
+        rss_reader = RssReader(link=args.link)
 
         if args.limit is not None:
             limit = args.limit
