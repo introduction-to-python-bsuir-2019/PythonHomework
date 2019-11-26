@@ -1,5 +1,5 @@
 # One-shot command-line RSS reader
-###Interface
+### Interface
 usage: rss_reader.py  [-h] [--version] [--json] [--verbose] [--limit LIMIT]
                      url
 
@@ -14,3 +14,16 @@ optional arguments:
   --json         Print result as JSON in stdout
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
+  
+  example of json format:
+{
+  "news" : [
+    {
+    "title" : ,
+    "summary" : ,
+    "link" : ,
+    "images" : [],
+    "links" : []
+    }
+  ]
+}
