@@ -1,4 +1,4 @@
-version: '3.0'
+version: "3.6"
 services:
   app:
     build:
@@ -6,6 +6,13 @@ services:
     container_name: rss_reader
     stdin_open: true
     tty: true
+    environment:
+      MONGO_HOST: mongo
+    volumes:
+      - type: bind
+        source: ./app/saved_files
+        target: /code/app/saved_files
+        consistency: delegated
   mongo:
     image: mongo
     ports:

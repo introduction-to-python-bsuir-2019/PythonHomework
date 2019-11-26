@@ -1,6 +1,7 @@
 """
 This module contains class to work with database.
 """
+import os
 from dataclasses import asdict
 from typing import Optional
 from time import strptime, mktime, altzone, localtime, struct_time
@@ -17,7 +18,8 @@ class DB:
     """
 
     def __init__(self) -> None:
-        client = MongoClient("mongodb://mongo:27017/")
+        mongo_host = os.getenv('MONGO_HOST', '127.0.0.1')
+        client = MongoClient(f"mongodb://{mongo_host}:27017/")
         self._db = client["feed_db"]
         self._collection = self._db["feed_collection"]
 

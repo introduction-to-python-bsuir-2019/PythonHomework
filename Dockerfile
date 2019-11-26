@@ -4,7 +4,7 @@ RUN mkdir /code
 
 WORKDIR /code
 
-ADD app/support_files code/app/support_files
+ADD app/saved_files code/app/saved_files
 ADD requirements.txt code/requirements.txt
 ADD app/__init__.py code/app/__init__.py
 ADD app/core.py code/app/core.py

@@ -9,7 +9,7 @@ docker-compose up -d
 ```
 and
 ```text
-docker exec -it rss_reader bash
+docker exec -it rss_reader bash (this command u will run every time, when u need to use reader)
 ```
 Fine!
 

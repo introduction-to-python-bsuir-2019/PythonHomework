@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container bg-faded">
+            <div>
+                <a href="kek" class="font-weight-bold" style="color:black; font-size:xx-large; font:bold" >Как придумывать идеи для создания визуального контента</a>
+                <div class="row pl-3">
+                    <h6 class="pr-3">Author: Rolf</h6>
+                    <h6>Published: 161615</h6>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
