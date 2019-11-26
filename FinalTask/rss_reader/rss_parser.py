@@ -77,4 +77,3 @@ def recursive_to_json(obj):
                 _json[data] = (recursive_to_json(obj_data[data]))
             _json[data] = (obj_data[data])
     return _json
-
