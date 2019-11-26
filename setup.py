@@ -13,15 +13,14 @@ setup(
     long_description_content_type='text/markdown',
     author="Pivovar Sergey",
     author_email="pivovar-ser-leon@inbox.ru",
-    url="https://github.com/TeRRoRlsT/PythonHomework.git",
+    url="https://github.com/TeRRoRlsT/Pygit sthonHomework.git",
 
     packages=find_packages(),
 
     python_requires='>=3.8',
-    install_requires=['argparse', 'logging', 'feedparser', 'htmlparser', 'json'],
+    install_requires=['feedparser', 'requests', 'fpdf', 'peewee'],
 
     classifiers=[
-        "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
     ],
