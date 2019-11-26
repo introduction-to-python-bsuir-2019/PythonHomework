@@ -79,7 +79,7 @@ Installing:
 OR
 ```
 python3 -m pip install -r requirements.txt
-pip install ./dist/rss-reader-2.0.tar.gz
+pip install ./dist/rss-reader-4.0.tar.gz
 ```
 ## Version 3: News cashing
 News cashing implemented by using Sqlite3 DB. DB consists of 4 related tables: feed, news_item, links, imgs.
