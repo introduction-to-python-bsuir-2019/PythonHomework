@@ -3,6 +3,7 @@ import urllib.request
 import urllib.error
 from xml.dom.minidom import parseString
 from .html_parser import parse_HTML
+from .converter import Converter
 
 
 def output(string, sep=' ', end='\n', flush=False, verbose=True):
@@ -40,6 +41,12 @@ class RSSReader():
         self.__json = args.json
         self.__verbose = args.verbose
         self.__text = ""
+
+    def __find_news(self):
+        pass
+
+    def __cache_data(self):
+        pass
 
     def __read_news(self):
         """Read data from link"""
@@ -81,12 +88,18 @@ class RSSReader():
                         links]]
             if self.__verbose:
                 progress(self.__limit, counter)
+        self.__cache_data(column)
         return feed, column
 
+    def __read():
+        if not self.__date:
+            self.__read_news()
+            return self.__parse()
+        return self.__find_news()
+
     def show_news(self):
-        """Read, parse and print info in stdout"""
-        self.__read_news()
-        feed, column = self.__parse()
+        """Read and print info in stdout"""
+        feed, column = self.__read()
         output(f"{feed}", end="\n\n")
         for news in column:
             output(f"Title: {news[0]}")
@@ -101,33 +114,6 @@ class RSSReader():
 
     def show_json(self):
         """Read, parse, convert into json and print info in stdout"""
-        self.__read_news()
-        feed, column = self.__parse()
-        output("Convert to json...", verbose=self.__verbose)
-        counter = 0
-        if self.__verbose:
-            progress(len(column), counter)
-        json = '{\n  "title": "' + feed + '",\n  "news": ['
-        separ = False
-        for news in column:
-            if separ:
-                json += ','
-            separ = True
-            json += '{\n      "title": "' + news[0] + '",'
-            json += '\n      "date": "' + news[1] + '",'
-            json += '\n      "link": "' + news[2] + '",'
-            json += '\n      "description": "' + news[3] + '",'
-            json += '\n      "links": ['
-            links = ""
-            for lin in news[4]:
-                links += f'\n        "{lin}",'
-            if len(links) != 0:
-                json += links[:-1] + "\n      ]"
-            else:
-                json += ']'
-            json += "\n    }"
-            counter += 1
-            if self.__verbose:
-                progress(len(column), counter)
-        json += ']\n}'
+        feed, column = self.__read()
+        json = Converter.to_json(feed, column, self.__verbose)
         output(json)
