@@ -4,6 +4,7 @@ with open('README.md', 'r') as file:
     long_description = file.read()
 
 
+
 setup(
     name='news-feed',
     version='0.2',
@@ -32,8 +33,9 @@ setup(
         ]
     },
 
-    install_requires=['lxml>=4.3.0', 'requests', 'colorama',
-                      'Pillow', 'PyPDF2', 'Django', 'xhtml2pdf'],
+    install_requires=['lxml>=4.3.0', 'requests',
+                      'colorama', 'Pillow',
+                      'PyPDF2', 'Django',
+                      'xhtml2pdf', 'fpdf'],
     python_requires='>=3.6'
 )
-

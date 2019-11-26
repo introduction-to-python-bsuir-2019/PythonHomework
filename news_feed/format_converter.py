@@ -263,7 +263,7 @@ class FB2NewsConverter:
         :return: starting and ending of template
         """
 
-        fb2_start = """<?xml version="1.0" encoding="utf-8"?>
+        fb2_start = """<?xml version="1.0" encoding="windows-1251"?>
 <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
         """
 

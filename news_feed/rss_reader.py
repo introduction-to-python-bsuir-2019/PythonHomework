@@ -21,7 +21,6 @@ import lxml.etree as etree
 import xml.etree.ElementTree as ET
 
 import json
-import csv
 import sqlite3
 
 import argparse
