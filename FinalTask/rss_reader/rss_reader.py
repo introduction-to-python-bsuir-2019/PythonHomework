@@ -1,8 +1,8 @@
 import argparse
 import json
-from rss_parser import RssParser
+from rss_reader import rss_parser
 
-current_version = 0.21
+current_version = 0.24
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
     else:
         limit = 10
     verbose = args.verbose
-    my_parser = RssParser(args.source, limit, verbose)
+    my_parser = rss_parser.RssParser(args.source, limit, verbose)
     if args.json:
         my_parser.parse_rss()
         print(json.dumps(my_parser.feed_to_json(), indent=1))
