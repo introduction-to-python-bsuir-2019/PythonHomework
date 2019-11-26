@@ -4,7 +4,7 @@ import sys, os
 
 import requests
 
-sys.path.append(os.getcwd() + '/rss_reader')
+sys.path.append(os.getcwd() + '/rssreader')
 
 from rss_reader.image_handle import *
 

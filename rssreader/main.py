@@ -1,4 +1,9 @@
 """Main module of RssReader which starts program."""
+import sys, os
+
+PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(PACKAGE_PATH)
 
 import logging
 import argparse
@@ -9,7 +14,7 @@ import caching_news
 
 VERSION = '4.0'
 
-LOGS_FILENAME = "rss_reader.log"
+LOGS_FPATH = PACKAGE_PATH + "/rss_reader.log"
 
 ROOT_LOGGER_NAME = 'RssReader'
 MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.main'
@@ -94,9 +99,18 @@ def init_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-if __name__ == "__main__":
-    logging.config.fileConfig('logger_config.conf')
+def config_logger(logger : logging.Logger) -> None:
+    fh = logging.FileHandler(LOGS_FPATH)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+
+def main() -> None:
+    """Main func, which starts app."""
     logger = logging.getLogger(MODULE_LOGGER_NAME)
+    config_logger(logger)
+
     logger.info('START')
 
     parser = create_args_parser()
@@ -150,3 +164,7 @@ if __name__ == "__main__":
         logger.error('END (no args)')
         print('Missing argument: LINK\n')
         parser.parse_args(['-h'])
+
+
+if __name__ == "__main__":
+    main()

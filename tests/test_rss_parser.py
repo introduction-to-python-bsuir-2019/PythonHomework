@@ -2,7 +2,7 @@
 import unittest
 import sys, os
 
-sys.path.append(os.getcwd() + '/rss_reader')
+sys.path.append(os.getcwd() + '/rssreader')
 
 from rss_reader.rss_parser import RssReader
 

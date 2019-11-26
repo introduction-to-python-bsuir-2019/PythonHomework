@@ -1,0 +1,3 @@
+include requirements.txt
+include rss_reader/FreeSans.ttf
+include rss_reader/logger_config.conf
