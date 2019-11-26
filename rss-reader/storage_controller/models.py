@@ -69,19 +69,23 @@ class Article(peewee.Model):
     Fields:
         title: title of article
         description: description of article
+        dec_description: decorated description of article
         link: absolute URL to article
         pubDate: date of publication article
         media: all media objects from article
         source: absolute URL to containing RSS source
-        links: all links from article in specified format
+        links: all links from article without any formatting
+        dec_links: decorated links from article in special format
     """
     title = peewee.TextField()
     description = peewee.TextField()
+    dec_description = peewee.TextField()
     link = peewee.CharField(unique=True)
-    pubDate = peewee.DateField(formats=["%Y%m%d", ])
+    pubDate = peewee.DateTimeField()
     media = peewee.TextField()
     source = peewee.ForeignKeyField(Source, backref='articles')
     links = peewee.TextField()
+    dec_links = peewee.TextField()
 
     class Meta:
         database = DB_HANDLE
@@ -89,9 +93,11 @@ class Article(peewee.Model):
         order_by = ('-pubDate',)
 
     @classmethod
-    def from_dict(cls, struct, source):
+    def from_struct(cls, struct, source):
         """
         Class method for creating Article model object from given dict.
+        Object creating with safe load a pub date. If RSS feed have no pub date,
+        the article will be saved with the date of adding to the db.
 
         :param struct: dictionary with info about article
         :param source: Source object of source feeds. Used for connect sources with articles
@@ -101,25 +107,40 @@ class Article(peewee.Model):
         :rtype: Article or None
         """
         try:
+            if struct['pubDate'] != 'None':
+                date = datetime.datetime.strptime(struct['pubDate'], "%a, %d %b %Y %H:%M")
+            else:
+                date = datetime.datetime.now()
+
             return cls.create(
                 title=struct['title'],
                 description=struct['description'],
+                dec_description=struct['dec_description'],
                 link=struct['link'],
-                pubDate=datetime.datetime.strptime(struct['pubDate'], "%a, %d %b %Y %H:%M:%S %z"),
+                pubDate=date,
                 media=json.dumps(struct['media']),
                 source=source,
                 links=json.dumps(struct['links']),
+                dec_links=json.dumps(struct['dec_links'])
             )
         except peewee.IntegrityError:
             return None
 
     def to_dict(self):
+        """
+        Method for converting model objects to dict with all info.
+
+        :return: dict with article info
+        :rtype: dict
+        """
         return {
             'title': self.title,
             'description': self.description,
+            'dec_description': self.dec_description,
             'link': self.link,
-            'pubDate': self.pubDate,
-            'media': self.media,
+            'pubDate': self.pubDate.strftime("%a, %d %b %Y %H:%M"),
+            'media': json.loads(self.media),
             'source': self.source.url,
-            'links': self.links,
+            'links': json.loads(self.links),
+            'dec_links': json.loads(self.dec_links),
         }
