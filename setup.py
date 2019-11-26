@@ -13,7 +13,7 @@ setup(
     long_description_content_type='text/markdown',
     author="Pivovar Sergey",
     author_email="pivovar-ser-leon@inbox.ru",
-    url="https://github.com/TeRRoRlsT/Pygit sthonHomework.git",
+    url="https://github.com/TeRRoRlsT/PythonHomework.git",
 
     packages=find_packages(),
 
