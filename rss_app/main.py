@@ -11,7 +11,7 @@ def get_args():
     parser.add_argument("-v","--version", action="version", version="%(prog)s version {version}".format(version=__version__), default=None, help="Print version info")
     parser.add_argument("--json",action="store_true", help="Print result as JSON in stdout")
     parser.add_argument("--verbose", action="store_true", help="Outputs verbose status messages")
-    parser.add_argument("--limit", type=int, default=None, help="Limit news topics if this parameter provided")
+    parser.add_argument("--limit", type=int, default=None, help="Limit news topics if this parameter provided")    
     args = parser.parse_args()
     return args
 
@@ -26,7 +26,7 @@ def main():
     if args.version:
         print(args.version)
     if args.json:
-        rssobject.print_json(news)
+        rssobject.print_json(news)        
     else:
         rssobject.print_news(news) 
     

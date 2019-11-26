@@ -36,4 +36,34 @@ class RssAggregator():
             print("--------------------------------------------------") 
             print(json.dumps(news, indent=3))
 
+    def save_to_json_file(self,entries):
+        self.log.info("Save feed to json file")
+        news_list = list()
+        file_name = self.get_file_name()
+        with open(file_name, "w") as write_file:
+            for thefeedentry in entries:
+                news={
+                    "Title": thefeedentry.title,
+                    "Date": thefeedentry.published,
+                    "Link": thefeedentry.link,
+                    "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text
+                }
+                news_list.append(news)
+            json.dump(news_list, write_file, indent=3)
+
+    def get_file_name(self):
+        file_name_list = self.args.source.split("//")
+        file_name = file_name_list[1].replace("/", "")
+        file_name += ".json"
+        return file_name
+
+    def get_from_json_file(self):
+        file_name = self.get_file_name()
+        try:
+            with open(file_name, "r") as read_file:
+                news = json.load(read_file)
+        except FileNotFoundError:  
+            print("Error") 
+        return news
+
             
