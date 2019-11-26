@@ -6,7 +6,6 @@ import logging
 import json
 from rss_reader import argparser, get_rss
 
-
 """ List of selected data"""
 args = argparser()
 soup = BSoup(get_rss(args.source), "xml")
@@ -94,11 +93,22 @@ def get_news():
     print_news()
 
 
+def json():
+    print(json.dumps({'title': soup.find('title').string,
+                      'news': [{'Title': title[number],
+                                'Date': date[number],
+                                'Link': link[number],
+                                'Feed': description[number],
+                                'Image link': image_link[number]
+                                } for number in range(0, len(title))]}, ensure_ascii=False, indent=4))
+
+
 def main():
     open('logger.log', 'w').close()
     if argparser().verbose:
         logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
-                            level=logging.DEBUG, filename='logger.log')
+                            level=logging.DEBUG,
+                            filename='logger.log')
 
 
 get_news()
