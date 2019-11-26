@@ -28,12 +28,13 @@ def main():
                 logger.info("parsed rss to news list")
                 NewsGetterSafer.save_data(args.url, news_list, datetime.today().strftime('%Y%m%d'))
                 logger.info("news saved")
-            rss.print_news(news_list, args.limit)
-            logger.info("news are printed")
             if args.json:
                 logger.info("print json")
                 rss.in_json_format(news_list, args.limit)
                 logger.info("json is printed")
+            else:
+                rss.print_news(news_list, args.limit)
+                logger.info("news are printed")
             if args.verbose:
                 with open(log_file) as log_file:
                     print(log_file.read())
@@ -43,7 +44,7 @@ def main():
     except IncorrectDateOrURL as ex:
         logger.info("incorrect date or url")
         print('You have entered {0} url and {1} date, but it is incorrect or you have network problem.\
-Please check it and try again'.format(ex.url, ex.date))
+        Please check it and try again'.format(ex.url, ex.date))
     except RssGetError as ex:
         logger.info("incorrect url")
         print('You have entered {0} url, but it is incorrect or you have network problem. Please check it and try again'

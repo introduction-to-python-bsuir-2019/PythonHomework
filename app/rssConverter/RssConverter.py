@@ -60,22 +60,34 @@ class RssConverter:
 
     def in_json_format(self, news_list, limit):
         news_list = self.get_limited_news(news_list, limit)
-        print('{')
-        print('\t' + 'news:')
-        print('\t' + '[')
+        json_str = '{'
+        json_str += ' ' + '"news":'
+        json_str += ' ' + '['
         for new in news_list:
-            print('\t' * 2 + '{')
+            json_str += ' ' + '{'
             for key, item in new.items.items():
                 if key == 'links' or key == 'images':
-                    print("\t" * 3 + 'links:')
-                    print("\t" * 3 + '[')
+                    key = RssConverter.to_str_for_json(key)
+                    json_str += " " + key + ':'
+                    json_str += " " + '['
                     for link in item:
-                        print("\t" * 4 + link + ';')
-                    print("\t" * 3 + '];')
+                        link = RssConverter.to_str_for_json(link)
+                        json_str += " " + link + ','
+                    json_str = json_str[:-1]
+                    json_str += " " + '],'
                 else:
                     if item == 'Unknown' and key in ['pubDate', 'published']:
                         continue
-                    print("\t" * 3 + key + ':' + item + ';')
-            print("\t" * 2 + '};')
-        print("\t" * 1 + '];')
-        print('};')
+                    key = RssConverter.to_str_for_json(key)
+                    item = RssConverter.to_str_for_json(item)
+                    json_str += " " + key + ':' + item + ','
+            json_str = json_str[:-1]
+            json_str += " " + '},'
+        json_str = json_str[:-1]
+        json_str += " " + ']'
+        json_str += '}'
+        print(json_str)
+
+    @staticmethod
+    def to_str_for_json(value):
+        return '"' + str(value) + '"'
