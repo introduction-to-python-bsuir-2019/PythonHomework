@@ -11,7 +11,7 @@ from .utils import rss_interface
 from .utils.exceptions import RssException, RssValueException, RssNewsException
 from .utils.data_structures import ConsoleArgs
 
-PROG_VERSION = 3.0
+PROG_VERSION = 4.0
 
 
 def logger_init(level=None):

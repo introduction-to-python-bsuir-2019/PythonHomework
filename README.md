@@ -1,7 +1,10 @@
 # Rss reader hometask for EpamTrainee
 Python RSS-reader.
 
-Version 3
+Url for cloning:
+`https://github.com/Nenu1985/PythonHomework.git`
+
+Version 4
 ```shell
 usage: rss.py [-h] [--verbose] [--limit LIMIT] [--json] [-v] [--width WIDTH]
               url
@@ -73,6 +76,21 @@ python3 -m pip install -r requirements.txt
 pip install ./dist/rss-reader-2.0.tar.gz
 ```
 ## Version 3: News cashing
+News cashing implemented by using Sqlite3 DB. DB consists of 4 related tables: feed, news_item, links, imgs.
+The implementation is in the rss_reader/utils/sqlite.py file. It contains RssDB class. Builtin sqlite3 lib is
+used.
+Base RssParser class imports RssDB class and uses for storing and loading data. RssParser's method print_news() 
+is decorated with call_save_news_after_method() (rss_parser/utils/decorators) that calls appropriate function 
+for storing news data (_store_news()).
+
+## Version 4: Converters
+Utility implements news converting to pdf and html formats. See according files: rss_reader/utils/pdf.py and 
+rss_reader/utils/html_writer.py files.
+Pdf converter uses pyFPDF package. To correct print cyrillic symbols djvu fonts are imported. Html2Pdf method
+doesn't use because of unsupported utf-8 encoding. That's why I had to parse htmls and generate pdf object 
+manually.
+Html converter uses lxml.html library to parse and generate html content. 
+
 
 
 
