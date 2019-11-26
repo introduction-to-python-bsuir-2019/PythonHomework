@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 def get_install_requires():
-    with open('requirements.txt') as f
+    with open('requirements.txt') as f:
         return [req.strip() for req in f]
 
 setuptools.setup(
