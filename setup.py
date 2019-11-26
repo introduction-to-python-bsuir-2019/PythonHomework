@@ -21,10 +21,12 @@ setuptools.setup(
 
     install_requires=['attrs',
                       'bs4',
+                      'dateutil',
                       'feedparser',
-                      'terminaltables',
-                      'lxml',
                       'fpdf',
+                      'lxml',
+                      'python-dateutil',
+                      'terminaltables',
                       ],
 
     extras_require={  # Optional

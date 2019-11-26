@@ -1,22 +1,16 @@
 """
 Module is for storing and loading news via sqlite3
 """
-from datetime import datetime, date, timedelta
-from dateutil.parser import parse
+import sqlite3
+
+from datetime import timedelta
 from functools import partial
 from itertools import repeat
-import sqlite3
 from typing import Tuple, List
-import time
-from sqlite3 import Error
-
-# datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
-# date(2019, 12, 15)
-# datetime.strptime(duration, '%HH').time().strftime('%H:%M')
 
 from ..utils.data_structures import News, NewsItem
 from ..utils.exceptions import RssNewsException
-from ..utils.rss_utils import get_date, parse_date_from_console, dict_factory
+from ..utils.rss_utils import get_date, dict_factory
 
 
 class RssDB:
