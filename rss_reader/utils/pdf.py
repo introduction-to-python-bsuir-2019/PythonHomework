@@ -1,11 +1,12 @@
 import bs4
+import tempfile
+import os
+import urllib
+
 from copy import deepcopy
 from fpdf import FPDF
 from logging import Logger
-
-import urllib
 from pathlib import Path
-import tempfile
 
 from ..utils.IConverter import IConverter
 from ..utils.data_structures import News
@@ -13,6 +14,7 @@ from ..utils.exceptions import RssException, RssValueException
 
 
 class PdfWriter(IConverter):
+    """Class to convert news into pdf format"""
 
     djvu_font_path = Path('utils/dejavu_font/DejaVuSansCondensed.ttf')
 
@@ -24,6 +26,12 @@ class PdfWriter(IConverter):
         self._set_djvu_font()
         self.pdf.add_page()
         super().__init__(logger)
+
+        # In the case of the tests were running before pkl files contain wrong info about font's path
+        # That's why we need to clear it before importing fonts
+        ttf_pickle_files_to_remove = self.djvu_font_path.parent.glob('**/*.pkl')
+        for pkl in ttf_pickle_files_to_remove:
+            os.remove(pkl)
 
     def store_news(self, news: News, path_to_file: str) -> None:
         """Converts News obj to pdf and stores it to path_to_file"""

@@ -19,10 +19,13 @@ setuptools.setup(
 
     packages=setuptools.find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
 
-    install_requires=['bs4',
-                      'html2text',
+    install_requires=['attrs',
+                      'bs4',
                       'feedparser',
-                      'terminaltables'],
+                      'terminaltables',
+                      'lxml',
+                      'fpdf',
+                      ],
 
     extras_require={  # Optional
         'tests': ['nose', 'coverage'],

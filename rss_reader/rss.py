@@ -5,7 +5,9 @@ import argparse
 import getpass
 import logging
 import sys
+
 from importlib import import_module
+from pathlib import Path
 
 from .utils import rss_interface
 from .utils.exceptions import RssException, RssValueException, RssNewsException
@@ -90,7 +92,7 @@ def args_parser() -> ConsoleArgs:
     PARSER.add_argument('-v', '--version',
                         help='Print version info',
                         action='version',
-                        version=f'%(prog)s {PROG_VERSION}'
+                        version=f'{__file__}: Version {PROG_VERSION}'
                         )
     PARSER.add_argument('--width',
                         help='Define a screen width to display news',
@@ -98,7 +100,7 @@ def args_parser() -> ConsoleArgs:
                         type=int,
                         )
     PARSER.add_argument('--date',
-                        help='Date of stored news you want to see. Format: %Y%m%d',
+                        help='Date of stored news you want to see. Format: %%Y%%m%%d',
                         default='',
                         type=str)
     PARSER.add_argument('--to_pdf',

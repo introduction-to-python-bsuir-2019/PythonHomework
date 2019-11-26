@@ -6,26 +6,28 @@ Url for cloning:
 
 Version 4
 ```shell
-usage: rss.py [-h] [--verbose] [--limit LIMIT] [--json] [-v] [--width WIDTH]
-              url
-OR
+usage: rss_reader [-h] [--verbose] [--limit LIMIT] [--json] [-v]
+                  [--width WIDTH] [--date DATE] [--to_pdf TO_PDF]
+                  [--to_html TO_HTML]
+                  url
 
-python3 -m rss_reader ... (After installing package)
-
-Description:
 Rss reader. Just enter rss url from your favorite site and app will print
 latest news.
 
 positional arguments:
-  url            url of rss
+  url                url of rss
 
 optional arguments:
-  -h, --help     show this help message and exit
-  --verbose      Outputs verbose status messages
-  --limit LIMIT  Limit news topics if this parameter provided
-  --json         Print result as JSON in stdout
-  -v, --version  Print version info
-  --width WIDTH  Define a screen width to display news
+  -h, --help         show this help message and exit
+  --verbose          Outputs verbose status messages
+  --limit LIMIT      Limit news topics if this parameter provided
+  --json             Print result as JSON in stdout
+  -v, --version      Print version info
+  --width WIDTH      Define a screen width to display news
+  --date DATE        Date of stored news you want to see. Format: %Y%m%d
+  --to_pdf TO_PDF    Convert and store news you are looking for to pdf
+  --to_html TO_HTML  Convert and store news you are looking for to html
+
 
 ```
 
@@ -57,9 +59,11 @@ Launching:
 Utility wrapes into distribution package with setuptools.
 This package exports CLI utility named rss-reader.
 
-To generate distribution package (setuptool and wheel must be installed):
+To generate distribution package (setuptool and wheel must be installed).
 Launch:
+
 ``` python3 setup.py sdist bdist_wheel```
+
 In the ./dist repo you'll find a .tar and .whl files.
 
 Wheel package for the second iteration task 
@@ -69,7 +73,9 @@ Wheel package for the second iteration task
 Actual packages you may find in the './dist' repo if you don't want to generate it manually.
 
 Installing: 
-```python3 -m pip install ./dist/rss_reader-2.0-py3-none-any.whl```
+
+```python3 -m pip install ./dist/rss_reader-4.0-py3-none-any.whl```
+
 OR
 ```
 python3 -m pip install -r requirements.txt
