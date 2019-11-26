@@ -36,12 +36,12 @@ class RSSReader:
         :param source: URL for downloading news articles
         :param limit: limit news topics if this parameter provided
         :param date: print cached articles by date
-        :param kwargs: optional parameter for control behavior of method.
+        :param kwargs: optional parameter for control behavior of output method.
             Use one from this parameters:
             * to_json: bool - output in JSON or not
             * to_pdf: str - string filename for output
             * to_html: str - string filename for output
-            Default sample output
+            Default start sample output
         :type source: str
         :type limit: int
         :type date: str
