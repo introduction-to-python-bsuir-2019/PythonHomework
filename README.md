@@ -18,6 +18,8 @@ optional arguments:
   --json         Print result as JSON in stdout
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
+  --date DATE    Take a date in %Y%m%d format. The news from the specified day
+                 will be printed out.
 </pre>
 
 ## JSON structure

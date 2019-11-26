@@ -1,28 +1,31 @@
-"""Module contains class related to news"""
+"""Module contains class related to news."""
 
 import json
 import logging
 import sys
+import datetime
 
 import feedparser
 from bs4 import BeautifulSoup
 
+from rss.cache import Cache
 
-class RssReader():
-    """This class parse, process and output news."""
+
+class News:
+    """This class parses, processes and outputs news."""
 
     def __init__(self, url: str, limit=None):
-        logging.info('Initialization')
+        logging.info('News initialization')
 
         self.url = url
-        self.feeds = feedparser.parse(url)
+        logging.info('Parsing url')
+        self.feeds = feedparser.parse(self.url)
         self._check_url()
 
         self.feed_title = self.feeds.feed.get('title')
         self.list_of_news = []
-        self.limit = limit
 
-        self._check_limit()
+        self._check_limit(limit)
         self.make_list_of_news()
 
     def _check_url(self):
@@ -30,51 +33,59 @@ class RssReader():
 
         logging.info('Check URL')
         if self.feeds['bozo'] or self.feeds.status != 200:
-            logging.error('Something wrong with URL or Internet connection')
-            sys.exit(1)
+            raise Exception('Something wrong with URL or Internet connection')
 
-    def _check_limit(self):
-        """Check if the limit >= 0."""
+    def _check_limit(self, limit):
+        """Check if the limit > 0."""
 
         logging.info('Check limit')
-        if self.limit is not None and self.limit < 0:
-            logging.error('Limit < 0')
-            sys.exit(1)
+        if limit is not None and limit <= 0:
+            raise ValueError('Invalid limit: limit <= 0')
 
-    def print_news(self):
+    def print_news(self, limit):
         """Print news in human-readable format."""
 
-        logging.info('Print news')
-
-        print('Feed:', self.feed_title, "\n\n")
+        logging.info("Start printing news")
+        print('\nFeed:', self.feed_title, "\n\n")
 
         news_number = 1
-        for news in self.list_of_news:
+        #if self.list_of_news consists of 1 element
+        if type(list_of_news) == dict:
             print('№', news_number)
-            news_number += 1
-            print('Title:', news['title'])
-            print('Date:', news['date'])
-            print('Link:', news['link'], '\n')
+            self._print_entries(list_of_news)
+        else:
+            for news in list_of_news[:limit]:
+                print('№', news_number)
+                news_number += 1
+                self._print_entries(news)
 
-            if news['description']['text']:
-                print(news['description']['text'], '\n')
+    def _print_entries(self, news: dict):
+        """Print one news."""
 
-            if news['description']['images']:
-                print('Images:')
-                for item in news['description']['images']:
-                    print(item)
+        logging.info('Print one news')
+        print('Title:', news['title'])
+        print('Date:', news['date'])
+        print('Link:', news['link'], '\n')
 
-            if news['description']['links']:
-                print('Links:')
-                for item in news['description']['links']:
-                    print(item)
+        if news['description']['text'] != 'Nothing':
+            print(news['description']['text'], '\n')
 
-            print('-' * 50)
+        if news['description']['images']:
+            print('Images:')
+            for item in news['description']['images']:
+                print(item)
+
+        if news['description']['links']:
+            print('Links:')
+            for item in news['description']['links']:
+                print(item)
+
+        print('-' * 50)
 
     def _find_date_tag(self, news: dict) -> str:
         """
         Find date tag and return its value,
-        or return 'Unknown' if tag not found.
+        or return the current local date if tag not found.
         """
 
         logging.info('Find date tag')
@@ -86,7 +97,8 @@ class RssReader():
         elif news.get('Date:'):
             return news['Date']
         else:
-            return 'Unknown'
+            date = datetime.today()
+            return date.isoformat()
 
     def make_list_of_news(self):
         """Make a list of news.
@@ -96,26 +108,15 @@ class RssReader():
 
         logging.info('Make a list of news')
 
-        if self.limit is None or self.limit > len(self.feeds):
-            self.limit = len(self.feeds)
-
-
-        for news in self.feeds['entries'][:self.limit]:
-            one_news = {}
-
-            if news.get('title'):
-                one_news['title'] = news['title']
-            else:
-                one_news['title'] = 'Unknown'
-
-            if news.get('link'):
-                one_news['link'] = news['link']
-            else:
-                one_news['link'] = 'Unknown'
-
-            one_news['date'] = self._find_date_tag(news)
+        cache = Cache()
+        for news in self.feeds['entries']:
+            title = news.get('title', 'Unknown')
+            one_news = {'title': title.replace('&#39;', "'"),
+                        'link': news.get('link', 'Unknown'),
+                        'date': self._find_date_tag(news)}
             one_news.update(self._read_description(news))
             self.list_of_news.append(one_news)
+            cache.insert_news(one_news, self.url)
 
     def _read_description(self, news: dict) -> dict:
         """Return dict with keys 'text', 'images', 'links'.
@@ -129,8 +130,7 @@ class RssReader():
         soup = BeautifulSoup(news.description, features="html.parser")
 
         logging.info('Get text of description')
-        text = soup.text
-        text.replace('&#39;', "'")
+        text = soup.text.replace('&#39;', "'")
         if not text:
             text = 'Nothing'
 
@@ -158,14 +158,10 @@ class RssReader():
         return {'description': {'text': text, 'images': list_of_images,
                 'links': list_of_links}}
 
-    def convert_to_json(self):
+    def convert_to_json(self, limit=None):
         """Return news in JSON format."""
 
         logging.info('Convert news into JSON format')
-        try:
-            result = json.dumps({'news': {'feed': self.feed_title, 'items': self.list_of_news}},
-                                indent=4, ensure_ascii=False)
-        except Exception as e:
-            logging.error("Can't convert to JSON:", e)
-
+        result = json.dumps({'news': {'feed': self.feed_title, 'items': self.list_of_news[:limit]}},
+                            indent=4, ensure_ascii=False)
         return result
