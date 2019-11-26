@@ -11,4 +11,4 @@ You have two ways to work with app:
 - [Desktop-Console-Utility](rss_reader/)
 - [Web-Application](web_news_reader/)
 
-
+## Information about installation contained in the README of each of the implementations. 
