@@ -27,7 +27,7 @@ def save_image_by_url(image_url: str, filepath: str):
         shutil.copyfileobj(resp.raw, img)
 
     im = Image.open(filepath)
-    im.save(filepath, "PNG")
+    im.convert('RGB').save(filepath, "PNG")
 
 
 def get_image_as_base64(image_url: str) -> str:

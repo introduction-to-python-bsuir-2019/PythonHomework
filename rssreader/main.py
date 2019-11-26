@@ -6,11 +6,10 @@ import logging
 import argparse
 from logging import config
 
-PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(PACKAGE_PATH)
-
 from rss_parser import RssReader
 import caching_news
+
+PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 VERSION = '4.0'
 
@@ -25,7 +24,7 @@ CORRECT_END_LOG = 'END (correct)'
 
 # LINK = 'https://news.yahoo.com/rss/'
 # LINK = 'https://www.newsisfree.com/rss/'
-# LINK = 'https://news.tut.by/rss/index.rss'
+LINK = 'https://news.tut.by/rss/index.rss'
 
 
 def create_args_parser() -> argparse.ArgumentParser:
@@ -127,27 +126,28 @@ def main() -> None:
     elif args.link is not None:
         logger.info('Entrance to get news case')
 
-        rss_reader = RssReader(link=args.link)
+        # rss_reader = RssReader(link=args.link)
+        rss_reader = RssReader(link=LINK)
 
         if args.limit is not None:
             limit = args.limit
         else:
             limit = 0
 
-        try:
-            if args.json is True:
-                news = rss_reader.get_news_as_json(limit=limit)
-                print(news)
-            elif args.to_fb2 is not None:
-                rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
-            elif args.to_pdf is not None:
-                rss_reader.get_news_as_pdf(limit=limit, filepath=args.to_pdf)
-            else:
-                news = rss_reader.get_news_as_string(limit=limit)
-                print(news)
-            logger.info(CORRECT_END_LOG)
-        except AttributeError:
-            print("Incorrect link on resource!")
+        # try:
+        if args.json is True:
+            news = rss_reader.get_news_as_json(limit=limit)
+            print(news)
+        elif args.to_fb2 is not None:
+            rss_reader.get_news_as_fb2(limit=limit, filepath=args.to_fb2)
+        elif args.to_pdf is not None:
+            rss_reader.get_news_as_pdf(limit=limit, filepath=args.to_pdf)
+        else:
+            news = rss_reader.get_news_as_string(limit=limit)
+            print(news)
+        logger.info(CORRECT_END_LOG)
+        # except AttributeError:
+        #     print("Incorrect link on resource!")
         logger.info('END (incorrect link)')
     elif args.date is not None:
         logger.info(f'Getting cashed news by date: {args.date}')

@@ -116,7 +116,7 @@ class PDF(FPDF):
 
         self.iter += 1
 
-    def add_piece_of_news(self, title: str, date: str, link: str, img_url: str, content: str):
+    def add_piece_of_news(self, title: str, date: str, link: str, imgs_urls: list, content: str):
         """Insert piece of news to pdf."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.add_piece_of_news')
         logger.info('Insert piece of news to pdf')
@@ -128,6 +128,9 @@ class PDF(FPDF):
         self._add_title_of_news(title)
         self._add_date_of_news(date)
         self._add_link_of_news(link)
-        if img_url != '':
-            self._add_img_of_news(img_url)
+        if imgs_urls: #  if imgs_urls list is not empty
+            # for img_url in imgs_urls:
+                # self._add_img_of_news(img_url)
+            self._add_img_of_news(imgs_urls[0])
+
         self._add_content_of_news(content)

@@ -6,9 +6,6 @@ from django.contrib import messages
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/app_logic')
-
-
 from .app_logic.rss_parser import RssReader
 from .forms import SettingsForm, FORMATS_DICT
 
@@ -54,7 +51,7 @@ class SettingsUpdate(View):
                 response['Content-Disposition'] = f'attachment; filename="{file_name}"'
             return response
 
-    return render(request, 'rss_reader/settings.html', context={'form': form})
+        return render(request, 'rss_reader/settings.html', context={'form': form})
 
 
 def news_page(request):

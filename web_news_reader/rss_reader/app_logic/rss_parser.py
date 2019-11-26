@@ -11,11 +11,11 @@ from bs4 import BeautifulSoup
 import logging
 import json
 
-from rss_reader_consts import *
+from .rss_reader_consts import *
 
-import caching_news
-import to_fb2_converter
-import to_pdf_converter
+from .caching_news import *
+from .to_fb2_converter import FB2
+from .to_pdf_converter import PDF
 
 
 ROOT_LOGGER_NAME = 'RssReader'
@@ -116,10 +116,10 @@ class RssReader:
             if limit > 0:
                 news.append(piece_of_news.copy())
 
-            caching_news.db_write(piece_of_news[KEYWORD_DATE],
-                                  piece_of_news[KEYWORD_TITLE],
-                                  piece_of_news[KEYWORD_LINK],
-                                  piece_of_news[KEYWORD_CONTENT])
+            # caching_news.db_write(piece_of_news[KEYWORD_DATE],
+            #                       piece_of_news[KEYWORD_TITLE],
+            #                       piece_of_news[KEYWORD_LINK],
+            #                       piece_of_news[KEYWORD_CONTENT])
 
             piece_of_news.clear()
 
@@ -140,10 +140,10 @@ class RssReader:
         for one_news in news_list:
             news += EN + NEWS_SEPARATOR + DEN
 
-            for key_word in one_news:
-                if key_word == KEYWORD_CONTENT:
+            for key, value in one_news.items():
+                if key == KEYWORD_CONTENT:
                     news += EN
-                news += key_word + one_news[key_word] + EN
+                news += key + value + EN
 
         return feed + DEN + news
 
@@ -173,7 +173,7 @@ class RssReader:
         """
         news_list = self._get_news_as_list(limit)
 
-        fb2 = to_fb2_converter.FB2()
+        fb2 = FB2()
 
         fb2.add_description_of_resource(self._get_feed_title(),
                                         self._get_feed_subtitle(),
@@ -197,7 +197,7 @@ class RssReader:
         """
         news_list = self._get_news_as_list(limit)
 
-        pdf = to_pdf_converter.PDF()
+        pdf = PDF()
         pdf.add_font('FreeSans', '', 'FreeSans.ttf', uni=True)
 
         title = self._get_feed_title()

@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 from fpdf import FPDF
-from image_handle import save_image_by_url
+from .image_handle import save_image_by_url
 
 # from fpdf.py3k import PY3K
 

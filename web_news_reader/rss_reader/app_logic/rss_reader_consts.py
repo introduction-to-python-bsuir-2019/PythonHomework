@@ -5,12 +5,12 @@ NEWS_SEPARATOR = '=' * NEWS_SEPARATOR_LEN
 EN = '\n'  # enter
 DEN = '\n\n'  # double enter
 
-KEYWORD_FEED = 'Feed: '
-KEYWORD_TITLE = 'Title: '
-KEYWORD_DATE = 'Date: '
-KEYWORD_LINK = 'Link: '
-KEYWORD_IMG_LINK = 'Image link: '
-KEYWORD_CONTENT = 'Short content: '
+KEYWORD_FEED = 'feed'
+KEYWORD_TITLE = 'title'
+KEYWORD_DATE = 'date'
+KEYWORD_LINK = 'link'
+KEYWORD_IMG_LINK = 'img_link'
+KEYWORD_CONTENT = 'content'
 
 
 MONTHS = {

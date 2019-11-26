@@ -9,7 +9,7 @@ KEYWORD_FEED = 'Feed: '
 KEYWORD_TITLE = 'Title: '
 KEYWORD_DATE = 'Date: '
 KEYWORD_LINK = 'Link: '
-KEYWORD_IMG_LINK = 'Image link: '
+KEYWORD_IMGS_LINKS = "Image's links: "
 KEYWORD_CONTENT = 'Short content: '
 
 

@@ -69,17 +69,20 @@ class RssReader:
             url = ''
         return url
 
-    def _get_item_image_url(self, one_news: FeedParserDict) -> str:
-        """Get image's url of piece of news."""
+    def _get_item_images_urls(self, one_news: FeedParserDict) -> list():
+        """Get images's urls of piece of news."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_image_url')
         logger.info('Getting image-url of one news')
 
         img_link = ''
+        imgs_links = []
         try:
-            img_link = one_news.media_content[0]['url']
+            for piece_of_media in one_news.media_content:
+                if piece_of_media['type'] == 'image/jpeg' or piece_of_media == 'image/png':
+                    imgs_links.append(piece_of_media['url'])
         except AttributeError:
-            img_link = ''
-        return img_link
+            return []
+        return imgs_links
 
     def _get_item_title(self, one_news: FeedParserDict) -> str:
         """Get title of piece of news."""
@@ -149,7 +152,7 @@ class RssReader:
             piece_of_news[KEYWORD_TITLE] = self._get_item_title(one_news)
             piece_of_news[KEYWORD_DATE] = self._get_item_date(one_news)
             piece_of_news[KEYWORD_LINK] = self._get_item_link(one_news)
-            piece_of_news[KEYWORD_IMG_LINK] = self._get_item_image_url(one_news)
+            piece_of_news[KEYWORD_IMGS_LINKS] = self._get_item_images_urls(one_news)
             piece_of_news[KEYWORD_CONTENT] = self._get_item_content(one_news)
 
             if limit > 0:
@@ -183,10 +186,16 @@ class RssReader:
         for one_news in news_list:
             news += EN + NEWS_SEPARATOR + DEN
 
-            for key_word in one_news:
-                if key_word == KEYWORD_CONTENT:
-                    news += EN
-                news += key_word + one_news[key_word] + EN
+            for key, value in one_news.items():
+                if key == KEYWORD_IMGS_LINKS:
+                    if value:  # img_links list is not empty
+                        news += key + ' '
+                        for img_link in value:
+                            news += img_link + EN
+                else:
+                    if key == KEYWORD_CONTENT:
+                        news += EN
+                    news += key + value + EN
 
         return feed + DEN + news
 
@@ -234,7 +243,7 @@ class RssReader:
                             date=piece_of_news[KEYWORD_DATE],
                             content=piece_of_news[KEYWORD_CONTENT],
                             link=piece_of_news[KEYWORD_LINK],
-                            img_link=piece_of_news[KEYWORD_IMG_LINK])
+                            imgs_links=piece_of_news[KEYWORD_IMGS_LINKS])
 
         fb2.write_to_file(filepath)
 
@@ -260,7 +269,7 @@ class RssReader:
             pdf.add_piece_of_news(title=piece_of_news[KEYWORD_TITLE],
                                   date=piece_of_news[KEYWORD_DATE],
                                   link=piece_of_news[KEYWORD_LINK],
-                                  img_url=piece_of_news[KEYWORD_IMG_LINK],
+                                  imgs_urls=piece_of_news[KEYWORD_IMGS_LINKS],
                                   content=piece_of_news[KEYWORD_CONTENT])
 
         pdf.write_to_file(filepath)

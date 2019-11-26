@@ -71,10 +71,10 @@ def db_write(date: str, title: str, link: str, short_content: str) -> None:
     table_create(HEADER_TABLE_NAME + YYYYMMDD_date)
 
     with DataBaseConn(DB_NAME) as connection:
-        ursor = connection.cursor()
+        cursor = connection.cursor()
         cursor.execute("INSERT INTO {} VALUES (?,?,?,?)"
                        .format(HEADER_TABLE_NAME + YYYYMMDD_date),
-                       (title, date, link, short_content))
+                              (title, date, link, short_content))
 
 
 def get_list_of_tables() -> str:
