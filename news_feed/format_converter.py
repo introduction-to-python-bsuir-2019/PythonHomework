@@ -23,6 +23,18 @@ def silent_remove(path):
         pass
 
 
+def change_encoding(txt):
+    """
+    Changes encoding to fpdf compatible
+
+    :param txt: Text to encode
+    :return: new-encoded text
+    """
+
+    return str(txt).encode('KOI8-R',
+                           'replace').decode('KOI8-R')
+
+
 class PdfNewsConverter(FPDF):
     """
     Easy-to-use pdf rss news converter
@@ -58,7 +70,7 @@ class PdfNewsConverter(FPDF):
         self.ln(20)
 
         try:
-            header = self.change_encoding(self.items['title'])
+            header = change_encoding(self.items['title'])
         except KeyError:
             header = ''
 
@@ -109,20 +121,6 @@ class PdfNewsConverter(FPDF):
             self.set_x(0)
             silent_remove(filename)
 
-    @staticmethod
-    def change_encoding(txt):
-        """
-        Changes encoding to fpdf compatible
-
-        :param txt: Text to encode
-        :return: new-encoded text
-        """
-
-        return str(txt).encode('KOI8-R',
-                               'replace').decode('KOI8-R')
-
-        # return str(txt)
-
     def add_news_page(self, item):
         """
         Writes info about one news
@@ -131,7 +129,7 @@ class PdfNewsConverter(FPDF):
         :return: None
         """
 
-        item = {key: self.change_encoding(value)
+        item = {key: change_encoding(value)
                 for key, value in item.items()}
 
         title = item['title']
@@ -219,7 +217,7 @@ class FB2NewsConverter:
         :return: filled template
         """
 
-        item = {key: self.change_encoding(value)
+        item = {key: change_encoding(value)
                 for key, value in item.items()}
 
         title = item['title']
@@ -242,18 +240,6 @@ class FB2NewsConverter:
         )
 
         return template
-
-    @staticmethod
-    def change_encoding(txt):
-        """
-        Changes encoding to fpdf compatible
-
-        :param txt: Text to encode
-        :return: new-encoded text
-        """
-
-        return str(txt).encode('KOI8-R',
-                               'replace').decode('KOI8-R')
 
     @staticmethod
     def create_fb2_template():
@@ -381,6 +367,9 @@ class HTMLNewsConverter:
         :param item: one news info
         :return: one news info into html
         """
+
+        item = {key: change_encoding(value)
+                for key, value in item.items()}
 
         title = item['title']
         pub_date = item['pubDate']
