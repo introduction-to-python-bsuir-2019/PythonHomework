@@ -105,7 +105,8 @@ class RssBotInterface(metaclass=ABCMeta):
         db = RssDB(self.logger)
 
         loaded_news = db.load_news(news_date)
-
+        if len(loaded_news) == 0:
+            raise RssException(f'There is no news published with the {news_date} date. Try another one.')
         # return news
         return News(
             feed=f'Stored news from date: {news_date}',
