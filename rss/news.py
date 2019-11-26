@@ -50,11 +50,11 @@ class News:
 
         news_number = 1
         #if self.list_of_news consists of 1 element
-        if type(list_of_news) == dict:
+        if type(self.list_of_news) == dict:
             print('№', news_number)
-            self._print_entries(list_of_news)
+            self._print_entries(self.list_of_news)
         else:
-            for news in list_of_news[:limit]:
+            for news in self.list_of_news[:limit]:
                 print('№', news_number)
                 news_number += 1
                 self._print_entries(news)
