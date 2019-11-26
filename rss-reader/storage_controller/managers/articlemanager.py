@@ -23,8 +23,4 @@ class ArticleManager:
         :return: count of new created objects
         :rtype: int
         """
-        count = 0
-        for struct in structs:
-            if Article.from_dict(struct, source) is not None:
-                count += 1
-        return count
+        return len([art for struct in structs if (art := Article.from_struct(struct, source)) is not None])
