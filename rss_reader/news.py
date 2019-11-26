@@ -2,7 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 
 
-engine = create_engine('postgresql:///news')
+engine = create_engine('sqlite:///news')
 Base = declarative_base()
 
 
