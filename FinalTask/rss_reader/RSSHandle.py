@@ -94,6 +94,7 @@ class CacheControl:
     def create_table(self, name):
         """Creates table with feed name"""
         self.connect_db()
+        logging.info('Creating table for news feed cache.')
         self.cursor.execute(f"""CREATE TABLE {name}
                                 (title text, pubDate text, content text, src_link text,
                                  other_links text, media_links text)""")
@@ -103,7 +104,13 @@ class CacheControl:
     def insert_values(self, name, values):
         """Inserts values into the table"""
         self.connect_db()
+        logging.info('Inserting values in the table.')
         self.cursor.execute(f"""INSERT INTO {name}
                                 VALUES {values}""")
         self.conn.commit()
         self.conn.close()
+
+    def cache_output(self, date):
+        "Outputs news from cache in stdout."
+        self.connect_db()
+        logging.info('Printing RSS-Feed in stdout.')
