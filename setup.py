@@ -21,7 +21,6 @@ setuptools.setup(
 
     install_requires=['attrs',
                       'bs4',
-                      'dateutil',
                       'feedparser',
                       'fpdf',
                       'lxml',
