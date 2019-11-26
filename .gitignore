@@ -63,3 +63,4 @@ venv.bak/
 *.sqlite3
 *.html
 *.pdf
+__cache__/
