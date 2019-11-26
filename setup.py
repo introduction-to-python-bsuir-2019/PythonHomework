@@ -16,9 +16,9 @@ setup(
         "logger==1.4",
         "feedparser==5.2.1"
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     entry_points={
         'console_scripts':
-            ['rss-reader = %s.cmd:main' % "rssreader"]
+            ['rss-reader = %s.rssreader:main' % "rssreader"]
         }
 )
