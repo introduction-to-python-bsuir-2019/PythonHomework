@@ -2,14 +2,12 @@
 using: 'python3 setup.py sdist bdist_wheel'
 """
 import setuptools
-# from rss_reader.rss import PROG_VERSION
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 def get_install_requires():
-    with open('requirements.txt') as f:
-        return f.read()
+    with open('requirements.txt') as f
         return [req.strip() for req in f]
 
 setuptools.setup(
