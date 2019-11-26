@@ -1,12 +1,12 @@
 import argparse
 import json
-from rss_reader import rss_parser
+from rss_parser import RssParser
 
-current_version = 0.2
+current_version = 0.21
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Brand new euseand''s RSS-parser written in Python')
+    parser = argparse.ArgumentParser(description='Brand new euseand\'s RSS-parser written in Python')
     parser.version = current_version
     parser.add_argument("source", help="RSS URL")
     parser.add_argument("--version", help="Print version info", action="store_true")
