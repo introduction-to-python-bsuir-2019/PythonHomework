@@ -1,14 +1,14 @@
 import argparse
 import logging
 
-from .rss_reader import Reader
+from rss_reader import Reader
 
 
 def main():
     args = parse_args()
 
     if args.verbose:
-        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
     else:
         logging.basicConfig(format="%(levelname)s: %(message)s")
 

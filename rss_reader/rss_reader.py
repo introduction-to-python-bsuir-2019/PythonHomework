@@ -3,8 +3,8 @@
 import feedparser
 import logging
 
-from .article import Article
-from .json_format import JsonFormat
+from article import Article
+from json_format import Json
 
 
 class Reader:
@@ -22,28 +22,33 @@ class Reader:
         self.logger.info('Get RSS XML-file from url')
 
         self.feed = feedparser.parse(self.link)
-        self.parse_xml(self.feed)
+        self.parse_xml(self.feed.entries[:self.limit])
 
     def parse_xml(self, source):
         """Parse xml-file to articles"""
         self.logger.info('Parse XML-file to articles')
 
-        i = 0
-        for item in source.entries:
+        for item in source:
             content = []
-            for element in item.media_content:
-                content.append(element['url'])
+
+            try:
+                for element in item.media_content:
+                    content.append(element['url'])
+            except AttributeError:
+                try:
+                    for element in item.media_thumbnail:
+                        content.append(element['url'])
+                except AttributeError:
+                    content.append('No content!')
+                # content.append('No content!')
 
             self.articles.append(Article(item.title, item.published, item.description, item.link, content))
 
-            i += 1
-            if i == self.limit:
-                break
-
         if self.json is True:
-            json_format = JsonFormat()
+            json_object = Json()
             feeds = self.articles_to_array()
-            json_format.format(feeds)
+            json_object.format(feeds)
+            print(json_object)
 
     def articles_to_array(self):
         self.logger.info('Convert articles to array of dicts')
