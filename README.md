@@ -22,6 +22,9 @@ optional arguments:
                  will be printed out.
 </pre>
 
+## News caching
+The RSS news are stored in a local storage while reading. Local storage is implemented using shelve. The cached news are stored by key which consists of RSS URL and date.
+
 ## JSON structure
 <pre>
 {

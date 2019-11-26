@@ -49,7 +49,7 @@ class News:
         print('\nFeed:', self.feed_title, "\n\n")
 
         news_number = 1
-        #if self.list_of_news consists of 1 element
+        # if self.list_of_news consists of 1 element
         if type(self.list_of_news) == dict:
             print('№', news_number)
             self._print_entries(self.list_of_news)
