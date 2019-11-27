@@ -10,6 +10,7 @@ services:
 
   app:
     tty: true
+    container_name: rss_reader
     stdin_open: true
     depends_on:
       - 'mongo'
@@ -19,7 +20,7 @@ services:
     ports:
       - '3000:3000'
     links:
-      - mongo
+      - "mongo:mongodb"
     environment:
       - MONGO_URL=mongodb://mongo:27017/
 
