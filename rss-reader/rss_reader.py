@@ -25,9 +25,9 @@ import logging
 
 import feedparser
 
-from htmlparser import *
-from outputcontroller import *
-from storage_controller import *
+from html_parser import *
+from output_controller import *
+from storage import *
 
 
 class RSSReader:

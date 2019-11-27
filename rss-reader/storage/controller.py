@@ -6,7 +6,7 @@ import logging
 
 from peewee import PeeweeException
 
-from storage_controller.managers import *
+from storage.managers import *
 
 __all__ = ['StorageController']
 

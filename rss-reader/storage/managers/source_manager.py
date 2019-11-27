@@ -4,7 +4,7 @@ Module manager of database model Article.
 """
 import logging
 
-from storage_controller.models import Source, DB_HANDLE
+from storage.models import Source, DB_HANDLE
 
 __all__ = ['SourceManager']
 

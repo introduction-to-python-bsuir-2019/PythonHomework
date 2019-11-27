@@ -2,7 +2,7 @@
 Module manager of database model Article.
 
 """
-from storage_controller.models import Article, DB_HANDLE
+from storage.models import Article, DB_HANDLE
 
 __all__ = ['ArticleManager']
 
