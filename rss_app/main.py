@@ -1,9 +1,10 @@
 import argparse
 from rss_app.RSS import RssAggregator
 import logging
+from datetime import datetime
 
 
-__version__="0.2.0"
+__version__="0.3.0"
 
 def get_args():        
     parser=argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
@@ -11,25 +12,34 @@ def get_args():
     parser.add_argument("-v","--version", action="version", version="%(prog)s version {version}".format(version=__version__), default=None, help="Print version info")
     parser.add_argument("--json",action="store_true", help="Print result as JSON in stdout")
     parser.add_argument("--verbose", action="store_true", help="Outputs verbose status messages")
-    parser.add_argument("--limit", type=int, default=None, help="Limit news topics if this parameter provided")    
+    parser.add_argument("--limit", type=int, default=None, help="Limit news topics if this parameter provided")
+    parser.add_argument("--date", type=str, help="It should take a date in %Y%m%d format. For example: --date 20191020")
     args = parser.parse_args()
     return args
 
 def main():
     args=get_args()
+    if args.version:
+        print(args.version)
     if args.verbose:
         logger = get_log()
     else:
         logger = logging.getLogger()
     rssobject=RssAggregator(args, logger)
-    news=rssobject.get_news()    
-    if args.version:
-        print(args.version)
+    news=rssobject.get_news() 
+    if args.date:
+        try:
+            datetime.strptime(args.date, "%Y%m%d")
+            data = rssobject.get_from_json_file()
+            rssobject.print_news_from_file(data)
+            return
+        except ValueError:
+            print("ValueError: Time data {} does not match format %Y%m%d".format(args.date))
+            return       
     if args.json:
         rssobject.print_json(news)        
     else:
         rssobject.print_news(news) 
-    
     logger.info("Exit")
      
 

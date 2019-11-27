@@ -10,7 +10,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='rss-reader',
-    version='0.2.0',
+    version='0.3.0',
     description='A simple Python3.8 rss reader',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -20,7 +20,7 @@ setup(
     keywords='simple rss reader',
     packages=find_packages(),
     python_requires='>=3.8',
-    install_requires=['bs4', 'feedparser', 'requests'],
+    install_requires=['bs4', 'feedparser', 'requests', 'python-dateutil'],
     entry_points={
         'console_scripts': [
             'rss-reader=rss_app.main:main',
