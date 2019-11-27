@@ -5,8 +5,9 @@ from xml.etree import ElementTree
 from datetime import datetime
 
 from bs4 import BeautifulSoup
+from dateutil import parser as date_parser
 
-from rss_reader.storage import Article
+from rss_reader.models import Article
 from rss_reader.exceptions import ParsingError
 
 
@@ -16,7 +17,7 @@ class FeedParser:
         self.logger = logging.getLogger("rss_reader.Parser")
         self.feed = dict()
 
-    def parse(self, data: str) -> dict:
+    def parse(self, data):
         ''' Parse given feed in xml format to Article objects
             and save to self.feed
         '''
@@ -29,35 +30,32 @@ class FeedParser:
 
         channel = root.find('channel')
         self.feed['feed_name'] = html.unescape(channel.find('title').text)
+        self.feed['feed_source'] = html.unescape(channel.find('link').text)
 
         self.feed['articles'] = []
         for article in channel.findall('item'):
             media = {'links': None, 'images': []}
-            content = ''
-            date = datetime.strptime(html.unescape(article.find('pubDate').text), "%a, %d %b %Y %H:%M:%S %z")
+            date = date_parser.parse(html.unescape(article.find('pubDate').text))
             title = html.unescape(article.find('title').text)
 
             if article.find('description').text:
                 content_html = BeautifulSoup(article.find('description').text, 'html.parser')
+                content = content_html.get_text()
+
                 media['links'] = [link['href'] for link in content_html.find_all('a')]
                 for image in content_html.find_all('img'):
-                    media['images'].append({'description': image['alt'], 'source_url': image['src']})
-                if attachments := article.findall('enclosure'):
-                    for attachment in attachments:
-                        if attachment.attrib['type'].startswith('image'):
-                            media['images'].append({'description': 'No description',
-                                                    'source_url': attachment.attrib['url']})
-
-                for number, image in enumerate(media['images']):
-                    content += f'[image {number+1}: {image["description"]}][{number+1}] '
-                content += content_html.get_text()
+                    if 'alt' in image.attrs and image['alt'] != '':
+                        description = image['alt']
+                    else:
+                        description = 'No description'
+                    media['images'].append({'description': description, 'source_url': image['src']})
 
             link = article.find('link').text
             self.feed['articles'].append(Article(date, title, content, media, link))
 
         return self.feed
 
-    def get_json_feed(self, limit: int) -> str:
+    def get_json_feed(self, limit):
         '''Reformat self.feed to JSON format and return it'''
         self.logger.info('Converting feed to JSON')
         try:

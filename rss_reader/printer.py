@@ -4,6 +4,7 @@ class Printer:
         ''' Print feed to cmd'''
         print(f'\nFeed: {feed["feed_name"]}\n')
         for article in feed['articles'][:limit]:
+            content = ''
             if not article.media['links'] and not article.media['images']:
                 links = 'No links'
             else:
@@ -13,11 +14,13 @@ class Printer:
                     links += '[{}]: {} (link)\n'.format(counter, link)
                     counter += 1
                 for image in article.media['images']:
+                    content += f'[image : {image["description"]}] '
                     links += '[{}]: {} (image)\n'.format(counter, image['source_url'])
+                content += article.content
             print('Title: {}\nDate: {}\nLink: {}\n\n{}\n\n\nLinks:\n{}'.format(article.title,
                                                                                article.date,
                                                                                article.link,
-                                                                               article.content,
+                                                                               content,
                                                                                links))
             print('\n'*3)
 
