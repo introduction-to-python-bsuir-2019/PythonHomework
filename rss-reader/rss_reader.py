@@ -19,14 +19,15 @@ in terminal to find more information.
 """
 __package__ = 'rss-reader'
 
+import argparse
 import datetime
 import logging
+
 import feedparser
-import argparse
 
 from htmlparser import *
-from storage_controller import *
 from outputcontroller import *
+from storage_controller import *
 
 
 class RSSReader:

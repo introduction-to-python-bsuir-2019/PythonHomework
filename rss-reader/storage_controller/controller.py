@@ -3,6 +3,7 @@ Module with controllers for work with db.
 
 """
 import logging
+
 from peewee import PeeweeException
 
 from storage_controller.managers import *

@@ -8,13 +8,14 @@ Recommend use only class OutputController with parameters:
 Default start sample output.
 
 """
-import os
 import json
 import logging
+import os
 from abc import ABC
+
+from colorama import init, Style, Fore
 from fpdf import FPDF
 from requests import get
-from colorama import init, Style, Fore
 
 # Initialization colorama for colorized output
 init()

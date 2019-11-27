@@ -5,9 +5,9 @@ Used SQLite3 database and peewee module for work with it.
 """
 
 import datetime
+import json
 
 import peewee
-import json
 
 __all__ = ['DB_HANDLE', 'Source', 'Article']
 

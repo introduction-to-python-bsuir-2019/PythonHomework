@@ -1,7 +1,7 @@
+import datetime
+import html
 import logging
 from abc import ABC, abstractmethod
-import html
-import datetime
 
 __all__ = ['Parser']
 
