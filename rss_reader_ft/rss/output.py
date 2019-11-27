@@ -27,17 +27,18 @@ class Output:
     @staticmethod
     def to_json_format(rss_feed_dict: Dict[str, Any]) -> None:
         """Output data to the console in JSON format"""
+        json_data = JsonConverter(rss_feed_dict).convert_to_format()
+
         logging.info('Print RSS feed in JSON format')
 
-        json_data = JsonConverter(rss_feed_dict).convert_to_format()
         print(json_data)
 
     @staticmethod
     def to_html_format(rss_feed_dict: Dict[str, Any]) -> None:
-        """Output data to the console in HTML format"""
-        logging.info('Print RSS feed in HTML format')
-
+        """Output data to HTML file"""
         html_data = HtmlConverter(rss_feed_dict).convert_to_format()
+
+        logging.info('Print RSS feed in HTML format')
 
         with open('News_feed.html', 'w') as fw:
             fw.write(html_data)

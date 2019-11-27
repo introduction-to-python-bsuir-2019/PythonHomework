@@ -1,4 +1,4 @@
-"""Module contains objects related to JSON"""
+"""Module contains objects related to HTML"""
 import logging
 from typing import Dict, Any
 
@@ -26,21 +26,19 @@ class HtmlConverter(FormatConverter):
               <title>News feed</title>
              </head>
              <body>
-              <table>
+              <table width="600" align="center">
         """
 
-        html += f'<caption>{self.convert_data["Feed"]} {self.convert_data["Url"]}</caption>'
-
+        html += f'<caption><h1>{self.convert_data["Feed"]} <a href={self.convert_data["Url"]}>Ссылка</a></h1></caption>'
 
         for entry in self.convert_data["News"]:
             html += '<tr><td>'
-            html += f'\n<p>Title: {entry["Title"]}</p>'
-            html += f'<p>Date: {entry["Date"]}</p>'
-            html += f'<p>Link: {entry["Link"]}\n</p>'
+            html += f'\n<h3><p align="center">{entry["Title"]}</p></h3>'
+            html += f'<p align="center"><a href={entry["Link"]}>Ссылка на статью</a></p>'
             for count, img_link in enumerate(entry["Links"]["Img_links"]):
-                html += f'<p><img src=\'{img_link}\' width="189" height="255"></p>'  # 2 this a shift
+                html += f'<p><img src=\'{img_link}\' width="600" height="400"></p>'  # 2 this a shift
+            html += f'<p>Date: {entry["Date"]}</p>'
             html += f'<p>{entry["Description"]}\n</p>'
-            html += f'<p>Links:\n[1] {entry["Links"]["Source_link"]} (link)</p>'
             html += '</td></tr>'
 
         html += '</table></body></html>'

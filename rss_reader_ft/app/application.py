@@ -1,5 +1,6 @@
 """Module contains objects related to logs"""
 import sys
+import logging
 from typing import Dict, Any
 
 from rss_reader_ft.app.application_log import ApplicationLog

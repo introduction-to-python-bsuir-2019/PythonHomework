@@ -22,19 +22,23 @@ class MongoDatabase:
             self.feed_collection = db[self.collection_name]
         except ConnectionError as ex:
             logging.error('Error connection to database')
+        logging.info('Сonnect to the database')
 
     def _check_news_feed(self, data: Dict[str, Any]) -> bool:
         """Method for checking if an object is in the database"""
+        logging.info('Check for data in the database')
         return self.feed_collection.find(
-            {"Feed": data["Feed"], "Url": data["Url"], "Date_Parsed": data["Date_Parsed"]}).count() == 0
+            {"Url": data["Url"], "Date_Parsed": data["Date_Parsed"]}).count() == 0
 
     def _update_news_feed(self, new_news_feed: Dict[str, Any]) -> None:
         """
         Method for updating old news in the database
         when parsing a news feed again
         """
+        logging.info('Updating old news')
+
         old_news_feed = self.feed_collection.find_one(
-            {"Feed": new_news_feed["Feed"], "Url": new_news_feed["Url"], "Date_Parsed": new_news_feed["Date_Parsed"]})
+            {"Url": new_news_feed["Url"], "Date_Parsed": new_news_feed["Date_Parsed"]})
 
         news_update = []
 
@@ -44,8 +48,7 @@ class MongoDatabase:
 
         update_old_news_feed = old_news_feed["News"] + news_update
 
-        self.feed_collection.update_one({"Feed": old_news_feed["Feed"],
-                                         "Url": old_news_feed["Url"],
+        self.feed_collection.update_one({"Url": old_news_feed["Url"],
                                          "Date_Parsed": old_news_feed["Date_Parsed"]},
                                         {"$set": {"News": update_old_news_feed}})
 
@@ -54,13 +57,15 @@ class MongoDatabase:
         In which we determine whether the object exists and select an update or add
         """
         if self._check_news_feed(data):
+            logging.info('Сached data')
             self.feed_collection.insert_one(data)
         else:
             self._update_news_feed(data)
-        logging.info('Сached data')
 
     def get_news(self, limit: int, date: int, source: str) -> Dict:
         """Method for finding news in a database and issuing them according to parameters"""
+        logging.info('We get data from the database')
+
         if date is None and limit is None:
             return self.feed_collection.find_one(
                 {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}

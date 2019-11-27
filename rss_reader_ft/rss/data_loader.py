@@ -1,5 +1,6 @@
 """Module contains objects related to data loading"""
 import logging
+from typing import Dict, Any
 
 import feedparser
 
@@ -10,14 +11,14 @@ class DataLoader:
         """Init DataLoader class"""
         self.url_source: str = url_source
 
-    def upload(self):
+    def upload(self) -> Dict[str, Any]:
         """Method of loading data from a site by URL"""
         try:
             data = feedparser.parse(self.url_source)
 
             if data.bozo != 0:
-                raise ConnectionError("Incorrect url")
-
+                print("Incorrect url")
+                raise ConnectionError("Not work connection")
         except Exception as ex:
             logging.error(f'Error connection {ex}', exc_info=False)
         logging.info('Get data by URL')

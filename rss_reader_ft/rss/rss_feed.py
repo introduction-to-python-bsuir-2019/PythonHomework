@@ -28,7 +28,6 @@ class RSSFeed:
             "Url": self.rss_url,
             "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")
         })
-        logging.info('Update rss_feed_dict(Add Feed and Url)')
 
         for entry in self.rss_feed.entries:
             soup = BeautifulSoup(entry.summary, features="html.parser")
@@ -42,8 +41,7 @@ class RSSFeed:
                     "Img_links": [link.get("src") for link in soup.find_all("img") if link.get("src")]
                 }
             })
-        logging.info('Append dict in News')
 
         self.rss_feed_dict.update({"News": self.news})
-        logging.info('Update rss_feed_dict(Add News)')
+        logging.info('Data processing for further work with them')
         return self.rss_feed_dict

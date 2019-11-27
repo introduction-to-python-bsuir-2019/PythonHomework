@@ -14,7 +14,7 @@ class ApplicationLog:
             datefmt='%Y-%m-%d %H:%M:%S',
             level=logging.INFO
         )
-        logging.info('Create base config')
+        logging.info('Create base config for log')
 
     @staticmethod
     def print_log() -> None:
