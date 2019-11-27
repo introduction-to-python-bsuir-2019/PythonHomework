@@ -1,14 +1,28 @@
+"""
+Module for output the result of the utility and printing in different formats.
+Recommend use only class OutputController with parameters:
+    * to_json: bool - output in JSON or not
+    * to_pdf: str - string filename for output
+    * to_html: str - string filename for output
+    * colorize: bool - print the result in colorized mode
+Default start sample output.
+
+"""
+import os
 import json
 import logging
-import abc
-import os
-import fpdf
-import requests
+from abc import ABC
+from fpdf import FPDF
+from requests import get
+from colorama import init, Style, Fore
+
+# Initialization colorama for colorized output
+init()
 
 __all__ = ['OutputController']
 
 
-class BaseController(abc.ABC):
+class BaseController(ABC):
     """
     Abstract base class for all output controllers. Using such interface for all controllers.
     """
@@ -52,29 +66,53 @@ class SamplePrintController(BaseController):
 
         :param articles: dict with title and list of news articles
         :param kwargs: optional params. Use to extend a count given params in base method
+            colorize: bool - print the result of the utility in colorized mode
         :type articles: dict
         """
         logging.info("Start sample output")
         if (title := articles.get('title', None)) is not None:
-            self._print_title(title)
+            self._print_title(title, colorize=kwargs.get('colorize', False))
 
         for article in articles['articles']:
-            self._print_article(article)
+            self._print_article(article, colorize=kwargs.get('colorize', False))
 
     def _print_article(self, article, **kwargs):
         """
-        Method for output given articles in given PDF file.
+        Method for output given articles in standard out.
 
         :param article: articles to output
         :param kwargs: optional params. Use to extend a count given params in base method
+            colorize: bool - print the result of the utility in colorized mode
+        :type article: dict
         """
-        print(f"Title: {article['title']}\n"
-              f"Date: {article['pubDate']}\n"
-              f"Link: {article['link']}\n\n"
-              f"{article['dec_description']}\n\n"
-              f"Links:")
+
+        if kwargs.get('colorize', False):
+            output = "{}Title:{} %s\n" \
+                     "{}Date: {}%s{}\n" \
+                     "{}Link: {}%s{}\n" \
+                     "\n" \
+                     "%s\n" \
+                     "\n" \
+                     "{}Links:{}".format(Fore.BLUE, Style.RESET_ALL,
+                                         Fore.BLUE, Fore.LIGHTYELLOW_EX, Style.RESET_ALL,
+                                         Fore.BLUE, Fore.YELLOW, Style.RESET_ALL,
+                                         Fore.BLUE, Style.RESET_ALL)
+            format_link = "{}%s{}"
+        else:
+            output = "Title: %s\n" \
+                     "Date: %s\n" \
+                     "Link: %s\n" \
+                     "\n" \
+                     "%s\n" \
+                     "\n" \
+                     "Links:"
+            format_link = "%s"
+
+        print(output % (article['title'], article['pubDate'], article['link'], article['dec_description']))
+
         for link in article['dec_links']:
-            print(link)
+            params = (Fore.YELLOW, Style.RESET_ALL) if link.endswith('(link)') else (Fore.GREEN, Style.RESET_ALL)
+            print((format_link % link).format(*params))
         print('################################################################################')
 
     def _print_title(self, title, **kwargs):
@@ -83,9 +121,13 @@ class SamplePrintController(BaseController):
 
         :param title: title to output
         :param kwargs: optional params. Use to extend a count given params in base method
+            colorize: bool - print the result of the utility in colorized mode
         :type title: str
         """
-        print(f"Feed: {title}\n")
+        if kwargs.get('colorize', False):
+            print(f"%sFeed: %s{title}%s\n" % (Fore.BLUE, Fore.LIGHTMAGENTA_EX, Style.RESET_ALL))
+        else:
+            print(f"Feed: {title}\n")
 
 
 class JSONPrintController(BaseController):
@@ -130,7 +172,7 @@ class PDFPrintController(BaseController):
         if print_to is not None and not print_to.endswith(self.extension):
             print_to += self.extension
 
-        writer = fpdf.FPDF()
+        writer = FPDF()
         writer.add_page()
         self._print_title(articles['title'], writer=writer)
 
@@ -233,7 +275,7 @@ class PDFPrintController(BaseController):
         """
         if not os.path.exists(os.path.join(self.cache_folder)):
             os.mkdir(os.path.join(self.cache_folder))
-        img_data = requests.get(link).content
+        img_data = get(link).content
         ready_image_path = os.path.join(self.cache_folder, filename)
         with open(ready_image_path, 'wb') as handler:
             handler.write(img_data)
@@ -320,7 +362,7 @@ class OutputController:
     """
 
     @staticmethod
-    def print(articles, to_pdf=None, to_html=None, to_json=False):
+    def print(articles, to_pdf=None, to_html=None, to_json=False, colorize=False):
         """
         Method for the choice and run procedure of output given articles.
         The output method depends on a given parameters.
@@ -332,11 +374,13 @@ class OutputController:
         :param articles: articles for output
         :param to_pdf: filename for output in PDF
         :param to_html: filename for output using HTML
-        :param to_json: Output a given articles in JSON format
+        :param to_json: Print given articles in JSON format
+        :param colorize: Print result in colorized mode
         :type articles: dict
         :type to_pdf: str
         :type to_html: str
         :type to_json: bool
+        :type colorize: bool
         """
         if to_html is not None:
             HTMLPrintController().print_to(articles, filename=to_html)
@@ -346,4 +390,4 @@ class OutputController:
         if to_json:
             JSONPrintController().print_to(articles)
         else:
-            SamplePrintController().print_to(articles)
+            SamplePrintController().print_to(articles, colorize=colorize)
