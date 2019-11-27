@@ -18,6 +18,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
+    links:
+      - mongo
     environment:
       - MONGO_URL=mongodb://mongo:27017/
 
