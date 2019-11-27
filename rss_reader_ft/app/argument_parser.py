@@ -49,12 +49,12 @@ class ArgumentParser:
         )
         parser.add_argument(
             '--to-html',
-            help='Print result as JSON in stdout',
+            help='Print result as HTML file',
             action='store_true'
         )
         parser.add_argument(
             '--to-pdf',
-            help='Print result as JSON in stdout',
+            help='Print result as PDF file',
             action='store_true'
         )
         logging.info('Parsed arguments')
