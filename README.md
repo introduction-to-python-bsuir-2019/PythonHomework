@@ -29,20 +29,21 @@ The RSS news are stored in a local storage while reading. Local storage is imple
 <pre>
 {
     "news": {
-        "feed": "Yahoo News - Latest News & Headlines",
+        "feed": "TUT.BY: Новости ТУТ - Главные новости",
         "items": [
             {
-                "title": "Ukrainian energy company tied to Hunter Biden supported American think tank, paid for trips",
-                "link": "https://news.yahoo.com/ukrainian-energy-company-tied-to-hunter-biden-supported-american-think-tank-paid-for-trips-015132322.html",
-                "date": "Tue, 12 Nov 2019 20:51:32 -0500",
+                "title": "Охрана, неприкосновенность, пенсия. Канопацкая предлагает закон о гарантиях для экс-президента Беларуси",
+                "link": "https://news.tut.by/economics/662957.html?utm_campaign=news-feed&utm_medium=rss&utm_source=rss-news",
+                "date": "Wed, 27 Nov 2019 15:41:00 +0300",
                 "description": {
-                    "text": "Burisma gave more than $450,000 to the Atlantic Council, a prominent Washington think tank.",
+                    "text": "Депутат Анна Канопацкая разработала законопроект «О гарантиях президенту Республики Беларусь, прекратившему исполнение своих полномочий, и членам его семьи» и в ближайшее время внесет его на рассмотрение в Палату представителей.",
                     "images": [
-                        "http://l1.yimg.com/uu/api/res/1.2/2Q92DOIaZFmDeg0l9DbhAg--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-images/2019-11/42dec8d0-05a9-11ea-adcf-9417cbbb4d35"
+                        {
+                            "src": "https://img.tyt.by/thumbnails/n/politika/04/4/c5109116a72e8f8029fecf5ca544c9d4.jpg",
+                            "alt": "Фото: sb.by"
+                        }
                     ],
-                    "links": [
-                        "https://news.yahoo.com/ukrainian-energy-company-tied-to-hunter-biden-supported-american-think-tank-paid-for-trips-015132322.html"
-                    ]
+                    "links": null
                 }
             }
         ]

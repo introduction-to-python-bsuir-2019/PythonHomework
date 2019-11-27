@@ -120,7 +120,7 @@ class Cache:
         if news['description']['images']:
             print('Images:')
             for item in news['description']['images']:
-                print(item)
+                print(item['src'])
 
         if news['description']['links']:
             print('Links:')
