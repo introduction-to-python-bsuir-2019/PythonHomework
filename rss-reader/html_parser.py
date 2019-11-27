@@ -167,9 +167,11 @@ class HTMLParser:
         if type(elem) == str:
             return html.unescape(elem)
         elif type(elem) == dict:
-            return {k: self._clear_from_html(v) for k, v in elem.items()}
+            return {self._clear_from_html(k): self._clear_from_html(v) for k, v in elem.items()}
         elif type(elem) == list:
             return [self._clear_from_html(el) for el in elem]
+        else:
+            return elem
 
     @staticmethod
     def _get_limited_articles(response, limit):
@@ -202,10 +204,8 @@ class HTMLParser:
         :return: (startpos, endpos) is a position of next tag in line if line have a tag, else None
         :rtype: tuple or None
         """
-        if line.find('<') != -1:
-            startpos = line.find('<')
-            endpos = line.find('>', startpos) + 1
-            return startpos, endpos
+        if (startpos := line.find('<')) != -1 and (endpos := line.find('>')) != -1:
+            return startpos, endpos + 1
         else:
             return None
 
