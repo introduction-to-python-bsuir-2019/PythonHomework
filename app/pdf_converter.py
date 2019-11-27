@@ -3,13 +3,17 @@
     where it will save news in PDF format
 """
 
-import fpdf
 import os
 import json
+
+from bs4 import BeautifulSoup
+import urllib.request
+import fpdf
+
 from app.RSSreader import RSSreader
 
 
-class Converter:
+class PDFConverter:
     """ Writes news in PDF file """
 
     def __init__(self, args, logger, news=None):
@@ -18,8 +22,7 @@ class Converter:
         self.news = news
         self.logger = logger
 
-        # fpdf.set_global('SYSTEM_TTFONTS', os.path.join(os.path.dirname(__file__), 'fonts'))
-        fpdf.set_global('SYSTEM_TTFONTS', os.path.abspath('fonts'))
+        fpdf.set_global('SYSTEM_TTFONTS', os.path.join(os.path.dirname(__file__), 'fonts'))
         self.pdf = fpdf.FPDF()
         self.pdf.add_font('NotoSans-Black', '', 'NotoSans-Black.ttf', uni=True)
         self.pdf.add_font('NotoSans-Thin', '', 'NotoSans-Thin.ttf', uni=True)
@@ -36,6 +39,7 @@ class Converter:
         for new in news:
             self.create_cells(new)
             self.pdf.ln(10)
+            self.pdf.add_page()
 
         file_path = self.args.to_pdf + os.path.sep + 'cached_news.pdf'
         self.pdf.output(file_path)
@@ -54,13 +58,15 @@ class Converter:
             new = rss_reader.to_json(new)
             self.create_cells(new)
             self.pdf.ln(10)
+            self.pdf.add_page()
 
         file_path = self.args.to_pdf + os.path.sep + 'news.pdf'
+        print(file_path)
         self.pdf.output(file_path)
         self.logger.info('News has been written to PDF file')
 
     def write_title(self, title):
-        """Writes title of PDF file"""
+        """ Writes title of PDF file """
 
         self.pdf.set_font('NotoSans-Black', size=16)
         self.pdf.add_page()
@@ -70,9 +76,55 @@ class Converter:
 
     def create_cells(self, new):
         """ Creates cells in PDF file with news content """
-
+        
+        img_path = None
         for key, value in new.items():
             self.pdf.set_font('NotoSans-Black', size=12)
             self.pdf.cell(25, 5, txt=key + ': ', ln=0, align='L')
             self.pdf.set_font('NotoSans-Thin', size=12)
-            self.pdf.multi_cell(0, 5, txt=value)
+            if key == 'Summary':
+                self.pdf.multi_cell(0, 5, txt=BeautifulSoup(value, 'html.parser').text)
+                img_path = self.download_image(value)
+            else:
+                self.pdf.multi_cell(0, 5, txt=value)
+        if img_path:
+            self.write_image(img_path)
+
+    def download_image(self, html_text):
+        """ Downloads image form given url and returns path """
+
+        soup = BeautifulSoup(html_text, 'html.parser')
+        img = soup.find('img')
+        if img:
+            img_url = img['src']
+            print('IMG_URL:', img_url)
+        else:
+            return None
+        directory_path = 'images' + os.path.sep
+        if not os.path.exists(directory_path):
+            self.logger.info('Creating directory images')
+            os.mkdir(directory_path)
+        split_list = img_url.split('/')
+        img_name = split_list[len(split_list) - 1]
+        split_list = img_name.split('.')
+        img_name = split_list[len(split_list) - 2] + '.jpg'
+        print('IMG_NAME:', img_name)
+        img = urllib.request.urlopen(img_url).read()
+        img_path = os.path.abspath('') + os.path.sep + directory_path + img_name
+        with open(img_path, "wb") as out:
+            out.write(img)
+            self.logger.info('Image has been downloaded')
+        return img_path
+
+    def write_image(self, img_path):
+        """ Writes image to pdf file """
+
+        try:
+            self.pdf.image(img_path)
+        except SyntaxError:
+            print("IMAGE SyntaxError - poebat'")
+            return None
+        except RuntimeError:
+            print(print("IMAGE SyntaxError - pohuy"))
+            return None
+        self.pdf.multi_cell(0, 10, txt=f'{img_path}')

@@ -4,6 +4,15 @@
 # How to use
 * pip install -r requirements.txt
 * python rss-reader.py "https://news.yahoo.com/rss/" --limit 2 --json
+* --date prints cached news that were parsed previously from the given URL
+* For --to-pdf argument: specify the path to the folder 
+where 'news.pdf/cached_news.pdf' file will be saved.
+The file will be overwritten after restarting the program.
+Make sure to copy that file if you need it
+* Btw i use fonts for .pdf files, hope they will be installed correctly
+by 'pip install .'
+* P.S. Ля, ребята, 4 курс птуира, уже распред идет во всю, работа нужна кааапец
+
 
 # Parameters
 * --help (show this help message and exit)
@@ -19,3 +28,11 @@ feed = {
   'Summary': 'news description',
   'Link': 'original link to news',
 }
+
+# Progress
+-   [x] [Iteration 1] One-shot command-line RSS reader.
+-   [x] [Iteration 2] Distribution
+-   [x] [Iteration 3] News caching
+-   [ ] [Iteration 4] Format converter
+-   [ ] * [Iteration 5] Output colorization
+-   [ ] * [Iteration 6] Web-server

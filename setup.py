@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages
 import os
+
+from setuptools import setup, find_packages
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -19,11 +20,20 @@ setup(
     author='Dydyshko Andrey',
     author_email='dydyshko1999@gmail.com',
     keywords='simple rss reader',
+    #packages=find_packages(),
+    packages=['app', 'app.fonts'],
+    package_data={'app': [
+        'app/fonts/NotoSans-Black.ttf',
+        'app/fonts/Black.cw127.pkl',
+        'app/fonts/NotoSans-Black.pkl',
+        'app/fonts/NotoSans-Thin.ttf',
+        'app/fonts/NotoSans-Thin.pkl',
+        'app/fonts/NotoSans-Thin.cw127.pkl',
+    ]},
+    #data_files=[('app', ['fonts/NotoSans-Black.ttf', ])],
     include_package_data=True,
-    packages=find_packages(),
-    # packages=['app', 'app.cache'],
     python_requires='>=3.8',
-    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'python-dateutil'],
+    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'python-dateutil', 'fpdf', 'setuptools-git'],
     entry_points={
         'console_scripts': [
             'rss-reader=app.__main__:main',

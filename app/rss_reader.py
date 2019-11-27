@@ -2,11 +2,13 @@
     Controls the launch of the rss-reader program
 """
 
+import logging
+
+import dateutil.parser as dateparser
+
 from app.argparser import ArgParser
 from app.RSSreader import RSSreader
-from app.converter import Converter
-import logging
-import dateutil.parser as dateparser
+from app.pdf_converter import PDFConverter
 
 
 def main():
@@ -43,7 +45,7 @@ def main():
             else:
                 rss_reader.print_cached_feed(cached_feed)
             if args.to_pdf:
-                converter = Converter(arguments, logger)
+                converter = PDFConverter(arguments, logger)
                 converter.write_json_to_pdf()
         logger.info('Exit')
         return
@@ -51,7 +53,7 @@ def main():
     feed = rss_reader.get_feed()
 
     if args.to_pdf:
-        converter = Converter(arguments, logger, news=feed)
+        converter = PDFConverter(arguments, logger, news=feed)
         converter.write_to_pdf()
 
     if args.json:

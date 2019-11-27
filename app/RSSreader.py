@@ -4,11 +4,12 @@
     in different formats
 """
 
-import feedparser
+import os
 import json
+
+import feedparser
 from bs4 import BeautifulSoup
 import dateutil.parser as dateparser
-import os
 
 
 class RSSreader:
@@ -57,7 +58,7 @@ class RSSreader:
         feed = dict()
         feed['Title'] = entry.title
         feed['Published'] = entry.published
-        feed['Summary'] = BeautifulSoup(entry.summary, "html.parser").text
+        feed['Summary'] = entry.summary
         feed['Link'] = entry.link
         feed['Url'] = self.args.url
         return feed
@@ -69,7 +70,7 @@ class RSSreader:
         # directory_path = os.path.abspath(os.path.dirname('app')) + os.path.sep + 'cache' + os.path.sep
         directory_path = 'cache' + os.path.sep
         if not os.path.exists(directory_path):
-            self.logger.info('Creating directory')
+            self.logger.info('Creating directory cache')
             os.mkdir(directory_path)
 
         file_path = directory_path + date + '.json'
