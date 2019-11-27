@@ -23,12 +23,13 @@ def create_session(adding=None):
 
 
 class RssReader(object):
-    def __init__(self, source, limit, date, json, configuration_for_conversion):
+    def __init__(self, source, limit, date, json, configuration_for_conversion, all):
         self.source = source
         self.limit = limit
         self.date = date
         self.json = json
         self.configuration_for_conversion = configuration_for_conversion
+        self.all = all
         self.news_to_print = []
         Base.metadata.create_all(engine)
 
@@ -71,14 +72,19 @@ class RssReader(object):
         with create_session() as s:
             self.news_to_print.extend(s.query(News).filter(func.date(News.date) == self.date).all())
             if not self.news_to_print:
-                raise Exception('No cached news on this date')
-            self.print_news()        
-            
+                raise Exception('No cached news on this date')      
+    
+    def get_all_news(self):
+        with create_session() as s:
+            self.news_to_print = s.query(News).all()
+            if not self.news_to_print:
+                raise Exception('No cached news')
+                   
     def get_news_to_print(self):
         with create_session() as s:
             if self.limit:
                 self.news_to_print = s.query(News)\
-                                      .filter(News.date_of_addition == datetime.today())\
+                                      .filter(func.Date(News.date_of_addition) == datetime.today().date())\
                                       .order_by(News.date_of_addition.desc())\
                                       .limit(self.limit).all()
             else:
@@ -87,17 +93,18 @@ class RssReader(object):
                                       .order_by(News.date_of_addition.asc()).all()
         if self.json:
             print(Json(self.news_to_print))
-        else:
-            self.print_news()
             
     def print_news(self):
         for feed in self.news_to_print:
             print(feed)
             print('='*50)
     
-    def __call__(self):
+    def exec(self):
         if self.date:
             self.get_cached_news()
+        elif self.all:
+            self.get_all_news()
         else:
             self.get_and_parse_news()
-        self.get_news_to_print()
+            self.get_news_to_print()
+        self.print_news()

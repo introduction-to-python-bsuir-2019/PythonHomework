@@ -1,4 +1,4 @@
-from sqlalchemy import *
+from sqlalchemy import create_engine, Column, String, DateTime, PickleType, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -37,5 +37,3 @@ class News(Base):
 
     def __call__(self):
         return self.feed, self.title, self.date, self.link, self.description, self.media_content
-
-    

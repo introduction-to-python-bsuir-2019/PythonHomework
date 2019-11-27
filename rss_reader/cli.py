@@ -11,20 +11,21 @@ def main():
     args = parser.parse_args()
     init_logging(args.verbose)
     configuration_for_conversion = mk_config_for_conversion(args.to_pdf, args.to_html)
-    rss = RssReader(args.source, args.limit, args.date, args.json, configuration_for_conversion)
-    rss()
+    rss = RssReader(args.source, args.limit, args.date, args.json, configuration_for_conversion, args.all)
+    rss.exec()
 
 
 def adding_arguments():
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
     parser.add_argument('source', metavar='source', type=url, help='RSS URL')
     parser.add_argument('--version', action='version', version='ver 1.2', help='Print version info')
-    parser.add_argument('--limit', metavar='LIMIT', type=int)
-    parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('--json', action='store_true')
-    parser.add_argument('--date', type=date)
-    parser.add_argument('--to-pdf', type=directory)
-    parser.add_argument('--to-html', type=directory)
+    parser.add_argument('--limit', metavar='LIMIT', type=int, help='Amount of news output')
+    parser.add_argument('--verbose', action='store_true', help='Print all logs in stdout')
+    parser.add_argument('--json', action='store_true', help='Print news in json format')
+    parser.add_argument('--date', type=date, help='Print news published on a given day')
+    parser.add_argument('--to-pdf', type=directory, help='Conversion news to the PDF format')
+    parser.add_argument('--to-html', type=directory, help='Conversion news to the HTML format')
+    parser.add_argument('--all', action='store_true', help='Getting all cached news')
     return parser
 
 
@@ -52,6 +53,7 @@ def init_logging(verbose):
     if verbose:
         logging.basicConfig(format='%(module)s %(asctime)s  %(message)s',
                             datefmt='%I:%M:%S', level=logging.INFO)
+
 
 def mk_config_for_conversion(pdf, html):
     from collections import defaultdict
