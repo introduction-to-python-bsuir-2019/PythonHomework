@@ -19,7 +19,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - MONGO_URL=mongodb://mongo:27017/News_feed
+      - MONGO_URL=mongodb://mongo:27017/
 
   mongo-express:
     image: mongo-express
