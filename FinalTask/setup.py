@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="rss-reader-euseand",
-    version="0.24",
+    version="0.25",
     author="Yevgeny Semak",
     author_email="euseand@gmail.com",
     url="https://github.com/euseand/PythonHomework/tree/FinalTask/FinalTask",
