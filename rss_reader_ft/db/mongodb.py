@@ -8,6 +8,7 @@ import pymongo
 
 class MongoDatabase:
     """MongoDatabase class"""
+
     def __init__(self, URL_CONNECTION: str, DB_NAME: str, COLLECTION_NAME: str):
         """Init MongoDatabase class"""
         self.url_connection: str = URL_CONNECTION
@@ -66,24 +67,19 @@ class MongoDatabase:
         """Method for finding news in a database and issuing them according to parameters"""
         logging.info('We get data from the database')
 
-        if date is None and limit is None:
-            return self.feed_collection.find_one(
-                {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}
-            )
-        elif date is None and limit is not None:
-            news_feed = self.feed_collection.find_one(
-                {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}
-            )
-            if 0 < limit <= len(news_feed["News"]):
-                news_feed["News"] = news_feed["News"][:limit]
-            return news_feed
-        else:
+        if date is not None:
             news_feed = self.feed_collection.find_one(
                 {"Url": source, "Date_Parsed": str(date)}
             )
-            if news_feed is None:
-                print('Nothing found for a given date')
+        else:
+            news_feed = self.feed_collection.find_one(
+                {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}
+            )
+        if limit is not None:
+            if 0 < limit <= len(news_feed["News"]):
+                news_feed["News"] = news_feed["News"][:limit]
+                return news_feed
             else:
-                if 0 < limit <= len(news_feed["News"]):
-                    news_feed["News"] = news_feed["News"][:limit]
+                return news_feed
+        else:
             return news_feed
