@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import datetime
 
-from .rss_reader import NewsReader
+from news_feed.rss_reader import NewsReader
 
 
 class TestNewsReader(unittest.TestCase):
