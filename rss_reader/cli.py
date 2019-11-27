@@ -42,7 +42,7 @@ def url(source):
 
 def date(date):
     try:
-        checked_date = datetime.strptime(date, '%Y%m%d')
+        checked_date = datetime.strptime(date, '%Y%m%d').date()
         return checked_date
     except:
         raise argparse.ArgumentError('Wrong date')

@@ -4,7 +4,7 @@ import feedparser
 from datetime import datetime, date
 from time import mktime
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import DATE, func, TIME, desc, asc
+from sqlalchemy import func, desc, asc, Date 
 from .news import News, engine, Base
 from .json_formatter import Json
 from contextlib import contextmanager
@@ -23,10 +23,10 @@ def create_session(adding=None):
 
 
 class RssReader(object):
-    def __init__(self, source, limit, dates, json, configuration_for_conversion):
+    def __init__(self, source, limit, date, json, configuration_for_conversion):
         self.source = source
         self.limit = limit
-        self.dates = dates
+        self.date = date
         self.json = json
         self.configuration_for_conversion = configuration_for_conversion
         self.news_to_print = []
@@ -38,7 +38,7 @@ class RssReader(object):
         logging.info('Parsing news')
         if news['entries'] and news['status'] == 200:
             with create_session('adding') as s:
-                list_of_news = news['entries'][:self.limit[0]] if self.limit else news['entries']
+                list_of_news = news['entries'][:self.limit] if self.limit else news['entries']
                 for feed in list_of_news:
                     text_of_the_feed = self.parse_html(feed['summary_detail']['value'])
                     title = self.parse_html(feed['title'])
@@ -69,8 +69,7 @@ class RssReader(object):
     
     def get_cached_news(self):
         with create_session() as s:
-            for date in self.dates:
-                self.news_to_print.extend(s.query(News).filter(func.DATE(News.date) == date).all())
+            self.news_to_print.extend(s.query(News).filter(func.date(News.date) == self.date).all())
             if not self.news_to_print:
                 raise Exception('No cached news on this date')
             self.print_news()        
@@ -81,10 +80,10 @@ class RssReader(object):
                 self.news_to_print = s.query(News)\
                                       .filter(News.date_of_addition == datetime.today())\
                                       .order_by(News.date_of_addition.desc())\
-                                      .limit(self.limit[0]).all()
+                                      .limit(self.limit).all()
             else:
                 self.news_to_print = s.query(News)\
-                                      .filter(func.DATE(News.date_of_addition) == datetime.today().date())\
+                                      .filter(func.Date(News.date_of_addition) == datetime.today().date())\
                                       .order_by(News.date_of_addition.asc()).all()
         if self.json:
             print(Json(self.news_to_print))
@@ -97,7 +96,7 @@ class RssReader(object):
             print('='*50)
     
     def __call__(self):
-        if self.dates:
+        if self.date:
             self.get_cached_news()
         else:
             self.get_and_parse_news()
