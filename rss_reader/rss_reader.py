@@ -23,11 +23,12 @@ def create_session(adding=None):
 
 
 class RssReader(object):
-    def __init__(self, source, limit, date, json):
+    def __init__(self, source, limit, dates, json, configuration_for_conversion):
         self.source = source
         self.limit = limit
-        self.date = date
+        self.dates = dates
         self.json = json
+        self.configuration_for_conversion = configuration_for_conversion
         self.news_to_print = []
         Base.metadata.create_all(engine)
 
@@ -68,8 +69,10 @@ class RssReader(object):
     
     def get_cached_news(self):
         with create_session() as s:
-            date_for_find = [datetime.strptime(date_of_feed, '%Y%m%d').date() for date_of_feed in self.date]
-            self.news_to_print = s.query(News).filter(func.DATE(News.date) == date_for_find[0]).all()
+            for date in self.dates:
+                self.news_to_print.extend(s.query(News).filter(func.DATE(News.date) == date).all())
+            if not self.news_to_print:
+                raise Exception('No cached news on this date')
             self.print_news()        
             
     def get_news_to_print(self):
@@ -94,7 +97,7 @@ class RssReader(object):
             print('='*50)
     
     def __call__(self):
-        if self.date:
+        if self.dates:
             self.get_cached_news()
         else:
             self.get_and_parse_news()
