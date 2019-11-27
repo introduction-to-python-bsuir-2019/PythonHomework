@@ -20,6 +20,10 @@ by 'pip install .'
 * --json (prints result as JSON in stdout)
 * --verbose (outputs verbose status messages)
 * --version (print version info)
+* --date (It should take a date in YYYYmmdd format. For example:
+ --date 20191020The new from the specified day will be printed out.
+  If the news are not found error will be returned.)
+* --to-pdf TO_PDF (It should take the path of the directory where new PDF file will be saved)
 
 # JSON structure
 feed = {
@@ -27,6 +31,8 @@ feed = {
   'Published': 'date',
   'Summary': 'news description',
   'Link': 'original link to news',
+  'Url': 'url of rss feed'
+  'Image': 'original link to the image'
 }
 
 # Progress

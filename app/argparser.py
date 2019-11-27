@@ -49,7 +49,7 @@ class ArgParser:
         argparser.add_argument(
             '--date',
             type=str,
-            help='It should take a date in %Y%m%d format. For example: --date 20191020'
+            help='It should take a date in YYYYmmdd format. For example: --date 20191020'
                  'The new from the specified day will be printed out. If the news are not found error will be returned.'
         )
         argparser.add_argument(
