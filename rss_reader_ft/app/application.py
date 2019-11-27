@@ -21,9 +21,8 @@ class Application:
     def run_app(self) -> None:
         """Мethod sets application behavior"""
 
-        print(self.dict_args)
-
         logging.info(f'args{self.dict_args}')
+        
         mongo_db = MongoDatabase(URL_CONNECTION, DB_NAME, COLLECTION_NAME)
         mongo_db.database_connection()
 
@@ -32,6 +31,8 @@ class Application:
         feed = RSSFeed(self.dict_args, data)
 
         process_data = feed.data_processing()
+
+        print(process_data)
 
         mongo_db.cache_news_feed(process_data)
 

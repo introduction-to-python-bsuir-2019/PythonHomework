@@ -63,7 +63,7 @@ class MongoDatabase:
         else:
             self._update_news_feed(data)
 
-    def get_news(self, limit: int, date: int, source: str) -> Dict:
+    def get_news(self, limit: int, date: int, source: str) -> Dict[str, Any]:
         """Method for finding news in a database and issuing them according to parameters"""
         logging.info('We get data from the database')
 
@@ -78,6 +78,7 @@ class MongoDatabase:
         if limit is not None:
             if 0 < limit <= len(news_feed["News"]):
                 news_feed["News"] = news_feed["News"][:limit]
+                print()
                 return news_feed
             else:
                 return news_feed

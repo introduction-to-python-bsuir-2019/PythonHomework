@@ -15,7 +15,31 @@ Utility provides the following interface:
     + --limit    - Limit news topics if this parameter is provided.
     + --date     - Return cached news from the specified day. Format is %Y%M%D.
 
-## Install RSS reader
+## Install RSS reader v2.0 (work)
+1. Create docker container:
+    ```
+    docker run -it python /bin/bash
+    ```
+2. Clone or Download repository https://github.com/ZayJob/PythonHomework
+3. Go to folder /PythonHomework
+4. **git branch**
+5. There is no branch besides **master**? Then follow this tutorial:
+    ```
+    git branch --track finalTask remotes/origin/finalTask
+    git checkout finalTask
+    git checkout cfbdb81
+    ```
+  
+6. I recommend creating a virtual environment. **python3.8 -m venv env**, **. env/bin/activate**.
+7. Let's collect our package **python3.8 setup.py sdist**.
+8. Let's install our package **pip3.8 install dist/rss_reader_ft-2.0.tar.gz**
+9. Let's install req. **pip3.8 install -r requirements.txt**.
+10. Use:
+    ```
+    rss-reader "https://news.yahoo.com/rss/" --limit 1
+    ```
+
+## Install RSS reader v4.0 (demo, not working)
 1. Create docker container:
     ```
     docker run -it -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock python /bin/bash

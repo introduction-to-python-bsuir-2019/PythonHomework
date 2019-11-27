@@ -15,7 +15,6 @@ class DataLoader:
         """Method of loading data from a site by URL"""
         try:
             data = feedparser.parse(self.url_source)
-
             if data.bozo != 0:
                 print("Incorrect url")
                 raise ConnectionError("Not work connection")
