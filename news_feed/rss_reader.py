@@ -34,7 +34,7 @@ from .format_converter import (PdfNewsConverter,
 from xml.etree.ElementTree import ParseError
 from sqlite3 import OperationalError
 
-init(convert=True)
+init(convert=True)  # to use colorama
 
 PROJECT_VERSION = '2.0'
 PROJECT_DESCRIPTION = ''
@@ -70,6 +70,14 @@ class NewsReader:
         self.limit = limit
         self.cashing = caching
         self.colorful = colorful
+        self.items = None
+
+    def add_news(self):
+        """
+        Is used to get news from self.url
+
+        :return: None
+        """
 
         self.items = self.get_news()
 
@@ -466,6 +474,7 @@ def main_logic(args):
                       limit=args.limit,
                       caching=args.caching,
                       colorful=args.colorful)
+    news.add_news()
 
     items = get_items(news, args.date)
 

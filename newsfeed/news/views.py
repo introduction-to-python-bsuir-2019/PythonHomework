@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, View
 
 from django.db.utils import IntegrityError
@@ -88,6 +88,7 @@ def rss_source(request):
             url = form.cleaned_data['rss_source']
 
             news_reader = NewsReader(url)
+            news_reader.add_news()
             items = news_reader.items
 
             add_to_news_database(items, NewsInfo)

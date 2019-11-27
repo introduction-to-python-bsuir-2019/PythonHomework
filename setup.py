@@ -4,7 +4,6 @@ with open('README.md', 'r') as file:
     long_description = file.read()
 
 
-
 setup(
     name='news-feed',
     version='0.2',
@@ -24,7 +23,7 @@ setup(
         "Operating System :: OS Independent"
     ],
 
-    package_data={'news_feed': ['news_feed/fonts/arial.ttf']},
+    package_data={'news_feed': ['news_feed/fonts/arial.ttf', 'news_feed/req.txt']},
     include_package_data=True,
 
     entry_points={
