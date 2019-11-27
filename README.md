@@ -3,7 +3,7 @@ RSS reader is a command-line utility which receives RSS URL and prints results i
 ## Installation
 Use the package manager pip to install rss_reader.
 ```bash
-pip install -i https://test.pypi.org/simple/ rss-reader-kis==1.1
+pip install -i https://test.pypi.org/simple/ rss-reader-kis==1.2
 pip install feedparser
 pip install bs4
 ``` 
