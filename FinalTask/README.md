@@ -3,10 +3,12 @@ Pure Python command-line RSS reader.
 Utility provide the following interface:
 
 usage: rss_reader.py [-h] [--version] [--json] [--verbose] [--limit LIMIT]
-                     source
+                     [--source SOURCE] [--date DATE]
 
-positional arguments:
-  source         RSS URL
+  --source or --date argument required   
+
+  --source argument should take RSS feed url
+  --date argument should take a date in %Y%m%d format
 
 optional arguments:
   -h, --help     show this help message and exit

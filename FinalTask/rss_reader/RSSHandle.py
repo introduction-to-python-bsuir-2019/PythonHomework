@@ -3,7 +3,8 @@ import feedparser
 import sqlite3
 import logging
 import json
-from datetime import datetime
+import datetime
+from dateutil.parser import parse
 
 
 class SetEncoder(json.JSONEncoder):
@@ -82,35 +83,52 @@ Source link: {elem['src_link']}
 
 class CacheControl:
 
-    def __init__(self):
+    def __init__(self, date=None):
         self.conn = None
         self.cursor = None
+        self.date = date
 
     def connect_db(self):
         logging.info('Connecting to the cache database.')
-        self.conn = sqlite3.connect('newscache.db')
-        self.cursor = conn.cursor()
+        self.conn = sqlite3.connect('cache/newscache.db')
+        self.cursor = self.conn.cursor()
 
-    def create_table(self, name):
-        """Creates table with feed name"""
+    def _table_exists(self, publ):
+        """Check if table exists"""
         self.connect_db()
-        logging.info('Creating table for news feed cache.')
-        self.cursor.execute(f"""CREATE TABLE {name}
-                                (title text, pubDate text, content text, src_link text,
-                                 other_links text, media_links text)""")
+        logging.info('Checking if table exists.')
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [publ])
+        if self.cursor.fetchone() is None:
+            logging.info('There is no such table.')
+            return False
+        else:
+            logging.info("Table already exists.")
+            return True
+
         self.conn.commit()
         self.conn.close()
 
-    def insert_values(self, name, values):
+    def insert_values(self, publ, values):
         """Inserts values into the table"""
         self.connect_db()
+        logging.info('Creating table...')
+        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {publ}
+                               (title text, pubTime text, content text, other_links text,
+                                media_links text, src_link text, feed text)""")
+
         logging.info('Inserting values in the table.')
-        self.cursor.execute(f"""INSERT INTO {name}
-                                VALUES {values}""")
+        self.cursor.execute(f"""INSERT INTO {publ}
+                                VALUES(?,?,?,?,?,?,?)""", values)
+
         self.conn.commit()
         self.conn.close()
 
-    def cache_output(self, date):
+    def cache_output(self, limit):
         "Outputs news from cache in stdout."
-        self.connect_db()
+        if not self._table_exists(self.date):
+            raise KeyError('There is no cache for this date!')
+        elif self.date is None:
+            raise TypeError('Date is required for this iperation!')
+
         logging.info('Printing RSS-Feed in stdout.')
+        feed_list = self.cursor.execute("SELECT * FROM ?", self.date)
