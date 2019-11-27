@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
 
     python_requires='>=3.8',
-    install_requires=['feedparser', 'requests', 'fpdf', 'peewee'],
+    install_requires=['feedparser', 'requests', 'fpdf', 'peewee', 'colorama'],
 
     classifiers=[
         "Operating System :: OS Independent",
