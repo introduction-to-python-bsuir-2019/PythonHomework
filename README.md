@@ -16,19 +16,50 @@ Utility provides the following interface:
     + --date     - Return cached news from the specified day. Format is %Y%M%D.
 
 ##Install RSS reader
-
-1. Clone or Download [repository](https://github.com/ZayJob/PythonHomework)
-2. Go to folder /PythonHomework
-3. **git branch**
-4. There is no branch besides **master**? Then follow this tutorial.
-    + **git branch -a**.
-    + **git branch --track finalTask remotes/origin/finalTask**.
-    + **git checkout finalTask**.
-    + **git branch**.
-    + **git checkout cfbdb81**.
-5. I recommend creating a virtual environment. **python3.8 -m venv env**, **. env/bin/activate**.
-6. Let's collect our package **python3.8 setup.py sdist**.
-7. Let's install our package **pip3.8 install dist/rss-reader-2.0.tar.gz**
+1. Create docker container:
+    ```
+    docker run -it -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock python /bin/bash
+    ```
+2. Install docker in container:
+    ```
+    apt-get update && \
+    apt-get -y install apt-transport-https \
+         ca-certificates \
+         curl \
+         gnupg2 \
+         software-properties-common && \
+    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey && \
+    add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+       $(lsb_release -cs) \
+       stable" && \
+    apt-get update && \
+    apt-get -y install docker-ce
+    ```
+3. Install docker-compose in container:
+    ```
+    sudo curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    ```
+4. Clone or Download repository https://github.com/ZayJob/PythonHomework
+5. Go to folder /PythonHomework
+6. **git branch**
+7. There is no branch besides **master**? Then follow this tutorial:
+    ```
+    git branch --track finalTask remotes/origin/finalTask
+    git checkout finalTask
+    ```
+8. I recommend creating a virtual environment. **python3.8 -m venv env**, **. env/bin/activate**.
+9. Let's collect our package **python3.8 setup.py sdist**.
+10. Let's install our package **pip3.8 install dist/rss_reader_ft-4.0.tar.gz**
+11. Up MongoDB and Mongo-Express:
+    ```
+    docker-compose up --build -d
+    ```
+12. Use:
+    ```
+    rss-reader "https://news.yahoo.com/rss/" --limit 1
+    ```
 
 ## Distribution
 Utility is wrapped into package named rss_reader_ft. Additionally this package exports CLI utility named rss-reader.
