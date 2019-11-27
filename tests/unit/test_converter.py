@@ -1,9 +1,9 @@
-from unittest import mock, TestCase
+from unittest import TestCase
+from unittest.mock import patch, call, Mock, mock_open
 from pathlib import Path
-from urllib.error import URLError, HTTPError
+from base64 import b64decode
+from urllib.error import URLError
 from datetime import datetime
-
-from bs4 import BeautifulSoup as bs
 
 from rssreader.converter import Converter, HTMLConverter, FB2Converter
 from rssreader.feed import Feed
@@ -11,150 +11,287 @@ from rssreader.news import News
 
 
 class ConverterTestCase(TestCase):
-    def setUp(self) -> None:
-        self.test_dir = Path().cwd().joinpath('tmp_tests')
-        self.test_dir.mkdir(exist_ok=True)
+    """Test basic abstract class for any converter"""
+    def test_init(self) -> None:
+        mock_instance = Mock()
+        self.converter = Converter.__init__(mock_instance, Path('path/to/cache'), Path('path/to/file'))
+        self.assertListEqual([call._init_file_dir(), call._init_image_dir(Path('path/to/cache'))],
+                             mock_instance.mock_calls)
 
-    def tearDown(self) -> None:
-        self.test_dir.rmdir()
+    def test_init_file_dir_exist(self) -> None:
+        """Test init when file already exists"""
+        mock_instance = Mock()
 
-    def test__get_image_binary(self) -> None:
-        img_path = self.test_dir.joinpath('img.png')
-        self.assertFalse(img_path.exists())  # an image does not exist
+        mock_instance.file_path.parent.exists.return_value = True
+        Converter._init_file_dir(mock_instance)
+        self.assertListEqual([call.file_path.parent.exists()], mock_instance.mock_calls)
 
-        with open(img_path, 'wb') as file:
-            file.write(b'image')
+    def test_init_file_dir_make(self) -> None:
+        """Test init when file directory does not exist"""
+        mock_instance = Mock()
 
-        self.assertEqual(Converter._get_image_binary(img_path), 'aW1hZ2U=')
-        img_path.unlink()
+        mock_instance.file_path.parent.exists.return_value = False
+        Converter._init_file_dir(mock_instance)
+        self.assertListEqual([call.file_path.parent.exists(), call.file_path.parent.mkdir(parents=True, exist_ok=True)],
+                             mock_instance.mock_calls)
+
+    def test_init_image_dir_exist(self) -> None:
+        """Test init when image cache already exists"""
+        mock_instance = Mock()
+        mock_instance._get_image_binary = Mock(return_value='binary')
+
+        mock_path = Mock(return_value='path/to/cache')
+        mock_path.joinpath = Mock()
+        mock_path.joinpath.return_value.exists.return_value = True
+
+        Converter._init_image_dir(mock_instance, mock_path)
+
+        # directory is not created
+        self.assertNotIn(call().mkdir(parents=True, exist_ok=True), mock_path.joinpath.mock_calls)
+
+        # check default image data
+        self.assertEqual({'name': 'no_image.jpg', 'type': 'image/jpeg', 'url': '', 'data': 'binary'},
+                         mock_instance._default_image)
+
+    def test_init_image_dir_make(self) -> None:
+        """Test init when image cache does not exist"""
+        mock_instance = Mock()
+        mock_path = Mock(return_value='path/to/cache')
+        mock_path.joinpath = Mock()
+        mock_path.joinpath.return_value.exists.return_value = False
+
+        Converter._init_image_dir(mock_instance, mock_path)
+
+        self.assertIn(call().mkdir(parents=True, exist_ok=True), mock_path.joinpath.mock_calls)
+
+    def test_get_image_binary_make(self) -> None:
+        with patch("builtins.open", mock_open(read_data=b'binary')) as mock_image:
+            result = Converter._get_image_binary('path/to/image')
+
+        mock_image.assert_called_with('path/to/image', 'rb')
+        self.assertEqual(b'binary', b64decode(result))
 
     def test__obtain_image_ident(self) -> None:
         self.assertEqual(
             Converter._obtain_image_ident('https://test.com/1.jpg'), '1bef62681cbe8fb79a72834948c477cd.jpg')
+        self.assertEqual(
+            Converter._obtain_image_ident('https://test.com/2.jpg'), '8e3df14265973abe39396370d6ed6e6b.jpg')
 
-    def mock_urlretrieve_ok(url, img_path) -> None:
-        with open(img_path, 'wb') as img:
-            img.write(b'image')
+    def test__download_image_ok(self) -> None:
+        with patch('urllib.request.urlretrieve') as mock_urlretrieve:
+            result = Converter._download_image('url/to/image', 'store/path')
 
-    @mock.patch('urllib.request.urlretrieve', side_effect=mock_urlretrieve_ok)
-    def test__download_image_ok(self, mocked_data) -> None:
-        img_path = self.test_dir.joinpath('img.png')
-        self.assertFalse(img_path.exists())  # an image does not exist
+        mock_urlretrieve.assert_called_with('url/to/image', 'store/path')
+        self.assertTrue(result)
 
-        self.assertTrue(Converter._download_image(None, image_path=img_path))
-        self.assertTrue(img_path.is_file())
-        img_path.unlink()
+    def test_download_image_err(self) -> None:
+        with patch('urllib.request.urlretrieve', side_effect=URLError('shutdown')) as mock_urlretrieve:
+            result = Converter._download_image('url/to/image', 'store/path')
 
-    def mock_urlretrieve_error(url, img_path) -> None:
-        if url == 'URL':
-            raise URLError('url Error')
-        elif url == 'HTTP':
-            raise HTTPError(msg='http error', code=404, fp=None, hdrs='', url='some')
-        else:
-            raise Exception('Unknown error')
+        mock_urlretrieve.assert_called_with('url/to/image', 'store/path')
+        self.assertFalse(result)
 
-    @mock.patch('urllib.request.urlretrieve', side_effect=mock_urlretrieve_error)
-    def test__download_image_error(self, mocked_data) -> None:
-        img_path = self.test_dir.joinpath('img.png')
-        self.assertFalse(img_path.exists())  # an image does not exist
+    def test_save(self) -> None:
+        fake_instance = Mock()
+        fake_instance.file_path = 'path/to/file'
+        mo = mock_open()
 
-        self.assertFalse(Converter._download_image('URL', image_path=img_path))
-        self.assertFalse(img_path.is_file())
+        with patch("builtins.open", mo, create=True) as mock_write:
+            Converter._save(fake_instance, data='conversion result')
 
-        self.assertFalse(Converter._download_image('HTTP', image_path=img_path))
-        self.assertFalse(img_path.is_file())
+        mock_write.assert_called_with('path/to/file', 'w')
+        mo().write.assert_called_once_with('conversion result')
 
-        with self.assertRaises(Exception) as cm:
-            Converter._download_image('Another', image_path=img_path)
+    def test_perform(self) -> None:
+        fake_instance = Mock()
+        fake_instance._convert = Mock(return_value='data')
+        Converter.perform(fake_instance, 'feed')
+        self.assertListEqual([call._convert('feed'), call._save('data')], fake_instance.mock_calls)
 
 
 class HTMLConverterTestCase(TestCase):
+    """Test html converter"""
     def setUp(self) -> None:
-        self.test_dir = Path().cwd().joinpath('tmp_tests')
-        self.test_dir.mkdir(exist_ok=True)
+        self.paths = [Path('cache/dir'), Path('file/path')]
 
-    def tearDown(self) -> None:
-        self.test_dir.joinpath('images', 'no_image.jpg').unlink()
-        self.test_dir.joinpath('images').rmdir()
-        self.test_dir.rmdir()
-
-    def test__converter(self) -> None:
-        self.file_path = self.test_dir.joinpath('news.html')
-        self.assertFalse(self.file_path.is_file())  # this file does not exist
-        html_conv = HTMLConverter(self.test_dir, self.file_path)
-
-        self.feed = Feed('https://dummy.xz/here.rss', 1)
+        self.feed = Feed('https://dummy.xz/here.rss', None)
         self.feed.encoding = 'utf-8'
         self.feed.title = 'Dummy news'
 
         self.first_news = News(
             'First', 'Thu, 30 Oct 2019 10:25:00 +0300', datetime(2019, 10, 30, 10, 25, 11), 'https://dummy.xz/1',
-            'Everything is ok', [{'type': 'text/html)', 'href': 'https://sdf.dummy.xz/details_1'}]
+            'Everything is ok', [{'type': 'text/html)', 'href': 'https://sdf/1'}]
         )
 
         self.second_news = News(
             'Second', 'Thu, 30 Oct 2019 10:25:00 +0300', datetime(2019, 10, 30, 10, 25, 11), 'https://dummy.xz/2',
-            'We are happy', []
+            'We are happy', [{'type': 'image/jpeg)', 'href': 'https://sdf/1.jpg'}]
         )
 
         self.feed.news.append(self.first_news)
         self.feed.news.append(self.second_news)
 
-        result = bs(html_conv._convert(self.feed), "html.parser")
-        # check head
-        self.assertEqual(result.find('title').text, 'Offline rss')
+    def test_init(self) -> None:
+        with patch('rssreader.converter.Converter.__init__') as mock_parent:
+            instance = HTMLConverter(*self.paths)
 
-        # check body
-        self.assertEqual(result.find('h1').text, self.feed.title)
+        mock_parent.assert_called_once_with(*self.paths)
+        self.assertTrue(hasattr(instance, 'book_template'))
+        self.assertTrue(hasattr(instance, 'news_template'))
+        self.assertTrue(hasattr(instance, 'href_template'))
+        self.assertTrue(hasattr(instance, 'img_template'))
 
-        html_news = result.find_all('h4')
-        self.assertEqual(len(html_news), 2)
+    def test_convert(self) -> None:
+        """Test conversion result when no limit is applied"""
+        fake_instance = Mock()
+        self.feed.limit = None
+        fake_instance._process_links = Mock(return_value=(['images|'], ['links|']))
+        fake_instance.news_template.format = Mock(return_value='news|')
+        fake_instance.book_template.format = Mock(return_value='HTML')
+        result = HTMLConverter._convert(fake_instance, self.feed)
 
-        for i in range(0, len(html_news)):
-            with self.subTest(i=i):
-                self.assertEqual(html_news[i].text, self.feed.news[i].title + self.feed.news[i].description)
+        self.assertTrue(result == 'HTML')
+
+        # check processed links
+        self.assertListEqual(
+            [call([{'type': 'text/html)', 'href': 'https://sdf/1'}]),
+             call([{'type': 'image/jpeg)', 'href': 'https://sdf/1.jpg'}])],
+            fake_instance._process_links.mock_calls
+        )
+
+        # check news data to be applied to format
+        self.assertListEqual(
+            [call(title='First', description='Everything is ok', img='images|', hrefs='links|'),
+             call(title='Second', description='We are happy', img='images|', hrefs='links|')],
+            fake_instance.news_template.format.mock_calls
+        )
+
+        # check result call
+        self.assertListEqual(
+            [call(title='Dummy news', encoding='utf-8', news='news|\n    news|')],
+            fake_instance.book_template.format.mock_calls
+        )
+
+    def test_convert(self) -> None:
+        """Test conversion result when news limit is applied"""
+        fake_instance = Mock()
+        self.feed.limit = 1
+        fake_instance._process_links = Mock(return_value=(['images|'], ['links|']))
+        fake_instance.news_template.format = Mock(return_value='news|')
+        fake_instance.book_template.format = Mock(return_value='HTML')
+        result = HTMLConverter._convert(fake_instance, self.feed)
+
+        self.assertTrue(result == 'HTML')
+
+        # check processed links
+        self.assertListEqual(
+            [call([{'type': 'text/html)', 'href': 'https://sdf/1'}])],
+            fake_instance._process_links.mock_calls
+        )
+
+        # check news data to be applied to format
+        self.assertListEqual(
+            [call(title='First', description='Everything is ok', img='images|', hrefs='links|')],
+            fake_instance.news_template.format.mock_calls
+        )
+
+        # check result call
+        self.assertListEqual(
+            [call(title='Dummy news', encoding='utf-8', news='news|')],
+            fake_instance.book_template.format.mock_calls
+        )
 
 
 class FB2ConverterTestCase(TestCase):
+    """Test fb2 converter"""
     def setUp(self) -> None:
-        self.test_dir = Path().cwd().joinpath('tmp_tests')
-        self.test_dir.mkdir(exist_ok=True)
+        self.paths = [Path('cache/dir'), Path('file/path')]
 
-    def tearDown(self) -> None:
-        self.test_dir.joinpath('images', 'no_image.jpg').unlink()
-        self.test_dir.joinpath('images').rmdir()
-        self.test_dir.rmdir()
-
-    def test__converter(self) -> None:
-        self.file_path = self.test_dir.joinpath('news.fb2')
-        self.assertFalse(self.file_path.is_file())  # this file does not exist
-        fb2_conv = FB2Converter(self.test_dir, self.file_path)
-
-        self.feed = Feed('https://dummy.xz/here.rss', 1)
+        self.feed = Feed('https://dummy.xz/here.rss', None)
         self.feed.encoding = 'utf-8'
         self.feed.title = 'Dummy news'
 
         self.first_news = News(
             'First', 'Thu, 30 Oct 2019 10:25:00 +0300', datetime(2019, 10, 30, 10, 25, 11), 'https://dummy.xz/1',
-            'Everything is ok', [{'type': 'text/html)', 'href': 'https://sdf.dummy.xz/details_1'}]
+            'Everything is ok', [{'type': 'text/html)', 'href': 'https://sdf/1'}]
         )
 
         self.second_news = News(
             'Second', 'Thu, 30 Oct 2019 10:25:00 +0300', datetime(2019, 10, 30, 10, 25, 11), 'https://dummy.xz/2',
-            'We are happy', []
+            'We are happy', [{'type': 'image/jpeg)', 'href': 'https://sdf/1.jpg'}]
         )
 
         self.feed.news.append(self.first_news)
         self.feed.news.append(self.second_news)
 
-        result = bs(fb2_conv._convert(self.feed), "html.parser")
+    def test_init(self) -> None:
+        with patch('rssreader.converter.Converter.__init__') as mock_parent:
+            instance = FB2Converter(*self.paths)
 
-        self.assertEqual(result.find('book-title').text, self.feed.title)
+        mock_parent.assert_called_once_with(*self.paths)
+        self.assertTrue(hasattr(instance, 'book_template'))
+        self.assertTrue(hasattr(instance, 'news_template'))
+        self.assertTrue(hasattr(instance, 'image_template'))
+        self.assertTrue(hasattr(instance, 'binary_template'))
 
-        fb2_news = result.find_all('section')
-        self.assertEqual(len(fb2_news), 2)
+    def test_convert(self) -> None:
+        """Test conversion result when no limit is applied"""
+        fake_instance = Mock()
+        self.feed.limit = None
+        fake_instance._process_links = Mock(return_value=(['binary|'], ['images|'], ['links|']))
+        fake_instance.news_template.format = Mock(return_value='news|')
+        fake_instance.book_template.format = Mock(return_value='FB2')
+        fb2 = FB2Converter._convert(fake_instance, self.feed)
 
-        self.maxDiff = None
-        self.assertEqual(fb2_news[0].text, '\n1. First\n\nEverything is ok\nMore information on: '
-                                           'https://sdf.dummy.xz/details_1\n')
-        self.assertEqual(fb2_news[1].text, '\n2. Second\n\nWe are happy\nMore information on: \n')
+        self.assertTrue(fb2 == 'FB2')
+
+        # check processed links
+        self.assertListEqual(
+            [call([{'type': 'text/html)', 'href': 'https://sdf/1'}]),
+             call([{'type': 'image/jpeg)', 'href': 'https://sdf/1.jpg'}])],
+            fake_instance._process_links.mock_calls
+        )
+
+        # check news data to be applied to format
+        self.assertListEqual(
+            [call(num=1, title='First', description='Everything is ok', images='images|', links='links|'),
+             call(num=2, title='Second', description='We are happy', images='images|', links='links|')],
+            fake_instance.news_template.format.mock_calls
+        )
+
+        # check result call
+        self.assertListEqual(
+            [call(title='Dummy news', prog='rssreader 0.5', url='https://dummy.xz/here.rss', encoding='utf-8',
+                  sections='news|news|', binaries='binary|binary|')],
+            fake_instance.book_template.format.mock_calls
+        )
+
+    def test_convert_limit(self) -> None:
+        """Test conversion result when news limit is applied"""
+        fake_instance = Mock()
+        self.feed.limit = 1
+        fake_instance._process_links = Mock(return_value=(['binary|'], ['images|'], ['links|']))
+        fake_instance.news_template.format = Mock(return_value='news|')
+        fake_instance.book_template.format = Mock(return_value='FB2')
+        fb2 = FB2Converter._convert(fake_instance, self.feed)
+
+        self.assertTrue(fb2 == 'FB2')
+
+        # check processed links
+        self.assertListEqual(
+            [call([{'type': 'text/html)', 'href': 'https://sdf/1'}])],
+            fake_instance._process_links.mock_calls
+        )
+
+        # check news data to be applied to format
+        self.assertListEqual(
+            [call(num=1, title='First', description='Everything is ok', images='images|', links='links|')],
+            fake_instance.news_template.format.mock_calls
+        )
+
+        # check final conversion
+        self.assertListEqual(
+            [call(title='Dummy news', prog='rssreader 0.5', url='https://dummy.xz/here.rss', encoding='utf-8',
+                  sections='news|', binaries='binary|')],
+            fake_instance.book_template.format.mock_calls
+        )

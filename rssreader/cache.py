@@ -10,13 +10,18 @@ import rssreader
 
 class Cache(rssreader.base.BaseClass):
     """Class to work with cache. Implementation is based on using sqlite3."""
-    def __init__(self, cache_dir: Path, db_name: Path = None, ) -> None:
+    def __init__(self, cache_dir: Path, db_name: Path = None, mode: str = 'rw') -> None:
         """Initialize cache. Default db name is cache.db"""
         self.db = cache_dir.joinpath(db_name or 'cache.db')
         try:
-            self._connection = sqlite3.connect(f'file:{self.db}?mode=rw', uri=True)
+            self._connection = sqlite3.connect(f'file:{self.db}?mode={mode}', uri=True)
         except sqlite3.OperationalError:
-            self._create_db()
+            logging.info(f'There is not db at {self.db}')
+            if mode == 'ro':
+                self._connection = None
+                logging.info('DB will no be created because cache is accessed in readonly mode')
+            else:
+                self._create_db()
 
     def _create_db(self) -> None:
         """Create an empty DB"""
@@ -81,9 +86,6 @@ class Cache(rssreader.base.BaseClass):
     def _insert_feed(self, feed: "rssreader.feed.Feed") -> int:
         """Insert general information about the feed"""
         logging.info('Insert a new feed into cache')
-        # Argument feed does not have type hint due to a circular import. So, we check it here.
-        if not isinstance(feed, rssreader.feed.Feed):
-            logging.info('Cache initialization is incorrect because of wrong feed object type.')
 
         cursor = self._connection.cursor()
         cursor.execute('insert into feed (url, title, encoding) values(?, ?, ?)',
@@ -109,6 +111,9 @@ class Cache(rssreader.base.BaseClass):
         """
         Retrieve feed data from cache
         """
+        if self._connection is None:
+            return
+
         with closing(self._connection) as connection:
             logging.info('Load data from cache')
             cursor = connection.cursor()

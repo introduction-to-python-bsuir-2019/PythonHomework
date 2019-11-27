@@ -32,17 +32,17 @@ class Converter(ABC):
 
     def _init_image_dir(self, cache_dir: Path) -> None:
         """Create a directory (if missed) to store downloaded images"""
-        image_dir = cache_dir.joinpath('images')
-        if image_dir.exists():
-            logging.info(f'Directory "{image_dir}" to store images already exists')
+        self.image_dir = cache_dir.joinpath('images')
+        if self.image_dir.exists():
+            logging.info(f'Directory "{self.image_dir}" to store images already exists')
         else:
-            image_dir.mkdir(parents=True, exist_ok=True)
-            logging.info(f'Directory "{image_dir}" to store images has been created')
+            self.image_dir.mkdir(parents=True, exist_ok=True)
+            logging.info(f'Directory "{self.image_dir}" to store images has been created')
 
         self._default_image = {'name': 'no_image.jpg', 'type': 'image/jpeg', 'url': ''}
 
         # check whether default image is missed in image cache
-        image_cache_path = image_dir.joinpath(self._default_image['name'])
+        image_cache_path = self.image_dir.joinpath(self._default_image['name'])
         if not image_cache_path.exists():
             image_source_path = Path(__file__).parent.joinpath('data', self._default_image['name'])
             if image_source_path.exists():
@@ -51,11 +51,10 @@ class Converter(ABC):
             else:
                 raise FileNotFoundError(f'Default image "{image_source_path}" does not exist.')
 
-        self.image_dir = image_dir
         self._default_image['data'] = self._get_image_binary(image_cache_path)
 
     @staticmethod
-    def _get_image_binary(image_path: str) -> str:
+    def _get_image_binary(image_path: Path) -> str:
         """Return image base64 binary as string"""
         with open(image_path, 'rb') as f:
             return b64encode(f.read()).decode()
@@ -121,7 +120,7 @@ class HTMLConverter(BaseClass, Converter):
         news_array = []
 
         logging.info('Iterate over all news:')
-        for i, n in enumerate(feed.news):
+        for i, n in enumerate(feed.news[:feed.limit]):
             logging.info(f'[{i + 1}]: {n.link}')
             images, links = self._process_links(n.hrefs)
             news_array.append(
@@ -210,7 +209,7 @@ class FB2Converter(BaseClass, Converter):
         self._used_images = set()  # unique set of used images to prevent from adding duplicates into binaries
 
         logging.info('Iterate over all news:')
-        for i, n in enumerate(feed.news):
+        for i, n in enumerate(feed.news[:feed.limit]):
             logging.info(f'[{i + 1}]: {n.link}')
             binary, images, links = self._process_links(n.hrefs)
             news_array.append(

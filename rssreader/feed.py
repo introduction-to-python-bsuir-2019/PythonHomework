@@ -112,7 +112,7 @@ class Feed(BaseClass):
 
     def load_from_cache(self, storage: Path) -> None:
         """Load cached news"""
-        Cache(cache_dir=storage).load(self)
+        Cache(cache_dir=storage, mode='ro').load(self)
 
     def cache(self, storage: Path) -> None:
         """Cache news"""

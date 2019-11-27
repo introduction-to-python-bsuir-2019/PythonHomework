@@ -1,19 +1,19 @@
 """
 Tests for rssreader.feed module
 """
-import unittest
+from unittest import TestCase
+from unittest.mock import Mock, patch
 from datetime import datetime
 import io
 from contextlib import redirect_stdout
 from pathlib import Path
-
-import feedparser
+from html import unescape
 
 from rssreader.news import News
 from rssreader.feed import Feed
 
 
-class FeedTestCase(unittest.TestCase):
+class FeedTestCase(TestCase):
     """
     Test cases for Feed class
     """
@@ -31,20 +31,28 @@ class FeedTestCase(unittest.TestCase):
 
         self.feed.news.append(self.first_news)
 
-        with open('tests/correct.rss', 'r') as fd:
-            self.correct_rss = fd.read()
+        self.rss_entries = [
+            Mock(title='&copy; M1', description='desc 1', published_parsed=[2019, 10, 31, 12, 54, 9]),
+            Mock(title='&copy; M2', description='desc 2', published_parsed=[2019, 10, 31, 12, 54, 9]),
+            Mock(title='M3', description='&copy; desc 3', published_parsed=[2019, 10, 31, 12, 54, 9])
+        ]
+        self.mock_feed = Mock(bozo=0, encoding='utf-8', feed=Mock(title='Feed'), entries=self.rss_entries)
 
     def test_request(self) -> None:
         """
-        Test that rss file is parsed
+        Test general function processing rss request
         """
-        cache_dir = Path().cwd()
-        self.feed.limit = 10
-        self.feed.news = []
-        self.feed.url = self.correct_rss
-        self.feed.request(cache_dir)
-        self.assertEqual(3, len(self.feed.news))
-        cache_dir.joinpath('cache.db').unlink()
+        cache_dir = Path('path/to/cache')
+        self.feed.url = 'ask/some/url'
+
+        with patch('feedparser.parse', return_value='parsed rss') as mock_feedparser:
+            with patch('rssreader.feed.Feed._parse') as mock_parse:
+                with patch('rssreader.feed.Feed.cache') as mock_cache:
+                    self.feed.request(cache_dir)
+
+        mock_feedparser.assert_called_once_with('ask/some/url')
+        mock_parse.assert_called_once_with('parsed rss')
+        mock_cache.assert_called_once_with(cache_dir)
 
     def test__parse_all(self) -> None:
         """
@@ -52,57 +60,40 @@ class FeedTestCase(unittest.TestCase):
         """
         self.feed.news = []
         self.feed.limit = None
-        data = feedparser.parse(self.correct_rss)
-        self.feed._parse(data)
+
+        with patch('bs4.BeautifulSoup', return_value=Mock(text='data')):
+            with patch('rssreader.feed.Feed._extract_links', return_value={}) as mock_links:
+                self.feed._parse(self.mock_feed)
+
+        self.assertEqual(self.mock_feed.encoding, self.feed.encoding)
+        self.assertEqual('Feed', self.feed.title)
+
         self.assertEqual(3, len(self.feed.news))
-
-        self.assertEqual('Good news', self.feed.title)
-        standards = [
-            News(
-                'Sun', 'Thu, 31 Oct 2019 14:42:00 +0300', datetime(2019, 10, 31, 14, 42, 0),
-                'https://news.good.by/wild/1.html',
-                'The sun is shining', [
-                    {'type': 'text/html', 'href': 'https://news.good.by/wild/1.html'},
-                    {'type': 'image/jpeg', 'href': 'https://img.good.by/n/reuters/0c/a/meksika_1.jpg'}]
-            ),
-            News(
-                'Birds', 'Thu, 31 Oct 2019 18:42:00 +0300', datetime(2019, 10, 31, 18, 42, 0),
-                'https://news.good.by/wild/2.html',
-                'The birds are signing', [
-                    {'type': 'text/html', 'href': 'https://news.good.by/wild/2.html'},
-                    {'type': 'image/jpeg', 'href': 'https://img.good.by/n/reuters/0c/a/meksika_2.jpg'}]
-            ),
-            News(
-                'Animals', 'Mon, 29 Oct 2019 14:42:00 +0300', datetime(2019, 10, 29, 14, 42),
-                'https://news.good.by/wild/3.html',
-                'The animals are jumping', [
-                    {'type': 'text/html', 'href': 'https://news.good.by/wild/3.html'},
-                    {'type': 'image/jpeg', 'href': 'https://img.good.by/n/reuters/0c/a/meksika_3.jpg'}]
-            )
-        ]
-
-        # check parsed items
+        self.assertEqual(mock_links.call_count, 3)
         for i in range(0, 3):
             with self.subTest(i=i):
-                self.assertEqual(standards[i].get_json_dict(), self.feed.news[i].get_json_dict())
+                self.assertEqual(unescape(self.rss_entries[i].title), self.feed.news[i].title)
+                self.assertEqual(unescape(self.rss_entries[i].description), self.feed.news[i].description)
 
     def test__parse_one(self) -> None:
         """
-        Limit argument does not impact on parsing - all news are parsed.
+        Limit argument does not impact on parsing - all news are processed.
         """
         self.feed.news = []
         self.feed.limit = 1
-        data = feedparser.parse(self.correct_rss)
-        self.feed._parse(data)
+
+        with patch('bs4.BeautifulSoup', return_value=Mock(text='data')):
+            with patch('rssreader.feed.Feed._extract_links', return_value={}):
+                self.feed._parse(self.mock_feed)
+
         self.assertEqual(3, len(self.feed.news))
 
     def test__parse_err(self) -> None:
-        """feed.bozo attribute is set to 1. That means that feed is not well-formed."""
-        with open('tests/incorrect.rss', 'r') as fd:
-            self.incorrect_rss = fd.read()
+        """Test a situation when feed in incorrect"""
 
-        data = feedparser.parse(self.incorrect_rss)
-        with self.assertRaises(Exception) as cm:
+        # It means that result feed is not well-formed.
+        data = Mock(bozo=1)
+        with self.assertRaises(Exception):
             self.feed._parse(data)
 
     def test_get_json(self) -> None:
@@ -156,5 +147,15 @@ class FeedTestCase(unittest.TestCase):
         Exception is raised as there is no news
         """
         self.feed.news = []
-        with self.assertRaises(Exception) as cm:
+        with self.assertRaises(Exception):
             self.feed.print(False, to_json=True)
+
+    def test_load_from_cache(self) -> None:
+        self.feed = Feed('https://dummy.xz/here.rss', 1)
+
+        cache_dir = Path('path/to/cache')
+        with patch('rssreader.cache.Cache.load', return_value=None) as mock_load:
+            self.feed.load_from_cache(cache_dir)
+
+        mock_load.assert_called_once_with(self.feed)
+        self.assertEqual(0, len(self.feed.news))  # news list is empty
