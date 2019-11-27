@@ -16,7 +16,7 @@ def argsparsing():
     parser.add_argument("--json", help="Print result as JSON in stdout", action="store_true")
     parser.add_argument("--verbose", help="Outputs verbose status messages", action="store_true")
     parser.add_argument("--limit", type=int, help="Limit news topics if this parameter provided")
-    parser.add_argument("--date",type=int,help="Read cashed news by date in next format YMD")
+    parser.add_argument("--date",type=int,help="Read cashed news by date in next format YYMMDD")
     return parser.parse_args()
 
 def making_log(operation, message, file='loglist.log'):
@@ -40,12 +40,13 @@ class NewsRss:
         self.link=[]
         self.desc=[]
         self.links=[]
-
+        self.datalist=[]
 
     def feed_find(self):
         soup = BeautifulSoup(urllib.request.urlopen(self.arguments.source), "xml")
         making_log(1, "Opened URL for news reading, URL: %s" % self.arguments.source)
         list = soup.find_all("item")
+        datafeed={}
         making_log(1, "Find all <item> tags in feed.")
         making_log(1, "Limit is: (%s)        " % (str(self.arguments.limit)))
         for cout, feed in enumerate(list):
@@ -81,42 +82,69 @@ class NewsRss:
                 print("\n\n\n")    
     
 
-    #def date_convert(self):
-
+    def date_convert(self):
+        if len(str(self.arguments.date))>8 or len(str(self.arguments.date))<8 :
+            print("Error in date input")
+            return False
+        
+        return True
 
 
     def filewrite(self):
         for index in range(len(self.title)):
                 fp=open("feeddata.txt","a")
-                fp.write("Title: ")
-                fp.write(str(self.title[index]))
-                fp.write(" !\nDate:  ")
                 fp.write(str(self.pubDate[index]))
-                fp.write(" !\nLink: ")
+                fp.write(" \n")
+                fp.write(str(self.title[index]))
+                fp.write(" \n")
                 fp.write(str(self.link[index]))
-                fp.write(" !\nFeed: ")
+                fp.write(" \n")
                 fp.write(str(self.desc[index]))
-                fp.write(" !\nImages: ")
+                fp.write(" \n")
                 fp.write(str(self.links))
-                fp.write(' !\n\n\n')
+                fp.write(' \n')
                 fp.close()
 
 
     def fileread(self):     
         fp=open("feeddata.txt","r")
+        flag=True
         for line in fp:
-            print(line)
+            #monttdict={'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'}
+            day=line[(line.find(", ")+2):line.find(" ",line.find(", ")+2)]
+            month1=line[line.find(" ",line.find(", ")+2):line.find(" ",line.find(", ")+5)]
+            month1=month1[1:]
+            year=line[(line.rfind(month1)+4):(line.rfind(month1)+8)]
+            if month1=='Nov': month1='11'
+            elif month1=='Jan': month1='01'
+            cachedate=year+month1+day
+            if str(cachedate)==str(self.arguments.date):
+                flag=False
+                self.pubDate.append(line)
+                self.title.append(fp.readline())
+                self.link.append(fp.readline())
+                self.desc.append(fp.readline())
+                self.links.append(fp.readline())
+        if flag: print("No news on this date :(")
         fp.close()
+
+      
 
 
 def main():
     news=NewsRss()
-    news.feed_find()
-    news.print_news()
-    if news.arguments.verbose:
-        making_log(0,'')
-    #news.filewrite()
-    #news.fileread()
+    if news.arguments.date:
+        if news.date_convert():
+            news.fileread()
+            news.print_news()
+            if news.arguments.verbose:
+                making_log(0,'')
+    else:
+        news.feed_find()
+        news.print_news()
+        news.filewrite()
+        if news.arguments.verbose:
+            making_log(0,'')
 
 
 if __name__=='__main__':
