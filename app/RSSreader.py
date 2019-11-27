@@ -38,8 +38,19 @@ class RSSreader:
             print(f'Title: {entry.title}')
             print(f'Published: {entry.published}', end='\n\n')
             print(f'Summary: {BeautifulSoup(entry.summary, "html.parser").text}', end='\n\n')
+            print(f'Image: {self.get_img_url(entry)}')
             print(f'Link: {entry.link}')
             print('========================================================')
+
+    def get_img_url(self, entry):
+        """ Parses image url from <description> in rss feed """
+        soup = BeautifulSoup(entry.summary, 'html.parser')
+        img = soup.find('img')
+        if img:
+            img_url = img['src']
+            return img_url
+        else:
+            return None
 
     def print_feed_json(self, entries):
         """ Prints feed in stdout in JSON format """
@@ -47,36 +58,33 @@ class RSSreader:
         self.logger.info('Printing feed in JSON format')
 
         for entry in entries:
-            feed = self.to_json(entry)
-            print('========================================================')
-            print(json.dumps(feed, indent=2, ensure_ascii=False))
-            print('========================================================')
+            feed = self.to_dict(entry)
+            print(json.dumps(feed, indent=2, ensure_ascii=False), ',', sep='')
 
-    def to_json(self, entry):
-        """ Returns feed in JSON (actually dict()) format """
+    def to_dict(self, entry):
+        """ Returns feed in dict() format """
 
         feed = dict()
         feed['Title'] = entry.title
         feed['Published'] = entry.published
-        feed['Summary'] = entry.summary
+        feed['Summary'] = BeautifulSoup(entry.summary, "html.parser").text
         feed['Link'] = entry.link
         feed['Url'] = self.args.url
+        feed['Image'] = self.get_img_url(entry)
         return feed
 
     def cache_news_json(self, entry):
         """ Saves all printed news in JSON format (path = 'cache/{publication_date}.json')"""
 
         date = dateparser.parse(entry.published, fuzzy=True).strftime('%Y%m%d')
-        # directory_path = os.path.abspath(os.path.dirname('app')) + os.path.sep + 'cache' + os.path.sep
         directory_path = 'cache' + os.path.sep
         if not os.path.exists(directory_path):
             self.logger.info('Creating directory cache')
             os.mkdir(directory_path)
 
         file_path = directory_path + date + '.json'
-        # print('FILE_PATH!:', file_path)
 
-        feed = self.to_json(entry)
+        feed = self.to_dict(entry)
         news = list()
         try:
             with open(file_path, encoding='utf-8') as rf:
@@ -85,10 +93,9 @@ class RSSreader:
                     # already cached
                     return
         except FileNotFoundError:
-            pass
+            self.logger.info('File not found')
         except json.JSONDecodeError:
-            # Empty json file
-            pass
+            self.logger.info('Empty JSON file')
 
         with open(file_path, 'w', encoding='utf-8') as wf:
             news.append(feed)
@@ -96,10 +103,8 @@ class RSSreader:
 
     def get_cached_json_news(self):
         """ Returns the list of cached news with date from arguments """
-        # file_path = os.path.abspath(os.path.dirname('app'))
-        # file_path += os.path.sep + 'cache' + os.path.sep + self.args.date + '.json'
+
         file_path = 'cache' + os.path.sep + self.args.date + '.json'
-        print('FILE_PATH:', file_path)
         cached_news = list()
         try:
             with open(file_path) as rf:
@@ -134,6 +139,4 @@ class RSSreader:
 
         self.logger.info('Printing cached feed in JSON format')
         for new in cached_feed:
-            print('---------------------------------------------------------')
-            print(json.dumps(new, indent=2))
-            print('---------------------------------------------------------')
+            print(json.dumps(new, indent=2), ',', sep='')

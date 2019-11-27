@@ -5,12 +5,16 @@
 
 import os
 import json
+import warnings
 
 from bs4 import BeautifulSoup
 import urllib.request
 import fpdf
 
 from app.RSSreader import RSSreader
+
+
+warnings.filterwarnings("ignore")
 
 
 class PDFConverter:
@@ -55,13 +59,12 @@ class PDFConverter:
 
         rss_reader = RSSreader(self.arguments, self.logger)
         for new in self.news:
-            new = rss_reader.to_json(new)
+            new = rss_reader.to_dict(new)
             self.create_cells(new)
             self.pdf.ln(10)
             self.pdf.add_page()
 
         file_path = self.args.to_pdf + os.path.sep + 'news.pdf'
-        print(file_path)
         self.pdf.output(file_path)
         self.logger.info('News has been written to PDF file')
 
@@ -76,13 +79,13 @@ class PDFConverter:
 
     def create_cells(self, new):
         """ Creates cells in PDF file with news content """
-        
+
         img_path = None
         for key, value in new.items():
             self.pdf.set_font('NotoSans-Black', size=12)
             self.pdf.cell(25, 5, txt=key + ': ', ln=0, align='L')
             self.pdf.set_font('NotoSans-Thin', size=12)
-            if key == 'Summary':
+            if key == 'Image':
                 self.pdf.multi_cell(0, 5, txt=BeautifulSoup(value, 'html.parser').text)
                 img_path = self.download_image(value)
             else:
@@ -90,26 +93,20 @@ class PDFConverter:
         if img_path:
             self.write_image(img_path)
 
-    def download_image(self, html_text):
+    def download_image(self, img_url):
         """ Downloads image form given url and returns path """
 
-        soup = BeautifulSoup(html_text, 'html.parser')
-        img = soup.find('img')
-        if img:
-            img_url = img['src']
-            print('IMG_URL:', img_url)
-        else:
-            return None
+        img = None
         directory_path = 'images' + os.path.sep
         if not os.path.exists(directory_path):
             self.logger.info('Creating directory images')
             os.mkdir(directory_path)
-        split_list = img_url.split('/')
-        img_name = split_list[len(split_list) - 1]
-        split_list = img_name.split('.')
-        img_name = split_list[len(split_list) - 2] + '.jpg'
-        print('IMG_NAME:', img_name)
-        img = urllib.request.urlopen(img_url).read()
+        img_name = self.create_image_name(img_url)
+        try:
+            img = urllib.request.urlopen(img_url).read()
+        except ValueError:
+            self.logger.info('Failed download')
+            return None
         img_path = os.path.abspath('') + os.path.sep + directory_path + img_name
         with open(img_path, "wb") as out:
             out.write(img)
@@ -122,9 +119,26 @@ class PDFConverter:
         try:
             self.pdf.image(img_path)
         except SyntaxError:
-            print("IMAGE SyntaxError - poebat'")
             return None
         except RuntimeError:
-            print(print("IMAGE SyntaxError - pohuy"))
             return None
         self.pdf.multi_cell(0, 10, txt=f'{img_path}')
+
+    def create_image_name(self, img_url):
+        """
+            Image URL looks like
+            'https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-images/2019-11/aa8c02a0-0c79-11ea-b1fd-1011ee5d77f0'
+            (without '.jpg' at the end)
+            or
+            'https://img.tyt.by/thumbnails/n/minsk/0a/10/proektnoe_predlozhenie_ulyanovskaya_belorusskaya.jpg'
+            (with '.jpg' at the end)
+            This method gets last part of url after '/' and adds '.jpg' if it is missing
+            So image name will look like 'aa8c02a0-0c79-11ea-b1fd-1011ee5d77f0.jpg'
+        """
+
+        split_list = img_url.split('/')
+        img_name = split_list[-1]
+        if '.jpg' in img_name:
+            return img_name
+        img_name += '.jpg'
+        return img_name
