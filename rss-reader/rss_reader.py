@@ -10,6 +10,7 @@ Opportunities:
     * Limiting articles
     * Caching news feeds in SQLite database
     * Converting to PDF and HTML formats
+    * Print in colorize mode
 
 For information enter
     "python rss_reader.py -h"
@@ -41,6 +42,7 @@ class RSSReader:
             * to_json: bool - output in JSON or not
             * to_pdf: str - string filename for output
             * to_html: str - string filename for output
+            * colorize: bool - print the result in colorized mode
             Default start sample output
         :type source: str
         :type limit: int
@@ -101,10 +103,12 @@ def main():
     parser.add_argument('--date', type=str, help='Print cached articles by date')
     parser.add_argument('--to-pdf', type=str, help='Print result as PDF in entered file')
     parser.add_argument('--to-html', type=str, help='Print result as HTML in entered file')
+    parser.add_argument('--colorize', action='store_true', help='Print the result of the utility in colorized mode')
 
     settings = parser.parse_args()
 
     output = {
+        'colorize': settings.colorize,
         'to_json': settings.json,
         'to_pdf': settings.to_pdf,
         'to_html': settings.to_html,
