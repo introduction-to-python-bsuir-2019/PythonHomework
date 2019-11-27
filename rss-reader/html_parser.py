@@ -94,7 +94,7 @@ class Img(Tag):
 
         :return: string to output tag in the description section
         """
-        return "[Image {}: {}] ".format('{}', self.alt)
+        return "[Image {}: %s] " % self.alt
 
     def link(self):
         """
@@ -153,7 +153,7 @@ class HTMLParser:
         articles = [self._clear_from_html(article) for article in nice_articles]
 
         logging.info("Getting a RSS source title")
-        title = response.feed.title
+        title = response['feed']['title']
 
         return {'title': title, 'articles': articles}
 
@@ -184,7 +184,7 @@ class HTMLParser:
         :return: news articles of limited length
         :rtype: dict
         """
-        result = response.entries
+        result = response['entries']
         if limit is not None:
             logging.info(f"Completed. Loaded {min(limit, len(result))} articles with limit {limit}")
             return result[0:min(limit, len(result))]
@@ -312,8 +312,8 @@ class HTMLParser:
         :rtype: dict
         """
 
-        dec_description, dec_links = self._process_description(article.description)
-        description, links = self._process_description(article.description, False, False)
+        dec_description, dec_links = self._process_description(article['description'])
+        description, links = self._process_description(article['description'], False, False)
 
         images = [obj for obj in self._tags if isinstance(obj, Img)]
 
@@ -325,15 +325,15 @@ class HTMLParser:
         ]
 
         try:
-            date = datetime.datetime(*article.published_parsed[:6]).strftime("%a, %d %b %Y %H:%M")
+            date = datetime.datetime(*article['published_parsed'][:6]).strftime("%a, %d %b %Y %H:%M")
         except (AttributeError, ValueError):
             date = 'None'
 
         result = {
-            'title': article.title,
+            'title': article['title'],
             'description': description,
             'dec_description': dec_description,
-            'link': article.link,
+            'link': article['link'],
             'pubDate': date,
             'media': media,
             'links': links,
