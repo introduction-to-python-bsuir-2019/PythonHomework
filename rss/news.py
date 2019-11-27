@@ -97,7 +97,7 @@ class News:
         elif news.get('Date:'):
             return news['Date']
         else:
-            date = datetime.today()
+            date = datetime.datetime.now()
             return date.isoformat()
 
     def make_list_of_news(self):
@@ -134,29 +134,29 @@ class News:
         if not text:
             text = 'Nothing'
 
-        logging.info('Get list of images')
-        list_of_images = []
+        logging.info('Get set of images')
+        set_of_images = set()
         images = soup.findAll('img')
         for image in images:
             if image.get('src'):
-                list_of_images.append(image['src'])
+                set_of_images.add(image['src'])
 
-        if not list_of_images:
-            list_of_images = None
+        if not set_of_images:
+            set_of_images = None
 
-        logging.info('Get list of links')
-        list_of_links = []
+        logging.info('Get set of links')
+        set_of_links = set()
         for tag in soup.findAll():
             if tag.get('href'):
-                list_of_links.append(tag['href'])
+                set_of_links.add(tag['href'])
             if tag.get('url'):
-                list_of_links.append(tag['url'])
+                set_of_links.add(tag['url'])
 
-        if not list_of_links:
-            list_of_links = None
+        if not set_of_links:
+            set_of_links = None
 
-        return {'description': {'text': text, 'images': list_of_images,
-                'links': list_of_links}}
+        return {'description': {'text': text, 'images': set_of_images,
+                'links': set_of_links}}
 
     def convert_to_json(self, limit=None):
         """Return news in JSON format."""
