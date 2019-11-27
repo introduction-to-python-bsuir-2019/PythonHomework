@@ -1,4 +1,4 @@
-#RSS reader
+# RSS reader
 
 RSS reader is a command-line utility which receives RSS URL and prints results in human-readable format.
 
@@ -15,7 +15,7 @@ Utility provides the following interface:
     + --limit    - Limit news topics if this parameter is provided.
     + --date     - Return cached news from the specified day. Format is %Y%M%D.
 
-##Install RSS reader
+## Install RSS reader
 1. Create docker container:
     ```
     docker run -it -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock python /bin/bash
