@@ -3,8 +3,15 @@ from .news import News
 
 class FeedEncoder(json.JSONEncoder):
     def default(self, obj: object):
-        if isinstance(obj, Json):  
-            return {'News':[{'Feed'+str(number):{k:v for k,v in (feed.__dict__).items()} for number, feed in zip(range(len(obj.news_to_convert)),obj.news_to_convert)}]}
+        names_of_sections = ('Feed source', 'Title', 'Date', 'Link', 'Description', 'Media_content')
+        if isinstance(obj, Json):
+            number_of_news = len(obj.news_to_convert)
+            return {'News':
+                        [{'Feed'+str(number):
+                                {section_name:str(feed_section) for section_name, feed_section
+                                                                    in zip(names_of_sections, feed())}\
+                                                                        for number, feed 
+                                                                            in zip(range(number_of_news),obj.news_to_convert)}]}
         return json.JSONEncoder.default(self, obj)
     
 

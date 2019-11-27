@@ -25,7 +25,8 @@ def adding_arguments():
     parser.add_argument('--date', type=date, help='Print news published on a given day')
     parser.add_argument('--to-pdf', type=directory, help='Conversion news to the PDF format')
     parser.add_argument('--to-html', type=directory, help='Conversion news to the HTML format')
-    parser.add_argument('--all', action='store_true', help='Getting all cached news')
+    parser.add_argument('--all', action='store_true', help='Getting all cached news.\
+                    Compatible with the following arguments: --verbose, --json, --to-pdf, --to-html')
     return parser
 
 

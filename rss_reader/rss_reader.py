@@ -91,20 +91,24 @@ class RssReader(object):
                 self.news_to_print = s.query(News)\
                                       .filter(func.Date(News.date_of_addition) == datetime.today().date())\
                                       .order_by(News.date_of_addition.asc()).all()
-        if self.json:
-            print(Json(self.news_to_print))
             
     def print_news(self):
+        if self.json:
+            print(Json(self.news_to_print))
+            return
         for feed in self.news_to_print:
             print(feed)
-            print('='*50)
+            print('='*77)
     
     def exec(self):
-        if self.date:
-            self.get_cached_news()
-        elif self.all:
-            self.get_all_news()
-        else:
-            self.get_and_parse_news()
-            self.get_news_to_print()
-        self.print_news()
+        try:
+            if self.date:
+                self.get_cached_news()
+            elif self.all:
+                self.get_all_news()
+            else:
+                self.get_and_parse_news()
+                self.get_news_to_print()
+            self.print_news()
+        except Exception as e:
+            print(e)
