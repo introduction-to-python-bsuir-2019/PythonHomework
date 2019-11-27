@@ -9,7 +9,7 @@ pip install bs4
 ``` 
 ## Usage
 ```python
-from rss_reader import rss_reader
+from reader import rss_reader
 
 """
 Construct a new RSSReader object.
