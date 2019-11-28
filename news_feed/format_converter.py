@@ -114,7 +114,7 @@ class PdfNewsConverter(FPDF):
 
             self.set_x(self.w / 2 - 15)
             self.image(filename, type='jpg')
-        except requests.exceptions.MissingSchema:
+        except (requests.exceptions.MissingSchema, OSError):
             self.set_x(0)
             self.cell(0, 10, 'No image', 0, 0, 'C')
         finally:

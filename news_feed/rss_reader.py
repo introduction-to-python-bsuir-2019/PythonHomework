@@ -11,7 +11,6 @@ into command line to find more information
 """
 
 import requests
-import os
 
 import datetime
 from dateutil.parser import parse
@@ -38,10 +37,6 @@ init(convert=True)  # to use colorama
 
 PROJECT_VERSION = '2.0'
 PROJECT_DESCRIPTION = ''
-
-
-class NewsNotFoundError(FileNotFoundError):
-    pass
 
 
 class NoNewsInCacheError(OperationalError):
@@ -81,7 +76,7 @@ class NewsReader:
 
         self.items = self.get_news()
 
-    def get_news(self):
+    def get_news(self) -> dict:
         """
         Read rss from self.url and creates from it
         dictionary. If self.cashing is True -> cashed news
@@ -213,7 +208,7 @@ class NewsReader:
         connection.commit()
 
     @staticmethod
-    def read_by_date_sql(date, dir='news_cash'):
+    def read_by_date_sql(date, dir='news_cash') -> dict:
         """
         Reads news from sql database by given date
         from given directory
@@ -257,11 +252,11 @@ class NewsReader:
         return items
 
     @staticmethod
-    def get_date(news_date):
+    def get_date(news_date) -> datetime:
         """
         Returns date of news publication
 
-        :param news: string date from dictionary of given news
+        :param news_date: string date from dictionary of given news
         :return: date of news publication
         """
 
@@ -294,7 +289,7 @@ class NewsReader:
         return text, image_link, image_text
 
     @staticmethod
-    def get_description(description):
+    def get_description(description) -> str:
         """
         Remove all tags from raw description and
         return just simple news description
@@ -403,7 +398,7 @@ class NewsReader:
         return json_result
 
 
-def get_items(news, date):
+def get_items(news, date) -> dict:
     """
     If date is not Null read data from
     sql database, else return simple python dictionary
