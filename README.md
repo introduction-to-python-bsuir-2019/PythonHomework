@@ -79,8 +79,9 @@ Installing:
 OR
 ```
 python3 -m pip install -r requirements.txt
-pip install ./dist/rss-reader-4.0.tar.gz
+pip install ./dist/rss_reader-4.0.tar.gz
 ```
+
 ## Version 3: News cashing
 News cashing implemented by using Sqlite3 DB. DB consists of 4 related tables: feed, news_item, links, imgs.
 The implementation is in the rss_reader/utils/sqlite.py file. It contains RssDB class. Builtin sqlite3 lib is
@@ -98,13 +99,25 @@ manually.
 Html converter uses lxml.html library to parse and generate html content. 
 
 
-
 ## Docker deployment
+
+Instructions checked double times. Please, give an error's message if you have problems.
+
 ```docker run -it python /bin/bash
 git clone https://github.com/Nenu1985/PythonHomework.git 
 cd PythonHomework
 pip install .
-python -m rss-reader --help```
+python -m rss_reader --help
+```
+
+OR if you ran into errors
+
+```docker run -it python /bin/bash
+git clone https://github.com/Nenu1985/PythonHomework.git 
+cd PythonHomework
+pip install ./dist/rss_reader-4.0-py3-none-any.whl
+python -m rss_reader --help
+```
 
 
 

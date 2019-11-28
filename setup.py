@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 
 def get_install_requires():
-    with open('requirements.txt') as f:
+    with open('requirements.txt', 'r') as f:
         return [req.strip() for req in f]
 
 
