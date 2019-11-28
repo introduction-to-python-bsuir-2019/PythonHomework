@@ -47,22 +47,29 @@ def main():
     if args.version:
         print('\nRSS-Reader v2.0\n')
 
-    rss_object = RssHandler(args.source)
-    cache_out = CacheControl(args.date)
-    cache_in = CacheControl()
-
-    for news in rss_object.feed_dict['news']:
-        date_parsed = parse(news['pubDate'])
-        name = datetime.datetime.strftime(date_parsed, '%Y%m%d')
-        values = news.copy()
-        values['pubDate'] = datetime.datetime.strftime(parse(news['pubDate']), '%H%M%S')
-        values['source'] = rss_object.feed_dict['source']
-        values['links'] = ' '.join(values['links'])
-        values['media'] = ' '.join(values['media'])
-        cache_in.insert_values('date'+name, tuple(values.values()))
+    cache = CacheControl(args.date)
 
     if args.date is not None:
-        cache_out.cache_output(args.limit)
+        if len(args.date) != 8:
+            raise KeyError('Date is not valid!')
+        try:
+            int(args.date)
+        except ValueError:
+            raise KeyError('Date is not valid!')
+    else:
+        rss_object = RssHandler(args.source)
+        for news in rss_object.feed_dict['news']:
+            date_parsed = parse(news['pubDate'])
+            name = datetime.datetime.strftime(date_parsed, '%Y%m%d')
+            values = news.copy()
+            values['pubDate'] = datetime.datetime.strftime(parse(news['pubDate']), '%H%M%S')
+            values['source'] = rss_object.feed_dict['source']
+            values['links'] = ' '.join(values['links'])
+            values['media'] = ' '.join(values['media'])
+            cache.insert_values('date'+name, tuple(values.values()))
+
+    if args.date is not None:
+        cache.cache_output(args.limit)
     else:
         rss_object.output(args.json, args.limit)
 

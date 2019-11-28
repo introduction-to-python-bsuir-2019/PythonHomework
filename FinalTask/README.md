@@ -1,3 +1,5 @@
+######Usage and general description
+
 Pure Python command-line RSS reader.
 
 Utility provide the following interface:
@@ -16,3 +18,9 @@ optional arguments:
   --json         Print result as JSON in stdout
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
+
+######Cache
+
+Cache was implemented with **sqlite3** library. Feed stored in _newscache.db_
+database file. Database file stored in the same directory as _rss-reader_
+script.

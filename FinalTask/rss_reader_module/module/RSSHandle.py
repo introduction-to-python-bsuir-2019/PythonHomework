@@ -91,15 +91,15 @@ class CacheControl:
 
     def connect_db(self):
         dbpath = os.path.join(os.path.dirname(__file__), 'newscache.db')
-        logging.info('Connecting to the cache database at %s'%dbpath)
+        logging.info('Connecting to the cache database at %s' % dbpath)
         self.conn = sqlite3.connect(dbpath)
         self.cursor = self.conn.cursor()
 
-    def _table_exists(self, publ):
+    def _table_exists(self, tbl_name):
         """Check if table exists"""
         self.connect_db()
         logging.info('Checking if table exists.')
-        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [publ])
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tbl_name])
         if self.cursor.fetchone() is None:
             logging.info('There is no such table.')
             return False
@@ -111,15 +111,21 @@ class CacheControl:
         logging.info('Closing connection with database')
         self.conn.close()
 
-    def insert_values(self, publ, values):
+    def insert_values(self, tbl_name, values):
         """Inserts values into the table"""
         self.connect_db()
-        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {publ}
+        if len(values) != 7:
+            raise KeyError(f'Given {len(values)} params, but expected 7!')
+
+        self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {tbl_name}
                                (title text, pubTime text, content text, other_links text,
                                 media_links text, src_link text, feed text)""")
 
+        if self._row_exists(tbl_name, values):
+            return None
+
         logging.info('Inserting values in the table.')
-        self.cursor.execute(f"""INSERT INTO {publ}
+        self.cursor.execute(f"""INSERT INTO {tbl_name}
                                 VALUES(?,?,?,?,?,?,?)""", values)
 
         self.conn.commit()
@@ -128,10 +134,50 @@ class CacheControl:
 
     def cache_output(self, limit):
         "Outputs news from cache in stdout."
+        self.date = 'date' + self.date
         if not self._table_exists(self.date):
             raise KeyError('There is no cache for this date!')
         elif self.date is None:
             raise TypeError('Date is required for this iperation!')
 
         logging.info('Printing RSS-Feed in stdout.')
-        feed_list = self.cursor.execute("SELECT * FROM ?", self.date)
+        self.cursor.execute(f"SELECT * FROM {self.date} ORDER BY puBtime")
+        feed_list = self.cursor.fetchall()
+        print(f'\nDate: {parse(self.date[4:]).date()}\n')
+        for row in feed_list:
+            if feed_list.index(row) == limit:
+                break
+            print(f"""
+Title: {row[0]}
+Published: {row[1]}
+Feed: {row[6]}
+Source link: {row[5]}
+
+{row[2]}
+
+                  """)
+
+            print('Links:')
+            for (count, link) in enumerate((row[3]+''+row[4]).split()):
+                print(f'[{count + 1}]{link}')
+            print('-'*80)
+
+        self.conn.commit()
+        logging.info('Closing connection with database')
+        self.conn.close()
+
+    def _row_exists(self, tbl_name, values):
+        "Check if given row exist"
+        self.connect_db()
+        self.cursor.execute(f"""SELECT * FROM {tbl_name} WHERE title=? AND
+                              pubTime=? AND content=? AND other_links=? AND
+                                media_links=? AND src_link=? AND feed=?""", values)
+
+        if self.cursor.fetchall() == []:
+            return False
+        else:
+            return True
+
+        self.conn.commit()
+        logging.info('Closing connection with database')
+        self.conn.close()
