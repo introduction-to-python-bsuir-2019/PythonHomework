@@ -90,7 +90,7 @@ class CacheControl:
 
     def connect_db(self):
         logging.info('Connecting to the cache database.')
-        self.conn = sqlite3.connect('cache/newscache.db')
+        self.conn = sqlite3.connect('newscache.db')
         self.cursor = self.conn.cursor()
 
     def _table_exists(self, publ):

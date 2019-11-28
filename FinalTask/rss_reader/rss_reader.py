@@ -13,9 +13,9 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
 
     group.add_argument('--source',
-                        action='store',
-                        type=str,
-                        help='RSS URL')
+                       action='store',
+                       type=str,
+                       help='RSS URL')
 
     parser.add_argument('--version',
                         action='store_true',
@@ -35,9 +35,9 @@ def main():
                         help='Limit news topics if this parameter provided')
 
     group.add_argument('--date',
-                        action='store',
-                        type=str,
-                        help='Print cached news that was published on given date')
+                       action='store',
+                       type=str,
+                       help='Print cached news that was published on given date')
 
     args = parser.parse_args()
 
@@ -53,7 +53,7 @@ def main():
 
     for news in rss_object.feed_dict['news']:
         date_parsed = parse(news['pubDate'])
-        name = datetime.datetime.strftime(date_parsed,'%Y%m%d')
+        name = datetime.datetime.strftime(date_parsed, '%Y%m%d')
         values = news.copy()
         values['pubDate'] = datetime.datetime.strftime(parse(news['pubDate']), '%H%M%S')
         values['source'] = rss_object.feed_dict['source']

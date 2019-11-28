@@ -8,9 +8,10 @@ setuptools.setup(
                 author_email='qqaezz@gmail.com',
                 include_package_data=True,
                 python_requires='>=3',
-                install_requires=['feedparser==5.2.1', 'beautifulsoup4==4.8.0', 'lxml==4.4.1'],
+                install_requires=['feedparser==5.2.1', 'beautifulsoup4==4.8.0',
+                                  'python-dateutil==2.8.0', 'lxml==4.4.1'],
                 packages=setuptools.find_packages(exclude=["tests"]),
-                py_modules=['rss_reader.RSSHandle'],
+                py_modules=['rss_reader.RSSHandle', 'rss_reader.rss_reader'],
                 entry_points={
                     'console_scripts': [
                         'rss-reader=rss_reader.rss_reader:main',
