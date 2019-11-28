@@ -155,6 +155,7 @@ class RssFeed:
                                              'Feed': self.description[number],
                                              'Image link': self.image_link[number]
                                              } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4)
+
             f.write(newsJson)
             f.close()
         if self.args.json:
@@ -214,9 +215,10 @@ def print_date():
 def get_news():
     """This function get information from rss page and print int cmd"""
     logging.info("Start parsing feeds")
-    if parsargument().date and len(parsargument().date[0]) is not 8:
+    right_length = 8
+    if parsargument().date and len(parsargument().date[0]) is not right_length:
         print("Enter date in format %YYYYMMDD")
-    if parsargument().date and len(parsargument().date[0]) is 8:
+    if parsargument().date and len(parsargument().date[0]) is right_length:
         print_date()
     else:
         news = RssFeed()
