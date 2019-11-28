@@ -20,3 +20,11 @@ def init_logger(name: str) -> Logger:
     # add handler to logger object
     logger.addHandler(stream_handler)
     return logger
+
+
+def get_logger(name: str) -> Logger:
+    """
+    Return logger object.
+    :param name: Name of the logger object.
+    """
+    return logging.getLogger(name)

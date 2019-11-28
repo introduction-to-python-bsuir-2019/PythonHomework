@@ -15,3 +15,17 @@ class DateError(ValueError):
     This class should be raised, if received some problems with converting date.
     """
     pass
+
+
+class DirError(Exception):
+    """
+    This class should be raised, if received path is not a directory.
+    """
+    pass
+
+
+class DirExistsError(Exception):
+    """
+    This class should be raised, if directory which was received by bath not exists.
+    """
+    pass

@@ -1,0 +1,11 @@
+<title>
+<p>
+{feed_title}
+</p>
+</title>
+<p>
+Link: {feed_link}
+</p>
+<section>
+{items}
+</section>

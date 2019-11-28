@@ -1,12 +1,15 @@
-import setuptools
 import os
+
+import setuptools
+
 import app
+from app.support_files.config import APP_NAME
 
 with open("requirements.txt") as fp:
     install_requires = fp.read()
 
 setuptools.setup(
-    name="rss_reader",
+    name=APP_NAME,
     version=app.__version__,
     author="Budzich Maxim",
     author_email="131119999@gmail.com",
@@ -16,6 +19,6 @@ setuptools.setup(
     python_requires=">=3.8",
     install_requires=install_requires,
     entry_points={
-        "console_scripts": ["rss_reader=app.core:main"],
+        "console_scripts": [f"{APP_NAME}=app.core:main"],
     }
 )

@@ -1,24 +1,12 @@
 ## It is a one-shot command-line RSS reader by Zviger.
 ### Installation
-Clone this repository and run setup.py file with parameters "install --user"
-or
-Download docker [https://docs.docker.com/] and docker-compose [https://docs.docker.com/compose/install/]
-after this run command:
+Clone this repository and run
 ```text
-docker-compose up -d
+pip install . --user
 ```
-and
-```text
-docker exec -it rss_reader bash (this command u will run every time, when u need to use reader)
-```
-Fine!
-
-Now you can write in the docker console "rss_reader" with some parameters
 ### User interface
 ```text
-usage: rss_reader [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] [--date DATE] source
-
-It is a python command-line rss reader
+usage: rss-reader [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] [--date DATE] [--to_html PATH] [--to_fb2 PATH] source
 
 positional arguments:
   source                RSS URL
@@ -32,7 +20,8 @@ optional arguments:
   --json                Outputs verbose status messages
   --length LENGTH       Sets the length of each line of news output
   --date DATE           Search past news by date in format yeardaymonth (19991311)
-
+  --to_html PATH        Save news by path in html format
+  --to_fb2 PATH         Save news by path in fb2 format
 ```
 
 ### Json structure
@@ -64,4 +53,12 @@ When the --date parameter is used, news is downloaded from the database by the e
 
 Features:
 * The --limit parameter affects the amount of data loaded into the database.
-* Date must be written in the yearmonthday (example - 19991113) format. 
+* Date must be written in the yearmonthday (example - 19991113) format.
+
+### Saving in files
+Using the "--to_html" and "--to_fb2" parameters, you can save files at a given path.
+The path should be written in the style of UNIX systems (example: ./some/folder).
+File names are formed using the "feed[index].[format]" template (example: feed13.html).
+File indices go sequentially and a new file fills this sequence or is set to the end.
+What does this mean: if, for example, there are files "feed1.html" and "feed3.html",
+a new file will be created with the name "feed2.html".

@@ -1,9 +1,11 @@
 <div class="border border-black p-3">
 <a href="{item_link}" class="font-weight-bold" style="color:black; font-size:large; font:bold" >{item_title}</a>
+<div class="col">
 <div class="row pl-3">
 <h6 class="pr-3">Author: {item_author}</h6>
 <h6>Published: {item_published}</h6>
-<p class="text-left">{item_description}</p>
-<img src="{item_img}" class="img-fluid mx-auto rounded" alt="Responsive image" width="200">
+</div>
+<p class="text pt-2 pb-2">{item_description}</p>
+{item_images}
 </div>
 </div>

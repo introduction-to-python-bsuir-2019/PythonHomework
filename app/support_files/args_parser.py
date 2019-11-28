@@ -21,6 +21,8 @@ def get_args() -> Namespace:
     parser.add_argument("--length", type=int, help="Sets the length of each line of news output", default=120)
     parser.add_argument("--date", type=str, help="Search past news by date in format yeardaymonth (19991311)",
                         default=None)
+    parser.add_argument("--to_html", metavar="PATH", type=str, help="Save news by path in html format", default=None)
+    parser.add_argument("--to_fb2", metavar="PATH", type=str, help="Save news by path in fb2 format", default=None)
     parser.parse_args()
     args = parser.parse_args()
     return args

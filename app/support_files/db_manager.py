@@ -10,9 +10,11 @@ from pymongo import MongoClient
 
 from app.support_files.dtos import Feed, Item
 from app.support_files.exeptions import FindFeedError, DateError
+from app.support_files.config import APP_NAME
+from app.support_files.app_logger import get_logger
 
 
-class DB:
+class DBManager:
     """
     Class to work with database.
     """
@@ -22,6 +24,7 @@ class DB:
         client = MongoClient(f"mongodb://{mongo_host}:27017/")
         self._db = client["feed_db"]
         self._collection = self._db["feed_collection"]
+        self._logger = get_logger(APP_NAME)
 
     def insert_feed(self, feed: Feed) -> None:
         """
@@ -29,7 +32,9 @@ class DB:
         If this feed exists in the database, then news is added that was not there.
         :param feed: Feed, which should be inserted.
         """
+        self._logger.info("Loading data from database to join with inserted data is started")
         cashed_feed = self.find_feed_by_link(feed.rss_link)
+        self._logger.info("Loading data from database to join with inserted data is finished")
 
         if cashed_feed is not None:
             items = set(feed.items)
@@ -39,6 +44,7 @@ class DB:
             self._collection.update_one({"rss_link": feed.rss_link}, {"$set": {"items": result_items}})
         else:
             self._collection.insert_one(asdict(feed))
+        self._logger.info("New and old data are joined")
 
     def find_feed_by_link(self, link: str) -> Optional[Feed]:
         """
@@ -91,7 +97,4 @@ class DB:
 
 
 if __name__ == "__main__":
-    db = DB()
-    db.find_feed_by_link_and_date("", "201")
-    print([len(feed["items"]) for feed in db._collection.find({})])
-    print([feed["rss_link"] for feed in db._collection.find({})])
+    DBManager().truncate_collection()
