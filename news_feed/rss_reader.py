@@ -393,7 +393,7 @@ class NewsReader:
 
         logging.info('Json was created')
 
-        json_result = json.dumps(items)
+        json_result = json.dumps(items, ensure_ascii=False).encode('UTF-8').decode()
 
         return json_result
 
