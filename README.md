@@ -88,6 +88,8 @@ To start web application input next commands:
 >> python manage.py runserver
 ```
 
+After commands execution go to [localhost:8000](localhost:8000)
+
 ## Tests:
 To run unittests go to news_feed directory and print in console:
 

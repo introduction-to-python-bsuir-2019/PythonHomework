@@ -260,7 +260,7 @@ def download_fb2(request, posts):
     """
 
     post_names = get_news_titles(posts)
-    posts = NewsInfo.objects.filter(title__in=post_names)
+    posts = NewsInfo.objects.filter(title_hash__in=post_names)
 
     items = dict()
 
