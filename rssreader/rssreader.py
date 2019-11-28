@@ -7,6 +7,7 @@ import urllib.request
 import sys
 import json
 import datetime
+from fpdf import FPDF
 
 
 def argsparsing():
@@ -17,6 +18,7 @@ def argsparsing():
     parser.add_argument("--verbose", help="Outputs verbose status messages", action="store_true")
     parser.add_argument("--limit", type=int, help="Limit news topics if this parameter provided")
     parser.add_argument("--date",type=int,help="Read cashed news by date in next format YYMMDD")
+    parser.add_argument("--to-html", help="Convert news to html and save in .html file",action="store_true")
     return parser.parse_args()
 
 def making_log(operation, message, file='loglist.log'):
@@ -46,7 +48,6 @@ class NewsRss:
         soup = BeautifulSoup(urllib.request.urlopen(self.arguments.source), "xml")
         making_log(1, "Opened URL for news reading, URL: %s" % self.arguments.source)
         list = soup.find_all("item")
-        datafeed={}
         making_log(1, "Find all <item> tags in feed.")
         making_log(1, "Limit is: (%s)        " % (str(self.arguments.limit)))
         for cout, feed in enumerate(list):
@@ -54,23 +55,49 @@ class NewsRss:
                 making_log(1, "Opened feed on %s link." % feed.link.text)
                 strmedia = str(feed.find_all("media:content"))
                 ded = feed.description.text
-                self.links=[] 
+                llinks=[] 
                 for i in range(strmedia.count('url="')):
-                    self.links.append(strmedia[strmedia.find('url="'): (strmedia.find('"', (strmedia.find('url="')+5))+1)])
+                    llinks.append(strmedia[(strmedia.find('url="')+5): (strmedia.find('"', (strmedia.find('url="')+5)))])
+                self.links.append(str(llinks))
                 self.link.append(feed.link.text)
-                self.title.append(feed.title.text)
+                ded=str(feed.title.text).replace("&#39;","'")
+                ded.replace("&quot;","'")
+                self.title.append(ded)
                 self.pubDate.append(feed.pubDate.text)
                 self.desc.append(ded[(ded.find('a>') + 1):ded.find('<p><br')])
             else:
                 making_log(1, "Iteration closed with code 0(all_goods)")
                 break
+    
+
+    def convert_to_html(self):
+        for index in range(len(self.title)):
+            image=str(self.links[index])
+            image=image[2:-2]
+            filename="%s.html"%str(self.title[index])[:-2]
+            htmltext="""
+<html>
+    <head>
+            <title> %s </title>
+    </head>
+    <body>
+            <h1> Title: %s </h1>
+            <h4> Date: %s </h4>
+            <h4> Link: %s </h4>
+            <h4> Feed: %s </h4>
+            <p><img src=%s width="400" height="400"></p>
+    </body>
+</html>        
+            """%(str(self.title[index]), str(self.title[index]),str(self.pubDate[index]),str(self.link[index]),str(self.desc[index]),image)
+            fp=open(filename,"w")
+            fp.write(htmltext)
 
 
     def print_news(self):
         arg=self.arguments.json
         for index in range(len(self.title)):
             if arg:
-                print(json.dumps({"item":{"link":self.link[index],"body":{"title":self.title[index],"date": self.pubDate[index],"images": self.links,"feed":self.desc[index]}}},indent=4))
+                print(json.dumps({"item":{"link":self.link[index],"body":{"title":self.title[index],"date": self.pubDate[index],"images": self.links[index],"feed":self.desc[index]}}},indent=4))
                 print("\n\n\n")
             else:    
                 print("Title: " + self.title[index],
@@ -78,7 +105,7 @@ class NewsRss:
                         "\nLink: " + self.link[index])
                 print("Feed: " + self.desc[index])
                 if self.links != []:
-                    print("Images: \n" + str(self.links))
+                    print("Images: \n" + self.links[index])
                 print("\n\n\n")    
     
 
@@ -94,15 +121,15 @@ class NewsRss:
         for index in range(len(self.title)):
                 fp=open("feeddata.txt","a")
                 fp.write(str(self.pubDate[index]))
-                fp.write(" \n")
+                fp.write("\n")
                 fp.write(str(self.title[index]))
-                fp.write(" \n")
+                fp.write("\n")
                 fp.write(str(self.link[index]))
-                fp.write(" \n")
+                fp.write("\n")
                 fp.write(str(self.desc[index]))
-                fp.write(" \n")
-                fp.write(str(self.links))
-                fp.write(' \n')
+                fp.write("\n")
+                fp.write(str(self.links[index]))
+                fp.write("\n")
                 fp.close()
 
 
@@ -125,7 +152,7 @@ class NewsRss:
                 self.link.append(fp.readline())
                 self.desc.append(fp.readline())
                 self.links.append(fp.readline())
-        if flag: print("No news on this date :(")
+        if flag: print("No news on this date (")
         fp.close()
 
       
@@ -137,12 +164,15 @@ def main():
         if news.date_convert():
             news.fileread()
             news.print_news()
+            #if news.arguments.to-html:
+            news.convert_to_html()
             if news.arguments.verbose:
                 making_log(0,'')
     else:
         news.feed_find()
         news.print_news()
         news.filewrite()
+        news.convert_to_html()
         if news.arguments.verbose:
             making_log(0,'')
 
