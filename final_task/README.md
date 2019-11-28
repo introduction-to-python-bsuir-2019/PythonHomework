@@ -1,23 +1,24 @@
-<h4><b>[Iteration 3] One-shot command-line RSS reader.</b></h4>
+<h4><b>[Iteration 4] One-shot command-line RSS reader.</b></h4>
 
 <h5>Utility interface</h5>
 
 <pre>
-usage: rss_reader.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] [--to-html PATH] source
+usage: rss-reader [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] [--to-html PATH] [--to-pdf PATH] source
 
 Pure Python command-line RSS rss_reader.
 
 positional arguments:
-  source         RSS URL
+  source          RSS URL
 
 optional arguments:
-  -h, --help     show this help message and exit
-  --version      Print version info
-  --json         Print result as JSON in stdout
-  --verbose      Output verbose status messages
-  --limit LIMIT  Limit news topics if this parameter provided
-  --date DATE    Get news by date (date format: "yyyymmdd")
+  -h, --help      show this help message and exit
+  --version       Print version info
+  --json          Print result as JSON in stdout
+  --verbose       Output verbose status messages
+  --limit LIMIT   Limit news topics if this parameter provided
+  --date DATE     Get news by date (date format: "yyyymmdd")
   --to-html PATH  Convert news to HTML format
+  --to-pdf PATH   Convert news to PDF format
 </pre>
 
 <h5>JSON structure</h5>
