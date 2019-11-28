@@ -17,7 +17,7 @@ setup(
     keywords='simple rss reader',
     packages=find_packages(),
     python_requires='>=3.8',
-    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'colorama'],
+    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'colorama', 'jinja2', 'pdfkit'],
     entry_points={
         'console_scripts': [
             'rss-reader=rss_reader.__main__:main',
