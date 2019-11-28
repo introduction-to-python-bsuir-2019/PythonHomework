@@ -21,3 +21,9 @@ services:
       - mongo:mongodb
     environment:
       - MONGO_URL=mongodb://mongo:27017/
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
