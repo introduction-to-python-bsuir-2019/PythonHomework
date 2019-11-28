@@ -4,6 +4,7 @@ import sqlite3
 import logging
 import json
 import datetime
+import os
 from dateutil.parser import parse
 
 
@@ -89,8 +90,9 @@ class CacheControl:
         self.date = date
 
     def connect_db(self):
-        logging.info('Connecting to the cache database.')
-        self.conn = sqlite3.connect('newscache.db')
+        dbpath = os.path.join(os.path.dirname(__file__), 'newscache.db')
+        logging.info('Connecting to the cache database at %s'%dbpath)
+        self.conn = sqlite3.connect(dbpath)
         self.cursor = self.conn.cursor()
 
     def _table_exists(self, publ):
@@ -106,12 +108,12 @@ class CacheControl:
             return True
 
         self.conn.commit()
+        logging.info('Closing connection with database')
         self.conn.close()
 
     def insert_values(self, publ, values):
         """Inserts values into the table"""
         self.connect_db()
-        logging.info('Creating table...')
         self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS {publ}
                                (title text, pubTime text, content text, other_links text,
                                 media_links text, src_link text, feed text)""")
@@ -121,6 +123,7 @@ class CacheControl:
                                 VALUES(?,?,?,?,?,?,?)""", values)
 
         self.conn.commit()
+        logging.info('Closing connection with database')
         self.conn.close()
 
     def cache_output(self, limit):

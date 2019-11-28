@@ -4,7 +4,7 @@ import argparse
 import logging
 import datetime
 from dateutil.parser import parse
-from rss_reader.RSSHandle import RssHandler, CacheControl
+from rss_reader_module.module.RSSHandle import RssHandler, CacheControl
 
 
 def main():
