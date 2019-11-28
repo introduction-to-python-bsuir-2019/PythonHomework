@@ -9,8 +9,7 @@ import logging
 import os
 import re
 import requests
-
-VERSION = 'v1.4'
+from rss_reader import cfg
 
 
 class NewsFeed:
@@ -265,14 +264,14 @@ def update_cache(fresh_news, dates, cached):
 
 def main():
     args = parse_arguments()
-    if args.version and (args.json or args.limit or args.topdf):
+    if args.version and (args.json or args.limit or args.to_html or args.to_fb2):
         raise ValueError('You don\'t use --version together with other arguments')
     if not (args.version or args.source or args.date):
         raise ValueError('Source, --date or --version expected')
     if args.limit and args.limit < 1:
         raise ValueError('Incorrect limit input (likely to be non-positive)')
     if args.version:
-        print('RSS-reader '+VERSION)
+        print('RSS-reader '+cfg.VERSION)
     else:
         if args.verbose:
             logging.basicConfig(level=logging.INFO,

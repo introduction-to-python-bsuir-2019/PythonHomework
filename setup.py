@@ -1,11 +1,8 @@
 import setuptools
-from rss_reader.rss_reader import VERSION
-
-with open('requirements.txt') as f:
-    requirements=f.read().splitlines()
+from rss_reader import cfg
 
 setuptools.setup(name='adzemreader',
-                 version=VERSION[1:],
+                 version=cfg.VERSION[1:],
                  author='Aliaksei Dzemasiuk',
                  author_email='mr.glazik@gmail.com',
                  description='RSS-feed reader',
@@ -19,10 +16,5 @@ setuptools.setup(name='adzemreader',
                                    'requests',
                                    'jsonpickle',
                                    'bs4',
-                                   'feedparser'],
-                 setup_requires=['html5lib',
-                                 'requests',
-                                 'jsonpickle',
-                                 'bs4',
-                                 'feedparser']
+                                   'feedparser']
 )
