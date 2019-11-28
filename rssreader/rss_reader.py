@@ -46,8 +46,8 @@ class RSSReader:
             * colorize: bool - print the result in colorized mode
             Default start sample output
         :type source: str
-        :type limit: int
-        :type date: str
+        :type limit: int or None
+        :type date: str or None
         :type kwargs: dict
         """
         if limit and limit < 1:
@@ -73,7 +73,7 @@ class RSSReader:
 
         logging.info("All articles was successfully loaded")
 
-        OutputController.print(articles, **kwargs)
+        return OutputController.print(articles, **kwargs)
 
     @staticmethod
     def _get_articles_from_url(source, limit):
@@ -86,7 +86,6 @@ class RSSReader:
         logging.info("Completed. Check status code of response.")
 
         if response['status'] in range(200, 300):
-            print(response)
             logging.info(f"Status code {response['status']}. Getting articles from '{source}' was successful")
         else:
             print(f"Error connecting with URL '{source.strip()}' with status code {response['status']}.")
