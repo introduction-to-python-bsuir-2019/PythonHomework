@@ -1,5 +1,5 @@
 """
-    Contains class Converter which receives path
+    Contains class PDFConverter which receives path
     where it will save news in PDF format
 """
 
@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import fpdf
 
-from app.RSSreader import RSSreader
+from app.RSSReader import RSSReader
 
 
 warnings.filterwarnings("ignore")
@@ -21,6 +21,8 @@ class PDFConverter:
     """ Writes news in PDF file """
 
     def __init__(self, args, logger, news=None):
+        """ Sets up fonts for PDF file """
+
         self.arguments = args
         self.args = args.get_args()
         self.news = news
@@ -57,7 +59,7 @@ class PDFConverter:
 
         self.write_title('RSS news')
 
-        rss_reader = RSSreader(self.arguments, self.logger)
+        rss_reader = RSSReader(self.arguments, self.logger)
         for new in self.news:
             new = rss_reader.to_dict(new)
             self.create_cells(new)

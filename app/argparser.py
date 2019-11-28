@@ -5,7 +5,7 @@
 import argparse
 
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 
 class ArgParser:
@@ -57,6 +57,12 @@ class ArgParser:
             dest='to_pdf',
             type=str,
             help='It should take the path of the directory where new PDF file will be saved'
+        )
+        argparser.add_argument(
+            '--to-html',
+            dest='to_html',
+            type=str,
+            help='It should take the path of the directory where new HTML file will be saved'
         )
         args = argparser.parse_args()
         return args

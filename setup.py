@@ -12,7 +12,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='rss-reader',
-    version='0.3.0',
+    version='0.4.0',
     description='A simple Python3.8 rss reader',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -20,8 +20,9 @@ setup(
     author='Dydyshko Andrey',
     author_email='dydyshko1999@gmail.com',
     keywords='simple rss reader',
-    #packages=find_packages(),
+    # packages=find_packages(),
     packages=['app', 'fonts', 'app.fonts'],
+    # fonts for PDF
     package_data={
         'app': [
             'app/fonts/NotoSans-Black.ttf',
@@ -40,7 +41,7 @@ setup(
             'NotoSans-Thin.cw127.pkl',
         ]
     },
-    #data_files=[('app', ['fonts/NotoSans-Black.ttf', ])],
+    # data_files=[('app', ['fonts/NotoSans-Black.ttf', ])],
     include_package_data=True,
     python_requires='>=3.8',
     install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'python-dateutil', 'fpdf', 'setuptools-git'],
