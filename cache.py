@@ -1,36 +1,29 @@
-import csv
+import sqlite3
 
-def csv_writer(path, fieldnames, data):
-    """
-    Функция для записи в файл csv
-    path - путь до файла
-    fieldnames - название столбцов
-    data - список из списков
-    """
-    with open(path, "w", newline='') as out_file:
-        '''
-        out_file - выходные данные в виде объекта
-        delimiter - разделитель :|;
-        fieldnames - название полей (столбцов)
-        '''
-        writer = csv.DictWriter(out_file, delimiter=';', fieldnames=fieldnames)
-        writer.writeheader()
-        for row in data:
-            writer.writerow(row)
+from sqlite3 import Error
 
-# если точка входа наш скрипт
-def test(articles):
-    data = articles
+def sql_connection():
+    try:
+        con = sqlite3.connect('mydatabase.db')
+        return con
+    except Error:
+        print(Error)
 
-    my_list = []
-    fieldnames = data[0]
-    cell = data[1:]
-    print('столбцы', fieldnames)
-    print('ячейки(строки)', cell)
-    for values in cell:
-        print('строки', values)
-        inner_dict = dict(zip(fieldnames, values))
-        my_list.append(inner_dict)
 
-    path = "dict_output.csv"
-    csv_writer(path, fieldnames, my_list)
+def sql_table(con, entities):
+    cursorObj = con.cursor()
+    try:
+        cursorObj.execute("CREATE TABLE IF NOT EXISTS news(title, published, link, description)")
+    finally:
+        cursorObj.execute('INSERT OR REPLACE INTO news(title, published, link, description) VALUES(?, ?, ?, ?)', entities)
+    con.commit()
+
+
+def sql_fetch(con):
+    cursorObj = con.cursor()
+    cursorObj.execute('SELECT * FROM news')
+    while True:
+        row = cursorObj.fetchone()
+        if row == None:
+            break
+        print('Title:',row[0],'\n','Date:',row[1],'\n','Link:',row[2],'\n','Description:',row[3],'\n')

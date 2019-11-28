@@ -1,15 +1,15 @@
 from setuptools import setup
 
 setup(
-    name='RSS parser',
+    name='RSS reader',
     version = 'Second iteration',
     description = 'CLI utility to process RSS',
     author = 'Pavel Shymansky',
-    py_module = ['rss.parser','arg.py'],
-    install_requires = ['feedparser', 'bs4'], #!!!!!!!!!!!!!!!!!!!не забытЬ!!!!!!!!!!!!!
-    python_requires='>=3.8',
+    py_module = ['rss_reader.py', 'arg.py', 'loggerfile.py', 'version.py', 'cache.py'],
+    install_requires = ['feedparser', 'bs4'], #TODO: Add modules
+    python_requires='>=3.7',
     entry_points ='''
     [console_scripts]
-    rss-parser=rss_parser: main
+    rss-reader=rss_reader:main
     '''
     )

@@ -1,5 +1,5 @@
 import unittest
-from rss_parser import parse
+from rss_reader import parse
 
 class FunctionTestMethods(unittest.TestCase):
     def test_url(self):
