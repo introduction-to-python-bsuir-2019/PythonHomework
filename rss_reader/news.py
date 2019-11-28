@@ -1,4 +1,5 @@
 import html
+import os
 import re
 import json
 import logging
@@ -121,3 +122,26 @@ class News:
     def to_json(self):
         """This function returns JSON-string with news"""
         return json.dumps({'Source:': self.name_of_source, 'Feeds': self.all_news}, ensure_ascii=False).encode('utf8')
+
+    def to_fb2(self, filepath):
+        """This function create file in fb2 format with news"""
+        pass
+
+    def to_html(self, filepath):
+        print(filepath[-5::])
+        if filepath[-5::] != ".html":
+            filename = filepath + ".html"
+        with open(filename, 'w') as html_file:
+            html_file.write(f'<html>\n<head>{self.name_of_source}</head>\n<body>\n')
+            for elem in self.all_news:
+                html_file.write(f'<h3>{elem["title"]}</h3>')
+                html_file.write(f'<p>Date of posting: {elem["date"]}</p>')
+                html_file.write(f'<p>{elem["description"]}</p>')
+                html_file.write(f'<p><a href="{elem["link"]}">Link to source</a></p>')
+
+                for media in elem['media']:
+                    print(f'<p><img src="{media["url"]}></p>')
+                    html_file.write(f'<p><img src="{media["url"]}"></p>')
+                    html_file.write('<hr>')
+            html_file.write('</body></html>')
+        print(f'All news you can find at {os.path.realpath(filename)}')

@@ -6,7 +6,7 @@ import logging
 import sys
 
 
-version = '1.2'
+version = '1.3'
 
 
 def main():
@@ -26,13 +26,14 @@ def main():
     parser.add_argument('-V', '--verbose', help='Outputs verbose status messages', action='store_true')
     parser.add_argument('-L', '--limit', help='Limit news topics if this parameter is provided', type=int, default=0)
     parser.add_argument('--date', help='Find news in cache if this parameter is provided', type=int, default=0)
+    parser.add_argument('--to-html', help='Create a HTML file with news', type=str, default="")
+    parser.add_argument('--to-fb2', help='Create a fb2 file with news', type=str, default="")
     args = parser.parse_args()
 
     if args.verbose:
         stdout_handler = logging.StreamHandler(sys.stdout)
         stdout_handler.setFormatter(formatter)
         logger.addHandler(stdout_handler)
-    feeds = feedparser.parse(args.URL)
 
     if args.date:
         logger.info('Starting to read from cache')
@@ -44,6 +45,8 @@ def main():
             logger.info('News from cache ware read')
         exit()
 
+    feeds = feedparser.parse(args.URL)
+
     if feeds.bozo:
         logger.error('Feed is not well-formed XML')
     else:
@@ -52,7 +55,13 @@ def main():
     news = News(feeds, args.limit)
     logger.info('News is parsed')
 
-    if args.json:
+    if args.to_html:
+        news.to_html(args.to_html)
+
+    elif args.to_fb2:
+        news.to_fb2(args.to_fb2)
+
+    elif args.json:
         print(news.to_json().decode())
         logger.info('News is displayed in stdout in a json format')
     else:

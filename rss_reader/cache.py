@@ -3,6 +3,8 @@ import logging
 
 
 file_path = 'cache.db'
+
+
 class Cache:
     """"This class contains news and methods of work whit cache"""
     cursor = None
