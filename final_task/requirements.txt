@@ -1,3 +1,4 @@
 feedparser
 bs4
 fpdf
+requests

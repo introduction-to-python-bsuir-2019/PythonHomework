@@ -9,8 +9,8 @@ import html
 import json
 import feedparser
 from bs4 import BeautifulSoup
-import cacher
-import format_converter
+import rss_reader.cacher as cacher
+import rss_reader.format_converter as format_converter
 
 def init_cli_parser():
     """
@@ -177,8 +177,8 @@ def main():
             news = news[:args.limit if args.limit else len(news)]
         except ValueError:
             if not args.verbose:
-                print(f"error: not well-formed xml or broken access to the Internet")
-            logger.error(f"not well-formed xml or broken access to the Internet")
+                print(f"error: not well-formed xml or no access to the Internet")
+            logger.error(f"not well-formed xml or no access to the Internet")
             logger.info(f"end of work -->|")
             return
 
@@ -200,10 +200,10 @@ def main():
         logger.info(f"writing news in {args.pdf} file in pdf format..")
         try:
             format_converter.to_pdf(news, args.pdf)
-        except RuntimeError:
+        except ConnectionError:
             if not args.verbose:
-                print(f"error: TTF Font file not found: DejaVuSansCondensed.ttf")
-            logger.error("TTF Font file not found: DejaVuSansCondensed.ttf")
+                print(f"error: no access to the Internet")
+            logger.error("no access to the Internet")
             logger.info(f"end of work -->|")
             return
         logger.info(f"file {args.pdf} was successfully rewrited")

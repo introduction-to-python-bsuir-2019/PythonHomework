@@ -21,8 +21,8 @@ setuptools.setup(
     packages=["rss_reader"],
     package_dir={"rss_reader": 'rss_reader'},
     include_package_data=True,
-    python_requires='>=3.8',
-    install_requires=['feedparser', 'bs4', 'fpdf'],
+    python_requires='>=3.7',
+    install_requires=['feedparser', 'bs4', 'fpdf', 'requests'],
     entry_points={
         'console_scripts':
             [f"rss-reader = rss_reader.rss_reader:main"]

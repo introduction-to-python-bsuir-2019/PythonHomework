@@ -2,9 +2,9 @@
 this module provides tools for converting news to html and pdf formats
 """
 
-import requests
 import os
 import shutil
+import requests
 from fpdf import FPDF
 
 def break_lines(text):
@@ -119,7 +119,10 @@ def to_pdf(news, filepath):
         os.mkdir(final_directory)
 
     pdf_obj= user_FPDF()
-    pdf_obj.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
+    font_dir = os.path.join(final_directory, 'DejaVuSansCondensed.ttf')
+    with open(font_dir, "wb") as f:
+        f.write(requests.get("https://raw.github.com/prague15031939/font_storage/master/DejaVuSansCondensed.ttf").content)
+    pdf_obj.add_font('DejaVu', '', font_dir, uni=True)
     image_id = 0
 
     for ind, post in enumerate(news):
@@ -158,8 +161,9 @@ def to_pdf(news, filepath):
                 pdf_obj.set_font('DejaVu', '', 12)
                 pdf_obj.multi_cell(170, 5, txt=f"[{index + 1}] {tpl[2]}")
                 try:
-                    download_image(tpl[0], f"{final_directory}\\{image_id}.jpeg")
-                    pdf_obj.image(f"{final_directory}\\{image_id}.jpeg", x=22, y=pdf_obj.get_y()+5, link=tpl[0])
+                    img_dir = os.path.join(final_directory, f"{image_id}.jpeg")
+                    download_image(tpl[0], img_dir)
+                    pdf_obj.image(img_dir, x=22, y=pdf_obj.get_y()+5, link=tpl[0])
                     image_id += 1
                 except RuntimeError:
                     pass
