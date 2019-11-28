@@ -73,7 +73,7 @@ class RSSReader:
 
         logging.info("All articles was successfully loaded")
 
-        return OutputController.print(articles, **kwargs)
+        OutputController.print(articles, **kwargs)
 
     @staticmethod
     def _get_articles_from_url(source, limit):
