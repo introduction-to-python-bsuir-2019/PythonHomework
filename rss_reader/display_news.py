@@ -63,6 +63,7 @@ class DisplayNewsJson:
 
     def print_news(self) -> None:
         """Print news in JSON format."""
+        self.validate_json()
         print(json.dumps(self._news_data, ensure_ascii=False, indent=4))
         logging.info('All news are printed in stdout in JSON format')
 
@@ -80,7 +81,7 @@ class DisplayNewsJson:
             logging.info('Successful validation of JSON schema and data')
 
     @staticmethod
-    def _read_json_schema_file() -> Dict[str, List[Dict[str, Any]]]:
+    def read_json_schema_file() -> Dict[str, List[Dict[str, Any]]]:
         """Read JSON schema file and load them."""
         if not os.path.isfile(JSON_SCHEMA):
             raise RSSNewsDisplayError('Can\'t read json schema.')
