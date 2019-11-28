@@ -54,8 +54,7 @@ class News():
 
 def caching_news(news):
     if os.name == "posix":
-        owner_name = os.getlogin()
-        file_path = "/home/" + owner_name + "/.cashed_news"
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cashed_news")
     else:
         file_path = """C:\\news.rss"""
 
@@ -66,8 +65,7 @@ def caching_news(news):
 
 def recashing_news():
     if os.name == "posix":
-        owner_name = os.getlogin()
-        file_path = "/home/" + owner_name + "/.cashed_news"
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cashed_news")
     else:
         file_path = """C:\\news.rss"""
 
