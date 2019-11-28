@@ -6,6 +6,9 @@ services:
     hostname: mongo
     ports:
       - 27017:27017
+    depends_on:
+      - mongo-express
+
   app:
     tty: true
     container_name: rss_reader

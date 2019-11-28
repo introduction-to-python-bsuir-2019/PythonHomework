@@ -16,7 +16,7 @@ class HtmlConverter(FormatConverter):
 
     def convert_to_format(self) -> str:
         """Сonversion method to HTML format"""
-        logging.info('Convert data to JSON and return it')
+        logging.info('Convert data to HTML and return it')
 
         html: str = """
             <!DOCTYPE HTML>
