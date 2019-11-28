@@ -22,9 +22,12 @@ class RssAggregator():
         for thefeedentry in entries:
             print("--------------------------------------------------")        
             print("Title: ", thefeedentry.title)
-            print("Date: ", thefeedentry.published)           
-            print("Link: ", thefeedentry.link)
-            print(BeautifulSoup(thefeedentry.description, "html.parser").text)  
+            print("Date: ", thefeedentry.published, end="\n\n")                    
+            print("Alt image: ", )
+            print(BeautifulSoup(thefeedentry.description, "html.parser").text, end="\n\n")
+            print("Links:")
+            print("News: ", thefeedentry.link)
+            print("Image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
 
     def print_json(self, entries):
         self.log.info("RSS news to json")
@@ -32,10 +35,13 @@ class RssAggregator():
             news={
                 "Title": thefeedentry.title,
                 "Date": thefeedentry.published,
-                "Link": thefeedentry.link,
-                "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text
-            }
-            print("--------------------------------------------------") 
+                "Alt image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'],
+                "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text,
+                "Links":{
+                    "News": thefeedentry.link,
+                    "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
+                }                
+            } 
             print(json.dumps(news, indent=3))
 
     def save_to_json_file(self,entries):
@@ -47,8 +53,12 @@ class RssAggregator():
                 news={
                     "Title": thefeedentry.title,
                     "Date": thefeedentry.published,
-                    "Link": thefeedentry.link,
-                    "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text
+                    "Alt image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'],
+                    "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text,
+                    "Links":{
+                        "News": thefeedentry.link,
+                        "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
+                    }
                 }
                 news_list.append(news)
             json.dump(news_list, write_file, indent=3)
@@ -80,8 +90,10 @@ class RssAggregator():
         for thefeedentry in entries[:self.args.limit]:                  
             print("--------------------------------------------------")       
             print("Title: ", thefeedentry['Title'])
-            print("Date: ", thefeedentry['Date'])          
-            print("Link: ", thefeedentry['Link'])
-            print(thefeedentry['Discription'])
-
+            print("Date: ", thefeedentry['Date'], end="\n\n")
+            print("Alt image: ", thefeedentry['Alt image'])                    
+            print(thefeedentry['Discription'], end="\n\n")
+            print("Links: ")
+            print("News: ", thefeedentry['Links']['News'])
+            print("Image: ", thefeedentry['Links']['Image'])
             

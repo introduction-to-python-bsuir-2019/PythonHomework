@@ -12,4 +12,4 @@
 * --version (Print version info)
 * --date ()
 # JSON structure
-news = {"Title": "title", "Date":"date", "Link":"link", "Discription":"discription"}
+news = {"Title": "title", "Date":"date", "Alt image":"alt", "Discription":"discription", "Links":{"News":"link", "Image":"src"} }
