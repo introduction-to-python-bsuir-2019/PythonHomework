@@ -4,8 +4,6 @@ from unittest.mock import patch, MagicMock
 
 from rssreader.output_controller import (SamplePrintController,
                                          JSONPrintController,
-                                         PDFPrintController,
-                                         HTMLPrintController,
                                          OutputController)
 
 
@@ -133,14 +131,6 @@ class TestJSONPrintController(unittest.TestCase):
         print_mock.assert_called_with(json.dumps(self.articles))
 
 
-class TestPDFPrintController(unittest.TestCase):
-    pass
-
-
-class TestHTMLPrintController(unittest.TestCase):
-    pass
-
-
 class TestOutputController(unittest.TestCase):
     def setUp(self):
         self.controller = OutputController()
@@ -192,14 +182,18 @@ class TestOutputController(unittest.TestCase):
 
         # PDF
         with patch('rssreader.output_controller.PDFPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles, to_pdf='filename'))
+            with patch('rssreader.output_controller.SamplePrintController.print_to') as standard_printer:
+                self.assertIsNone(self.controller.print(self.articles, to_pdf='filename'))
 
+        standard_printer.assert_called_once_with(self.articles, colorize=False)
         chosen_printer.assert_called_once_with(self.articles, filename='filename')
 
         # HTML
         with patch('rssreader.output_controller.HTMLPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles, to_html='filename'))
+            with patch('rssreader.output_controller.SamplePrintController.print_to') as standard_printer:
+                self.assertIsNone(self.controller.print(self.articles, to_html='filename'))
 
+        standard_printer.assert_called_once_with(self.articles, colorize=False)
         chosen_printer.assert_called_once_with(self.articles, filename='filename')
 
 
