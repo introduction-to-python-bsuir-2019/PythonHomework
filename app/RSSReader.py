@@ -1,5 +1,5 @@
 """
-    Contains class RSSreader which receives arguments from cmd
+    Contains class RSSReader which receives arguments from cmd
     and allows to parse URL with RSS feed and print it in stdout
     in different formats
 """
@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 import dateutil.parser as dateparser
 
 
-class RSSreader:
+class RSSReader:
     """ Reads news from RSS url and prints them """
 
     def __init__(self, args, logger):
@@ -62,7 +62,7 @@ class RSSreader:
             print(json.dumps(feed, indent=2, ensure_ascii=False), ',', sep='')
 
     def to_dict(self, entry):
-        """ Returns feed in dict() format """
+        """ Converts entry to dict() format """
 
         feed = dict()
         feed['Title'] = entry.title

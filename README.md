@@ -5,11 +5,14 @@
 * pip install -r requirements.txt
 * python rss-reader.py "https://news.yahoo.com/rss/" --limit 2 --json
 * --date prints cached news that were parsed previously from the given URL
+Creates folder cache and saves news in JSON files format
+file name = date (like 20191125.json)
 * For --to-pdf argument: specify the path to the folder 
 where 'news.pdf/cached_news.pdf' file will be saved.
 The file will be overwritten after restarting the program.
-Make sure to copy that file if you need it
-* Btw i use fonts for .pdf files, hope they will be installed correctly
+Make sure to copy that file if you need it. Same thing with --to-html argument
+* Btw i use fonts for .pdf files to avoid encoding issues,
+hope they will be installed correctly
 by 'pip install .'
 * P.S. Ля, ребята, 4 курс птуира, уже распред идет во всю, работа нужна кааапец
 
@@ -24,6 +27,7 @@ by 'pip install .'
  --date 20191020The new from the specified day will be printed out.
   If the news are not found error will be returned.)
 * --to-pdf TO_PDF (It should take the path of the directory where new PDF file will be saved)
+* --to-html TO_HTML (It should take the path of the directory where new HTML file will be saved)
 
 # JSON structure
 feed = {
@@ -39,6 +43,6 @@ feed = {
 -   [x] [Iteration 1] One-shot command-line RSS reader.
 -   [x] [Iteration 2] Distribution
 -   [x] [Iteration 3] News caching
--   [ ] [Iteration 4] Format converter
+-   [x] [Iteration 4] Format converter
 -   [ ] * [Iteration 5] Output colorization
 -   [ ] * [Iteration 6] Web-server

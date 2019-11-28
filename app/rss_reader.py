@@ -7,8 +7,9 @@ import logging
 import dateutil.parser as dateparser
 
 from app.argparser import ArgParser
-from app.RSSreader import RSSreader
+from app.RSSReader import RSSReader
 from app.pdf_converter import PDFConverter
+from app.html_converter import HTMLConverter
 
 
 def main():
@@ -28,7 +29,7 @@ def main():
         print(args.version)
         logger.info('Exit')
 
-    rss_reader = RSSreader(arguments, logger)
+    rss_reader = RSSReader(arguments, logger)
 
     if args.date:
         try:
@@ -45,16 +46,23 @@ def main():
             else:
                 rss_reader.print_cached_feed(cached_feed)
             if args.to_pdf:
-                converter = PDFConverter(arguments, logger)
-                converter.write_json_to_pdf()
+                pdf_converter = PDFConverter(arguments, logger)
+                pdf_converter.write_json_to_pdf()
+            if args.to_html:
+                html_converter = HTMLConverter(arguments, logger)
+                html_converter.write_to_html()
         logger.info('Exit')
         return
 
     feed = rss_reader.get_feed()
 
     if args.to_pdf:
-        converter = PDFConverter(arguments, logger, news=feed)
-        converter.write_to_pdf()
+        pdf_converter = PDFConverter(arguments, logger, news=feed)
+        pdf_converter.write_to_pdf()
+
+    if args.to_html:
+        html_converter = HTMLConverter(arguments, logger)
+        html_converter.write_to_html()
 
     if args.json:
         rss_reader.print_feed_json(feed)
