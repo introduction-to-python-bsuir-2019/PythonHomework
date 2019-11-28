@@ -2,12 +2,12 @@
 Main module. Launches the rss reader and output the result
 """
 import argparse
+import coloredlogs
 import getpass
 import logging
 import sys
 
 from importlib import import_module
-from pathlib import Path
 
 from .utils import rss_interface
 from .utils.exceptions import RssException, RssValueException, RssNewsException
@@ -23,6 +23,7 @@ def logger_init(level=None):
     Other logs in regards of the 'level' are printed into console
     """
 
+    coloredlogs.install()
     level = level or logging.CRITICAL
     logger = logging.getLogger(getpass.getuser())
     logger.setLevel(level=level)

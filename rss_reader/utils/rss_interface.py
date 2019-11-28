@@ -1,11 +1,11 @@
-from abc import ABCMeta, abstractmethod
 import bs4
-from datetime import datetime
 import json
-from pathlib import Path
-
 import logging
 import feedparser
+
+from abc import ABCMeta, abstractmethod
+from colorama import Fore, Back, Style, init
+from pathlib import Path
 from terminaltables import SingleTable
 from textwrap import wrap
 
@@ -180,7 +180,9 @@ class BaseRssBot(RssBotInterface):
 
         :return: str with news
         """
-        table = [['Feed', f"Title: {self.news.feed}\nLink: {self.news.link}"]]
+        table = [[f'{Fore.GREEN}Feed',
+                  f"{Fore.GREEN}Title: {self.news.feed}{Fore.RESET}\n"
+                  f"{Fore.GREEN}Link: {Fore.BLUE}{self.news.link}{Fore.RESET}"]]
         news_items = self.news.items
         for n, item in enumerate(news_items):
             # table.append([1, item.get('human_text')])
@@ -194,7 +196,7 @@ class BaseRssBot(RssBotInterface):
                         splitted_by_paragraphs.insert(i, wrapped_line)
                         i += 1
 
-            table.append([str(n + 1), '\n'.join(splitted_by_paragraphs)])
+            table.append([f'{Fore.GREEN}{n + 1}{Fore.RESET}', '\n'.join(splitted_by_paragraphs)])
 
         table_inst = SingleTable(table)
         table_inst.inner_heading_row_border = False
@@ -239,9 +241,9 @@ class BaseRssBot(RssBotInterface):
         """
         self.logger.info(f'Extending {news_item.title}')
         out_str = ''
-        out_str += f"\nTitle: {news_item.title}\n" \
-                   f"Date: {news_item.published}\n" \
-                   f"Link: {news_item.link}\n"
+        out_str += f"\n{Fore.GREEN}Title: {Fore.CYAN} {news_item.title} {Fore.RESET}\n" \
+                   f"{Fore.GREEN}Date: {Fore.CYAN}{news_item.published}{Fore.RESET}\n" \
+                   f"{Fore.GREEN}Link: {Fore.BLUE}{news_item.link}{Fore.RESET}\n"
 
         html = bs4.BeautifulSoup(news_item.html, "html.parser")
 
@@ -264,8 +266,10 @@ class BaseRssBot(RssBotInterface):
                 out_str += f'\n[image {img_idx}:  {tag.attrs.get("title")}][{img_idx}]'
 
         out_str += f'{html.getText()}\n'
-        out_str += 'Links:\n'
-        out_str += '\n'.join([f'[{i + 1}]: {link} (link)' for i, link in enumerate(links)]) + '\n'
-        out_str += '\n'.join([f'[{i + len(links) + 1}]: {link} (image)' for i, link in enumerate(imgs)]) + '\n'
+        out_str += f'{Fore.RED}Links:{Fore.RESET}\n'
+        out_str += '\n'.join([f'{Fore.LIGHTMAGENTA_EX}[{i + 1}]{Fore.RESET}: '
+                              f'{Fore.BLUE}{link}{Fore.RESET} (link)' for i, link in enumerate(links)]) + '\n'
+        out_str += '\n'.join([f'{Fore.LIGHTMAGENTA_EX}[{i + len(links) + 1}]{Fore.RESET}: '
+                              f'{link} (image)' for i, link in enumerate(imgs)]) + '\n'
 
         return out_str

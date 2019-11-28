@@ -110,7 +110,7 @@ pip install .
 python -m rss_reader --help
 ```
 
-OR if you ran into errors
+OR if you run into errors
 
 ```docker run -it python /bin/bash
 git clone https://github.com/Nenu1985/PythonHomework.git 

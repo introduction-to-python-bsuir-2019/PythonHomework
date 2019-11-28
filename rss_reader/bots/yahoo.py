@@ -1,6 +1,8 @@
 """Yahoo specified rss parser bot"""
 import bs4
 
+from colorama import Fore
+
 from rss_reader.utils.rss_interface import BaseRssBot
 from ..utils.data_structures import NewsItem
 
@@ -16,9 +18,9 @@ class Bot(BaseRssBot):
         """
 
         out_str = ''
-        out_str += f"\nTitle: {news_item.title}\n" \
-                   f"Date: {news_item.published}\n" \
-                   f"Link: {news_item.link}\n"
+        out_str += f"\n{Fore.GREEN}Title: {Fore.CYAN} {news_item.title} {Fore.RESET}\n" \
+                   f"{Fore.GREEN}Date: {Fore.CYAN}{news_item.published}{Fore.RESET}\n" \
+                   f"{Fore.GREEN}Link: {Fore.BLUE}{news_item.link}{Fore.RESET}\n"
 
         html = bs4.BeautifulSoup(news_item.html, "html.parser")
 
@@ -42,7 +44,7 @@ class Bot(BaseRssBot):
                 out_str += '\n'
 
         # out_str += Color('{autocyan}Links:{/autocyan}\n')
-        out_str += 'Links:\n'
+        out_str += f'{Fore.RED}Links:{Fore.RESET}\n'
         out_str += '\n'.join([f'[{i + 1}]: {link} (link)' for i, link in enumerate(links)]) + '\n'
         out_str += '\n'.join([f'[{i + len(links) + 1}]: {link} (image)' for i, link in enumerate(imgs)]) + '\n'
 
