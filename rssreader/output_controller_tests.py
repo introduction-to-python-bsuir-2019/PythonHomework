@@ -2,13 +2,11 @@ import json
 import unittest
 from unittest.mock import patch, MagicMock
 
-from output_controller import (
-    SamplePrintController,
-    JSONPrintController,
-    PDFPrintController,
-    HTMLPrintController,
-    OutputController
-)
+from rssreader.output_controller import (SamplePrintController,
+                                         JSONPrintController,
+                                         PDFPrintController,
+                                         HTMLPrintController,
+                                         OutputController)
 
 
 class TestSamplePrintController(unittest.TestCase):
@@ -135,12 +133,12 @@ class TestJSONPrintController(unittest.TestCase):
         print_mock.assert_called_with(json.dumps(self.articles))
 
 
-# class TestPDFPrintController(unittest.TestCase):
-#     pass
+class TestPDFPrintController(unittest.TestCase):
+    pass
 
 
-# class TestHTMLPrintController(unittest.TestCase):
-#     pass
+class TestHTMLPrintController(unittest.TestCase):
+    pass
 
 
 class TestOutputController(unittest.TestCase):
@@ -175,39 +173,34 @@ class TestOutputController(unittest.TestCase):
         self.filename = 'filename'
 
     def test_print(self):
+        # Sample
         with patch('rssreader.output_controller.SamplePrintController.print_to') as chosen_printer:
             self.assertIsNone(self.controller.print(self.articles))
 
-        self.assertEqual(chosen_printer.print_to.call_count, 1)  # (self.articles, colorize=False)
-        del chosen_printer
-
-        with patch('rssreader.output_controller.JSONPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles))
-        del chosen_printer
-
-        with patch('rssreader.output_controller.PDFPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles))
-        del chosen_printer
-
-        with patch('rssreader.output_controller.HTMLPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles))
-        del chosen_printer
+        chosen_printer.assert_called_once_with(self.articles, colorize=False)
 
         with patch('rssreader.output_controller.SamplePrintController.print_to') as chosen_printer:
             self.assertIsNone(self.controller.print(self.articles, colorize=True))
-        del chosen_printer
 
+        chosen_printer.assert_called_once_with(self.articles, colorize=True)
+
+        # JSON
         with patch('rssreader.output_controller.JSONPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles, colorize=True))
-        del chosen_printer
+            self.assertIsNone(self.controller.print(self.articles, to_json=True))
 
+        chosen_printer.assert_called_once_with(self.articles)
+
+        # PDF
         with patch('rssreader.output_controller.PDFPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles, colorize=True))
-        del chosen_printer
+            self.assertIsNone(self.controller.print(self.articles, to_pdf='filename'))
 
+        chosen_printer.assert_called_once_with(self.articles, filename='filename')
+
+        # HTML
         with patch('rssreader.output_controller.HTMLPrintController.print_to') as chosen_printer:
-            self.assertIsNone(self.controller.print(self.articles, colorize=True))
-        del chosen_printer
+            self.assertIsNone(self.controller.print(self.articles, to_html='filename'))
+
+        chosen_printer.assert_called_once_with(self.articles, filename='filename')
 
 
 if __name__ == '__main__':
