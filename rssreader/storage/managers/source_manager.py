@@ -4,7 +4,7 @@ Module manager of database model Article.
 """
 import logging
 
-from storage.models import Source, DB_HANDLE
+from rssreader.storage.models import Source, DB_HANDLE
 
 __all__ = ['SourceManager']
 

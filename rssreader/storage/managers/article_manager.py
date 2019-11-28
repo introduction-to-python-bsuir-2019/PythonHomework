@@ -2,7 +2,7 @@
 Module manager of database model Article.
 
 """
-from storage.models import Article, DB_HANDLE
+from rssreader.storage.models import Article, DB_HANDLE
 
 __all__ = ['ArticleManager']
 

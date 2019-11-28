@@ -13,11 +13,11 @@ Opportunities:
     * Print in colorize mode
 
 For information enter
-    "python rss_reader.py -h"
+    "python3.8 rss_reader -h"
 in terminal to find more information.
 
 """
-__package__ = 'rss-reader'
+__package__ = 'rssreader'
 
 import argparse
 import datetime
@@ -25,9 +25,9 @@ import logging
 
 import feedparser
 
-from html_parser import *
-from output_controller import *
-from storage import *
+from rssreader.html_parser import *
+from rssreader.output_controller import *
+from rssreader.storage import *
 
 
 class RSSReader:

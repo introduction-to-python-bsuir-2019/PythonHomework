@@ -3,6 +3,8 @@ This project was created for the EPAM Python Courses 2019.
 
 ## Installing
 
+First, this app runs on Python version >=3.8.
+
 ### Download:
 
 `git clone https://github.com/TeRRoRlsT/PythonHomework.git`
@@ -10,12 +12,16 @@ This project was created for the EPAM Python Courses 2019.
 ### Setup:
 Go to repository **PythonHomework** and execute the command:
 
-`python3 setup.py install`
+`python3.8 -m pip install .` 
+
+or
+
+`pip install .` 
 
 ## Running
-To view the help for running project go to **PythonHomework** folder and execute the command:
+To view the help for running project go to **PythonHomework/rssreader** folder and execute the command:
 
-`python3 rss_reader.py --help`
+`python3.8 rss_reader.py --help`
 
 ### SQLite3
 This application uses SQLite3 database to cache all downloaded news articles.
@@ -24,7 +30,7 @@ If you use '--date YYYYMMDD' the application will load news articles from the DB
 ## Tests
 For run unittest go to **PythonHomework** folder and execute the command:
 
-`python3 -m unittests test*`
+`python3.8 -m unittest tests`
 
  ## Authors
 * Sergey Pivovar - BSUIR 2019
