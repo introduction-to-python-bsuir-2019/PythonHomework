@@ -10,18 +10,22 @@ import json
 import feedparser
 from bs4 import BeautifulSoup
 import cacher
+import format_converter
 
 def init_cli_parser():
     """
     this function initializes command line parser with all nessecary arguments
     """
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader.', prog='rss-reader')
-    group = parser.add_mutually_exclusive_group(required = True)
-    group.add_argument("source", type=str, nargs='?', default=None, help="RSS URL")
-    parser.add_argument('--version', help="print version info", action='version', version='%(prog)s 1.3')
-    parser.add_argument("--json", help="print result as JSON in stdout", action="store_true")
+    group_news = parser.add_mutually_exclusive_group(required = True)
+    group_format = parser.add_mutually_exclusive_group()
+    group_news.add_argument("source", type=str, nargs='?', default=None, help="RSS URL")
+    parser.add_argument('--version', help="print version info", action='version', version='%(prog)s 1.4')
+    group_format.add_argument("--json", help="print result as JSON in stdout", action="store_true")
     parser.add_argument("--verbose", help="output verbose status messages", action="store_true")
-    group.add_argument("--date", type=str,  help="print news with provided publish date in stdout")
+    group_news.add_argument("--date", type=str, help="print news with provided publish date in stdout")
+    group_format.add_argument("--to-html", type=str, help="print news in a specified file in html format", dest="html", metavar="FILE")
+    group_format.add_argument("--to-pdf", type=str, help="print news in a specified file in pdf format", dest="pdf", metavar="FILE")
     parser.add_argument("--limit", type=int, help="limit news topics if this parameter provided")
 
     return parser.parse_args()
@@ -42,7 +46,7 @@ def brush_text(line):
     """
     this function forms description text into more convinient form
     """
-    start = 100
+    start = 80
     while True:
         i = start - 10
         try:
@@ -51,7 +55,7 @@ def brush_text(line):
         except IndexError:
             break
         line = line[:i] + "\n" + line[i + 1:]
-        start += 100
+        start += 80
 
     return line
 
@@ -66,13 +70,14 @@ def get_post_content(post, feed_title):
     data['pub_parsed'] = f"{post.published_parsed.tm_year}{post.published_parsed.tm_mon}{post.published_parsed.tm_mday}"
     data['link'] = post.link
     soup = BeautifulSoup(post.description, 'html.parser')
-    data['description'] = brush_text(html.unescape(soup.text))
+    data['description'] = html.unescape(soup.text)
     data['hrefs'] = [(link['href'], 'link') for link in soup.find_all('a') if link.get('href', None)]
     for img in soup.find_all('img'):
         if not img.get('src', 'Unknown') == '':
             data['hrefs'] += [(img.get('src', 'Unknown'), 'image', img.get('alt', ''))]
             data['description'] = \
-                f"[image {len(data['hrefs'])}: {img.get('alt', '')}] [{len(data['hrefs'])}]\n" + data['description']
+                f"[image {len(data['hrefs'])}: {img.get('alt', '')}][{len(data['hrefs'])}] " + data['description']
+    data['description'] = brush_text(data['description'])
 
     return data
 
@@ -94,16 +99,11 @@ def display_news(news):
     """
     this function prints news in stdout
     """
-    if len(news) == 0:
-        return
-
-    is_same_feed = all([news[0]['feed'] == item['feed'] for item in news])
-    if is_same_feed:
-        print(f"Feed: {news[0]['feed']}\n")
+    if not news:
+        return None
 
     for item in news:
-        if not is_same_feed:
-            print(f"Feed: {item['feed']}\n")
+        print(f"Feed: {item['feed']}\n")
         print(f"Title: {item['title']}")
         print(f"Publication date: {item['pub_date']}")
         print(f"Link: {item['link']}\n")
@@ -183,14 +183,32 @@ def main():
             return
 
     if args.limit:
-        logger.info(f"the limit of publications to show - {args.limit}")
+        logger.info(f"the limit of publications to print - {args.limit}")
 
-    if not args.json:
+    if not args.json and not args.html and not args.pdf:
         logger.info(f"displaying news..\n")
         display_news(news)
-    else:
+    elif args.json:
         logger.info(f"displaying news in json format..\n")
         print(to_json(news))
+    elif args.html:
+        logger.info(f"writing news in {args.html} file in html format..")
+        format_converter.to_html(news, args.html)
+        logger.info(f"file {args.html} was successfully rewrited")
+        logger.info(f"end of work -->|")
+    elif args.pdf:
+        logger.info(f"writing news in {args.pdf} file in pdf format..")
+        try:
+            format_converter.to_pdf(news, args.pdf)
+        except RuntimeError:
+            if not args.verbose:
+                print(f"error: TTF Font file not found: DejaVuSansCondensed.ttf")
+            logger.error("TTF Font file not found: DejaVuSansCondensed.ttf")
+            logger.info(f"end of work -->|")
+            return
+        logger.info(f"file {args.pdf} was successfully rewrited")
+        logger.info(f"end of work -->|")
+        return
 
     logger.info(f"\npublications were successfully shown - {len(news)}")
     logger.info(f"end of work -->|")
