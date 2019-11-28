@@ -35,6 +35,7 @@ setup(
     install_requires=['lxml>=4.3.0', 'requests',
                       'colorama', 'Pillow',
                       'PyPDF2', 'Django',
-                      'xhtml2pdf', 'fpdf'],
+                      'xhtml2pdf', 'fpdf',
+                      'python-dateutil'],
     python_requires='>=3.6'
 )
