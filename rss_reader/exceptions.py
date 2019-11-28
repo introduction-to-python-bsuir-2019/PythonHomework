@@ -1,23 +1,22 @@
 """Contain application exceptions."""
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 
 class RSSReaderException(Exception):
     """Application main exception."""
 
-    def __init__(self, message: str, error: Optional[str] = None) -> None:
+    def __init__(self, message: str, error: Optional[Any] = None) -> None:
         """Initialze RSS reader exception. Print error message."""
-        print('{0}. RSS reader critical error'.format(message))
-        logging.exception('{0}{1}. RSS reader critical error'.format(message, f': {error}' if error else ''))
+        logging.exception('{}. RSS reader critical error'.format(message), exc_info=error)
 
 
 class RSSNewsDisplayError(RSSReaderException):
     """News display exception."""
 
-    def __init__(self, message) -> None:
+    def __init__(self, message: str, error: str) -> None:
         """Initialze RSS news display error."""
-        super().__init__(message)
+        super().__init__(message, error)
 
 
 class RSSReaderParseException(RSSReaderException):
@@ -26,14 +25,6 @@ class RSSReaderParseException(RSSReaderException):
     def __init__(self, message: str) -> None:
         """Initialze RSS reader parse exception."""
         super().__init__(message)
-
-
-class RSSNewsJSONSchemaException(RSSReaderException):
-    """JSON schema exception."""
-
-    def __init__(self, message: str, error: str) -> None:
-        """Initialze RSS news JSON schema exception."""
-        super().__init__(message, error)
 
 
 class RSSNewsCacheError(RSSReaderException):

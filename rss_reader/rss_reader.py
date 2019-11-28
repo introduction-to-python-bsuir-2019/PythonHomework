@@ -10,6 +10,7 @@ from sys import exit
 from rss_reader.cache_storage import ReadCache, WriteCache
 from rss_reader.config import NAME, VERSION
 from rss_reader.display_news import DisplayNewsText, DisplayNewsJson, format_to_display
+from rss_reader.exceptions import RSSReaderException
 from rss_reader.format_converter import Converter, format_to_convert
 from rss_reader.source_parser import SourceParser
 
@@ -95,7 +96,8 @@ class RSSReader:
         try:
             self.execute_rss_reader()
         except Exception as error:
-            logging.info(error)
+            if not issubclass(type(error), RSSReaderException):
+                RSSReaderException('Unidentified error', error)
             exit('RSS reader has beed completed unsuccessfully')
         else:
             logging.info('RSS reader has beed completed successfully')

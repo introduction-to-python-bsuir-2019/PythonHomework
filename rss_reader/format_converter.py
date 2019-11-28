@@ -23,10 +23,10 @@ class Converter:
                  html_path: Optional[str] = None, pdf_path: Optional[str] = None) -> None:
         """Initialze HTML converter."""
         self._news_data = news_data
-        self.html_path = html_path
-        self.pdf_path = pdf_path
+        self.html_path = os.path.abspath(html_path) if html_path else html_path
+        self.pdf_path = os.path.abspath(pdf_path) if pdf_path else pdf_path
         self.img_folder = None
-        self.png_extension = '.png'
+        self.png_extension = 'png'
 
     def convert_news(self):
         """Convert news to the selected format."""
@@ -38,15 +38,13 @@ class Converter:
         """Convert news to HTML file."""
         def create_image_folder() -> None:
             """Create image folder."""
-            self.img_folder = f'{os.path.dirname(image_path)}/{Path(image_path).resolve().stem}'
+            self.img_folder = os.path.join(os.path.dirname(image_path), Path(image_path).resolve().stem)
             if not os.path.exists(self.img_folder):
                 try:
                     os.mkdir(self.img_folder)
                 except OSError as error:
-                    message = f'Can\'t create directory for image files: {self.img_folder}'
-                    print(message)
-                    logging.info(f'{message}\n{error}')
-                    raise
+                    raise RSSConvertationException(f'Can\'t create directory for image files: {self.img_folder}',
+                                                   error)
 
         def add_styles() -> None:
             """Add styles to HTML stream."""
@@ -105,7 +103,8 @@ class Converter:
         def download_image() -> str:
             """Вownloads picture from the link."""
             link = item.get('link', '')
-            image_path = f'{self.img_folder}/image_link_{news_number}_{link_number}{self.png_extension}'
+            image_path = os.path.join(self.img_folder,
+                                      '.'.join([f'image_link_{news_number}_{link_number}', self.png_extension]))
             response = requests.get(link)
             if response.status_code == 200:
                 Image.open(BytesIO(response.content)).convert("RGBA").save(image_path)
@@ -133,17 +132,26 @@ class Converter:
                     doc.stag('br')
         html_document = indent(doc.getvalue(), indent_text=True)
         if self.html_path:
-            with open(self.html_path, 'w') as file_obj:
-                file_obj.write(html_document)
+            try:
+                with open(self.html_path, 'w') as file_obj:
+                    file_obj.write(html_document)
+            except OSError as error:
+                raise RSSConvertationException(f'Can\'t create HTML file: {self.img_folder}', error)
             logging.info('Successful conversion to HTML')
         return html_document
 
     def conver_to_pdf(self, source_html: str):
         """Convert news to PDF format."""
-        with open(self.pdf_path, 'w+b') as result_file:
-            pisa_status = pisa.CreatePDF(source_html, dest=result_file, encoding='UTF-8')
+        try:
+            with open(self.pdf_path, 'w+b') as result_file:
+                pisa_status = pisa.CreatePDF(source_html, dest=result_file, encoding='UTF-8')
+        except OSError as error:
+            raise RSSConvertationException(f'Can\'t create FDP file: {self.img_folder}', error)
         if not self.html_path:
-            shutil.rmtree(self.img_folder)
+            try:
+                shutil.rmtree(self.img_folder)
+            except OSError as error:
+                raise RSSConvertationException(f'Can\'t delete directory with image files: {self.img_folder}', error)
         if pisa_status.err:
             raise RSSConvertationException('Can\'t create PDF file', pisa_status.err)
         logging.info('Successful conversion to PDF')

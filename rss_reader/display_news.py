@@ -1,5 +1,5 @@
 """Contain all news display related objects."""
-import json as jsonmodule
+import json
 import logging
 import os
 from typing import Any, Dict, List, Optional, Union
@@ -10,7 +10,7 @@ from colorama import Fore
 
 from rss_reader.config import JSON_SCHEMA
 from rss_reader.containers import DictionaryValues
-from rss_reader.exceptions import RSSNewsJSONSchemaException
+from rss_reader.exceptions import RSSNewsDisplayError
 
 
 class DisplayNewsText:
@@ -63,7 +63,7 @@ class DisplayNewsJson:
 
     def print_news(self) -> None:
         """Print news in JSON format."""
-        print(jsonmodule.dumps(self._news_data, ensure_ascii=False, indent=4))
+        print(json.dumps(self._news_data, ensure_ascii=False, indent=4))
         logging.info('All news are printed in stdout in JSON format')
 
     def validate_json(self) -> None:
@@ -73,9 +73,9 @@ class DisplayNewsJson:
             jsonschema.Draft7Validator.check_schema(schema)
             jsonschema.Draft7Validator(schema).validate(self._news_data)
         except jsonschema.exceptions.SchemaError as error:
-            raise RSSNewsJSONSchemaException('Invalid JSON schema', error)
+            raise RSSNewsDisplayError('Invalid JSON schema', error)
         except jsonschema.exceptions.ValidationError as error:
-            raise RSSNewsJSONSchemaException('Well-formed but invalid JSON', error)
+            raise RSSNewsDisplayError('Well-formed but invalid JSON', error)
         else:
             logging.info('Successful validation of JSON schema and data')
 
@@ -83,13 +83,13 @@ class DisplayNewsJson:
     def _read_json_schema_file() -> Dict[str, List[Dict[str, Any]]]:
         """Read JSON schema file and load them."""
         if not os.path.isfile(JSON_SCHEMA):
-            raise RSSNewsJSONSchemaException('Can\'t read json schema.')
+            raise RSSNewsDisplayError('Can\'t read json schema.')
 
         with open(JSON_SCHEMA, 'r') as schema_file:
             try:
-                schema = jsonmodule.load(schema_file)
-            except jsonmodule.decoder.JSONDecodeError as error:
-                raise RSSNewsJSONSchemaException('Poorly-formed text, not JSON', error)
+                schema = json.load(schema_file)
+            except json.decoder.JSONDecodeError as error:
+                raise RSSNewsDisplayError('Poorly-formed text, not JSON', error)
             else:
                 logging.info('Successful read and load JSON schema file')
                 return schema

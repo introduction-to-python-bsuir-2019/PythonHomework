@@ -1,11 +1,11 @@
 """Contain all news parse related objects."""
 import logging
+import os
 import urllib
 from datetime import datetime
 from html import unescape
 from operator import itemgetter
-from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 from typing import Dict, List, Optional, Union
 
@@ -22,10 +22,10 @@ class SourceParser:
 
     def __init__(self, source: str) -> None:
         """Initialze RSS source parser."""
-        self.__source = source
-        self.__empty_published = datetime.now()
+        self._source = source
+        self._empty_published = datetime.now()
         self.__news = {'title': '', 'published': '', 'link': '', 'text': '', 'links': []}
-        self.__cache_news = {'source': source, 'feed': '', 'id': '', 'date': self.__empty_published, 'news': {}}
+        self.__cache_news = {'source': source, 'feed': '', 'id': '', 'date': self._empty_published, 'news': {}}
         self.cache_data = []
 
     def parse_source_data(self, source_data: FeedParserDict) -> None:
@@ -48,7 +48,7 @@ class SourceParser:
             try:
                 cashe_date = parser.parse(published).replace(tzinfo=None)
             except ValueError:
-                cache_update.update({'date': self.__empty_published})
+                cache_update.update({'date': self._empty_published})
             else:
                 cache_update.update({'date': cashe_date})
             finally:
@@ -67,11 +67,11 @@ class SourceParser:
             description.parse_description(item.get('description'))
             news = return_news()
             add_news_cache_data()
-        logging.info('RSS news has been parsed successfuly')
+        logging.info('RSS news has been parsed successfully')
 
     def get_source_data(self) -> FeedParserDict:
         """Parse source link RSS into dictionary."""
-        source_data = parse(self.__source)
+        source_data = parse(self._source)
         if source_data.bozo == 1:
             raise RSSReaderParseException('Invalid or inaccessible RSS URL')
         logging.info('Successful get RSS data from RSS URL')
@@ -86,7 +86,7 @@ class DescriptionParser:
         self.__element = {'text': '', 'type': '', 'link': ''}
         self._news_link = news_link
         link_parse = urlparse(news_link)
-        self._host_name = f'{link_parse.scheme}://{link_parse.hostname}'
+        self._host_name = os.path.join(f'{link_parse.scheme}://', link_parse.hostname)
         self.links = []
         self.text = []
         self.structure = []
@@ -101,45 +101,44 @@ class DescriptionParser:
             if not skip_text and not tag.name and not tag.string.isspace():
                 formated_text = self.format_string(tag.string)
                 self.text.append(formated_text)
-                self.__update_structure({'text': formated_text, 'type': 'text'})
+                self._update_structure({'text': formated_text, 'type': 'text'})
             elif tag.name == 'a':
-                self.__parse_description_tag(tag, 'href', 'link')
+                self._parse_description_tag(tag, 'href', 'link')
             elif tag.name == 'img':
-                self.__parse_description_tag(tag, 'src', 'image')
+                self._parse_description_tag(tag, 'src', 'image')
             if tag.name:
                 self._parse_description_data(tag, tag.name in ('a', 'img'))
 
-    def __parse_description_tag(self, tag: Tag, tag_link: str, tag_type: str) -> None:
+    def _parse_description_tag(self, tag: Tag, tag_attr: str, tag_type: str) -> None:
         """Parse link or image tag to well-formed text and add link or image link to list of links."""
         def control_last_link() -> None:
             """Remove last link if it led to an image embedded in this link."""
             last_link = self.links.pop()
-            if not (last_link.type == 'link' and last_link.link == link):
+            if not (last_link.get('type', '') == 'link' and last_link.get('link', '') == link):
                 self.links.append(last_link)
 
         def get_tag_link() -> None:
             """Return tag link."""
-            link = urllib.parse.quote(attrs_dict.get(tag_link, ''), safe=':/')
+            link = urllib.parse.quote(tag.attrs.get(tag_attr, ''), safe=':/')
             if not link or self._news_link == link:
                 return None
             elif not urlparse(link).hostname:
-                link = '{0}{1}'.format(self._host_name, str(Path(link)))
+                link = urljoin(self._host_name, link)
             return link
 
-        attrs_dict = dict(tag.attrs)
         link = get_tag_link()
         if not link:
             return
-        if tag_type == 'img':
+        if tag_type == 'image' and self.links:
             control_last_link()
         self.links.append({'link': link, 'type': tag_type})
         tag_number = len(self.links)
         tag_text = self.format_string(str(tag.string or '')).strip()
         self.text.append('{0}{1}'.format(f'[{tag_type} {tag_number}',
                                          f': {tag_text}][{tag_number}]' if tag_text else ']'))
-        self.__update_structure({'text': tag_text, 'type': tag_type, 'link': link})
+        self._update_structure({'text': tag_text, 'type': tag_type, 'link': link})
 
-    def __update_structure(self, element_structure: Dict[str, Union[str, int]]) -> None:
+    def _update_structure(self, element_structure: Dict[str, str]) -> None:
         """Update description structure."""
         element = self.__element.copy()
         element.update(element_structure)

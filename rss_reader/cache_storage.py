@@ -21,6 +21,8 @@ class CacheStorage:
         """Initialze cache storage."""
         def init_cache_db() -> tinydb.database.Table:
             """Initialze TinyDB and return source table."""
+            if not os.path.isfile(CACHE_DB):
+                raise RSSNewsCacheError('Can\'t read cache JSON file.')
             if os.path.isfile(CACHE_DB):
                 serialization = SerializationMiddleware()
                 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
@@ -67,7 +69,7 @@ class WriteCache(CacheStorage):
         for news_data in tqdm(self.news_list, desc='Caching; ', leave=False):
             news_id = news_data.get('id', '')
             try:
-                self.verify_news_data(news_data)
+                self.verify_data(news_data)
             except RSSNewsCacheError:
                 pass
             else:
@@ -75,8 +77,7 @@ class WriteCache(CacheStorage):
         add_changes_to_database()
 
     @staticmethod
-    def verify_news_data(
-            news_data: Dict[str, Union[str, datetime, Dict[str, Union[str, List[Dict[str, str]]]]]]) -> None:
+    def verify_data(news_data: Dict[str, Union[str, datetime, Dict[str, Union[str, List[Dict[str, str]]]]]]) -> None:
         """Verify cache data."""
         if not news_data.get('id', ''):
             raise RSSNewsCacheError('Cache error: news don\'t have \'ID\'')
