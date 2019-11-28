@@ -6,12 +6,14 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
 def get_install_requires():
     with open('requirements.txt') as f:
         return [req.strip() for req in f]
 
+
 setuptools.setup(
-    name="rss-reader",  # Replace with your own username
+    name="rss_reader",  # Replace with your own username
     version=str(4.0),
     author="Andrey Nenuzhny",
     author_email="nenuzhny85@gmail.com",

@@ -100,11 +100,11 @@ Html converter uses lxml.html library to parse and generate html content.
 
 
 ## Docker deployment
-docker run -it python /bin/bash
+```docker run -it python /bin/bash
 git clone https://github.com/Nenu1985/PythonHomework.git 
 cd PythonHomework
 pip install .
-python rss-reader --help
+python -m rss-reader --help```
 
 
 
