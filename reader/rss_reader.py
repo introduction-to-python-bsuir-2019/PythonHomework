@@ -1,23 +1,26 @@
 import feedparser
+import json
 from bs4 import BeautifulSoup
 # https://news.yahoo.com/rss/
 
 
 class RSSReader:
-    def __init__(self, source, limit):
+    def __init__(self, source, limit=1, json=False):
         self.source = source
         self.limit = limit
-        self.feeds = []
+        self.json = json
+        self.feeds = {}
 
     def parse_source(self):
         d = feedparser.parse(self.source)
 
-        channel_title = d['channel']['title']
+        self.feeds['feed_name'] = d['channel']['title']
+        self.feeds['news'] = []
 
         for news in d['entries'][0:self.limit]:
-            self.feeds.append(self.read_news(news))
+            self.feeds['news'].append(self.read_news(news))
 
-        self.print_to_console(channel_title, self.feeds)
+        self.print_feeds()
 
     @staticmethod
     def read_news(news):
@@ -42,17 +45,19 @@ class RSSReader:
 
         return item
 
-    @staticmethod
-    def print_to_console(channel_title, feeds):
-        print()
-        print('Feed:', channel_title)
-        print('-' * 40)
-        for item in feeds:
-            print('Title:', item['title'])
-            print('Date:', item['date'])
-            print('Link:', item['link'])
+    def print_feeds(self):
+        if not self.json:
             print()
-            print('Image title:', item['image_title'])
-            print('Image description:', item['image_description'])
-            print('Image link:', item['image_link'])
+            print('Feed:', self.feeds['feed_name'])
             print('-' * 40)
+            for item in self.feeds['news']:
+                print('Title:', item['title'])
+                print('Date:', item['date'])
+                print('Link:', item['link'])
+                print()
+                print('Image title:', item['image_title'])
+                print('Image description:', item['image_description'])
+                print('Image link:', item['image_link'])
+                print('-' * 40)
+        else:
+            print(json.dumps(self.feeds))
