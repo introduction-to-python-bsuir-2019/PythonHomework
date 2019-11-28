@@ -1,23 +1,22 @@
 """
-THis module provides tools for converting news to HTML format
+This module provides tools for converting news to HTML format
 """
 
 import os
 import rss_reader.templates.html_templates as templates
-from rss_reader.os_funcs import create_directory
+from rss_reader.os_funcs import create_directory, download_images
 from rss_reader.news_date import get_date_pretty_str
-
-src_dir_name = 'src'
 
 
 def convert_news_to_html(news, path):
     """
-    THis function converts news to HTML format
+    This function converts news to HTML format
     :param news: News class instance
     :param path: path to result file (str)
     :return: None
     """
     directory = os.path.dirname(path)
+    src_dir_name = os.path.splitext(path)[0]
     path_to_images = create_directory(directory, src_dir_name)
     news_items_html = []
     for item in news.items:
@@ -29,22 +28,5 @@ def convert_news_to_html(news, path):
                                                     links=item.content.links)
         news_items_html.append(news_item_html)
     news_html = templates.news.render(news=news_items_html, title=news.feed)
-    with open(path, 'w') as output_file:
+    with open(path, 'w', encoding='utf-8') as output_file:
         output_file.write(news_html)
-
-
-def download_images(news_item, path_to_dir, item_index):
-    """
-    THis function downloads images from Internet
-    :param news_item: NewsItem class instance
-    :param path_to_dir: path to destination directory (str)
-    :param item_index: news_item index in news object (int)
-    :return: list of image paths (list)
-    """
-    img_path_list = []
-    img_index = 0
-    for img in news_item.content.images:
-        img_path = img.download(path_to_dir, f'{str(item_index)}_{str(img_index)}.jpeg')
-        img_path_list.append(img_path)
-        img_index += 1
-    return img_path_list

@@ -37,11 +37,11 @@ news_item = Template('''
                 {{text}}
             </p>
             <b>Links</b><br><br>
-            {% for link in links %}
-                <a>{{link}}</a><br>
+            {% for l in links %}
+                <a href="{{l}}">{{l}}</a><br>
             {% endfor %}
             <br>
-            <b>Source: </b><a>{{link}}</a>
+            <b>Source: </b><a href="{{link}}">{{link}}</a>
         </div>
     </div>
 </div>
