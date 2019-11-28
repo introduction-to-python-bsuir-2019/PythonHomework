@@ -79,16 +79,17 @@ class RSSReader:
     def _get_articles_from_url(source, limit):
         logging.info("Completed. Check the availability of URL.")
 
-        if 'status' not in (response := feedparser.parse(source.strip())) or len(response.entries) == 0:
+        if 'status' not in (response := feedparser.parse(source.strip())) or len(response['entries']) == 0:
             print(f"Error: Impossible parse RSS Feeds from url '{source}'")
             exit(0)
 
         logging.info("Completed. Check status code of response.")
 
-        if response.status in range(200, 300):
-            logging.info(f"Status code {response.status}. Getting articles from '{source}' was successful")
+        if response['status'] in range(200, 300):
+            print(response)
+            logging.info(f"Status code {response['status']}. Getting articles from '{source}' was successful")
         else:
-            print(f"Error connecting with URL '{source.strip()}' with status code {response.status}.")
+            print(f"Error connecting with URL '{source.strip()}' with status code {response['status']}.")
             exit(0)
 
         return Parser.parse(response, limit)
