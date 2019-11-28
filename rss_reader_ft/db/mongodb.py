@@ -78,7 +78,6 @@ class MongoDatabase:
         if limit is not None:
             if 0 < limit <= len(news_feed["News"]):
                 news_feed["News"] = news_feed["News"][:limit]
-                print()
                 return news_feed
             else:
                 return news_feed

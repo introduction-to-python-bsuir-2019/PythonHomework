@@ -13,6 +13,7 @@ class DataLoader:
 
     def upload(self) -> Dict[str, Any]:
         """Method of loading data from a site by URL"""
+        data = None
         try:
             data = feedparser.parse(self.url_source)
             if data.bozo != 0:

@@ -2,30 +2,22 @@ version: '3.1'
 
 services:
   mongo:
-    image: 'mongo'
+    image: mongo
+    hostname: mongo
     ports:
-      - '27017:27017'
-    depends_on:
-      - 'mongo-express'
-
+      - 27017:27017
   app:
     tty: true
     container_name: rss_reader
     stdin_open: true
     depends_on:
-      - 'mongo'
+      - mongo
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - 3000:3000
     links:
-      - "mongo:mongodb"
+      - mongo:mongodb
     environment:
       - MONGO_URL=mongodb://mongo:27017/
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - '8081:8081'

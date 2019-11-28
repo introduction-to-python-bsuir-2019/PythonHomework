@@ -32,8 +32,6 @@ class Application:
 
         process_data = feed.data_processing()
 
-        print(process_data)
-
         mongo_db.cache_news_feed(process_data)
 
         news = mongo_db.get_news(self.dict_args["limit"], self.dict_args["date"], self.dict_args["source"])
