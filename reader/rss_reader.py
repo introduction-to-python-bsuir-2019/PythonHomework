@@ -1,32 +1,37 @@
 import feedparser
 import json
+import datetime
 from bs4 import BeautifulSoup
-# https://news.yahoo.com/rss/
 
 
 class RSSReader:
-    def __init__(self, source, limit=1, json=False):
+    def __init__(self, source, limit=1, json=False, date=''):
         self.source = source
         self.limit = limit
         self.json = json
+        self.date = date
         self.feeds = {}
 
     def parse_source(self):
         d = feedparser.parse(self.source)
 
-        self.feeds['feed_name'] = d['channel']['title']
         self.feeds['news'] = []
+        channel = d['channel']['title']
 
         for news in d['entries'][0:self.limit]:
-            self.feeds['news'].append(self.read_news(news))
+            self.feeds['news'].append(self.read_news(news, channel))
 
-        self.print_feeds()
-        self.cache()
+        if self.date:
+            self.from_cache()
+        else:
+            self.print_feeds(self.feeds['news'])
+            self.to_cache()
 
     @staticmethod
-    def read_news(news):
+    def read_news(news, channel):
         item = dict()
 
+        item['feed_name'] = channel
         item['title'] = news['title'].replace('&#39;', "'")
         item['date'] = news['published']
         item['link'] = news['link']
@@ -46,7 +51,7 @@ class RSSReader:
 
         return item
 
-    def cache(self):
+    def to_cache(self):
         with open('cache.json', 'r') as f:
             feeds_f = json.load(f)
             for item in self.feeds['news']:
@@ -55,17 +60,29 @@ class RSSReader:
 
         if feeds_f['news'][0].get('title') == '':
             del feeds_f['news'][0]
-        feeds_f['feed_name'] = self.feeds['feed_name']
 
         with open('cache.json', 'w') as f:
             json.dump(feeds_f, f, indent=1)
 
-    def print_feeds(self):
-        if not self.json:
+    def from_cache(self):
+        to_print = []
+        with open('cache.json', 'r') as f:
+            feeds_f = json.load(f)
+            for item in feeds_f['news']:
+                item_date = datetime.datetime.strptime(item['date'], '%a, %d %b %Y %H:%M:%S %z').strftime('%Y%m%d')
+                if self.date == item_date:
+                    to_print.append(item)
+
+        self.print_feeds(to_print)
+
+    def print_feeds(self, to_print):
+        if self.json:
+            print(json.dumps(self.feeds, indent=1))
+        else:
             print()
-            print('Feed:', self.feeds['feed_name'])
+            print('Feed:', to_print[0].get('feed_name'))
             print('-' * 40)
-            for item in self.feeds['news']:
+            for item in to_print:
                 print('Title:', item['title'])
                 print('Date:', item['date'])
                 print('Link:', item['link'])
@@ -74,5 +91,3 @@ class RSSReader:
                 print('Image description:', item['image_description'])
                 print('Image link:', item['image_link'])
                 print('-' * 40)
-        else:
-            print(json.dumps(self.feeds, indent=1))
