@@ -9,7 +9,7 @@ setuptools.setup(
     description=conf.__description__,
     url=conf.__url__,
     packages=[conf.__package__],
-    python_requires='>=3.8',
+    python_requires='>=3.6',
     entry_points={
         'console_scripts':
             ['rss-reader = cmd:main']

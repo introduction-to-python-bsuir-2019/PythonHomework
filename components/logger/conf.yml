@@ -1,0 +1,32 @@
+version: 1
+disable_existing_loggers: True
+
+loggers:
+  standard:
+    level: INFO
+    handlers: [console, error_file_handler]
+    propagate: no
+formatters:
+    standard:
+        format: '%(asctime)s - %(message)s'
+        datefmt: '%H:%M:%S'
+    error:
+        format: '%(levelname)s <PID %(process)d:%(processName)s> %(name)s.%(funcName)s(): %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: standard
+    stream: ext://sys.stdout
+  error_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: error
+    filename: /tmp/rss-reader-errors.log
+    maxBytes: 10485760
+    backupCount: 20
+    encoding: utf8
+root:
+  level: NOTSET
+  handlers: [console, error_file_handler]
+  propogate: yes
