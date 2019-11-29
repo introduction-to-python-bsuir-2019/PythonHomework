@@ -59,7 +59,7 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(len(self.bot_reddit.get_json()), 2759)
 
     def test_bot_reddit_news_length(self):
-        self.assertEqual(len(self.bot_reddit.print_news()), 6155)
+        self.assertEqual(len(self.bot_reddit.print_news()), 6924)
 
 
 

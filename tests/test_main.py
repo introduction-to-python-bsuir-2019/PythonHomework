@@ -72,4 +72,4 @@ class TestMainModule(unittest.TestCase):
         with open('./tests/data/help.txt', 'r') as f:
             out_str = f.read()
 
-        self.assertEqual(len(out_str), 5352)
+        self.assertEqual(len(out_str), 6112)

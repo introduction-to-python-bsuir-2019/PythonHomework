@@ -1,5 +1,7 @@
 attrs==19.3.0
 bs4==0.0.1
+colorama==0.4.1
+coloredlogs==10.0
 coverage==4.5.4
 feedparser==5.2.1
 fpdf==1.7.2

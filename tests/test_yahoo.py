@@ -39,12 +39,12 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(len(self.bot.get_json()), 3336)
 
     def test_bot_reddit_news_length(self):
-        self.assertEqual(len(self.bot.print_news()), 5951)
+        self.assertEqual(len(self.bot.print_news()), 6111)
 
     def test_human_text(self):
         item = self.bot.news.items[0]
         self.assertEqual(item.title, 'Israel kills Islamic Jihad commander, rockets rain from Gaza')
-        self.assertEqual(len(self.bot._parse_news_item(item)), 1035)
+        self.assertEqual(len(self.bot._parse_news_item(item)), 1092)
 
     def test_raising_exception(self):
         url = 'asdf'
