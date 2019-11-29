@@ -18,7 +18,7 @@ class RSSListener:
         """Метод принимает url и пускает его в обработку"""
         logging.info("We begin to process the url")
         try:
-            self.portal = Portal(url)
+            self.portal = Portal(url, self.limit)
             saver = Saver(self.portal.news)
             saver.start_saving()
         except FatalError:
@@ -26,6 +26,6 @@ class RSSListener:
         except Exception as e:
             raise FatalError("Something go wrong")
         try:
-            self.portal.print(self.limit, self.json_flag)
+            self.portal.print(self.json_flag)
         except Exception as e:
             raise FatalError("Problems with printing")
