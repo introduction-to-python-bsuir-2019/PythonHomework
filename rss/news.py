@@ -24,6 +24,7 @@ class News:
 
         self.feed_title = self.feeds.feed.get('title')
         self.list_of_news = []
+        self.list_of_row_descriptions = []
 
         self._check_limit(limit)
         self.make_list_of_news()
@@ -115,6 +116,7 @@ class News:
                         'link': news.get('link', 'Unknown'),
                         'date': self._find_date_tag(news)}
             one_news.update(self._read_description(news))
+
             self.list_of_news.append(one_news)
             cache.insert_news(one_news, self.url)
 
@@ -123,7 +125,7 @@ class News:
 
         'text' value is description(str)
         'images' value is a dict
-        'links' value is a set of urls
+        'links' value is a list of urls
         """
 
         logging.info('Get information from description')
@@ -134,9 +136,9 @@ class News:
         if not text:
             text = 'Nothing'
 
+        self.list_of_row_descriptions.append(news.description)
         return {'description': {'text': text, 'images': self._get_img_list(soup),
-                'links': self._get_links_set(soup),
-                }}
+                'links': self._get_links_list(soup)}}
 
     def _get_img_list(self, soup) -> list:
         """Get images src and alt from soup object.
@@ -144,14 +146,14 @@ class News:
         """
 
         logging.info('Get images')
-        list_of_images =[]
+        list_of_images = []
         images = soup.findAll('img')
         for image in images:
             if image.get('src'):
                 list_of_images.append({'src': image['src'], 'alt': image['alt']})
         return list_of_images if list_of_images else None
 
-    def _get_links_set(self, soup):
+    def _get_links_list(self, soup):
         """Get links from soup object."""
 
         logging.info('Get set of links')
@@ -161,7 +163,7 @@ class News:
                 set_of_links.add(tag['href'])
             if tag.get('url'):
                 set_of_links.add(tag['url'])
-        return set_of_links if set_of_links else None
+        return list(set_of_links) if set_of_links else None
 
     def convert_to_json(self, limit=None):
         """Return news in JSON format."""

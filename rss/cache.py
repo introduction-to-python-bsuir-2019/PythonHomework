@@ -26,7 +26,15 @@ class Cache:
         """Convert date to %Y%m%d format."""
 
         logging.info('Convert date')
+
         converted_date = dateparser.parse(date)
+        if not converted_date:
+            logging.info("Date isn't clear. Try to parse again")
+            try:
+                converted_date = datetime.datetime.strptime(date, "%a, %d %b %Y %X %z")
+                return converted_date.strftime('%Y%m%d')
+            except Exception:
+                raise Exception('Something wrong with date')
         return converted_date.strftime('%Y%m%d')
 
     def insert_news(self, news, url: str):
