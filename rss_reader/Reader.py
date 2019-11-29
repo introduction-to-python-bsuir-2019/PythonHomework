@@ -7,6 +7,9 @@ from rss_reader.NewsItem import NewsItem
 from rss_reader.Image import Image
 
 
+FORMATTER = logging.Formatter("%(time)s — %(name)s — %(level)s — %(message)s")
+
+
 class Reader:
     """
     Class which can parse html pages and get news from them.
@@ -26,7 +29,7 @@ class Reader:
         Parse url for rss-reader.
         :return: parsed page.
         """
-        logging.basicConfig(filename="rss_reader.log", filemode="w", level=logging.INFO)
+        logging.basicConfig(filename="rss_reader.log", filemode="w", level=logging.INFO, format="")
         try:
             result = feedparser.parse(self._rss_url)
             if self.is_verbose:

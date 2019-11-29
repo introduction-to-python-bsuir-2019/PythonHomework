@@ -42,7 +42,7 @@ class NewsItem:
                     res_str = res_str + "\n"
             return res_str
         else:
-            return None
+            return ""
 
     def get_links(self):
         """
@@ -60,6 +60,12 @@ class NewsItem:
             res_str = "There are no links"
         return res_str
 
+    def _get_main_image_title(self):
+        return self.images[0].image_title if self.images[0] is not None else ""
+    
+    def _get_main_image_link(self):
+        return self.images[0].image_link if self.images[0] is not None else ""
+
     def __str__(self):
         return "Title: \t{0} \n" \
                "Date: \t{2}.\n" \
@@ -68,9 +74,9 @@ class NewsItem:
                "Image link: {4}\n" \
                "Links: {5}\n" \
             .format(self.title, self.link, self.date,
-                    self.images[0].image_title if self.images[0] is not None else "",
-                    self.images[0].image_link if self.images[0] is not None else "",
-                    self.get_links() + (self.get_images() if self.get_images() is not None else ""))
+                    self._get_main_image_title(),
+                    self._get_main_image_link(),
+                    self.get_links() + self.get_images())
 
     def convert_to_json(self):
         """
