@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+.big_text{
+    font-size: 130%;
+}
+.input_text {
+	width: 350px;
+	height: 40px;
+}
+.bigger_height {
+    height: 40px;
+}
+
+</style>
+<body>
+<center>
+    <H1>Welcom to Rss reader utility!</H1>
+    <h2>Here you can reed news)</h2>
+</center>
+
+<h3>Please, choose one of these case of feeds:</h3>
+<ul>
+    <li>
+        <a href="{{url_for('get_news', url='https://news.tut.by/rss/index.rss')}}">'https://news.tut.by/rss/index.rss'</a>
+    </li>
+    <li><a href="{{url_for('get_news', url='https://news.google.com/news/rss')}}">'https://news.google.com/news/rss'</a>
+    </li>
+    <li><a href="{{url_for('get_news', url='https://news.yahoo.com/rss/')}}">'https://news.yahoo.com/rss/'</a></li>
+</ul>
+<h3>Or use the form to download preferred news:</h3>
+<form action="{{url_for('get_news')}}" method="POST">
+    <table border="1" style="background-color:grey">
+        <tr>
+            <td>url</td>
+            <td><input type="text" size="100" value="https://news.tut.by/rss/index.rss" class="input_text big_text"
+                       name="url"></td>
+            <td>Rss Feed's url</td>
+        </tr>
+        <tr>
+            <td>limit</td>
+            <td><input type="number" value="5" class="big_text" name="limit"></td>
+            <td>Count of news you'd like to reed</td>
+        </tr>
+        <tr>
+            <td>Date</td>
+            <td>
+                <input type="date" size="100" value={{now}} class="bigger_height big_text" name="date">
+                <input type="checkbox" name="is_date">
+            </td>
+            <td>Date of store news. Check the checkbox, enter the date you want to and enjoy with your favorite news!
+            </td>
+        </tr>
+        <tr>
+            <td>Json</td>
+            <td><input type="checkbox" name="json"></td>
+            <td>News will be printed in json format</td>
+        </tr>
+        <tr>
+            <td>Pdf</td>
+            <td><input type="checkbox" name="is_pdf"></td>
+            <td>News will be printed in pdf format</td>
+        </tr>
+        <tr>
+            <td colspan="3" align="center"><input type="submit" class="input_text big_text" value="Submit"></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

@@ -111,6 +111,7 @@ venv.bak/
 
 # tests data files
 cover/
+tests/data/test.html
 tests/data/help.txt
 tests/data/yahoo.txt
 
@@ -120,7 +121,7 @@ rss_reader/storage
 
 # pdf & html files
 *.pdf
-*.html
+
 
 # Unused files
 rss_reader/utils/dejavu_font/DejaVuSansCondensed.cw127.pkl
