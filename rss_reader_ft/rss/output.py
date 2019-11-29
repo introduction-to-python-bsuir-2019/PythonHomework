@@ -2,6 +2,8 @@
 import logging
 from typing import Dict, Any
 
+from colored import fore, style, back
+
 from rss_reader_ft.conversion.json_converter import JsonConverter
 from rss_reader_ft.conversion.html_converter import HtmlConverter
 
@@ -23,6 +25,21 @@ class Output:
 
             for count, img_link in enumerate(entry["Links"]["Img_links"]):
                 print(f'[{count + 2}] {img_link} (image)')  # 2 this a shift
+
+    @staticmethod
+    def to_rss_format_colored(rss_feed_dict: Dict[str, Any]) -> None:
+        """Output to the console with color"""
+        logging.info('Print RSS feed')
+        print(fore.GREEN + style.BOLD + f'Feed: {rss_feed_dict["Feed"]}' + style.RESET)
+        for entry in rss_feed_dict["News"]:
+            print(fore.LIGHT_BLUE + style.BOLD + '\nTitle: ' + style.RESET + style.BOLD + f'{entry["Title"]}' + style.RESET)
+            print(fore.LIGHT_RED + style.BOLD + 'Date: ' + style.RESET + style.BOLD + f'{entry["Date"]}' + style.RESET)
+            print(fore.LIGHT_BLUE + style.BOLD + 'Link: ' + style.RESET + style.BOLD + f'{entry["Link"]}\n' + style.RESET)
+            print(style.BOLD + f'{entry["Description"]}\n' + style.RESET)
+            print(fore.LIGHT_BLUE + f'Links:\n[1] {entry["Links"]["Source_link"]} (link)')
+
+            for count, img_link in enumerate(entry["Links"]["Img_links"]):
+                print(f'[{count + 2}] {img_link} (image)' + style.RESET)  # 2 this a shift
 
     @staticmethod
     def to_json_format(rss_feed_dict: Dict[str, Any]) -> None:

@@ -57,5 +57,10 @@ class ArgumentParser:
             help='Print result as PDF file',
             action='store_true'
         )
+        parser.add_argument(
+            '--colorize',
+            help='Add color for print',
+            action='store_true'
+        )
         logging.info('Parsed arguments')
         return vars(parser.parse_args())

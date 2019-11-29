@@ -1,3 +1,4 @@
 feedparser==5.2.1
 bs4==0.0.1
 pymongo==3.9.0
+colored==1.4.0

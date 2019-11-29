@@ -35,13 +35,18 @@ class Application:
         mongo_db.cache_news_feed(process_data)
 
         news = mongo_db.get_news(self.dict_args["limit"], self.dict_args["date"], self.dict_args["source"])
+
         if news is not None:
             if self.dict_args["json"]:
                 Output.to_json_format(news)
-            elif self.dict_args["to_html"]:
-                Output.to_html_format(news)
             else:
-                Output.to_rss_format(news)
+                if self.dict_args["colorize"]:
+                    Output.to_rss_format_colored(news)
+                else:
+                    Output.to_rss_format(news)
+
+            if self.dict_args["to_html"]:
+                Output.to_html_format(news)
 
         if self.dict_args["verbose"]:
             ApplicationLog.print_log()

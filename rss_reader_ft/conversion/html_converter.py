@@ -36,11 +36,10 @@ class HtmlConverter(FormatConverter):
             html += f'\n<h3><p align="center">{entry["Title"]}</p></h3>'
             html += f'<p align="center"><a href={entry["Link"]}>Ссылка на статью</a></p>'
             for count, img_link in enumerate(entry["Links"]["Img_links"]):
-                html += f'<p><img src=\'{img_link}\' width="600" height="400"></p>'  # 2 this a shift
+                html += f'<p><img src=\'{img_link}\' width="600" height="400"></p>'
             html += f'<p>Date: {entry["Date"]}</p>'
             html += f'<p>{entry["Description"]}\n</p>'
             html += '</td></tr>'
 
         html += '</table></body></html>'
-
         return html
