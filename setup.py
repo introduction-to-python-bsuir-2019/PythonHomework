@@ -19,8 +19,13 @@ setup(
     author_email='ge2nadiy.k@gmail.com',
     keywords='simple rss reader',
     packages=find_packages(),
+    package_data={
+        'rss_app':[
+            'fonts/ttf/DejaVuSansCondensed.ttf'
+        ]
+    },
     python_requires='>=3.8',
-    install_requires=['bs4', 'feedparser', 'requests', 'python-dateutil'],
+    install_requires=['bs4', 'feedparser', 'requests', 'python-dateutil', 'httplib2'],
     entry_points={
         'console_scripts': [
             'rss-reader=rss_app.main:main',
