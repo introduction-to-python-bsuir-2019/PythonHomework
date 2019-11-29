@@ -12,7 +12,7 @@ class NewsInfo(models.Model):
     link = models.CharField(max_length=255)
     description = models.CharField(max_length=1000)
     imageLink = models.CharField(max_length=255)
-    imageDescription = models.CharField(max_length=255)
+    imageDescription = models.CharField(max_length=256)
 
     def __str__(self):
         return self.title_hash
