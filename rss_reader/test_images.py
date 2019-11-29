@@ -1,5 +1,5 @@
 import unittest
-from reader.Image import Image
+from rss_reader.Image import Image
 
 
 class TestImage(unittest.TestCase):

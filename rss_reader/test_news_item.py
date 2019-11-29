@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from reader.NewsItem import NewsItem
+from rss_reader.NewsItem import NewsItem
 
 
 class TestNewsItem(unittest.TestCase):

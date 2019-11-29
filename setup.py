@@ -10,11 +10,11 @@ setuptools.setup(
     author_email="gulidamarta@gmail.com",
     description="RSS-reader, which can help you to read news "
                 "from the source you will give it.",
-    install_requires=['feedparser', 'bs4', 'lxml'],
+    install_requires=['feedparser', 'bs4', 'lxml', 'requests'],
     packages=setuptools.find_packages(),
     include_package_data=True,
     python_requires='>=3.6',
     entry_points={
-        'console_scripts': ['reader=rss_reader.rss_reader:main'],
+        'console_scripts': ['rss-reader=rss_reader.rss_reader:main'],
     }
 )

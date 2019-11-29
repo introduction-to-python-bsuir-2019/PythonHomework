@@ -3,8 +3,8 @@ import logging
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-from NewsItem import NewsItem
-from Image import Image
+from rss_reader.NewsItem import NewsItem
+from rss_reader.Image import Image
 
 
 class Reader:

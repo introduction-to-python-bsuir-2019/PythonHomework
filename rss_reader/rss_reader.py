@@ -1,5 +1,5 @@
 import argparse
-from Reader import Reader
+from rss_reader.Reader import Reader
 
 VERSION_INFO = 2.0
 
