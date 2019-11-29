@@ -59,9 +59,9 @@ class RssBotInterface(metaclass=ABCMeta):
         pdf_writer = PdfWriter(self.logger)
         pdf_writer.store_news(self.news, path_to_pdf)
 
-    def _print_news_to_html(self, path_to_pdf: str) -> None:
+    def _print_news_to_html(self, path_to_html: str) -> None:
         html_writer = HtmlWriter(self.logger)
-        html_writer.store_news(self.news, path_to_pdf)
+        html_writer.store_news(self.news, path_to_html)
 
     @call_save_news_after_method
     def get_json(self) -> str:

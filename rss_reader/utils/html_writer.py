@@ -21,29 +21,15 @@ class HtmlWriter(IConverter):
         news_items_ = deepcopy(news.items)
         page = self._add_feed_header_to_html(news.feed, news.link)
 
-        # page = E.HTML(
-        #     E.HEAD(
-        #         E.TITLE(f'{news.feed}')
-        #     ),
-        #     E.BODY(
-        #         E.CENTER(E.H1(f'Title: {news.feed}'),),
-        #
-        #         E.P(E.H2('Link: '),
-        #             E.A(f'{news.link}', href=news.link),
-        #             ),
-        #         E.HR(),
-        #     )
-        # )
-
         for news_number, item in enumerate(news_items_):
 
-            page.append(E.CENTER(f'[{news_number}]'))
+            page.append(E.CENTER(f'[{news_number + 1}]'))
             page.append(E.P(
                 E.H3(f'Title: {item.title}'),
                 E.H4(f'Link:'), E.A(f'{item.link}', href=item.link),
                 E.H4(f'Published: {item.published}'),
             ))
-            # html_content = bs4.BeautifulSoup(item.html, "html.parser")
+
             page.append(
                 html.fromstring(item.html)
             )
