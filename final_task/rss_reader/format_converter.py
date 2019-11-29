@@ -27,11 +27,10 @@ def to_html(news, filepath):
     """
     this function prints news in html format to file
     """
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding='utf-8') as f:
         f.write('''
 <html lang="en" dir="ltr">
   <head>
-    <meta charset="utf-8">
     <title>rss_reader</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     	<style>

@@ -65,12 +65,14 @@ def get_post_content(post, feed_title):
     """
     data = {}
     data['feed'] = feed_title
-    data['title'] = html.unescape(post.title)
-    data['pub_date'] = post.published
-    data['pub_parsed'] = f"{post.published_parsed.tm_year}{post.published_parsed.tm_mon}{post.published_parsed.tm_mday}"
+    data['title'] = html.unescape(post.title) if html.unescape(post.title) else '*no title*'
+    data['pub_date'] = post.published if post.published else '*no date*'
+    data['pub_parsed'] = \
+        f"{post.published_parsed.tm_year}{post.published_parsed.tm_mon}{post.published_parsed.tm_mday}" if \
+        data['pub_date'] != '*no date*' else '42'
     data['link'] = post.link
     soup = BeautifulSoup(post.description, 'html.parser')
-    data['description'] = html.unescape(soup.text)
+    data['description'] = html.unescape(soup.text) if html.unescape(soup.text) else '*no description*'
     data['hrefs'] = [(link['href'], 'link') for link in soup.find_all('a') if link.get('href', None)]
     for img in soup.find_all('img'):
         if not img.get('src', 'Unknown') == '':
@@ -112,8 +114,6 @@ def display_news(news):
         for index, tpl in enumerate(item['hrefs']):
             print(f"[{index + 1}] {tpl[0]} ({tpl[1]})")
         print('\n')
-
-    return
 
 def to_json(news):
     """
@@ -196,6 +196,7 @@ def main():
         format_converter.to_html(news, args.html)
         logger.info(f"file {args.html} was successfully rewrited")
         logger.info(f"end of work -->|")
+        return
     elif args.pdf:
         logger.info(f"writing news in {args.pdf} file in pdf format..")
         try:
