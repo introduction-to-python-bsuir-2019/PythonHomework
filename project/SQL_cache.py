@@ -4,7 +4,7 @@ import sys
 
 
 class Database():
-    """docstring for Database"""
+    """Class working with SQLite3 database"""
 
     def __init__(self):
         super(Database, self).__init__()

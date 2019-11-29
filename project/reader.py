@@ -13,6 +13,7 @@ class RSSReader():
     """RSSReader: Class for reading rss channels.
     Methods:
     show_news() - print news to stdout
+    show_json() - print news to stdout in json format
     """
 
     def __init__(self, source, limit, verbose, date):
@@ -24,9 +25,14 @@ class RSSReader():
         self.__text = ""
 
     def __find_news(self):
-        """ """
+        """Ask database for news from entered date
+        Return data in the same format with __parse function
+        """
         feed, data = Database().read_data(self.__source, self.__date)
         column = []
+        if not data:
+            stdout_write("Error: Articles from the entered date not found")
+            sys.exit()
         for news in data:
             column += [{"title": news[2],
                         "link": news[3],
@@ -35,6 +41,7 @@ class RSSReader():
         return feed[0][0], column
 
     def __cache_data(self, column, feed):
+        """Take parsed data and write it to database"""
         date = lambda pubDate: dateutil.parser.parse(pubDate).strftime("%Y%m%d")
         formated_data = [
             (self.__source, date(col["date"]), col["title"],
@@ -86,6 +93,7 @@ class RSSReader():
         return feed, column
 
     def __read(self):
+        """Information source selection"""
         if not self.__date:
             self.__read_news()
             return self.__parse()

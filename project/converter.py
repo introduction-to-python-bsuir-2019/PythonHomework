@@ -2,9 +2,10 @@ from .log_helper import stdout_write, write_progressbar
 
 
 class Converter():
-    """docstring for Converter"""
+    """Converter class. Convert data to some format"""
 
     def to_json(feed, column, verbose):
+        """Take data and return it in json"""
         stdout_write("Convert to json...", verbose=verbose)
         counter = 0
         if verbose:
