@@ -1,7 +1,8 @@
 import argparse
 import sys
-import App
 import logging
+from App.Errors import FatalError
+
 
 
 def parsing_args():
@@ -24,6 +25,4 @@ def start_settings(args):
     else:
         logging.basicConfig(level=logging.CRITICAL)
     if args.limit is not None and args.limit < 0:
-        print("Limit cannot be less than 0")
-        logging.error("Limit cannot be less than 0")
-        exit()
+        raise FatalError("Limit cannot be less than 0")

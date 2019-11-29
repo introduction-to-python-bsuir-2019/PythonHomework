@@ -1,6 +1,6 @@
 import logging
 from App.Portal import Portal
-
+from App.Errors import FatalError
 
 class RSSListener:
     """Класс листенер. Обрабатывает новые rss ссылки.
@@ -18,13 +18,11 @@ class RSSListener:
         logging.info("We begin to process the url")
         try:
             self.portals.append(Portal(url))
+        except FatalError:
+            raise
         except Exception as e:
-            print("Something go wrong")
-            logging.error(str(e))
-            exit()
+            raise FatalError("Something go wrong")
         try:
             self.portals[0].print(self.limit, self.json_flag)
         except Exception as e:
-            print("Problems with printing")
-            logging.error(str(e))
-            exit()
+            raise FatalError("Problems with printing")

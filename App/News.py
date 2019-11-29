@@ -1,5 +1,5 @@
 import logging
-
+from App.Errors import FatalError
 
 class News:
     """Класс служит для хранения и обработки информации свзянной с отдельной новостью."""
@@ -12,9 +12,7 @@ class News:
             self.summary = entry.summary
             self.link = entry.link
         except Exception as e:
-            print("Problems with article processing")
-            logging.error(str(e))
-            exit()
+            raise FatalError("Problems with article processing")
         self.images = []
         self.links = []
         self.clear_text()

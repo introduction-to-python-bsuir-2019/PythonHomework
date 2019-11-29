@@ -1,6 +1,7 @@
 import logging
 import feedparser
 import json
+from App.Errors import FatalError
 from App.News import News
 
 
@@ -19,9 +20,7 @@ class Portal:
             self.links = []
             self.update(rss.entries[::-1])
         except Exception as e:
-            print("Problems with rss processing")
-            logging.error(str(e))
-            exit()
+            raise FatalError("Problems with rss processing")
 
     def get_rss(self):
         """Получает rss файл"""
@@ -29,9 +28,7 @@ class Portal:
         try:
             return feedparser.parse(self.url)
         except Exception as e:
-            print("Problems getting rss file")
-            logging.error(str(e))
-            exit()
+            raise FatalError("Problems getting rss file")
 
     def update(self, entries):
         """Метод служит для получения(добавления новых в будущем) статей"""
@@ -42,10 +39,10 @@ class Portal:
                 self.updated = rss.feed.updated
                 for entry in entries:
                     self.news.insert(0, News(entry))
+        except FatalError:
+            raise
         except Exception as e:
-            print("Problems with article processing")
-            logging.error(str(e))
-            exit()
+            raise FatalError("Problems with article processing")
 
     def print(self, limit, json_flag):
         """Метод выводит информацию о портале и о статьях"""
