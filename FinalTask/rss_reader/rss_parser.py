@@ -11,8 +11,15 @@ class RssParser:
     """
     Class to parse RSS-news
     """
-
     def __init__(self, url, limit, verbose, date):
+        """
+        This function initializes the RssParser instance
+        :param url: rss-feed to be parsed
+        :param limit: number of news to be printed
+        :param verbose: flag of verbosity
+        :param date: date to print news of the specified day
+        :return: None
+        """
         self.url = url
         self.limit = limit
         self.feed = ''
@@ -27,6 +34,10 @@ class RssParser:
             self.logger.info('logging enabled')
 
     def parse_rss(self):
+        """
+        This function parses rss-link
+        :return: None
+        """
         rss_feed = feedparser.parse(self.url)
         if self.verbose:
             self.logger.info(f'{self.limit} news have been fetched')
@@ -40,16 +51,28 @@ class RssParser:
             self.news.append(my_article)
 
     def parse_rss_link(self, entry_link, link_id, link_type):
+        """
+        This function parses link (link or image) and creates link or image data object (namedtuple)
+        :param entry_link: link to be parsed
+        :param link_id: link id in list of links
+        :param link_type: image or just a link
+        :return: parsed_link - link or image date object (namedtuple)
+        """
         if link_type == 'link':
             link_url = entry_link['href']
-            my_link = self.link_data(link_id, link_url, 'link')
+            parsed_link = self.link_data(link_id, link_url, 'link')
         else:
             image_alt = entry_link['alt']
             image_url = entry_link['src']
-            my_link = self.image_data(link_id, image_url, 'image', image_alt)
-        return my_link
+            parsed_link = self.image_data(link_id, image_url, 'image', image_alt)
+        return parsed_link
 
     def create_article(self, entry):
+        """
+        This function parses raw article and creates article object from it (namedtuple)
+        :param entry: article to be parsed
+        :return: parsed_article - article data object (namedtuple)
+        """
         title = (entry.get('title').replace('&#39;', "'"))
         date = entry.get('published')
         url = entry.get('link')
@@ -62,10 +85,14 @@ class RssParser:
             my_link = self.parse_rss_link(entry_image, len(links), 'image')
             links.append(my_link)
         description = soup.text.replace('&#39;', "'")
-        my_article = self.article(title, date, url, description, links)
-        return my_article
+        parsed_article = self.article(title, date, url, description, links)
+        return parsed_article
 
     def parse_json_cache(self):
+        """
+        This function parses json cache from cache text file
+        :return: None
+        """
         if os.path.exists("news_cache.txt") and os.path.getsize("news_cache.txt") > 0:
             with open("news_cache.txt", 'r') as cache_file:
                 json_cache = json.load(cache_file)
@@ -96,9 +123,14 @@ class RssParser:
         else:
             print('Parse some online news first so there will be something to read from cache')
             exit()
-        return len(cached_news)
+        return
 
     def parse_cached_link(self, link):
+        """
+        This function parses cached link and creates link or image data object (namedtuple) from it
+        :param link: link to be parsed
+        :return: parsed_link - link or image data object (namedtuple)
+        """
         if link['type'] == 'image':
             link_id = link['id']
             image_url = link['url']
@@ -113,6 +145,11 @@ class RssParser:
         return parsed_link
 
     def create_cached_article(self, article):
+        """
+        This function parses cached article and creates article data object (namedtuple) from it
+        :param article: article to be parsed
+        :return: parsed_article - article data object (namedtuple)
+        """
         parsed_links = []
         for link in article['links']:
             my_link = self.parse_cached_link(link)
@@ -126,6 +163,10 @@ class RssParser:
         return parsed_article
 
     def feed_to_json(self):
+        """
+        This function converts current feed to JSON format
+        :return: None
+        """
         article_list = []
         for article in self.news:
             my_article_dict = self.article_to_json(article)
@@ -133,23 +174,37 @@ class RssParser:
         return {'feed': self.feed, 'url': self.url, 'news_objects': article_list}
 
     def article_to_json(self, article):
+        """
+        This function converts article to JSON format
+        :param article: article to be converted
+        :return: json_article_dict - article in JSON dictionary format
+        """
         links_list = []
         for link in article.links:
             my_json_link = self.link_to_json(link)
             links_list.append(my_json_link)
-        my_article_dict = dict(zip(('title', 'date', 'url', 'description', 'links'),
-                                   (article.title, article.date, article.url, article.description, links_list)))
-        return my_article_dict
+        json_article_dict = dict(zip(('title', 'date', 'url', 'description', 'links'),
+                                     (article.title, article.date, article.url, article.description, links_list)))
+        return json_article_dict
 
     @staticmethod
     def link_to_json(link):
+        """
+        This function converts link to JSON format
+        :param link:
+        :return: json_link_dict - link in JSON dictionary format
+        """
         if link.type == 'link':
-            my_link_dict = dict(zip(('id', 'url', 'type'), (link.id, link.url, link.type)))
+            json_link_dict = dict(zip(('id', 'url', 'type'), (link.id, link.url, link.type)))
         else:
-            my_link_dict = dict(zip(('id', 'url', 'type', 'alt'), (link.id, link.url, link.type, link.alt)))
-        return my_link_dict
+            json_link_dict = dict(zip(('id', 'url', 'type', 'alt'), (link.id, link.url, link.type, link.alt)))
+        return json_link_dict
 
     def feed_to_string(self):
+        """
+        This function converts current feed to string to be printed out
+        :return: result_string - string contains news to be printed in human-readable format
+        """
         if len(self.news) == 0:
             return 'No news for that day, try another'
         else:
@@ -171,6 +226,10 @@ class RssParser:
             return result_string
 
     def cache_feed_to_file(self):
+        """
+        This function caches current feed to cache text file
+        :return: None
+        """
         if not os.path.exists("news_cache.txt"):
             cache_file = open("news_cache.txt", 'w+')
             cache_file.close()
@@ -203,13 +262,17 @@ class RssParser:
         if self.verbose:
             self.logger.info(f'{cached_news} online news have been saved in local cache (duplicates were removed)')
             self.logger.info(f'{total_cached_news} online news are cached in the file now')
-        return total_cached_news
 
 
 def create_logger(logging_module):
+    """
+    This function creates logger
+    :param logging_module: logging module to be used
+    :return: logger - logger for current module
+    """
     logger = logging.getLogger(logging_module)
     logger.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(funcName)s - %(levelname)s - %(message)s')
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(formatter)
