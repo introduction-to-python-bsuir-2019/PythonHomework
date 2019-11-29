@@ -7,6 +7,7 @@ class News:
     def __init__(self, entry, channel_name):
         logging.info("Creating object News")
         try:
+            self.parsed_date = self.pars_date(entry.published_parsed)
             self.title = entry.title
             self.date = entry.published
             self.summary = entry.summary
@@ -17,6 +18,18 @@ class News:
         self.images = []
         self.links = []
         self.clear_text()
+
+    def pars_date(self, struct):
+        """Parsed date to string"""
+        year = str(struct.tm_year)
+        mon = str(struct.tm_mon)
+        if len(mon) < 2:
+            mon = "0" + mon
+        day = str(struct.tm_mday)
+        if len(day) < 2:
+            day = "0" + day
+        return year + mon + day
+
 
     def del_tags(self, ind1, ind2, ind3, delta=0, items=None):
         """В зависимости от входных параметров, метод может удалять ишние теги или
