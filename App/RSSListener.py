@@ -8,10 +8,11 @@ class RSSListener:
     Постороен так, что в будущем при добавлении минимального функционала,
     будет обрабатывать и сохранять новости из разных источников"""
 
-    def __init__(self, limit, json_flag):
+    def __init__(self, limit, json_flag, date):
         logging.info("Creating object RSSListener")
         self.limit = limit
         self.json_flag = json_flag
+        self.date = date
         self.portal = None
 
     def start(self, url):
@@ -19,13 +20,19 @@ class RSSListener:
         logging.info("We begin to process the url")
         try:
             self.portal = Portal(url, self.limit)
-            saver = Saver(self.portal.news)
-            saver.start_saving()
+            saver = Saver()
+            saver.start_saving(self.portal.news)
+            if self.date is not None:
+                old_news = saver.load(self.date)
+                if old_news is not None:
+                    self.portal.load_new_news(old_news)
+                    self.portal.print(self.json_flag)
+                else:
+                    print("Error: news haven't been founded")
+
+            else:
+                self.portal.print(self.json_flag)
         except FatalError:
             raise
         except Exception as e:
             raise FatalError("Something go wrong")
-        try:
-            self.portal.print(self.json_flag)
-        except Exception as e:
-            raise FatalError("Problems with printing")

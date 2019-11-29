@@ -1,5 +1,6 @@
 import argparse
 import sys
+import App
 import logging
 from App.Errors import FatalError
 
@@ -13,6 +14,7 @@ def parsing_args():
     parser.add_argument('--json', action="store_true", help='Print result as JSON in stdout')
     parser.add_argument('--verbose', action="store_true", help='Outputs verbose status messages')
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
+    parser.add_argument('--date', type=str, help='Date for which you want to display news (format %y%m%d)')
     return parser.parse_args()
 
 
@@ -26,3 +28,5 @@ def start_settings(args):
         logging.basicConfig(level=logging.CRITICAL)
     if args.limit is not None and args.limit < 0:
         raise FatalError("Limit cannot be less than 0")
+    if args.date is not None and (len(args.date) != 8 or args.date.isdigit() is False):
+        raise FatalError("Invalid date format")
