@@ -1,7 +1,5 @@
 import json
 
-from Image import Image
-
 
 class NewsItem:
     """

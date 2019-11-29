@@ -1,2 +1,4 @@
 feedparser
-bs4
+BeautifulSoup
+datetime
+logging
