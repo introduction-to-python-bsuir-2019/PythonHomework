@@ -18,7 +18,7 @@ def main():
 def adding_arguments():
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
     parser.add_argument('source', metavar='source', type=url, help='RSS URL')
-    parser.add_argument('--version', action='version', version='ver 1.2', help='Print version info')
+    parser.add_argument('--version', action='version', version='ver 1.4', help='Print version info')
     parser.add_argument('--limit', metavar='LIMIT', type=int, help='Amount of news output')
     parser.add_argument('--verbose', action='store_true', help='Print all logs in stdout')
     parser.add_argument('--json', action='store_true', help='Print news in json format')
