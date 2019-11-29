@@ -1,3 +1,4 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -99,6 +100,23 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+#pycharm configs
+.idea/
+.build/
+.dist/
+.news_feed.egg-info/
+
+#project files
+news_feed/**/*.csv
+news_feed/**/*.jpg
+news_feed/**/*.png
+news_feed/**/*.pdf
+news_feed/**/*.html
+news_feed/**/*.sql*
+
+*.pkl
+*.fb2
 
 # mypy
 .mypy_cache/

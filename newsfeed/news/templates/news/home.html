@@ -1,0 +1,94 @@
+{% extends 'news/base.html' %}
+{% block content %}
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-8">
+
+            {% for post in posts %}
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ post.rss_image }}" alt="{{ post.rss_image }}">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'news-by-rss' post.rss_hash %}">{{ post.rss_title }}</a>
+                    <a class="mr-2" href="{% url 'news-by-date' post.date_id %}">
+                        <small class="text-muted">{{ post.pubDate|date:"F j, Y" }}</small>
+                    </a>
+                </div>
+                <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
+                <img class="article-img text-muted" src="{{ post.imageLink }}" alt="{{ post.imageDescription }}">
+                <p class="article-content">{{ post.description }}</p>
+                <a class="article-content" href="{{ post.link }}">Original link</a>
+            </div>
+        </article>
+    {% endfor %}
+
+    {% if is_paginated %}
+        <!--<div class="pagination">-->
+        {% if request.GET.query %}
+
+        <center>
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page=1&query={{ request.GET.query }}&q={{ posts }}">First</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.previous_page_number }}&query={{ request.GET.query }}&q={{ posts }}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+                <a class="btn btn-info mb-4 mr-2" href="#">{{ page_obj.number }}</a>
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.next_page_number }}&query={{ request.GET.query }}&q={{ posts }}">{{ page_obj.next_page_number }}</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages }}&query={{ request.GET.query }}&q={{ posts }}">Last</a>
+            {% endif %}
+        </center>
+
+        {% else %}
+        <center>
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page=1&q={{ posts }}">First</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.previous_page_number }}&q={{ posts }}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+                <a class="btn btn-info mb-4 mr-2" href="#">{{ page_obj.number }}</a>
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.next_page_number }}&q={{ posts }}">{{ page_obj.next_page_number }}</a>
+                <a class="btn btn-outline-info mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages }}&q={{ posts }}">Last</a>
+            {% endif %}
+        </center>
+
+        {% endif %}
+        <!--</div>-->
+    {% endif %}
+
+        </div>
+        <div class="col-md-4">
+          <div class="content-section">
+            <h3>Our Sidebar</h3>
+            <p class='text-muted'>Some additional buttons
+                <form class="form-group" action="{% url 'remove-news' %}" method="GET">
+                    <button class="btn btn-outline-info" type="submit">
+                        Clear News
+                    </button>
+
+                </form>
+
+                <form class="form-group" action="{% url 'to-pdf' posts %}" method="GET">
+
+                    <button class="btn btn-outline-info" type="submit">
+                        Export to PDF
+                    </button>
+
+                </form>
+
+                <form class="form-group" action="{% url 'to-fb2' posts %}" method="GET">
+
+                    <button class="btn btn-outline-info" type="submit">
+                        Export to FB2
+                    </button>
+
+                </form>
+
+            </p>
+          </div>
+        </div>
+    </div>
+
+        <!--</div>-->
+</main>
+{% endblock content %}

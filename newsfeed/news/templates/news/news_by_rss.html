@@ -1,0 +1,22 @@
+{% extends 'news/base.html' %}
+{% block content %}
+    {% for post in posts %}
+
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="#">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="#">{{ post.rss_title }}</a>
+                    <a class="mr-2" href="#">
+                        <small class="text-muted">{{ post.pubDate|date:"F j, Y" }}</small>
+                    </a>
+                </div>
+                <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
+                <img class="article-img text-muted" src="{{ post.imageLink }}" alt="{{ post.imageDescription }}">
+                <p class="article-content">{{ post.description }}</p>
+                <a class="article-content" href="{{ post.link }}">Original link</a>
+            </div>
+        </article>
+    {% endfor %}
+
+{% endblock content %}
