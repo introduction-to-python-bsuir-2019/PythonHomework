@@ -36,7 +36,6 @@ from sqlite3 import OperationalError
 init()  # to use colorama
 
 PROJECT_VERSION = '2.0'
-PROJECT_DESCRIPTION = ''
 
 
 class NoNewsInCacheError(OperationalError):
@@ -76,18 +75,20 @@ class NewsReader:
 
         self.items = self.get_news()
 
-    def get_news(self) -> dict:
+    def get_rss_from_url(self) -> str:
         """
-        Read rss from self.url and creates from it
-        dictionary. If self.cashing is True -> cashed news
+        Read rss from self.url
 
-        :return: dictionary of news
+        :return: text of rss
         """
 
         try:
             request = requests.get(self.url)
         except requests.exceptions.MissingSchema:
             logging.warning(f'Invalid URL: {self.url}. Paste items by yourself.')
+            raise
+        except requests.exceptions.ConnectionError:
+            logging.warning(f'Invalid URL: {self.url}. Maybe your url contain errors.')
             raise
 
         if not request.ok:
@@ -98,6 +99,21 @@ class NewsReader:
         logging.info(f'Status code: {request.status_code}')  # TODO: create understandable error status output
 
         result = request.text
+
+        return result
+
+    def get_news(self) -> dict:
+        """
+        Creates dictionary from rss.
+        If self.cashing is True -> cashed news
+
+        News are cached into database.sqlite into folder
+        from which you use the script
+
+        :return: dictionary of news
+        """
+
+        result = self.get_rss_from_url()
 
         try:
             tree = ET.fromstring(result)
@@ -117,6 +133,9 @@ class NewsReader:
                 for el in head_el:
                     if el.tag == 'url':
                         items['title_image'] = el.text
+
+        if self.cashing:
+            conn = sqlite3.connect('database.sqlite')  # if we need to cache news we should open database just once
 
         for num, item in enumerate(tree.iter('item')):
 
@@ -145,16 +164,18 @@ class NewsReader:
             items[num].update(news_description)
 
             if self.cashing:
-                conn = sqlite3.connect('database.sqlite')
                 NewsReader._cash_news_sql(items[num], conn)
-                conn.close()
+
+        if self.cashing:
+            logging.info('News are cached')
+            conn.close()
 
         logging.info('Dictionary from rss-feed was created')
 
         return items
 
     @staticmethod
-    def _cash_news_sql(news, connection, dir='news_cash'):
+    def _cash_news_sql(news, connection):
         """
         Cashes news into sql database format by publication date
         into given directory
@@ -169,9 +190,6 @@ class NewsReader:
 
         date = NewsReader.get_date(news['pubDate'])
         date_id = ''.join(str(date).split('-'))
-
-        values = list(news.values())
-        column_names = list(news.keys())
 
         cursor = connection.cursor()
 
@@ -208,7 +226,7 @@ class NewsReader:
         connection.commit()
 
     @staticmethod
-    def read_by_date_sql(date, dir='news_cash') -> dict:
+    def read_by_date_sql(date) -> dict:
         """
         Reads news from sql database by given date
         from given directory
@@ -331,9 +349,9 @@ class NewsReader:
 
         return image_src, image_description
 
-    def news_text(self, news):
+    def news_text(self, news) -> str:
         """
-        Process news in dictionary format into
+        Process news frome dictionary format into
         readable text
 
         :param news: news dictionary
@@ -383,7 +401,7 @@ class NewsReader:
             print(yellow + '_' * 100 + reset)
 
     @staticmethod
-    def to_json(items):
+    def to_json(items) -> str:
         """
         Convert self.items (all news description)
         into json format
@@ -459,7 +477,6 @@ def main_logic(args):
 
     if args.version:
         print(PROJECT_VERSION)
-        print(PROJECT_DESCRIPTION)
 
     if args.verbose:
         logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s] %(message)s',

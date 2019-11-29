@@ -1,7 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
-
-import datetime
+from unittest.mock import patch
 
 from news_feed.rss_reader import NewsReader
 
