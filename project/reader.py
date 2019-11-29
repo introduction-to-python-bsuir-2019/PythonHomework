@@ -2,30 +2,11 @@ import sys
 import urllib.request
 import urllib.error
 from xml.dom.minidom import parseString
+import dateutil.parser
 from .html_parser import parse_HTML
 from .converter import Converter
-
-
-def stdout_write(string, sep=' ', end='\n', flush=False, verbose=True):
-    """Output function for singe string but convert &#39; to '"""
-    if verbose:
-        string = string.replace("&#39;", "'")
-        print(string, sep=sep, end=end, flush=flush)
-
-
-def write_progressbar(elems, done, length=20):
-    """Take arguments
-    elems: count of elements
-    done: progress (in elements)
-    length: progress bar length
-    Write progress bar to stdout
-    """
-    if done != 0:
-        print("\r", end="")
-    col = int(length * (done/elems))
-    print(f"[{'='*col + ' '*(length-col)}] {int(100*done/elems)}%", end="")
-    if elems == done:
-        print()
+from .log_helper import stdout_write, write_progressbar
+from .SQL_cache import Database
 
 
 class RSSReader():
@@ -38,18 +19,26 @@ class RSSReader():
         super(RSSReader, self).__init__()
         self.__source = source
         self.__limit = limit
-        self.__verbose = averbose
+        self.__verbose = verbose
         self.__date = date
         self.__text = ""
 
     def __find_news(self):
-        pass
+        """ """
+        feed, data = Database().read_data(self.__source, self.__date)
+        column = []
+        for news in data:
+            column += [{"title": news[2],
+                        "link": news[3],
+                        "text": news[4],
+                        "links": news[5].split('\n') }]
+        return feed[0][0], column
 
     def __cache_data(self, column, feed):
-        Date = format(pubDate)
+        date = lambda pubDate: dateutil.parser.parse(pubDate).strftime("%Y%m%d")
         formated_data = [
-            (self.__source, Date, col["title"],
-             col["link"], col["text"], col["links"]) for col in column]
+            (self.__source, date(col["date"]), col["title"],
+             col["link"], col["text"], "\n".join(col["links"])) for col in column]
         Database().write_data(formated_data, feed, self.__source)
 
     def __read_news(self):
@@ -96,7 +85,7 @@ class RSSReader():
         self.__cache_data(column, feed)
         return feed, column
 
-    def __read():
+    def __read(self):
         if not self.__date:
             self.__read_news()
             return self.__parse()
@@ -107,14 +96,15 @@ class RSSReader():
         feed, column = self.__read()
         stdout_write(f"{feed}", end="\n\n")
         for news in column:
-            stdout_write(f"Title: {news["title"]}")
-            stdout_write(f"Date: {news["date"]}")
-            stdout_write(f"Link: {news["link"]}", end="\n\n")
-            stdout_write(news["text"], end="\n\n")
-            if len(news["links"]) != 0:
+            stdout_write(f"Title: {news['title']}")
+            if 'date' in news:
+                stdout_write(f"Date: {news['date']}")
+            stdout_write(f"Link: {news['link']}", end="\n\n")
+            stdout_write(news['text'], end="\n\n")
+            if len(news['links']) != 0:
                 stdout_write("Links:")
             link_num = 1
-            for link in news["links"]:
+            for link in news['links']:
                 stdout_write(f"[{link_num}]: {link}")
                 link_num += 1
             stdout_write("\n\n")
