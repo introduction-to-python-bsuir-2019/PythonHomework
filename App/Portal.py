@@ -38,7 +38,7 @@ class Portal:
             if self.updated != rss.feed.updated:
                 self.updated = rss.feed.updated
                 for entry in entries:
-                    self.news.insert(0, News(entry))
+                    self.news.insert(0, News(entry, self.title))
         except FatalError:
             raise
         except Exception as e:
@@ -59,7 +59,6 @@ class Portal:
             print(json.dumps(main_dict, ensure_ascii=False, indent=4))
         else:
             logging.info("Saving to text")
-            print("\n\nRSS-chanel\n"
-                  "Title: {0}\n".format(self.title))
+            print("\n\nRSS-chanel")
             for news in self.news[:limit]:
                 print("*" * 20 + "New article" + "*" * 20 + "\n{0}\n".format(news))

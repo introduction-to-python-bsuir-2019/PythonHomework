@@ -4,13 +4,14 @@ from App.Errors import FatalError
 class News:
     """Класс служит для хранения и обработки информации свзянной с отдельной новостью."""
 
-    def __init__(self, entry):
+    def __init__(self, entry, channel_name):
         logging.info("Creating object News")
         try:
             self.title = entry.title
             self.date = entry.published
             self.summary = entry.summary
             self.link = entry.link
+            self.channel_name = channel_name
         except Exception as e:
             raise FatalError("Problems with article processing")
         self.images = []
@@ -46,10 +47,11 @@ class News:
             logging.warning("Problems with tag parsing:\n" + str(e))
 
     def __str__(self):
-        string = "Title: {0}\n" \
-                 "Date: {1}\n" \
-                 "Link: {2}\n\n" \
-                 "Summary: {3}".format(self.title, self.date, self.link, self.summary)
+        string = "Channel name: {0}\n" \
+                 "Title: {1}\n" \
+                 "Date: {2}\n" \
+                 "Link: {3}\n\n" \
+                 "Summary: {4}".format(self.channel_name, self.title, self.date, self.link, self.summary)
         if len(self.images) > 0:
             string = string + "\n\nImages in the article:"
             for img in self.images:
