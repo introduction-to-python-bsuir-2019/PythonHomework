@@ -3,4 +3,4 @@ requests  # http requests
 bs4 # for xml and html
 colorama  # colored output https://pypi.org/project/colorama/
 jinja2  # for generating html
-pdfkit # for generating pdf
+git+https://github.com/xhtml2pdf/xhtml2pdf.git

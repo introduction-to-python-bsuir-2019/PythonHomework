@@ -2,8 +2,8 @@
 [Introduction to Python] Homework Repository for EPAM courses
 
 # How to use
-1.  `pip3 install .`
-2.  install [wkhtmltopdf](https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf)
+1.  install git `apt-get install git`
+2.  `pip3 install .`
 3.  `rss-reader "https://www.androidpolice.com/feed/" --limit 3 --json --verbose --date`
 
 # Parameters
@@ -23,7 +23,7 @@
 Used [Pickle](https://docs.python.org/3/library/pickle.html) for storage
 
 Entries cached in `cache/date/domain.rss`
--  cache - name of cache folder, default "cache" (you can change in configuration.py)
+-  cache - name of cache folder, default "cache"
 -  date - script execution date
 -  domain - domain of rss feed
 

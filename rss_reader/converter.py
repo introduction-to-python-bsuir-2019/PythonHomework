@@ -9,12 +9,11 @@ import shutil
 from pathlib import Path
 
 import requests
-import pdfkit
+from xhtml2pdf import pisa
 from jinja2 import Template
 from bs4 import BeautifulSoup
 
-from rss_reader.configuration import IMAGE_DIR, TEMP_IMAGE_DIR
-#  from rss_reader.exceptions import RSSFeedException
+from rss_reader.exceptions import RSSFeedException
 
 
 class Converter:
@@ -23,16 +22,21 @@ class Converter:
         Attributes:
             title (str): Title of RSS feed
             entries (list): List of RSS news
-            directory (str): Directory where output will be saved
+            out_dir (str): Directory where output will be saved
     """
 
-    def __init__(self, title, entries, directory):
+    def __init__(self, title, entries, out_dir, image_dir="images", temp_image_dir="_temp_images"):
         self.title = title
         self.entries = entries
-        self.directory = directory
+        self.out_dir = Path(out_dir)
 
-    def _download_img(self, url, img_dir):
-        """ Download image in DIRECTORY/images
+        self.image_dir = Path(image_dir)
+        self.temp_image_dir = Path(temp_image_dir)
+
+        self.font_path = Path(__file__).resolve().parent / 'fonts/Roboto-Regular.ttf'
+
+    def _download_img(self, url, image_dir):
+        """ Download image in self.out_dir/image_dir
 
             Returns:
                 filename: image name
@@ -43,13 +47,11 @@ class Converter:
         filename = url.split('/')[-1]
         response = requests.get(url, allow_redirects=True)
 
-        out_dir = Path(self.directory)
+        if not self.out_dir.is_dir():
+            logging.info("Creating directory /%s", self.out_dir)
+            self.out_dir.mkdir()
 
-        if not out_dir.is_dir():
-            logging.info("Creating directory /%s", out_dir)
-            out_dir.mkdir()
-
-        image_dir = out_dir / img_dir
+        image_dir = self.out_dir / image_dir
         if not image_dir.is_dir():
             logging.info("Creating directory /%s", image_dir)
             image_dir.mkdir()
@@ -67,11 +69,11 @@ class Converter:
 
         """
         soup = BeautifulSoup(entry.summary, "html.parser")
-        imgs = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
-        for img in imgs:
-            filename = self._download_img(img, IMAGE_DIR)
-            downloaded_img_local_path = Path(IMAGE_DIR / filename)
-            entry.summary = entry.summary.replace(img, str(downloaded_img_local_path))
+        images = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
+        for image in images:
+            filename = self._download_img(image, self.image_dir)
+            downloaded_img_local_path = Path(self.image_dir / filename)
+            entry.summary = entry.summary.replace(image, str(downloaded_img_local_path))
 
         return entry
 
@@ -84,19 +86,20 @@ class Converter:
                 entry (dict): News dict
         """
         soup = BeautifulSoup(entry.summary, "html.parser")
-        imgs = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
-        for img in imgs:
-            filename = self._download_img(img, TEMP_IMAGE_DIR)
-            downloaded_img_absolute_path = Path(self.directory / TEMP_IMAGE_DIR / filename).absolute()
-            entry.summary = entry.summary.replace(img, str(downloaded_img_absolute_path))
+        images = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
+        for image in images:
+            filename = self._download_img(image, self.temp_image_dir)
+            downloaded_img_absolute_path = Path(self.out_dir / self.temp_image_dir / filename).absolute()
+            entry.summary = entry.summary.replace(image, str(downloaded_img_absolute_path))
 
         return entry
 
-    def _gen_html(self, absolute_urls=False):
+    def _gen_html(self, is_cyrillic_font=False, is_absolute_urls=False):
         """ Generates HTML
 
             Args:
-                absolute_urls (bool): Should we generate HTML with absolute URLs (to convert to PDF)?
+                is_cyrillic_font (bool) Should we generate HTML with cyrillic_font (to convert to PDF)?
+                is_absolute_urls (bool): Should we generate HTML with absolute URLs (to convert to PDF)?
 
             Returns:
                 html: String with HTML code
@@ -106,12 +109,18 @@ class Converter:
                 <meta charset="utf-8">
                 <title>{{title}}</title>
                 
-                <style type=text/css>  
+                <style type=text/css>
+                    {% if is_cyrillic_font %}
+                    @font-face { font-family: Roboto; src: url({{font_path}}), ; }
+                    {% endif %}
+                    body{
+                      font-family: Roboto;
+                    }
                     div 
                     { 
-                      margin: 50px; 
+                      margin: 10px; 
                       font-size: 20px; 
-                    } 
+                    }
                 </style> 
             </head>
             <body>
@@ -119,33 +128,39 @@ class Converter:
                     <div class='entry'>
                         <h2 class='title'>{{entry.title}}</h2>
                         <p><span class='date'>{{entry.published}}</span></p>
-                        <a class='link' href='{{entry.link}}'>{{entry.title}}</a>
-                        <br>
+                        <p><a class='link' href='{{entry.link}}'>{{entry.link}}</a></p>
                         <div class='description'>{{entry.summary}}</div>
                     </div>
                 {% endfor %}
             </body>
         </html>'''
-        if absolute_urls:
-            entries = [self._replace_urls_to_absolute(entry) for entry in self.entries]
+        if is_absolute_urls:
+            self.entries = [self._replace_urls_to_absolute(entry) for entry in self.entries]
         else:
-            entries = [self._replace_urls_to_local(entry) for entry in self.entries]
+            self.entries = [self._replace_urls_to_local(entry) for entry in self.entries]
 
-        html = Template(template).render(title=self.title, entries=entries)
+        html = Template(template).render(title=self.title, entries=self.entries,
+                                         is_cyrillic_font=is_cyrillic_font, font_path=self.font_path)
         return html
 
     def rss_to_html(self):
-        """ Generate HTML file in DIRECTORY """
+        """ Generate HTML file in self.out_dir """
         html = self._gen_html()
-        with open(Path(self.directory) / 'out.html', 'w') as file_object:
+
+        with open(Path(self.out_dir) / 'out.html', 'w') as file_object:
             file_object.write(html)
 
     def rss_to_pdf(self):
-        """ Generate PDF file in DIRECTORY """
-        html = self._gen_html(absolute_urls=True)
-        options = {'quiet': ''}
-        pdfkit.from_string(html, Path(self.directory) / 'out.pdf', options=options)
+        """ Generate PDF file in self.out_dir """
+        html = self._gen_html(is_cyrillic_font=True, is_absolute_urls=True)
+
+        with open(Path(self.out_dir) / 'out.pdf', "w+b") as file:
+            pdf = pisa.CreatePDF(html, dest=file, encoding='UTF-8')
+
         # Delete temp DIRECTORY/TEMP_IMAGE_DIR
-        temp_img_dir = Path(self.directory / TEMP_IMAGE_DIR)
+        temp_img_dir = Path(self.out_dir / self.temp_image_dir)
         logging.info("Cleaning up %s", temp_img_dir)
         shutil.rmtree(temp_img_dir)
+
+        if pdf.err:
+            raise RSSFeedException(message="Error during PDF generation")

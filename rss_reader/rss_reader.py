@@ -27,7 +27,6 @@ from colorama import Fore
 
 from rss_reader.exceptions import RSSFeedException
 from rss_reader.converter import Converter
-from rss_reader.configuration import CACHE_DIR
 
 
 class RSSFeed:
@@ -40,18 +39,19 @@ class RSSFeed:
             raw_entries (list): List of raw RSS news
     """
 
-    def __init__(self, source):
+    def __init__(self, source, cache_dir="cache"):
         self.source = source
         self.title = None
         self.entries = None
         self.raw_entries = None
+        self.cache_dir = Path(cache_dir)
 
     def _save_rss_in_file(self):
         """ Saving rss feed to cache/date/domain.rss """
         logging.info("Saving rss feed")
 
         date_dir = Path(datetime.now().strftime('%Y%m%d'))
-        cache_file_dir = CACHE_DIR / date_dir
+        cache_file_dir = self.cache_dir / date_dir
         if not cache_file_dir.is_dir():
             logging.info("Creating directory /%s", cache_file_dir)
             os.makedirs(cache_file_dir)
@@ -72,7 +72,7 @@ class RSSFeed:
         uri = urlparse(self.source)
         file_name = f"{uri.netloc}.rss"
 
-        cache_file_path = CACHE_DIR / date_dir / file_name
+        cache_file_path = self.cache_dir / date_dir / file_name
         if not cache_file_path.is_file():
             raise RSSFeedException(message=f"There is no entries for {date}")
 
@@ -81,8 +81,8 @@ class RSSFeed:
             self.title, self.raw_entries = pickle.load(file)
             self.entries = self._get_pretty_entries()
 
-    def _get_rss_in_json(self, entries):
-        """ Converts rss feed to json """
+    def _get_entries_in_json(self, entries):
+        """ Convert entries to json """
         logging.info("Converting rss feed to json")
         return json.dumps({"feed": self.title, "entries": entries},
                           indent=2, ensure_ascii=False)
@@ -132,7 +132,7 @@ class RSSFeed:
         logging.info("Printing rss feed")
 
         if is_json:
-            entries = self._get_rss_in_json(entries)
+            entries = self._get_entries_in_json(entries)
             print(entries)
         else:
             if colorize:
@@ -150,17 +150,17 @@ class RSSFeed:
                           f"Link: {entry['link']}\n\n"
                           f"{entry['summary']}\n\n")
 
-    def convert_to_html(self, directory, limit):
+    def convert_to_html(self, out_dir, limit):
         """ Create html file with rss news in DIR """
         logging.info("Converting RSS to HTML")
-        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), directory=directory)
+        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
         converter.rss_to_html()
         logging.info("Done.")
 
-    def convert_to_pdf(self, directory, limit):
+    def convert_to_pdf(self, out_dir, limit):
         """ Create pdf file with rss news in DIR """
         logging.info("Converting RSS to PDF")
-        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), directory=directory)
+        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
         converter.rss_to_pdf()
         logging.info("Done.")
 
@@ -205,9 +205,9 @@ def main():
         feed.get_rss(date=args.date)
         feed.print_rss(limit=args.limit, is_json=args.json, colorize=args.colorize)
         if args.to_html:
-            feed.convert_to_html(directory=args.to_html, limit=args.limit)
+            feed.convert_to_html(out_dir=args.to_html, limit=args.limit)
         if args.to_pdf:
-            feed.convert_to_pdf(directory=args.to_pdf, limit=args.limit)
+            feed.convert_to_pdf(out_dir=args.to_pdf, limit=args.limit)
     except RSSFeedException as ex:
         print(f"{ex.message}")
         sys.exit(0)
