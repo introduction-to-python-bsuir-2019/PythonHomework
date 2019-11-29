@@ -93,7 +93,7 @@ class RSSReader:
                     # already cached
                     return
         except FileNotFoundError:
-            self.logger.info('File not found')
+            self.logger.info('Creating new .json file')
         except json.JSONDecodeError:
             self.logger.info('Empty JSON file')
 
