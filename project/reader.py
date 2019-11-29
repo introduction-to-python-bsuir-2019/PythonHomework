@@ -28,25 +28,35 @@ class RSSReader():
         """Ask database for news from entered date
         Return data in the same format with __parse function
         """
+        output("Reading data from database...", verbose=self.__verbose)
         feed, data = Database().read_data(self.__source, self.__date)
         column = []
         if not data:
             stdout_write("Error: Articles from the entered date not found")
             sys.exit()
+        counter = 0
+        if self.__verbose:
+            write_progressbar(len(data), counter)
         for news in data:
             column += [{"title": news[2],
                         "link": news[3],
                         "text": news[4],
-                        "links": news[5].split('\n') }]
+                        "links": news[5].split('\n')}]
+            counter += 1
+            if self.__verbose:
+                write_progressbar(len(data), counter)
         return feed[0][0], column
 
     def __cache_data(self, column, feed):
         """Take parsed data and write it to database"""
-        date = lambda pubDate: dateutil.parser.parse(pubDate).strftime("%Y%m%d")
+        stdout_write("Writing data to database...", verbose=self.__verbose)
+
+        def date(pubDate): return dateutil.parser.parse(
+            pubDate).strftime("%Y%m%d")
         formated_data = [
             (self.__source, date(col["date"]), col["title"],
              col["link"], col["text"], "\n".join(col["links"])) for col in column]
-        Database().write_data(formated_data, feed, self.__source)
+        Database().write_data(formated_data, feed, self.__source, self.__verbose)
 
     def __read_news(self):
         """Read data from link"""

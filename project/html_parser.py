@@ -19,7 +19,7 @@ class _HTMLTagsParser(HTMLParser):
                     self.text += f": {attr[1]}"
                 elif attr[0] == "src":
                     self.links += [attr[1] + " (image)"]
-            self.text +=  f"][{num}]"
+            self.text += f"][{num}]"
         elif tag == "a":
             for attr in attrs:
                 if attr[0] == "href":

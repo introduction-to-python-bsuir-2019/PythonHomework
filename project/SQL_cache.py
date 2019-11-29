@@ -31,26 +31,36 @@ class Database():
     def _close(self):
         self.conn.close()
 
-    def write_data(self, data, feed, url):
+    def write_data(self, data, feed, url, verbose):
         """Write news to database
         Params:
-        data: turple
-        feed: str
+        data: turple - article data
+        feed: str - rss_channel feed 
         url: str
+        verbose: bool
         """
         try:
             self._open()
+            counter = 0
+            if verbose:
+                write_progressbar(len(data)+1, counter)
             for news in data:
                 self.cursor.execute(""" 
                     INSERT INTO news
                     VALUES (?,?,?,?,?,?) 
                     """, news)
+                counter += 1
+                if verbose:
+                    write_progressbar(len(data)+1, counter)
             self.conn.commit()
             self.cursor.execute("""
                 INSERT INTO feed
                 VALUES (?,?)
                 """, (url, feed))
             self.conn.commit()
+            counter += 1
+            if verbose:
+                write_progressbar(len(data)+1, counter)
         except sqlite3.IntegrityError:
             pass
         except sqlite3.DatabaseError:
