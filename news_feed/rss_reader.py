@@ -33,7 +33,7 @@ from .format_converter import (PdfNewsConverter,
 from xml.etree.ElementTree import ParseError
 from sqlite3 import OperationalError
 
-init(convert=True)  # to use colorama
+init()  # to use colorama
 
 PROJECT_VERSION = '2.0'
 PROJECT_DESCRIPTION = ''
