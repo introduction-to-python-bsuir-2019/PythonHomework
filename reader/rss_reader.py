@@ -21,6 +21,7 @@ class RSSReader:
             self.feeds['news'].append(self.read_news(news))
 
         self.print_feeds()
+        self.cache()
 
     @staticmethod
     def read_news(news):
@@ -45,6 +46,20 @@ class RSSReader:
 
         return item
 
+    def cache(self):
+        with open('cache.json', 'r') as f:
+            feeds_f = json.load(f)
+            for item in self.feeds['news']:
+                if item not in feeds_f['news']:
+                    feeds_f['news'].append(item)
+
+        if feeds_f['news'][0].get('title') == '':
+            del feeds_f['news'][0]
+        feeds_f['feed_name'] = self.feeds['feed_name']
+
+        with open('cache.json', 'w') as f:
+            json.dump(feeds_f, f, indent=1)
+
     def print_feeds(self):
         if not self.json:
             print()
@@ -60,4 +75,4 @@ class RSSReader:
                 print('Image link:', item['image_link'])
                 print('-' * 40)
         else:
-            print(json.dumps(self.feeds))
+            print(json.dumps(self.feeds, indent=1))
