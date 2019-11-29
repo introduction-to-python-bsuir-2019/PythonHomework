@@ -52,6 +52,7 @@ def table_create(table_name: str) -> None:
                             title text,
                             date_ text,
                             link text,
+                            imgs_links text,
                             short_content text
                             )
                             '''.format(table_name)
@@ -61,7 +62,7 @@ def table_create(table_name: str) -> None:
         cursor.execute(command)
 
 
-def db_write(date: str, title: str, link: str, short_content: str) -> None:
+def db_write(date: str, title: str, link: str, imgs_links: list, short_content: str) -> None:
     """Write item in datebase."""
     YYYYMMDD_date = _convert_date_to_YYYYMMDD(date)
 
@@ -72,9 +73,9 @@ def db_write(date: str, title: str, link: str, short_content: str) -> None:
 
     with DataBaseConn(DB_NAME) as connection:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO {} VALUES (?,?,?,?)"
+        cursor.execute("INSERT INTO {} VALUES (?,?,?,?,?)"
                        .format(HEADER_TABLE_NAME + YYYYMMDD_date),
-                              (title, date, link, short_content))
+                              (title, date, link, ' '.join(imgs_links), short_content))
 
 
 def get_list_of_tables() -> str:
@@ -110,7 +111,8 @@ def db_read(date: str) -> str:
             news += KEYWORD_TITLE + row[0] + EN
             news += KEYWORD_DATE + row[1] + EN
             news += KEYWORD_LINK + row[2] + EN
-            news += KEYWORD_CONTENT + row[3] + EN
+            news += KEYWORD_IMGS_LINKS + row[3] + EN
+            news += KEYWORD_CONTENT + row[4] + EN
             news += NEWS_SEPARATOR + DEN
 
     return news

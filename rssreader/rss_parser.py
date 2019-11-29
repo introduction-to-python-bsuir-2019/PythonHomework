@@ -69,7 +69,7 @@ class RssReader:
             url = ''
         return url
 
-    def _get_item_images_urls(self, one_news: FeedParserDict) -> list():
+    def _get_item_images_urls(self, one_news: FeedParserDict) -> list:
         """Get images's urls of piece of news."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_item_image_url')
         logger.info('Getting image-url of one news')
@@ -78,8 +78,8 @@ class RssReader:
         imgs_links = []
         try:
             for piece_of_media in one_news.media_content:
-                if piece_of_media['type'] == 'image/jpeg' or piece_of_media == 'image/png':
-                    imgs_links.append(piece_of_media['url'])
+                # if piece_of_media['type'] == 'image/jpeg' or piece_of_media == 'image/png':
+                imgs_links.append(piece_of_media['url'])
         except AttributeError:
             return []
         return imgs_links
@@ -129,7 +129,7 @@ class RssReader:
 
     def _fix_symbols(self, item: str) -> str:
         """Replace symbols from xml to ascii."""
-        return item.replace('&#39;', "'")
+        return item.replace('&#39;', "'").replace('&amp;', '&')
 
     def _get_news_as_list(self, limit: int=0) -> list:
         """Get list of news.
@@ -162,6 +162,7 @@ class RssReader:
                                   piece_of_news[KEYWORD_DATE],
                                   piece_of_news[KEYWORD_TITLE],
                                   piece_of_news[KEYWORD_LINK],
+                                  piece_of_news[KEYWORD_IMGS_LINKS],
                                   piece_of_news[KEYWORD_CONTENT])
 
             piece_of_news.clear()

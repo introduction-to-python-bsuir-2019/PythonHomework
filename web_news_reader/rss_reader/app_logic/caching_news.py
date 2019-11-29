@@ -17,9 +17,6 @@ HEADER_TABLE_NAME = 'date_'
 
 def _convert_date_to_YYYYMMDD(date: str) -> str:
     """Convert date, which got by feedparser from xml-format to YYYYMMDD."""
-    logger = logging.getLogger(MODULE_LOGGER_NAME + '.convert_date_to_YYYYMMDD')
-    logger.info('Converting date to YYYYMMDD format')
-
     return (''.join(date.split()[3:0:-1])).replace(date.split()[2], MONTHS[date.split()[2]])
 
 
@@ -43,15 +40,13 @@ class DataBaseConn:
 
 def table_create(table_name: str) -> None:
     """Create table on datebase."""
-    logger = logging.getLogger(MODULE_LOGGER_NAME + '.table_create')
-    logger.info(f'Create table in database: {DB_NAME} if it doesn\'t exist with name: {table_name}')
-
     command = '''CREATE TABLE if not exists
                             {}
                             (
                             title text,
                             date_ text,
                             link text,
+                            img_link text,
                             short_content text
                             )
                             '''.format(table_name)
@@ -61,27 +56,21 @@ def table_create(table_name: str) -> None:
         cursor.execute(command)
 
 
-def db_write(date: str, title: str, link: str, short_content: str) -> None:
+def db_write(date: str, title: str, link: str, img_link: str, short_content: str) -> None:
     """Write item in datebase."""
     YYYYMMDD_date = _convert_date_to_YYYYMMDD(date)
-
-    logger = logging.getLogger(MODULE_LOGGER_NAME + '.db_write')
-    logger.info(f'Write to table "{YYYYMMDD_date}" in database "{DB_NAME}"')
 
     table_create(HEADER_TABLE_NAME + YYYYMMDD_date)
 
     with DataBaseConn(DB_NAME) as connection:
-        ursor = connection.cursor()
-        cursor.execute("INSERT INTO {} VALUES (?,?,?,?)"
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO {} VALUES (?,?,?,?,?)"
                        .format(HEADER_TABLE_NAME + YYYYMMDD_date),
-                       (title, date, link, short_content))
+                              (title, date, link, img_link, short_content))
 
 
 def get_list_of_tables() -> str:
     """Get list of tables (dates)."""
-    logger = logging.getLogger(MODULE_LOGGER_NAME + '.get_list_of_tables')
-    logger.info('Getting list of names of tables in database')
-
     with DataBaseConn(DB_NAME) as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM sqlite_master where type='table'")
@@ -97,9 +86,6 @@ def get_list_of_tables() -> str:
 
 def db_read(date: str) -> str:
     """Read items from table with name: date of datebase."""
-    logger = logging.getLogger(MODULE_LOGGER_NAME + '.db_read')
-    logger.info(f'Read cached news with date: {date}')
-
     with DataBaseConn(DB_NAME) as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT DISTINCT * FROM {}".format(HEADER_TABLE_NAME + date))
@@ -110,7 +96,8 @@ def db_read(date: str) -> str:
             news += KEYWORD_TITLE + row[0] + EN
             news += KEYWORD_DATE + row[1] + EN
             news += KEYWORD_LINK + row[2] + EN
-            news += KEYWORD_CONTENT + row[3] + EN
+            news += KEYWORD_IMG_LINK + row[3] + EN
+            news += KEYWORD_CONTENT + row[4] + EN
             news += NEWS_SEPARATOR + DEN
 
     return news

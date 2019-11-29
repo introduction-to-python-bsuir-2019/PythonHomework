@@ -26,6 +26,8 @@ CORRECT_END_LOG = 'END (correct)'
 # LINK = 'https://news.yahoo.com/rss/'
 # LINK = 'https://www.newsisfree.com/rss/'
 LINK = 'https://news.tut.by/rss/index.rss'
+# LINK = 'https://habr.com/ru/rss/all/all/'
+
 
 
 def create_args_parser() -> argparse.ArgumentParser:

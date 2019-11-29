@@ -102,7 +102,7 @@ class FB2:
 
         self._add_image_binary(img_url, img_name)
 
-    def add_section(self, title_info: str, date: str, link: str, img_link: str, content: str) -> None:
+    def add_section(self, title_info: str, date: str, link: str, imgs_links: list, content: str) -> None:
         """Insert <section>{}</section> in xml-tree with parent-node."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.add_section')
         logger.info('Insert <section></section> in xml-tree with parent-node')
@@ -114,8 +114,10 @@ class FB2:
         self._add_tag_p(section, date)
         self._add_tag_p(section, link)
         self._add_tag_emptyline(section)
-        self._add_image(section, img_link, ('img' + str(self.image_iter) + '.png'))
+   
+        if imgs_links:  # if imgs_links list is not empty
+            self._add_image(section, imgs_links[0], ('img' + str(self.image_iter) + '.png'))
+            self.image_iter += 1
+
         self._add_tag_emptyline(section)
         self._add_tag_p(section, content)
-
-        self.image_iter += 1

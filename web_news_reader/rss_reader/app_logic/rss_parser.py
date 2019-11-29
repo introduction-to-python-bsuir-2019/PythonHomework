@@ -60,7 +60,7 @@ class RssReader:
         try:
             img_link = one_news.media_content[0]['url']
         except AttributeError:
-            img_link = ''
+            return ''
         return img_link
 
     def _get_item_title(self, one_news: FeedParserDict) -> str:
@@ -90,7 +90,7 @@ class RssReader:
 
     def _fix_symbols(self, item: str) -> str:
         """Replace symbols from xml to ascii."""
-        return item.replace('&#39;', "'")
+        return item.replace('&#39;', "'").replace('&amp;', '&')
 
     def _get_news_as_list(self, limit: int=0) -> list:
         """Get list of news.
@@ -116,10 +116,11 @@ class RssReader:
             if limit > 0:
                 news.append(piece_of_news.copy())
 
-            # caching_news.db_write(piece_of_news[KEYWORD_DATE],
-            #                       piece_of_news[KEYWORD_TITLE],
-            #                       piece_of_news[KEYWORD_LINK],
-            #                       piece_of_news[KEYWORD_CONTENT])
+            db_write(piece_of_news[KEYWORD_DATE],
+                    piece_of_news[KEYWORD_TITLE],
+                    piece_of_news[KEYWORD_LINK],
+                    piece_of_news[KEYWORD_IMG_LINK],
+                    piece_of_news[KEYWORD_CONTENT])
 
             piece_of_news.clear()
 
