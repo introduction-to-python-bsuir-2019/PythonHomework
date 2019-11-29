@@ -1,0 +1,5 @@
+feedparser
+BeautifulSoup
+datetime
+logging
+requests
