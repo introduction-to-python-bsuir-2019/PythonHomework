@@ -281,7 +281,12 @@ def download_fb2(request, posts):
         items[news['id']]['imageLink'] = news['imageLink']
         items[news['id']]['imageDescription'] = news['imageDescription']
 
-    filepath = os.path.join('news', 'media_root', 'news.fb2')
+    path = os.path.join('news', 'media_root')
+    os.makedirs(path, exist_ok=True)
+
+    filename = 'news.fb2'
+
+    filepath = os.path.join(path, filename)
 
     fb2 = FB2NewsConverter(items)
     fb2.output(filepath)
@@ -321,7 +326,12 @@ def download_pdf(request, posts):
         items[news['id']]['imageLink'] = news['imageLink']
         items[news['id']]['imageDescription'] = news['imageDescription']
 
-    filepath = os.path.join('news', 'media_root', 'news.pdf')
+    path = os.path.join('news', 'media_root')
+    os.makedirs(path, exist_ok=True)
+
+    filename = 'news.pdf'
+
+    filepath = os.path.join(path, filename)
 
     pdf = PdfNewsConverter(items)
     pdf.add_all_news()
