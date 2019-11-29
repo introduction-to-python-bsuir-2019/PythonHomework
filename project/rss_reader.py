@@ -16,7 +16,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    rss = RSSReader(args)
+    rss = RSSReader(args.source, args.limit, args.verbose, args.date)
     if args.json:
         rss.show_json()
     else:

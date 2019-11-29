@@ -1,18 +1,31 @@
 import sqlite3
-
+from os.path import exists
 
 class Database():
     """docstring for Database"""
 
     def __init__(self):
-        super(ClassName, self).__init__()
+        super(Database, self).__init__()
+        if not exists("cache.db"):
+            conn = sqlite3.connect("cache.db")
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE `feed` (`source` text unique, `name` text)
+                """)
+            cursor.execute("""
+                CREATE TABLE news(source text, 
+                date text, title text, link text, 
+                description text, links text)
+                """)
+            conn.commit()
+            conn.close()
         self.conn = None
         self.cursor = None
         
 
     def _open(self):
         self.conn = sqllite3.connect("cache.db")
-        self.cursor = conn.cursore()
+        self.cursor = conn.cursor()
 
     def _close(self):
         self.conn.close()

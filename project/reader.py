@@ -6,14 +6,14 @@ from .html_parser import parse_HTML
 from .converter import Converter
 
 
-def output(string, sep=' ', end='\n', flush=False, verbose=True):
+def stdout_write(string, sep=' ', end='\n', flush=False, verbose=True):
     """Output function for singe string but convert &#39; to '"""
     if verbose:
         string = string.replace("&#39;", "'")
         print(string, sep=sep, end=end, flush=flush)
 
 
-def progress(elems, done, length=20):
+def write_progressbar(elems, done, length=20):
     """Take arguments
     elems: count of elements
     done: progress (in elements)
@@ -31,15 +31,15 @@ def progress(elems, done, length=20):
 class RSSReader():
     """RSSReader: Class for reading rss channels.
     Methods:
-    show_news() - output news to stdout
+    show_news() - print news to stdout
     """
 
-    def __init__(self, args):
+    def __init__(self, source, limit, verbose, date):
         super(RSSReader, self).__init__()
-        self.__source = args.source
-        self.__limit = args.limit
-        self.__json = args.json
-        self.__verbose = args.verbose
+        self.__source = source
+        self.__limit = limit
+        self.__verbose = averbose
+        self.__date = date
         self.__text = ""
 
     def __find_news(self):
@@ -48,30 +48,31 @@ class RSSReader():
     def __cache_data(self, column, feed):
         Date = format(pubDate)
         formated_data = [
-            (self.__source, Date, col[0], col[2], col[3], col[4])
-            for col in column]
+            (self.__source, Date, col["title"],
+             col["link"], col["text"], col["links"]) for col in column]
         Database().write_data(formated_data, feed, self.__source)
 
     def __read_news(self):
         """Read data from link"""
         try:
-            output(f"Reading information from {self.__source}", end='...\n', verbose=self.__verbose)
+            stdout_write(f"Reading information from {self.__source}", end='...\n', verbose=self.__verbose)
             with urllib.request.urlopen(self.__source) as rss:
                 bytestr = rss.read()
                 self.__text = bytestr.decode("utf8")
-            output("Complete.", verbose=self.__verbose)
-        except Exception as e:
-            if type(e) is ValueError:
-                output("Error: Can't connect, please try with https://")
-            elif type(e) is urllib.error.URLError:
-                output("Error: Can't connect to web-site, please check URL")
-            else:
-                output("Unknown error")
+            stdout_write("Complete.", verbose=self.__verbose)
+        except ValueError:
+            stdout_write("Error: Can't connect, please try with https://")
+            sys.exit()
+        except urllib.error.URLError:
+            stdout_write("Error: Can't connect to web-site, please check URL")
+            sys.exit()
+        except Exception:
+            stdout_write("Unknown error")
             sys.exit()
 
     def __parse(self):
         """Parse XML data to python structures"""
-        output("Parsing information...", verbose=self.__verbose)
+        stdout_write("Parsing information...", verbose=self.__verbose)
         xml = parseString(self.__text)
         feed = xml.getElementsByTagName("title")[0].firstChild.data
         items = xml.getElementsByTagName("item")
@@ -85,11 +86,11 @@ class RSSReader():
             counter += 1
             a = item.getElementsByTagName("description")[0].firstChild.data
             text, links = parse_HTML(a)
-            column += [[item.getElementsByTagName("title")[0].firstChild.data,
-                        item.getElementsByTagName("pubDate")[0].firstChild.data,
-                        item.getElementsByTagName("link")[0].firstChild.data,
-                        text,
-                        links]]
+            column += [{"title": item.getElementsByTagName("title")[0].firstChild.data,
+                        "date": item.getElementsByTagName("pubDate")[0].firstChild.data,
+                        "link": item.getElementsByTagName("link")[0].firstChild.data,
+                        "text": text,
+                        "links": links}]
             if self.__verbose:
                 progress(self.__limit, counter)
         self.__cache_data(column, feed)
@@ -104,20 +105,22 @@ class RSSReader():
     def show_news(self):
         """Read and print info in stdout"""
         feed, column = self.__read()
-        output(f"{feed}", end="\n\n")
+        stdout_write(f"{feed}", end="\n\n")
         for news in column:
-            output(f"Title: {news[0]}")
-            output(f"Date: {news[1]}")
-            output(f"Link: {news[2]}", end="\n\n")
-            output(news[3], end="\n\n")
-            if len(news[4]) != 0:
-                output("Links:")
-            for i in range(len(news[4])):
-                output(f"[{i+1}]: {news[4][i]}")
-            output("\n\n")
+            stdout_write(f"Title: {news["title"]}")
+            stdout_write(f"Date: {news["date"]}")
+            stdout_write(f"Link: {news["link"]}", end="\n\n")
+            stdout_write(news["text"], end="\n\n")
+            if len(news["links"]) != 0:
+                stdout_write("Links:")
+            link_num = 1
+            for link in news["links"]:
+                stdout_write(f"[{link_num}]: {link}")
+                link_num += 1
+            stdout_write("\n\n")
 
     def show_json(self):
         """Read, parse, convert into json and print info in stdout"""
         feed, column = self.__read()
-        json = Converter.to_json(feed, column, self.__verbose)
-        output(json)
+        json_text = Converter.to_json(feed, column, self.__verbose)
+        stdout_write(json_text)

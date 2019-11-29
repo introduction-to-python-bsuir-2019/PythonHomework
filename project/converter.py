@@ -1,35 +1,35 @@
-from .reader import output, progress
+from .reader import stdout_write, write_progressbar
 
 
 class Converter():
     """docstring for Converter"""
 
     def to_json(feed, column, verbose):
-        output("Convert to json...", verbose=verbose)
+        stdout_write("Convert to json...", verbose=verbose)
         counter = 0
         if verbose:
-            progress(len(column), counter)
-        json = '{\n  "title": "' + feed + '",\n  "news": ['
+            write_progressbar(len(column), counter)
+        json_text = '{\n  "title": "' + feed + '",\n  "news": ['
         separ = False
         for news in column:
             if separ:
-                json += ','
+                json_text += ','
             separ = True
-            json += '{\n      "title": "' + news[0] + '",'
-            json += '\n      "date": "' + news[1] + '",'
-            json += '\n      "link": "' + news[2] + '",'
-            json += '\n      "description": "' + news[3] + '",'
-            json += '\n      "links": ['
+            json_text += '{\n      "title": "' + news["title"] + '",'
+            json_text += '\n      "date": "' + news["date"] + '",'
+            json_text += '\n      "link": "' + news["link"] + '",'
+            json_text += '\n      "description": "' + news["links"] + '",'
+            json_text += '\n      "links": ['
             links = ""
-            for lin in news[4]:
+            for lin in news["links"]:
                 links += f'\n        "{lin}",'
             if len(links) != 0:
-                json += links[:-1] + "\n      ]"
+                json_text += links[:-1] + "\n      ]"
             else:
-                json += ']'
-            json += "\n    }"
+                json_text += ']'
+            json_text += "\n    }"
             counter += 1
             if verbose:
-                progress(len(column), counter)
-        json += ']\n}'
-        return json
+                write_progressbar(len(column), counter)
+        json_text += ']\n}'
+        return json_text
