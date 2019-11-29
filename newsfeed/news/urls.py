@@ -3,12 +3,12 @@ from django.urls import path
 from .views import (index,
                     rss_source,
                     download_fb2,
+                    download_pdf,
                     PostListView,
                     DatePostListView,
                     RSSPostListView,
                     SearchResultView,
-                    remove_news,
-                    PdfView)
+                    remove_news)
 
 
 urlpatterns = [
@@ -28,7 +28,7 @@ urlpatterns = [
          remove_news,
          name='remove-news'),
     path('render/pdf/<str:posts>',
-         PdfView.as_view(),
+         download_pdf,
          name='to-pdf'),
     path('render/fb2/<str:posts>',
          download_fb2,

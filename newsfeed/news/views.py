@@ -4,16 +4,18 @@ from django.views.generic import ListView, View
 from django.db.utils import IntegrityError
 from django.db.models import Q
 
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 from .forms import GetRSSForm
 from .models import (NewsInfo)
 from .render import Render as PdfRender
 
 from news_feed.rss_reader import NewsReader
-from news_feed.format_converter import FB2NewsConverter
+from news_feed.format_converter import FB2NewsConverter, PdfNewsConverter
 
 import html
+
+import os
 
 
 def index(request):
@@ -232,22 +234,23 @@ def get_news_titles(post_names):
     return names
 
 
-class PdfView(View):
-    """
-        View for rendering pdf
-    """
-
-    def get(self, request, posts):
-        post_names = get_news_titles(posts)
-
-        posts = NewsInfo.objects.filter(title_hash__in=post_names)
-
-        params = {
-            'posts': posts,
-            'request': request
-        }
-
-        return PdfRender.render('pdf/pdf.html', params)
+# TODO: solve problem with cyrillic letters
+# class PdfView(View):
+#     """
+#         View for rendering pdf
+#     """
+#
+#     def get(self, request, posts):
+#         post_names = get_news_titles(posts)
+#
+#         posts = NewsInfo.objects.filter(title_hash__in=post_names)
+#
+#         params = {
+#             'posts': posts,
+#             'request': request
+#         }
+#
+#         return PdfRender.render('pdf/pdf.html', params)
 
 
 def download_fb2(request, posts):
@@ -278,13 +281,54 @@ def download_fb2(request, posts):
         items[news['id']]['imageLink'] = news['imageLink']
         items[news['id']]['imageDescription'] = news['imageDescription']
 
+    filepath = os.path.join('news', 'media_root', 'news.fb2')
+
     fb2 = FB2NewsConverter(items)
-    fb2.output('news.fb2')
+    fb2.output(filepath)
 
-    filename = 'news.fb2'
-
-    with open(filename, 'rb') as f:
+    with open(filepath, 'rb') as f:
         response = HttpResponse(f.read(), content_type=f'file/fb2')
         response['Content-Disposition'] = 'attachment; filename="news.fb2"'
 
         return response
+
+
+def download_pdf(request, posts):
+    """
+    Function for handling "Export to PDF" button
+
+    :param request:
+    :param posts: query name (string)
+    :return: file with pdf
+    """
+
+    post_names = get_news_titles(posts)
+    posts = NewsInfo.objects.filter(title_hash__in=post_names)
+
+    items = dict()
+
+    items.setdefault('title', '')
+
+    for news in posts.values():
+        items['title'] = news['rss_title']
+
+        items.setdefault(news['id'], dict())
+
+        items[news['id']]['title'] = news['title']
+        items[news['id']]['link'] = news['link']
+        items[news['id']]['pubDate'] = news['pubDate']
+        items[news['id']]['description'] = news['description']
+        items[news['id']]['imageLink'] = news['imageLink']
+        items[news['id']]['imageDescription'] = news['imageDescription']
+
+    filepath = os.path.join('news', 'media_root', 'news.pdf')
+
+    pdf = PdfNewsConverter(items)
+    pdf.add_all_news()
+    pdf.output(filepath, 'F')
+
+    response = FileResponse(open(filepath, 'rb'),
+                            content_type='application/pdf',
+                            filename="somefilename.pdf")
+
+    return response
