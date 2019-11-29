@@ -11,6 +11,7 @@ class Converter:
         self.log=log
 
     def pdf_converter(self,entries):
+        self.log.info("Converter in pdf format")
         pdf = fpdf.FPDF()
         pdf.add_page()
         pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
@@ -29,9 +30,25 @@ class Converter:
             pdf.ln(10)
         pdf.output(self.args.to_pdf)
         print(self.args.to_pdf)
-        
+
+    def html_converter(self, entries):
+        self.log.info("Converter in html format")
+        with open(self.args.to_html, "w", encoding="utf-8") as file_text:
+            file_text.write("<html>")
+            file_text.write("<body>")
+            file_text.write("<p>")
+            for thefeedentry in entries:
+                file_text.write("{}<br />".format(thefeedentry['Title']))
+                file_text.write("<a href = "">{}</a><br />".format(thefeedentry['Links']['News']))
+                file_text.write("<img src= {} > <br />".format(thefeedentry['Links']['Image']))
+                file_text.write("{} <br />".format(thefeedentry['Discription']))
+                file_text.write("{} <br /><br />".format(thefeedentry['Date']))
+            file_text.write("</p>")
+            file_text.write("</body>")
+            file_text.write("</html>")
+
     def get_path_image(self, thefeedentry):
-        self.log.info("Getting image name")
+        self.log.info("Getting path image")
         file_name_list = self.args.source.split("//")
         file_name = file_name_list[1].replace("/", "")
         folder_path = "image_" + file_name + os.path.sep
@@ -39,7 +56,6 @@ class Converter:
             self.log.info('Creating directory images')
             os.mkdir(folder_path)        
         img = thefeedentry['Links']['Image']
-        #print(img)
         image = img.split("/")
         file_path = os.path.abspath('') + os.path.sep + folder_path + image[-1]
         if ".jpg" or ".gif" or ".png" in file_path:

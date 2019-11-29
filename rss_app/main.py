@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 
 
-__version__="0.3.0"
+__version__="0.4.0"
 
 def get_args():        
     parser=argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
@@ -15,7 +15,10 @@ def get_args():
     parser.add_argument("--verbose", action="store_true", help="Outputs verbose status messages")
     parser.add_argument("--limit", type=int, default=None, help="Limit news topics if this parameter provided")
     parser.add_argument("--date", type=str, help="For example: --date 20191020")
-    parser.add_argument("--to-pdf",type=str, help="This argument receives the path where new file will be saved in format pdf")
+    parser.add_argument("--to-pdf", type=str, help='This argument receives the path where new file will be saved in format pdf.' + 
+                        'For example: --to-pdf d:/news.pdf')
+    parser.add_argument("--to-html", type=str, help="This argument receives the path where new file will be saved in format html." +
+                        "For example: --to-html d:/news.html")
     args = parser.parse_args()
     return args
 
@@ -31,8 +34,11 @@ def main():
     converter=Converter(args, logger)
     news=rssobject.get_news()
     if args.to_pdf:
-        news_for_converter=rssobject.get_news_for_converter() 
-        converter.pdf_converter(news_for_converter)
+        news_for_converter_pdf=rssobject.get_news_for_converter() 
+        converter.pdf_converter(news_for_converter_pdf)
+    if args.to_html:
+        news_for_converter_html=rssobject.get_news_for_converter() 
+        converter.html_converter(news_for_converter_html)
     if args.date:
         try:
             datetime.strptime(args.date, "%Y%m%d")

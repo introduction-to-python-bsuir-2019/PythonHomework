@@ -23,36 +23,22 @@ class RssAggregator():
     def print_news(self, entries):
         self.log.info("Printing news")      
         for thefeedentry in entries:
-            print("--------------------------------------------------")        
-            print("Title: ", thefeedentry.title)
-            print("Date: ", thefeedentry.published, end="\n\n")                    
-            print("Alt image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'])
-            print(BeautifulSoup(thefeedentry.description, "html.parser").text, end="\n\n")
-            print("Links:")
-            print("News: ", thefeedentry.link)
-            print("Image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
+            try:
+                print("--------------------------------------------------")        
+                print("Title: ", thefeedentry.title)
+                print("Date: ", thefeedentry.published, end="\n\n")                    
+                print("Alt image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'])
+                print(BeautifulSoup(thefeedentry.description, "html.parser").text, end="\n\n")
+                print("Links:")
+                print("News: ", thefeedentry.link)
+                print("Image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
+            except TypeError:
+                self.log.info("TypeError: 'NoneType'")
 
     def print_json(self, entries):
         self.log.info("RSS news to json")
         for thefeedentry in entries:
-            news={
-                "Title": thefeedentry.title,
-                "Date": thefeedentry.published,
-                "Alt image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'],
-                "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text,
-                "Links":{
-                    "News": thefeedentry.link,
-                    "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
-                }                
-            } 
-            print(json.dumps(news, indent=3))
-
-    def save_to_json_file(self,entries):
-        self.log.info("Save news to json file")
-        news_list = list()
-        file_name = self.get_file_name()
-        with open(file_name, "w", encoding="utf-8") as write_file:
-            for thefeedentry in entries:
+            try:
                 news={
                     "Title": thefeedentry.title,
                     "Date": thefeedentry.published,
@@ -61,10 +47,33 @@ class RssAggregator():
                     "Links":{
                         "News": thefeedentry.link,
                         "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
+                    }                
+                } 
+                print(json.dumps(news, indent=3))
+            except TypeError:
+                self.log.info("TypeError: 'NoneType'")
+
+    def save_to_json_file(self,entries):
+        self.log.info("Save news to json file")
+        news_list = list()
+        file_name = self.get_file_name()
+        with open(file_name, "w", encoding="utf-8") as write_file:
+            for thefeedentry in entries:
+                try:
+                    news={
+                        "Title": thefeedentry.title,
+                        "Date": thefeedentry.published,
+                        "Alt image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'],
+                        "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text,
+                        "Links":{
+                            "News": thefeedentry.link,
+                            "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
+                        }
                     }
-                }
-                self.save_image(thefeedentry, file_name)
-                news_list.append(news)
+                    self.save_image(thefeedentry, file_name)
+                    news_list.append(news)
+                except TypeError:
+                    self.log.info("TypeError: 'NoneType'")                             
             json.dump(news_list, write_file, indent=3)
 
     def get_file_name(self):

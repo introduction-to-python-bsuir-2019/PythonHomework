@@ -2,3 +2,4 @@ bs4 # for xml and html
 feedparser # rss parsing
 requests # http requests
 python-dateutil
+fpdf
