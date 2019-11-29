@@ -111,27 +111,60 @@ def main():
                 logger.error(error_message)
                 if not args.verbose:
                     print_message(error_message, is_error=True)
+
     if not is_error:
+
         if args.json:
+
             print_json(rss_news, 2)
             logger.info(f'{rss_news.get_count()} news were displayed in the console in json format')
-        else:
-            if args.to_html:
-                try:
-                    html_converter.convert_news_to_html(rss_news, args.to_html)
-                    logger.info(f'{rss_news.get_count()} news were converted to HTML ({args.to_html})')
-                except Exception as e:
-                    logger.error(e)
-            if args.to_pdf:
-                try:
-                    pdf_converter.convert_news_to_pdf(rss_news, args.to_pdf)
-                    logger.info(f'{rss_news.get_count()} news were converted to PDF ({args.to_pdf})')
-                except Exception as e:
-                    logger.error(e)
 
-            if not args.to_html and not args.to_pdf:
-                print(rss_news)
-                logger.info(f'{rss_news.get_count()} news were displayed in the console')
+        elif not args.to_html and not args.to_pdf:
+
+            print(rss_news)
+            logger.info(f'{rss_news.get_count()} news were displayed in the console')
+
+        if args.to_html:
+
+            if os.path.isdir(args.to_html):
+                msg = f'Invalid path: "{args.to_html}" is a directory'
+                logger.error(msg)
+                if not args.verbose:
+                    print_message(msg, is_error=True)
+            else:
+                path_to_output_dir = os.path.dirname(args.to_html)
+                if os.path.isdir(path_to_output_dir):
+                    try:
+                        html_converter.convert_news_to_html(rss_news, args.to_html)
+                        logger.info(f'{rss_news.get_count()} news were converted to HTML ({args.to_html})')
+                    except Exception as e:
+                        logger.error(e)
+                else:
+                    msg = f'Directory "{path_to_output_dir}" does not exists'
+                    logger.error(msg)
+                    if not args.verbose:
+                        print_message(msg, is_error=True)
+
+        if args.to_pdf:
+
+            if os.path.isdir(args.to_pdf):
+                msg = f'Invalid path: "{args.to_pdf}" is a directory'
+                logger.error(msg)
+                if not args.verbose:
+                    print_message(msg, is_error=True)
+            else:
+                path_to_output_dir = os.path.dirname(args.to_pdf)
+                if os.path.isdir(path_to_output_dir):
+                    try:
+                        pdf_converter.convert_news_to_pdf(rss_news, args.to_pdf)
+                        logger.info(f'{rss_news.get_count()} news were converted to PDF ({args.to_pdf})')
+                    except Exception as e:
+                        logger.error(e)
+                else:
+                    msg = f'Directory "{path_to_output_dir}" does not exists'
+                    logger.error(msg)
+                    if not args.verbose:
+                        print_message(msg, is_error=True)
 
     try:
         cache.dump()
