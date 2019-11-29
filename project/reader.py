@@ -45,8 +45,12 @@ class RSSReader():
     def __find_news(self):
         pass
 
-    def __cache_data(self):
-        pass
+    def __cache_data(self, column, feed):
+        Date = format(pubDate)
+        formated_data = [
+            (self.__source, Date, col[0], col[2], col[3], col[4])
+            for col in column]
+        Database().write_data(formated_data, feed, self.__source)
 
     def __read_news(self):
         """Read data from link"""
@@ -88,7 +92,7 @@ class RSSReader():
                         links]]
             if self.__verbose:
                 progress(self.__limit, counter)
-        self.__cache_data(column)
+        self.__cache_data(column, feed)
         return feed, column
 
     def __read():
