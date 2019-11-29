@@ -1,5 +1,6 @@
 import argparse
 from rss_app.RSS import RssAggregator
+from rss_app.converter import Converter
 import logging
 from datetime import datetime
 
@@ -14,6 +15,7 @@ def get_args():
     parser.add_argument("--verbose", action="store_true", help="Outputs verbose status messages")
     parser.add_argument("--limit", type=int, default=None, help="Limit news topics if this parameter provided")
     parser.add_argument("--date", type=str, help="For example: --date 20191020")
+    parser.add_argument("--to-pdf",type=str, help="This argument receives the path where new file will be saved in format pdf")
     args = parser.parse_args()
     return args
 
@@ -26,7 +28,11 @@ def main():
     else:
         logger = logging.getLogger()
     rssobject=RssAggregator(args, logger)
-    news=rssobject.get_news() 
+    converter=Converter(args, logger)
+    news=rssobject.get_news()
+    if args.to_pdf:
+        news_for_converter=rssobject.get_news_for_converter() 
+        converter.pdf_converter(news_for_converter)
     if args.date:
         try:
             datetime.strptime(args.date, "%Y%m%d")
