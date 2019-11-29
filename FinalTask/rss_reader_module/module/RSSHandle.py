@@ -28,11 +28,13 @@ class RssHandler:
 
     def url_handler(self):
         """Takes URL and return rss object"""
+
         self.feed = feedparser.parse(self.url)
         logging.info("RSS-Feed was parsed.")
 
     def rss_dict(self):
         """Make dictionary from RSS-Feed"""
+
         self.feed_dict['source'] = self.feed['feed']['title']
         self.feed_dict['news'] = []
 
@@ -48,8 +50,8 @@ class RssHandler:
 
     def to_json(self, limit):
         """Make JSON file from RSS"""
+
         json_dict = self.feed_dict.copy()
-        json_dict['news']
         if limit is not None:
             del(json_dict['news'][limit:])
         self.json_feed = json.dumps(json_dict, cls=SetEncoder)
@@ -57,6 +59,7 @@ class RssHandler:
 
     def output(self, json_param, limit):
         """Outputs information in stdout"""
+
         logging.info('Printing RSS-Feed in stdout.')
         if not json_param:
             print(f"\nFeed: {self.feed_dict['source']}")
@@ -88,6 +91,7 @@ class CacheControl:
         self.conn = None
         self.cursor = None
         self.date = date
+        self.cache_dict = {'Date':self.date, 'news':[]}
 
     def connect_db(self):
         dbpath = os.path.join(os.path.dirname(__file__), 'newscache.db')
@@ -97,6 +101,7 @@ class CacheControl:
 
     def _table_exists(self, tbl_name):
         """Check if table exists"""
+
         self.connect_db()
         logging.info('Checking if table exists.')
         self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tbl_name])
@@ -108,11 +113,12 @@ class CacheControl:
             return True
 
         self.conn.commit()
-        logging.info('Closing connection with database')
+        logging.info('Closing connection with database.')
         self.conn.close()
 
     def insert_values(self, tbl_name, values):
         """Inserts values into the table"""
+
         self.connect_db()
         if len(values) != 7:
             raise KeyError(f'Given {len(values)} params, but expected 7!')
@@ -129,25 +135,34 @@ class CacheControl:
                                 VALUES(?,?,?,?,?,?,?)""", values)
 
         self.conn.commit()
-        logging.info('Closing connection with database')
+        logging.info('Closing connection with database.')
         self.conn.close()
 
-    def cache_output(self, limit):
-        "Outputs news from cache in stdout."
+    def cache_output(self, limit, json_param):
+        """Outputs news from cache in stdout."""
+
         self.date = 'date' + self.date
         if not self._table_exists(self.date):
             raise KeyError('There is no cache for this date!')
         elif self.date is None:
-            raise TypeError('Date is required for this iperation!')
+            raise TypeError('Date is required for this operation!')
 
         logging.info('Printing RSS-Feed in stdout.')
         self.cursor.execute(f"SELECT * FROM {self.date} ORDER BY puBtime")
         feed_list = self.cursor.fetchall()
-        print(f'\nDate: {parse(self.date[4:]).date()}\n')
-        for row in feed_list:
-            if feed_list.index(row) == limit:
-                break
-            print(f"""
+        if json_param:
+            for row in feed_list:
+                self._cache_to_dict(self.date, row)
+            print(self.cache_to_json(limit))
+            logging.info('Printing JSON object created from RSS-Feed in stdout.')
+            print()
+
+        else:
+            print(f'\nDate: {parse(self.date[4:]).date()}\n')
+            for row in feed_list:
+                if feed_list.index(row) == limit:
+                    break
+                print(f"""
 Title: {row[0]}
 Published: {row[1]}
 Feed: {row[6]}
@@ -155,29 +170,58 @@ Source link: {row[5]}
 
 {row[2]}
 
-                  """)
+                    """)
 
-            print('Links:')
-            for (count, link) in enumerate((row[3]+''+row[4]).split()):
-                print(f'[{count + 1}]{link}')
-            print('-'*80)
+                print('Links:')
+                for (count, link) in enumerate((row[3]+''+row[4]).split()):
+                    print(f'[{count + 1}]{link}')
+                print('-'*80)
 
         self.conn.commit()
-        logging.info('Closing connection with database')
+        logging.info('Closing connection with database.')
         self.conn.close()
 
     def _row_exists(self, tbl_name, values):
-        "Check if given row exist"
+        """Check if given row exist."""
+
         self.connect_db()
+        logging.info('Checking if row exists.')
         self.cursor.execute(f"""SELECT * FROM {tbl_name} WHERE title=? AND
                               pubTime=? AND content=? AND other_links=? AND
                                 media_links=? AND src_link=? AND feed=?""", values)
 
         if self.cursor.fetchall() == []:
+            logging.info('Row not exists.')
             return False
         else:
+            logging.info('Row exists.')
             return True
 
         self.conn.commit()
-        logging.info('Closing connection with database')
+        logging.info('Closing connection with database.')
         self.conn.close()
+
+    def _cache_to_dict(self, tbl_name, values):
+        """Convert information from cache in dictionary."""
+
+        logging.info('Creating dictionary from cache output.')
+        self.cache_dict['news'].append({
+                                        'title':values[0],
+                                        'puBtime':values[1],
+                                        'content':values[2],
+                                        'other_links':values[3],
+                                        'media_links':values[4],
+                                        'src_link':values[5],
+                                        'feed':values[6]
+                                        })
+
+    def cache_to_json(self, limit):
+        "Create JSON from cache output"
+
+        json_dict = self.cache_dict.copy()
+        self.cache_dict = None
+        if limit is not None:
+            del(json_dict['news'][limit:])
+        json_feed = json.dumps(json_dict)
+        logging.info('Created JSON object from dictionary.')
+        return json_feed

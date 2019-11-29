@@ -69,7 +69,7 @@ def main():
             cache.insert_values('date'+name, tuple(values.values()))
 
     if args.date is not None:
-        cache.cache_output(args.limit)
+        cache.cache_output(args.limit, args.json)
     else:
         rss_object.output(args.json, args.limit)
 
