@@ -81,10 +81,22 @@ ________________________________________________________________________________
 ____________________________________________________________________________________________________
 ```
 ## Web application usage
-To start web application input next commands:
+To start web application go to newsfeed directory:
 
 ```
 >> cd newsfeed
+```
+
+Make migrations:
+```
+>> python manage.py makemigrations
+>> ...
+>> python manage.py migrate
+>> ...
+```
+
+And after it start server:
+```
 >> python manage.py runserver
 ```
 
