@@ -1,5 +1,5 @@
 You can use pip to install my package. 
-    pip install -i https://test.pypi.org/simple/ rss-reader-euseand==0.36
+    pip install --extra-index-package https://test.pypi.org/simple/ rss-reader-euseand==0.4
 Use it in command prompt with:
     rss-reader --help
 Tested on these rss-feeds:
