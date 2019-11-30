@@ -12,18 +12,23 @@ Pure Python command-line RSS reader.
 positional arguments:
   source         RSS URL
 
-optional arguments:
-  -h, --help     show this help message and exit
-  --version      Print version info
-  --json         Print result as JSON in stdout
-  --verbose      Outputs verbose status messages
-  --limit LIMIT  Limit news topics if this parameter provided
-  --date DATE    Take a date in %Y%m%d format. The news from the specified day
-                 will be printed out.
+ooptional arguments:
+  -h, --help         show this help message and exit
+  --version          Print version info
+  --json             Print result as JSON in stdout
+  --verbose          Outputs verbose status messages
+  --limit LIMIT      Limit news topics if this parameter provided
+  --date DATE        Take a date in %Y%m%d format. The news from the specified
+                     day will be printed out.
+  --to-html TO_HTML  Convert news into html and print in stdout. Argument
+                     receives the path where new file will be saved.
+  --to-fb2 TO_FB2    Convert news into fb2 and print in stdout. Argument
+                     receives the path where new file will be saved.
+
 </pre>
 
 ## News caching
-The RSS news are stored in a local storage while reading. Local storage is implemented using shelve. The cached news are stored by key which consists of date and RSS URL. The cashed news can be read with optional argument --date.
+The RSS news are stored in a local storage while reading. Local storage is implemented using shelve. The cached news are dicts with the news itself and its row (html) description which are stored by key. Key consists of date and RSS URL. The cashed news can be read with optional argument --date.
 
 ## JSON structure
 <pre>

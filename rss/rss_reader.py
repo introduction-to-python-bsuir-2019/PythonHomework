@@ -23,9 +23,9 @@ def add_args(parser):
     parser.add_argument('--limit', help='Limit news topics if this parameter provided', type=int)
     parser.add_argument('--date', help="""Take a date in %%Y%%m%%d format.
                          The news from the specified day will be printed out.""", type=str)
-    parser.add_argument('--to-html', help="""Convers news into html and print in stdout.
+    parser.add_argument('--to-html', help="""Convert news into html and print in stdout.
                         Argument receives the path where new file will be saved.""", type=str)
-    parser.add_argument('--to-fb2', help="""Convers news into fb2  and print in stdout.
+    parser.add_argument('--to-fb2', help="""Convert news into fb2  and print in stdout.
                         Argument receives the path where new file will be saved.""", type=str)
     return parser
 
