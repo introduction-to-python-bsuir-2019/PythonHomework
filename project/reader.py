@@ -50,9 +50,7 @@ class RSSReader():
     def __cache_data(self, column, feed):
         """Take parsed data and write it to database"""
         stdout_write("Writing data to database...", verbose=self.__verbose)
-
-        def date(pubDate): return dateutil.parser.parse(
-            pubDate).strftime("%Y%m%d")
+        date = lambda pubDate: dateutil.parser.parse(pubDate).strftime("%Y%m%d")
         formated_data = [
             (self.__source, date(col["date"]), col["title"],
              col["link"], col["text"], "\n".join(col["links"])) for col in column]
