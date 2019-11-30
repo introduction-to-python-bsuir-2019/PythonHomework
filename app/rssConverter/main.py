@@ -8,9 +8,11 @@ from app.rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDat
 from app.rssConverter.DataSafer import NewsGetterSafer
 from app.rssConverter.NewsPrinter import NewsPinter
 from app.rssConverter.HtmlConverter import HtmlConverter
+from app.rssConverter.FB2Converter import FB2Converter
 
 
 def main():
+    """Program logic"""
     parser = argparse.ArgumentParser(description='Rss reader', add_help=True)
     log_file = 'rss_converter.log'
     parser = args_adding(parser)
@@ -36,11 +38,16 @@ def main():
                 logger.info("print json")
                 NewsPinter.in_json_format(news_list, args.limit)
                 logger.info("json is printed")
-            if args.html:
+            if args.to_html:
                 image_dir = creating_image_dir(logger)
                 html_converter = HtmlConverter(image_dir, news_list)
-                html_converter.create_html_file(args.html)
+                html_converter.create_html_file(args.to_html)
                 html_converter.parse_news()
+            if args.to_fb2:
+                image_dir = creating_image_dir(logger)
+                fb2_converter = FB2Converter(image_dir, news_list)
+                fb2_converter.create_fb2_file(args.to_fb2)
+                fb2_converter.parse_news()
             else:
                 NewsPinter.print_news(news_list, args.limit)
                 logger.info("news are printed")
@@ -72,6 +79,7 @@ def main():
 
 
 def creating_image_dir(logger):
+    """Creating dir for saving images"""
     current_dir = os.getcwd()
     image_path = os.path.join(current_dir, 'images')
     if not os.path.exists(image_path):
@@ -83,6 +91,7 @@ def creating_image_dir(logger):
 
 
 def set_logger(log_file):
+    """Set program logger"""
     open(log_file, 'w').close()  # cleaning log file
     logger = logging.getLogger('rss_converter')
     file_handler = logging.FileHandler(log_file)
@@ -94,6 +103,7 @@ def set_logger(log_file):
 
 
 def args_adding(parser):
+    """adding command line arguments"""
     parser.add_argument(
         'url',
         help='url address'
@@ -129,6 +139,12 @@ def args_adding(parser):
     )
     parser.add_argument(
         '--to-html',
+        type=str,
+        help='Address, at which you want to save file'
+    )
+
+    parser.add_argument(
+        '--to-fb2',
         type=str,
         help='Address, at which you want to save file'
     )

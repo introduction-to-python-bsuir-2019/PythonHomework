@@ -2,9 +2,10 @@ from app.rssConverter.Exeptions import IncorrectLimit
 
 
 class NewsPinter:
+    """Class for printing news in simple and json format"""
 
     @staticmethod
-    def get_limited_news( dict_list, limit):
+    def get_limited_news(dict_list, limit):
         news_quantity = len(dict_list)
         if limit is None:
             limit = news_quantity
@@ -14,6 +15,7 @@ class NewsPinter:
 
     @staticmethod
     def print_news(news_list, limit=None):
+        """printing news in readable form"""
         news_list = NewsPinter.get_limited_news(news_list, limit)
         for new in news_list:
             for key, item in new.items.items():
@@ -32,6 +34,7 @@ class NewsPinter:
 
     @staticmethod
     def in_json_format(news_list, limit):
+        """Writing news in json format"""
         news_list = NewsPinter.get_limited_news(news_list, limit)
         json_str = '{'
         json_str += ' ' + '"news":'
@@ -63,4 +66,5 @@ class NewsPinter:
 
     @staticmethod
     def to_str_for_json(value):
+        """Converting python string to json string"""
         return '"' + str(value) + '"'

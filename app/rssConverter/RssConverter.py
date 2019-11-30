@@ -5,11 +5,13 @@ from app.rssConverter.Exeptions import RssGetError
 
 
 class RssConverter:
+    """Class for getting and parsing news from internet"""
 
     def __init__(self):
         self.tags = ['link', 'title', 'pubDate', 'published', ]
 
     def get_news(self, url):
+        """Getting new from internet"""
         result = feedparser.parse(url)
         if result.bozo == 0 and result.status == 200:
             return result['entries']
@@ -17,6 +19,7 @@ class RssConverter:
             raise RssGetError("url")
 
     def parse_news(self, dict_list):
+        """Parsing news to list"""
         news_list = []
         for dictionary in dict_list:
             new = New()

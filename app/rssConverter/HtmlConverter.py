@@ -4,6 +4,7 @@ from app.rssConverter.Exeptions import IncorrectAddress
 
 
 class HtmlConverter:
+    """Class for converting in html format"""
 
     def __init__(self, image_dir, news):
         self.html_template = '<h2>{title}</h2> <a href= {link} >Full news link</a>' \
@@ -16,12 +17,14 @@ class HtmlConverter:
         self.file_name = None
 
     def create_html_file(self, address):
+        """html file creation"""
         try:
             self.file_name = os.path.join(address, "news.html")
         except Exception:
             raise IncorrectAddress(address)
 
     def parse_news(self):
+        """Writing news to html file"""
         with open(self.file_name, "w") as f:
             f.write(self.html_start)
             for new in self.news:
