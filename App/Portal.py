@@ -5,7 +5,6 @@ from App.Errors import FatalError
 from App.News import News
 from App.ToHtml import ToHtml
 from App.ToPDF import ToPDF
-import traceback
 
 
 class Portal:
