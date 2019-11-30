@@ -1,0 +1,25 @@
+version: '3'
+services:
+ web:
+   build: .
+   command: python manage.py runserver 0.0.0.0:8000
+   ports:
+    - "8000:8000"
+   volumes:
+    - .:/code
+#   links:
+   depends_on:
+    - db
+
+ db:
+    image: "keinos/sqlite3:latest"
+#    stdin_open: true
+#    tty: true
+#    volumes:
+#      - ./db/:/root/db/
+
+#   image: postgres
+#   ports:
+#     - "5432:5432"
+#   environment:
+#     POSTGRES_PASSWORD: hunter2
