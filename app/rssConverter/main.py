@@ -34,10 +34,6 @@ def main():
                 logger.info("parsed rss to news list")
                 NewsGetterSafer.save_data(args.url, news_list, datetime.today().strftime('%Y%m%d'))
                 logger.info("news saved")
-            if args.json:
-                logger.info("print json")
-                NewsPinter.in_json_format(news_list, args.limit)
-                logger.info("json is printed")
             if args.to_html:
                 image_dir = creating_image_dir(logger)
                 html_converter = HtmlConverter(image_dir, news_list)
@@ -48,6 +44,10 @@ def main():
                 fb2_converter = FB2Converter(image_dir, news_list)
                 fb2_converter.create_fb2_file(args.to_fb2)
                 fb2_converter.parse_news()
+            if args.json:
+                logger.info("print json")
+                NewsPinter.in_json_format(news_list, args.limit)
+                logger.info("json is printed")
             else:
                 NewsPinter.print_news(news_list, args.limit)
                 logger.info("news are printed")

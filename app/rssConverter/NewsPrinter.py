@@ -19,7 +19,7 @@ class NewsPinter:
         news_list = NewsPinter.get_limited_news(news_list, limit)
         for new in news_list:
             for key, item in new.items.items():
-                if key == 'images' or key == 'links':
+                if key == 'links':
                     print("\n")
                     print(key)
                     for href in item:
@@ -67,4 +67,5 @@ class NewsPinter:
     @staticmethod
     def to_str_for_json(value):
         """Converting python string to json string"""
+        value = value.replace('"', "'")
         return '"' + str(value) + '"'
