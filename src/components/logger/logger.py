@@ -3,6 +3,7 @@ import logging
 import logging.config
 import yaml
 from src.components.helper.singleton import Singleton
+import coloredlogs
 
 
 class Logger(Singleton):
@@ -10,12 +11,24 @@ class Logger(Singleton):
     logger_name = 'standard'
 
     @classmethod
-    def initialize(cls):
+    def initialize(cls, is_colorize):
+
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),'conf.yml'), 'r') as file:
             config = yaml.safe_load(file.read())
             logging.config.dictConfig(config)
 
         cls._logger = logging.getLogger(cls.logger_name)
+
+        if is_colorize:
+            coloredlogs.install(
+                fmt='%(asctime)s - %(message)s',
+                datefmt='%H:%M:%S',
+                field_styles={
+                    'message' : dict(color='green'),
+                    'asctime' : dict(color='red'),
+                },
+                level='DEBUG', logger=cls._logger
+            )
 
     @classmethod
     def log(cls, message: str):

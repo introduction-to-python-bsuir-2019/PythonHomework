@@ -4,9 +4,12 @@ from .components.feed import *
 from .components.logger.logger import Logger
 import conf
 
+
+
 class App(Singleton):
 
     def __init__(self) -> None:
+
         console = Parser(
             'Pure Python command-line RSS reader.',
             conf.__description__
@@ -15,7 +18,7 @@ class App(Singleton):
         self._console_args = console.get_args()
 
         if self._console_args.verbose:
-            Logger.initialize()
+            Logger.initialize(self._console_args.colorize)
 
         self._feed = Feed(self._console_args)
 

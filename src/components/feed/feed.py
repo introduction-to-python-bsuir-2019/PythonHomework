@@ -11,6 +11,7 @@ class Feed:
 
     def __init__(self, args):
         self._is_json = args.json
+        self._is_colorize = args.colorize
         self._cache_date = args.date
         self._limit = args.limit
         self._url = args.source
@@ -27,7 +28,7 @@ class Feed:
             Logger.log_error('Limit must be up to zero')
             raise ValueError('limit equal or less 0')
 
-        if not Cache().get_specify_by_date(self._cache_date, self._limit):
+        if self._cache_date and not Cache().get_specify_by_date(self._cache_date, self._limit):
             raise Exception(f'There is no cached news '
                             f'{self._cache_date.strftime("from %d, %b %Y")}'
                             f'{(self._cache_date + timedelta(days=1)).strftime(" to %d, %b %Y")}')
@@ -40,7 +41,10 @@ class Feed:
         FeedFormatter.is_json = self._is_json
 
         output = FeedFormatter.generate_output(
-            self._decide_output(), self._limit, self._feeds_title
+            self._decide_output(),
+            self._limit,
+            self._feeds_title,
+            self._is_colorize
         )
 
         print(output)
