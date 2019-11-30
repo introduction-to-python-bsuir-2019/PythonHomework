@@ -121,9 +121,9 @@ rss_reader/storage
 
 # pdf & html files
 *.pdf
-
+rss_reader/my_html.html
 
 # Unused files
-rss_reader/utils/dejavu_font/DejaVuSansCondensed.cw127.pkl
-rss_reader/utils/dejavu_font/DejaVuSansCondensed.pkl
+static_files/dejavu_font/DejaVuSansCondensed.cw127.pkl
+static_files/dejavu_font/DejaVuSansCondensed.pkl
 rss_reader/utils/no_imagepng.png

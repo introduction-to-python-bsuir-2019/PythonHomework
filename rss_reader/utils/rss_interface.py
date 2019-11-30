@@ -82,7 +82,7 @@ class RssBotInterface(metaclass=ABCMeta):
         :return: News
         """
 
-    def _store_news(self) -> None:
+    def store_news(self) -> None:
         """Method stores news to DB"""
         if self.news.feed.find('Stored news from date') >= 0:
             return

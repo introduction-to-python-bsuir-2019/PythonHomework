@@ -26,11 +26,11 @@
 <h3>Please, choose one of these case of feeds:</h3>
 <ul>
     <li>
-        <a href="{{url_for('get_news', url='https://news.tut.by/rss/index.rss')}}">'https://news.tut.by/rss/index.rss'</a>
+        <a href="{{url_for('get_news', url='https://news.tut.by/rss/index.rss')}}">https://news.tut.by/rss/index.rss</a>
     </li>
-    <li><a href="{{url_for('get_news', url='https://news.google.com/news/rss')}}">'https://news.google.com/news/rss'</a>
+    <li><a href="{{url_for('get_news', url='https://news.google.com/news/rss')}}">https://news.google.com/news/rss</a>
     </li>
-    <li><a href="{{url_for('get_news', url='https://news.yahoo.com/rss/')}}">'https://news.yahoo.com/rss/'</a></li>
+    <li><a href="{{url_for('get_news', url='https://news.yahoo.com/rss/')}}">https://news.yahoo.com/rss/</a></li>
 </ul>
 <h3>Or use the form to download preferred news:</h3>
 <form action="{{url_for('get_news')}}" method="POST">

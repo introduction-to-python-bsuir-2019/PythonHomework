@@ -16,7 +16,7 @@ from ..utils.exceptions import RssException, RssValueException
 class PdfWriter(IConverter):
     """Class to convert news into pdf format"""
 
-    djvu_font_path = Path('utils/dejavu_font/DejaVuSansCondensed.ttf')
+    djvu_font_path = Path('../static_files/dejavu_font/DejaVuSansCondensed.ttf')
 
     def __init__(self, logger: Logger):
         self.row_space = 5
@@ -152,7 +152,7 @@ class PdfWriter(IConverter):
             self.pdf.add_font('DejaVu', '', self.djvu_font_path, uni=True)
             self.pdf.set_font('DejaVu', '', self.font_size)
         except RuntimeError as ex:
-            raise RssValueException(f'Try to use another font ttf file.\n{ex}')
+            raise RssValueException(f'Cwd: {Path.cwd()}\nTry to use another font ttf file.\n{ex}')
 
     def _text_color_blue(self) -> None:
         """Set blue text color"""
