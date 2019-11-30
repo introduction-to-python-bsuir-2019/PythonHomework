@@ -6,8 +6,6 @@ import logging
 
 
 class Article:
-    logger = logging.getLogger('__main__.py')
-
     def __init__(self, title, date, text, link, hrefs):
         self.title = title
         self.date = date

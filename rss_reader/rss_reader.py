@@ -6,13 +6,11 @@ import logging
 from tldextract import extract
 
 from .article import Article
-from .json_format import Json
-from .articles_cache import NewsCacher
+from .json_formatter import NewsJsonFormatter
+from .news_cacher import NewsCacher
 
 
 class Reader:
-    logger = logging.getLogger('__main__.py')
-
     def __init__(self, link, limit, json, date):
         self.link = link
         self.limit = limit
@@ -20,23 +18,23 @@ class Reader:
         self.json = json
         self.hrefs = []
         self.date = date
-        self.json_object = Json()
+        self.json_object = NewsJsonFormatter()
 
         ext_site_name = extract(self.link)
-        site_name = ext_site_name.domain + '.' + ext_site_name.suffix
+        site_name = f'{ext_site_name.domain}.{ext_site_name.suffix}'
         
         self.cacher_object = NewsCacher('cached_news.json', site_name)
 
     def parse_url(self):
         """Get RSS xml-file from url"""
-        self.logger.info('Get RSS XML-file from url')
+        logging.info('Get RSS XML-file from url')
 
         self.feed = feedparser.parse(self.link)
         self.parse_xml(self.feed.entries[:self.limit])
 
     def parse_xml(self, source):
         """Parse xml-file to articles"""
-        self.logger.info('Parse XML-file to articles')
+        logging.info('Parse XML-file to articles')
 
         for item in source:
             content = []
@@ -62,7 +60,7 @@ class Reader:
 
     def articles_to_array(self):
         """Convert articles to array of dicts"""
-        self.logger.info('Convert articles to array of dicts')
+        logging.info('Convert articles to array of dicts')
 
         array = []
         for article in self.articles:
@@ -78,12 +76,16 @@ class Reader:
 
     def print_articles(self):
         """Print articles to console"""
-        self.logger.info('Print articles to console')
+        logging.info('Print articles to console')
 
         if self.json is True:
             print(self.json_object)
         elif self.date != None:  
-            news = self.cacher_object.get_cached_news(self.date, self.limit)
+            try:
+                news = self.cacher_object.get_cached_news(self.date, self.limit)
+            except FileNotFoundError:
+                print('Cache file not found :(')
+                return
 
             if news == []:
                 print('News for this date not found :(')
