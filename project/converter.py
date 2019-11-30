@@ -101,9 +101,12 @@ class Converter():
 
         for news in column:
             image_links = []
+            text_links = []
             for link in news["links"]:
                 if "(image)" in link:
                     image_links += [link[:-8]]
+                else:
+                    text_links += [link[:-7]]
             images = []
             for link in image_links:
                 img_path = download_image(link)
@@ -116,7 +119,7 @@ class Converter():
                                              title=news["title"],
                                              images=images,
                                              date=news["date"],
-                                             description=news["text"],
+                                             description=news["text"] + 'links' + "\n".join(text_links),
                                              feed=feed
                                              )
             fb2_text += article
@@ -131,5 +134,18 @@ class Converter():
         with open(file_path, "w") as file:
             file.write(fb2_text)
 
-    def to_html(self, feed, column, url, sv_path, verbose=False):
-        pass
+    def to_html(self, feed, column, url, sv_path=os.getcwd(), verbose=False):
+        
+        def download_image(url):
+            try:
+                local_name, headers = urllib.request.urlretrieve(url, sv_path + url.split('/')[-1])
+                stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
+                return local_name
+            except (urllib.error.URLError, urllib.error.HTTPError):
+                stdout_write("Error occurred during downloading image")
+                return ""
+            except ValueError:
+                stdout_write("Error: image not found")
+                return ""
+
+

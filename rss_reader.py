@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-from .reader import RSSReader
+from project.reader import RSSReader
 
 
 def parse_arguments():
