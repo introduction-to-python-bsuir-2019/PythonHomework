@@ -63,27 +63,29 @@ class MongoDatabase:
         else:
             self._update_news_feed(data)
 
+    def _check_date_in_database(self, date: int, source: str):
+        logging.info('Date was found in db')
+        return self.feed_collection.find({"Url": source, "Date_Parsed": str(date)}).count() == 1
+
     def get_news(self, limit: int, date: int, source: str) -> Dict[str, Any]:
         """Method for finding news in a database and issuing them according to parameters"""
         logging.info('We get data from the database')
 
+        news_feed = None
         if date is not None:
-            if date > (datetime.datetime.today().strftime("%Y%m%d")):
+            if self._check_date_in_database(date, source):
                 news_feed = self.feed_collection.find_one(
-                    {"Url": source, "Date_Parsed": str(date)}
-                )
+                    {"Url": source, "Date_Parsed": str(date)})
             else:
-                logging.info(f'Data not found in date - {date}')
-                print("Incorrect date")
+                logging.info(f'Incorrect date')
+                print(f'Data not found in date - {date}')
         else:
             news_feed = self.feed_collection.find_one(
                 {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}
             )
+
         if limit is not None:
             if 0 < limit <= len(news_feed["News"]):
                 news_feed["News"] = news_feed["News"][:limit]
-                return news_feed
-            else:
-                return news_feed
-        else:
-            return news_feed
+
+        return news_feed

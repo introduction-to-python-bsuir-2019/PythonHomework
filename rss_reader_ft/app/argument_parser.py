@@ -68,10 +68,7 @@ class ArgumentParser:
 
 
 class ArgParserError(Exception):
-    """The exception class
-    The exception that is thrown when
-    the arguments are entered incorrectly
-    """
+    """The exception class"""
 
     def __init__(self, message):
         self.message = message

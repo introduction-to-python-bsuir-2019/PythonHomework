@@ -4,7 +4,10 @@ import os
 from typing import Dict, Any
 
 import requests
-from fpdf import FPDF
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.pdfbase import pdfmetrics
 
 from rss_reader_ft.conversion.format_converter import FormatConverter
 
@@ -33,58 +36,85 @@ class PdfConverter(FormatConverter):
         If you wonder why he did not support the Russian language, I will answer you,
         because the stars are not on my side and the moon is in the wrong phase,
         I tried to connect the font DejaVuSans.ttf with a friend,
-        but it does not work like several other options that were on the internet. 
+        but it does not work like several other options that were on the internet.
         Therefore, he works only with the Latin alphabet and sometimes there are articles with some data
         that he does not want to convert.
         8:00 AM scream of the soul (((
         """
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font('Arial', 'B', size=18)
 
-        self._edit_line(self.convert_data['Feed'], 18, 'C', 42, pdf)
-        self._edit_line(self.convert_data['Url'], 18, 'C', 42, pdf)
+        pdf_file = canvas.Canvas(file_name, landscape(letter))
+        pdfmetrics.registerFont(TTFont('DVS', 'DejaVuSans.ttf'))
 
-        for count, entry in enumerate(self.convert_data['News']):
+        pdf_file.setFont('DVS', 24, leading=None)
+        pdf_file.drawCentredString(415, 250, self.convert_data['Feed'])
 
-            self._edit_line(entry['Title'], 14, 'C', 42, pdf)
+        pdf_file.setFont('DVS', 24, leading=None)
+        pdf_file.drawCentredString(415, 200, self.convert_data['Url'])
+        pdf_file.showPage()
 
-            self._edit_line(entry['Date'], 14, 'C', 42, pdf)
+        for count, news in enumerate(self.convert_data['News']):
+            y = self._edit_text(pdf_file, 500, news['Title'])
 
-            pdf.cell(w=0, h=8, align="C", txt="Link on News", ln=1, link=entry['Link'])
-
-            for img_link in entry["Links"]["Img_links"]:
-                req = requests.get(img_link)
-                with open(f"{count}.jpg", "w+b") as wf:
+            for img in news["Links"]['Img_links']:
+                req = requests.get(img)
+                with open(f"img{count}.jpg", "w+b") as wf:
                     wf.write(req.content)
+                y -= 210
+                pdf_file.drawImage(f"img{count}.jpg", 300, y, width=200, height=200)
 
-                pdf.set_x(70)
-                pdf.image(f"{count}.jpg", w=70, h=70)
-                os.remove(f"{count}.jpg")
+                os.remove(f"img{count}.jpg")
 
-            self._edit_line(entry['Description'], 16, 'C', 42, pdf)
+            y -= 30
+            pdf_file.setFont('DVS', 18, leading=None)
+            pdf_file.drawCentredString(415, y, news['Date'])
 
-            pdf.add_page()
+            y -= 30
+            y = self._edit_link(pdf_file, y, news['Link'])
 
-        pdf.output(file_name, 'F')
+            y -= 30
+            self._edit_text(pdf_file, y, news['Description'])
+
+            pdf_file.showPage()
+
+        pdf_file.save()
 
     @staticmethod
-    def _edit_line(txt: str, size: int, pos: str, len_l: int, pdf) -> None:
+    def _edit_link(pdf_file, y: int, string: str) -> int:
+        if len(string) >= 80:
+            link_start = string[:50]
+            link_end = string[50:]
 
-        pdf.set_font('Arial', 'B', size=size)
-        split_txt = txt.split(" ")
-        temp_len = 0
-        line = []
+            pdf_file.setFont('DVS', 14, leading=None)
+            pdf_file.drawCentredString(415, y, link_start)
+            y -= 13
 
-        for word in split_txt:
-            if temp_len + len(word) < len_l:
-                line.append(word)
-                temp_len += len(word)
+            pdf_file.setFont('DVS', 14, leading=None)
+            pdf_file.drawCentredString(415, y, link_end)
+        else:
+            pdf_file.setFont('DVS', 14, leading=None)
+            pdf_file.drawCentredString(415, y, string)
+
+        return y
+
+    @staticmethod
+    def _edit_text(pdf_file, y: int, string: str) -> int:
+        if len(string) >= 70:
+            words = string.split(" ")
+            line = ''
+            for word in words:
+                if len(line) < 70:
+                    line = " ".join([line, word])
+                    if len(line) >= 70:
+                        pdf_file.setFont('DVS', 16, leading=None)
+                        pdf_file.drawCentredString(415, y, line)
+                        y -= 13
+                        line = ''
             else:
-                temp_len = 0
-                line.append(word)
-                pdf.cell(w=0, h=8, align=pos, txt=" ".join(line), ln=1)
-                line.clear()
+                pdf_file.setFont('DVS', 16, leading=None)
+                pdf_file.drawCentredString(415, y, line)
+                y -= 13
+        else:
+            pdf_file.setFont('DVS', 16, leading=None)
+            pdf_file.drawCentredString(415, y, string)
 
-        if line:
-            pdf.cell(w=0, h=8, align=pos, txt=" ".join(line), ln=1)
+        return y

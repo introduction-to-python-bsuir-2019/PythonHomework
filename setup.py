@@ -13,7 +13,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.8',
     url="https://github.com/ZayJob/PythonHomework/tree/finalTask",
-    install_requires=["bs4", "feedparser", "pymongo"],
+    install_requires=["bs4", "feedparser", "pymongo", "colored", "requests", "fpdf"],
     entry_points={
         'console_scripts':
             ['rss-reader = rss_reader_ft.__main__:main']

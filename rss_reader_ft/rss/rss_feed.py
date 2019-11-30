@@ -16,7 +16,7 @@ class RSSFeed:
         self.news: List = []
         self.rss_feed_dict: Dict[str, Any] = {}
 
-    def data_processing(self) -> Dict:
+    def data_processing(self) -> Dict[str, Any]:
         """
         Method for converting rss data to a dictionary
         and correcting them,
