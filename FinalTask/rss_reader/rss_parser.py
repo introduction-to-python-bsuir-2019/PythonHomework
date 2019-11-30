@@ -1,10 +1,11 @@
 import feedparser
-from bs4 import BeautifulSoup
 import logging
 import datetime
 import os
 import json
 from collections import namedtuple
+from bs4 import BeautifulSoup
+from fpdf import FPDF
 
 
 class RssParser:
@@ -93,8 +94,9 @@ class RssParser:
         This function parses json cache from cache text file
         :return: None
         """
-        if os.path.exists("news_cache.txt") and os.path.getsize("news_cache.txt") > 0:
-            with open("news_cache.txt", 'r') as cache_file:
+        cache_file_path = os.path.join(os.path.dirname(__file__), "news_cache.txt")
+        if os.path.exists(cache_file_path) and os.path.getsize(cache_file_path) > 0:
+            with open(cache_file_path, 'r') as cache_file:
                 json_cache = json.load(cache_file)
             for feed_instance in json_cache['news']:
                 if feed_instance['url'] == self.url:
@@ -217,6 +219,7 @@ class RssParser:
                         result_string += f'[image {link.id + 1} : {link.alt}][{link.id + 1}]'
                         result_string += f'{article.description}\n\n'
                         break
+                result_string += f'Links:\n'
                 for link in article.links:
                     if link.type == 'image':
                         result_string += f'[{link.id + 1}]: {link.url} ({link.type})\n'
@@ -225,17 +228,42 @@ class RssParser:
                 result_string += f'\n'
             return result_string
 
-    def cache_feed_to_file(self):
+    def feed_to_html(self):
+        result_string = ''
+        result_string += f'<!DOCTYPE html><html><title>rss-feed</title>'
+        result_string += f'<body><h3>Feed: {self.feed}</h3>'
+        for article in self.news:
+            result_string += f'<h4 style="display:inline">Title:</h4><span> {article.title}</span><br>' \
+                             f'<h4 style="display:inline">Date:</h4><span> {article.date}</span><br>' \
+                             f'<h4 style="display:inline">Url:</h4><span> {article.url}</span><br><br>'
+            for link in article.links:
+                if link.type == 'image':
+                    result_string += f'<img src="{link.url}" width="20%"><br><br>'
+                    result_string += f'<span>{article.description}</span><br><br>'
+                    break
+            result_string += f'<span>Links:</span><br>'
+            for link in article.links:
+                if link.type == 'image':
+                    result_string += f'<span>[{link.id + 1}]: </span>' \
+                                     f'<a href="{link.url}">{link.alt}({link.type})</a><br>'
+                else:
+                    result_string += f'<span>[{link.id + 1}]: </span>' \
+                                     f'<a href="{link.url}">{link.url}({link.type})</a><br>'
+            result_string += f'</body></html><br>'
+        return result_string
+
+    def cache_feed_to_text_file(self):
         """
         This function caches current feed to cache text file
         :return: None
         """
-        if not os.path.exists("news_cache.txt"):
-            cache_file = open("news_cache.txt", 'w+')
+        cache_file_path = os.path.join(os.path.dirname(__file__), "news_cache.txt")
+        if not os.path.exists(cache_file_path):
+            cache_file = open(cache_file_path, 'w+')
             cache_file.close()
         json_feed = self.feed_to_json()
-        if os.path.getsize("news_cache.txt") > 0:
-            with open("news_cache.txt", 'r') as cache_file:
+        if os.path.getsize(cache_file_path) > 0:
+            with open(cache_file_path, 'r') as cache_file:
                 json_cache = json.load(cache_file)
                 found = False
                 for feed in json_cache['news']:
@@ -252,16 +280,62 @@ class RssParser:
                 total_cached_news = 0
                 for feed in json_cache['news']:
                     total_cached_news += len(feed['news_objects'])
-            with open("news_cache.txt", 'w') as cache_file:
+            with open(cache_file_path, 'w') as cache_file:
                 json.dump(json_cache, cache_file)
         else:
-            with open("news_cache.txt", 'w') as cache_file:
+            with open(cache_file_path, 'w') as cache_file:
                 json_file_format = {'news': [json_feed]}
                 json.dump(json_file_format, cache_file)
                 cached_news = total_cached_news = len(json_feed['news_objects'])
         if self.verbose:
             self.logger.info(f'{cached_news} online news have been saved in local cache (duplicates were removed)')
             self.logger.info(f'{total_cached_news} online news are cached in the file now')
+
+    def cache_feed_to_html_file(self):
+        cache_file_path = os.path.join(os.path.dirname(__file__), "news_cache.html")
+        if os.path.exists(cache_file_path):
+            with open(cache_file_path, 'w+') as cache_file:
+                cache_file.write(self.feed_to_html())
+        else:
+            cache_file = open(cache_file_path, 'w+')
+            cache_file.close()
+            self.cache_feed_to_html_file()
+
+    def cache_feed_to_pdf_file(self):
+        pdf = FPDF()
+        pdf.add_page()
+        font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'ttf', 'DejaVuSerifCondensed.ttf')
+        pdf.add_font('DejaVu', '', font_path, uni=True)
+        pdf.set_font('DejaVu', '', 14)
+        pdf.set_margins(10, 10, 5)
+        pdf.cell(w=0, h=5, txt=self.feed)
+        pdf.ln()
+        pdf.ln()
+        for article in self.news:
+            pdf.set_font_size(12)
+            pdf.multi_cell(w=0, h=5, txt=f'Title: {article.title}')
+            pdf.multi_cell(w=0, h=5, txt=f'Date: {article.date}')
+            pdf.multi_cell(w=0, h=5, txt=f'Url: {article.url}')
+            pdf.ln()
+            pdf.multi_cell(w=0, h=5, txt=article.description)
+            pdf.ln()
+            pdf.cell(w=0, h=5, txt=f'Links:')
+            pdf.ln()
+            for link in article.links:
+                if link.type == 'image':
+                    pdf.multi_cell(w=0, h=5, txt=f'[{link.id + 1}]: {link.alt} ({link.type})')
+                else:
+                    pdf.multi_cell(w=0, h=5, txt=f'[{link.id + 1}]: {link.url} ({link.type})')
+            pdf.ln()
+            pdf.ln()
+        cache_file_path = os.path.join(os.path.dirname(__file__), "news_cache.pdf")
+        if os.path.exists(cache_file_path):
+            with open(cache_file_path, 'w+') as cache_file:
+                pdf.output(cache_file_path)
+        else:
+            cache_file = open(cache_file_path, 'w+')
+            cache_file.close()
+            self.cache_feed_to_pdf_file()
 
 
 def create_logger(logging_module):

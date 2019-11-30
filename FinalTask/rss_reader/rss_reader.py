@@ -3,7 +3,7 @@ import json
 from .rss_parser import RssParser
 from .rss_parser import create_logger
 
-current_version = 0.36
+current_version = 0.413
 
 
 def main():
@@ -16,15 +16,12 @@ def main():
     parser.add_argument("--limit", help="Limit news topics if this parameter provided", type=int)
     parser.add_argument("--date", help="Write date in %Y%m%d format (example: --date 20191020)"
                                        "to print out cached news for that date", type=str)
+    parser.add_argument("--to-html", help="Cache news to html file in readable format", action="store_true")
+    parser.add_argument("--to-pdf", help="Cache news to pdf file in readable format", action="store_true")
     args = parser.parse_args()
     if args.verbose:
         logger = create_logger('rss-reader')
         logger.info('logging enabled.')
-    if args.version:
-        print(f'Current version: {current_version}')
-        if args.verbose:
-            logger.info('current utility version was printed')
-        exit()
     if args.limit:
         limit = args.limit
         if args.verbose:
@@ -41,7 +38,7 @@ def main():
         online_or_cached += 'cached'
     else:
         my_parser.parse_rss()
-        my_parser.cache_feed_to_file()
+        my_parser.cache_feed_to_text_file()
         online_or_cached += 'online'
     if args.json:
         print(json.dumps(my_parser.feed_to_json(), indent=1))
@@ -53,6 +50,18 @@ def main():
         print(text_feed)
         if args.verbose:
             logger.info(f'{len(my_parser.news)} {online_or_cached} news have been printed')
+    if args.to_html:
+        my_parser.cache_feed_to_html_file()
+        if args.verbose:
+            logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in html file')
+    if args.to_pdf:
+        my_parser.cache_feed_to_pdf_file()
+        if args.verbose:
+            logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in pdf file')
+    if args.version:
+        print(f'Current version: {current_version}')
+        if args.verbose:
+            logger.info('current utility version was printed')
 
 
 if __name__ == '__main__':
