@@ -107,7 +107,11 @@ class HTMLConverter:
             file_name = 'news.html'
             html_code = self.create_html_code()
 
-        file_path = self.args.to_html + os.path.sep + file_name
-        with open(file_path, 'w') as wf:
-            wf.write(html_code)
-        self.logger.info('News has been written to HTML file')
+        try:
+            file_path = self.args.to_html + os.path.sep + file_name
+            with open(file_path, 'w') as wf:
+                wf.write(html_code)
+        except FileNotFoundError:
+            self.logger.info(f'Path to file {file_path} not found')
+        else:
+            self.logger.info('News has been written to HTML file')

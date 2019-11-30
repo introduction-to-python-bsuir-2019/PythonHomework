@@ -10,10 +10,11 @@ file name = date (like 20191125.json)
 * For --to-pdf argument: specify the path to the folder 
 where 'news.pdf/cached_news.pdf' file will be saved.
 The file will be overwritten after restarting the program.
-Make sure to copy that file if you need it. Same thing with --to-html argument
+Make sure to copy that file if you need it. Same thing with --to-html argument.
+Also --to-html uses pictures from websites, so they wont be displayed without
+internet connection
 * Btw i use fonts for .pdf files to avoid encoding issues,
-hope they will be installed correctly
-by 'pip install .'
+hope they will be installed correctly by 'pip install .'
 * P.S. Ля, ребята, 4 курс птуира, уже распред идет во всю, работа нужна кааапец
 
 

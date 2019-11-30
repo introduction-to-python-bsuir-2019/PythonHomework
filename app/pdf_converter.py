@@ -46,10 +46,13 @@ class PDFConverter:
             self.create_cells(new)
             self.pdf.ln(10)
             self.pdf.add_page()
-
-        file_path = self.args.to_pdf + os.path.sep + 'cached_news.pdf'
-        self.pdf.output(file_path)
-        self.logger.info('Cached news has been written to PDF file')
+        try:
+            file_path = self.args.to_pdf + os.path.sep + 'cached_news.pdf'
+            self.pdf.output(file_path)
+        except FileNotFoundError:
+            self.logger.info(f'Path to file {file_path} not found')
+        else:
+            self.logger.info('Cached news has been written to PDF file')
 
     def write_to_pdf(self):
         """ Writes news into PDF file """
@@ -65,10 +68,13 @@ class PDFConverter:
             self.create_cells(new)
             self.pdf.ln(10)
             self.pdf.add_page()
-
-        file_path = self.args.to_pdf + os.path.sep + 'news.pdf'
-        self.pdf.output(file_path)
-        self.logger.info('News has been written to PDF file')
+        try:
+            file_path = self.args.to_pdf + os.path.sep + 'news.pdf'
+            self.pdf.output(file_path)
+        except FileNotFoundError:
+            self.logger.info(f'Path to file {file_path} not found')
+        else:
+            self.logger.info('News has been written to PDF file')
 
     def write_title(self, title):
         """ Writes title of PDF file """
@@ -103,15 +109,21 @@ class PDFConverter:
         if not os.path.exists(directory_path):
             self.logger.info('Creating directory images')
             os.mkdir(directory_path)
+
         img_name = self.create_image_name(img_url)
         try:
             img = urllib.request.urlopen(img_url).read()
         except ValueError:
-            self.logger.info('Failed download')
+            self.logger.info('Failed image download')
             return None
-        img_path = os.path.abspath('') + os.path.sep + directory_path + img_name
-        with open(img_path, "wb") as out:
-            out.write(img)
+
+        try:
+            img_path = os.path.abspath('') + os.path.sep + directory_path + img_name
+            with open(img_path, "wb") as out:
+                out.write(img)
+        except FileNotFoundError:
+            self.logger.info('Could not write image to folder Images')
+        else:
             self.logger.info('Image has been downloaded')
         return img_path
 
