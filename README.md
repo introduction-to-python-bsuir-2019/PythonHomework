@@ -5,10 +5,6 @@ RSS reader is a command-line utility which receives RSS URL and prints results i
 
 ## Specification
 
-**Is used Docker + docker-compose and --to-pdf NOT WORK WITH RU NEWS FEEDS!**
-**If you want check valid or not news feeds for converted, add arg --verbose if he work - PDF file create)))**
-**If PDF not create add arg --limit 1**
-
 Utility provides the following interface:
   + positional arguments:
     + source - RSS URL
