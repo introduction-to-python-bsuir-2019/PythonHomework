@@ -25,7 +25,16 @@
 /home/ilya/snap/test.pdf
 ./test.html
 
+
+## 5 iter
+
+Выполнена
+
 ## Help
 usage: rss-reader [-h] [--version] [--json] [--verbose] [--limit LIMIT]
                   [--date DATE] [--to_html TO_HTML] [--to_pdf TO_PDF]
+                  [--colorize]
                   source
+
+## Install
+python setup.py install
