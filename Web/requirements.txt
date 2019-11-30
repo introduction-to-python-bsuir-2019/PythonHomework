@@ -1,5 +1,0 @@
-beautifulsoup4==4.6.0
-feedparser==5.2.1
-fpdf==1.7.2
-colorize==1.1.0
-sqlparse==0.3.0

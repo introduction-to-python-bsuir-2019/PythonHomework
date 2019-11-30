@@ -1,7 +1,7 @@
 # Desktop-Console-Utility
 ---
 
-## Installation of app
+## Installation of application
 
 You can install utility if you have python3.6 and higher.
 

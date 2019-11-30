@@ -1,6 +1,0 @@
-include requirements.txt
-include web_news_reader/FreeSans.ttf
-include web_news_reader/logger_config.conf
-include web_news_reader/news.db
-include web_news_reader/templates/*
-include web_news_reader/templates/rss_reader/*
