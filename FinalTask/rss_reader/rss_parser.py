@@ -1,10 +1,10 @@
 import feedparser
-from bs4 import BeautifulSoup
 import logging
 import datetime
 import os
 import json
 from collections import namedtuple
+from bs4 import BeautifulSoup
 
 
 class RssParser:
@@ -225,7 +225,30 @@ class RssParser:
                 result_string += f'\n'
             return result_string
 
-    def cache_feed_to_file(self):
+    def feed_to_html(self):
+        result_string = ''
+        result_string += f'<!DOCTYPE html><html><title>rss-feed</title>'
+        result_string += f'<body><h3>Feed: {self.feed}</h3>'
+        for article in self.news:
+            result_string += f'<h4 style="display:inline">Title:</h4><span> {article.title}</span><br>' \
+                             f'<h4 style="display:inline">Date:</h4><span> {article.date}</span><br>' \
+                             f'<h4 style="display:inline">Url:</h4><span> {article.url}</span><br><br>'
+            for link in article.links:
+                if link.type == 'image':
+                    result_string += f'<img src="{link.url}" width="20%"><br><br>'
+                    result_string += f'<span>{article.description}</span><br><br>'
+                    break
+            for link in article.links:
+                if link.type == 'image':
+                    result_string += f'<span>[{link.id + 1}]: </span>' \
+                                     f'<a href="{link.url}">{link.alt}({link.type})</a><br>'
+                else:
+                    result_string += f'<span>[{link.id + 1}]: </span>' \
+                                     f'<a href="{link.url}">{link.url}({link.type})</a><br>'
+            result_string += f'</body></html><br>'
+        return result_string
+
+    def cache_feed_to_text_file(self):
         """
         This function caches current feed to cache text file
         :return: None
@@ -262,6 +285,15 @@ class RssParser:
         if self.verbose:
             self.logger.info(f'{cached_news} online news have been saved in local cache (duplicates were removed)')
             self.logger.info(f'{total_cached_news} online news are cached in the file now')
+
+    def cache_feed_to_html_file(self):
+        if os.path.exists("news_cache.html"):
+            with open("news_cache.html", 'w+') as cache_file:
+                cache_file.write(self.feed_to_html())
+        else:
+            cache_file = open("news_cache.html", 'w+')
+            cache_file.close()
+            self.cache_feed_to_html_file()
 
 
 def create_logger(logging_module):
