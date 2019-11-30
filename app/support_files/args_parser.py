@@ -23,6 +23,7 @@ def get_args() -> Namespace:
                         default=None)
     parser.add_argument("--to_html", metavar="PATH", type=str, help="Save news by path in html format", default=None)
     parser.add_argument("--to_fb2", metavar="PATH", type=str, help="Save news by path in fb2 format", default=None)
+    parser.add_argument("--colorize", action="store_true", help="Make console text display colorful", default=False)
     parser.parse_args()
     args = parser.parse_args()
     return args

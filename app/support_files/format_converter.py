@@ -10,6 +10,7 @@ from typing import List
 from time import strftime, altzone, mktime, localtime, ctime, time, struct_time
 
 import urllib3
+from colored import fg, bg, attr
 
 from app.support_files.dtos import Feed
 from app.support_files.rss_parser import Parser
@@ -36,6 +37,19 @@ def get_templates(template_type: str, template_names: List[str]) -> List[str]:
     return templates
 
 
+def set_length(str_len: str):
+    """
+    Makes text the same length wide,
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            text = textwrap.fill(args[0], width=str_len)
+            result = func(text, *args[1:], **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+
 def get_img_by_url(url: str) -> str:
     """
     Gets img in base64 format by url.
@@ -57,34 +71,51 @@ class Converter:
         self.__feeds = feeds
         self._logger = get_logger(APP_NAME)
 
-    def to_console_format(self, str_len: int = 80) -> str:
+    def to_console_format(self, str_len: int = 80, col_en: bool = False) -> str:
         """
         Convert data to console format.
+        :param col_en: Enable colorizing, if true.
         :param str_len: Length of output strings.
         :return: Converted data.
         """
+        @set_length(str_len)
+        def set_color(text: str, text_color: str, enabled: bool) -> str:
+            """
+            Changes the text_color of the text if enabled is true.
+            :return: Colorized text.
+            """
+            color_str = ""
+            reset = ""
+            if enabled:
+                color_str = f"{fg(text_color)}"
+                reset = f" {attr('reset')}"
+            return color_str + text + reset
         strings = []
-        out_separator = "*" * str_len
-        in_separator = "-" * str_len
+        out_separator = set_color(f"{'*' * str_len}", "green_4", col_en)
+        in_separator = set_color(f"{'-' * str_len}", "chartreuse_3b", col_en)
         for feed in self.__feeds:
             strings.append(out_separator)
-            strings.append(f"Feed: {feed.title}")
+            strings.append(set_color(f"Feed: {feed.title}", "gold_1", col_en))
             for item in feed.items:
                 strings.append(in_separator)
-                strings.append(f"Author: {item.author}")
-                strings.append(f"Published: {convert_date(item.published_parsed)}")
+                strings.append(set_color(f"Author: {item.author}", "light_green_3", col_en))
+                strings.append(set_color(f"Published: {convert_date(item.published_parsed)}", "light_cyan_1", col_en))
                 strings.append("\n")
-                strings.append(f"Title: {item.title}")
-                strings.append(f"Description: {item.description}")
+                strings.append(set_color("Title:", "yellow_3a", col_en))
+                strings.append(set_color(f"\t{item.title}", "gold_1", col_en))
                 strings.append("\n")
-                strings.append(f"Link: {item.link}")
-                strings.append("Image links:")
+                strings.append(set_color("Description:", "yellow_3a", col_en))
+                strings.append(set_color(f"\t{item.description}", "light_green_3", col_en))
+                strings.append("\n")
+                strings.append(set_color("Link:", "yellow_3a", col_en))
+                strings.append(set_color(f"\t{item.link}", "wheat_1", col_en))
+                strings.append(set_color("Image links:", "yellow_3a", col_en))
                 for img_link in item.img_links:
-                    strings.append(f"{img_link}")
+                    strings.append(set_color(f"\t{img_link}", "light_cyan_1", col_en))
                 strings.append(in_separator)
             strings.append(out_separator)
 
-        strings = map(lambda s: textwrap.fill(s, width=str_len) + "\n", strings)
+        strings = map(lambda s: s + "\n", strings)
 
         result_string = functools.reduce(lambda a, b: a + b, strings)
 
@@ -170,4 +201,5 @@ class Converter:
 
 
 if __name__ == "__main__":
-    print(Converter([Parser("https://news.yahoo.com/rss/").parse_feed(items_limit=3)]).to_html_format())
+    print(Converter([Parser("https://news.yahoo.com/rss/").parse_feed(items_limit=1)]).
+          to_console_format(col_en=True, str_len=120))

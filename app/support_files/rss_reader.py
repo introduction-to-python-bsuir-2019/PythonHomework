@@ -34,6 +34,7 @@ class Reader:
         to_json = _args.json
         to_html_path = _args.to_html
         to_fb2_path = _args.to_fb2
+        colorize = _args.colorize
 
         if limit < 1 and limit != -1:
             print("The limit must be -1 or greater than 0")
@@ -98,7 +99,7 @@ class Reader:
                 print(converter.to_json_format(str_len=len_each_line))
             else:
                 logger.info("Data is converted to console format and printing is started")
-                print(converter.to_console_format(str_len=len_each_line))
+                print(converter.to_console_format(str_len=len_each_line, col_en=colorize))
             logger.info("Printing is finished")
         return None
 
