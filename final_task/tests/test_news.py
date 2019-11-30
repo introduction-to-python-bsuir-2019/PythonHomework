@@ -49,7 +49,6 @@ class NewsContentTest(unittest.TestCase):
         for img1, img2 in zip(news_content.images, self.news_content.images):
             self.assertDictEqual(img1.__dict__, img2.__dict__)
 
-
     def test_to_str(self):
         str_content = f'[image 1: alt][3]text\n\n\nLinks:\n[1]: link1 (link)\n[2]: ' + \
                       'link2 (link)\n[3]: http://link (image)\n'
@@ -154,4 +153,3 @@ class NewsTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

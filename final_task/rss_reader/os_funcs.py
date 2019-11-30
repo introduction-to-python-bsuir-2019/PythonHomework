@@ -17,7 +17,7 @@ def create_directory(path, name):
         if not os.path.exists(path):
             os.mkdir(path)
         return path
-    
+
 
 def get_project_directory_path():
     """
