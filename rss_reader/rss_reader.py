@@ -6,11 +6,11 @@ import feedparser
 
 from tldextract import extract
 
-from .news_cacher import NewsCacher
-from .json_formatter import NewsJsonFormatter
+from news_cacher import NewsCacher
+from json_formatter import NewsJsonFormatter
 
 
-class Reader:
+class NewsReader:
     def __init__(self, link, limit, json, date):
         self.link = link
         self.limit = limit
