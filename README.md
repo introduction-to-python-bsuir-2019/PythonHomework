@@ -7,7 +7,7 @@ Current version: v0.2
 Code checking: Code correspond to pep8
 #### Usage:
 ```shell
-usage: __main__.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] source
+usage: __main__.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] source
 
 Pure Python command-line RSS reader.
 
