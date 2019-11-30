@@ -1,22 +1,22 @@
 """RSS-reader module"""
 
-import feedparser
+import re
 import logging
+import feedparser
 
 from tldextract import extract
 
-from .article import Article
-from .json_formatter import NewsJsonFormatter
 from .news_cacher import NewsCacher
+from .json_formatter import NewsJsonFormatter
 
 
 class Reader:
     def __init__(self, link, limit, json, date):
         self.link = link
         self.limit = limit
-        self.articles = []
         self.json = json
         self.hrefs = []
+        self.news = []
         self.date = date
         self.json_object = NewsJsonFormatter()
 
@@ -33,8 +33,8 @@ class Reader:
         self.parse_xml(self.feed.entries[:self.limit])
 
     def parse_xml(self, source):
-        """Parse xml-file to articles"""
-        logging.info('Parse XML-file to articles')
+        """Parse xml-file to news array"""
+        logging.info('Parse XML-file to news array')
 
         for item in source:
             content = []
@@ -49,38 +49,20 @@ class Reader:
                 except AttributeError:
                     content.append('No content!')
 
-            self.articles.append(Article(item.title, item.published, item.description, item.link, content))
+            self.news.append({"title": item.title, "date": item.published, 
+                "text": self.strip_html_string(item.description), "link": item.link.split('?')[0], "hrefs": content})
 
-        feeds = self.articles_to_array()
         if self.date == None:
-            self.cacher_object.cache(feeds)
+            self.cacher_object.cache(self.news)
 
         if self.json is True:
-            self.json_object.format(feeds)
+            self.json_object.format(self.news)
 
-    def articles_to_array(self):
-        """Convert articles to array of dicts"""
-        logging.info('Convert articles to array of dicts')
+    def print_news(self):
+        """Print news to console"""
+        logging.info('Print news to console')
 
-        array = []
-        for article in self.articles:
-            feed_dict = {}
-            feed_dict.update({'title': article.title})
-            feed_dict.update({'date': article.date})
-            feed_dict.update({'text': article.text})
-            feed_dict.update({'link': article.link})
-            feed_dict.update({'hrefs': article.hrefs})
-            array.append(feed_dict)
-
-        return array
-
-    def print_articles(self):
-        """Print articles to console"""
-        logging.info('Print articles to console')
-
-        if self.json is True:
-            print(self.json_object)
-        elif self.date != None:  
+        if self.date != None:
             try:
                 news = self.cacher_object.get_cached_news(self.date, self.limit)
             except FileNotFoundError:
@@ -90,34 +72,35 @@ class Reader:
             if news == []:
                 print('News for this date not found :(')
                 return
-                
-            for article in news:
-                self.print_cached_article(article)
-                print('\n'*5)
+
+            if self.json is True:
+                self.json_object.format(news)
+                print(self.json_object)
+            else:
+                for element in news:
+                    self.print_one_news(element)
+                    print('\n'*5)
+        elif self.json is True:
+            print(self.json_object)
         else:
-            for article in self.articles:
-                self.print_article(article)
+            for element in self.news:
+                self.print_one_news(element)
                 print('\n'*5)
 
-    def print_article(self, article):
-        """Print article to console"""
+    def print_one_news(self, element, cached=False):
+        """Print one news to console"""
 
-        print(f'Title: {article.title}')
-        print(f'Date:  {article.date}')
-        print(f'Link: {article.link}')
-        print('Article text:')
-        print(article.text)
+        print(f'Title: {element["title"]}')
+        if cached == True:
+            print(f'Date:  {element["date"]}')
+        print(f'Link: {element["link"]}')
+        print('News text:')
+        print(element["text"])
         print('Hrefs:')
-        for href in article.hrefs:
+        for href in element["hrefs"]:
             print('| ' + href)
 
-    def print_cached_article(self, article):
-        """Print cached article to console"""
-
-        print(f'Title: {article["title"]}')
-        print(f'Link: {article["link"]}')
-        print('Article text:')
-        print(article["text"])
-        print('Hrefs:')
-        for href in article["hrefs"]:
-            print('| ' + href)
+    def strip_html_string(self, string):
+        """Remove html tags from a string"""
+        strip_string = re.compile('<.*?>')
+        return re.sub(strip_string, '', string)

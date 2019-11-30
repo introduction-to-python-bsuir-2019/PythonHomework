@@ -15,7 +15,7 @@ def main():
     reader = Reader(args.source, args.limit, args.json, args.date)
     reader.parse_url()
 
-    reader.print_articles()
+    reader.print_news()
 
 
 def parse_args():
