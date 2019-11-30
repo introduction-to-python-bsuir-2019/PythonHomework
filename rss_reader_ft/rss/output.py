@@ -6,6 +6,7 @@ from colored import fore, style, back
 
 from rss_reader_ft.conversion.json_converter import JsonConverter
 from rss_reader_ft.conversion.html_converter import HtmlConverter
+from rss_reader_ft.conversion.pdf_converter import PdfConverter
 
 
 class Output:
@@ -55,7 +56,15 @@ class Output:
         """Output data to HTML file"""
         html_data = HtmlConverter(rss_feed_dict).convert_to_format()
 
-        logging.info('Print RSS feed in HTML format')
+        logging.info('Print RSS feed in HTML file')
 
         with open('News_feed.html', 'w') as fw:
             fw.write(html_data)
+
+    @staticmethod
+    def to_pdf_format(rss_feed_dict: Dict[str, Any]) -> None:
+        """Output data to PDF file"""
+
+        logging.info('Print RSS feed in PDF file')
+
+        PdfConverter(rss_feed_dict).convert_to_format()

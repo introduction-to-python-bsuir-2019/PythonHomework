@@ -49,49 +49,19 @@ Utility provides the following interface:
     ```
     docker run -it -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock python /bin/bash
     ```
-2. Install docker in container:
+2. Input command:
+
     ```
-    apt-get update && \
-    apt-get -y install apt-transport-https \
-         ca-certificates \
-         curl \
-         gnupg2 \
-         software-properties-common && \
-    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey && \
-    add-apt-repository \
-       "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-       $(lsb_release -cs) \
-       stable" && \
-    apt-get update && \
-    apt-get -y install docker-ce
+    chmod +x install.sh && . install.sh
     ```
-3. Install docker-compose in container:
-    ```
-    sudo curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-    ```
-4. Clone repo from GitHab:
-    ```
-    git clone https://github.com/ZayJob/PythonHomework
-    ```
-5. Go to folder /PythonHomework
-6. **git branch**
-7. There is no branch besides **master**? Then follow this tutorial:
-    ```
-    git branch --track finalTask remotes/origin/finalTask
-    git checkout finalTask
-    ```
-8. Use for build:
-    ```
-    docker-compose build
-    ```
-9. Use for run app:
+
+3. Use for run app:
     ```
     docker-compose run app python -m rss_reader_ft "https://news.yahoo.com/rss" --limit 2 --json
     ```
-10. If you want to see the database, then open a browser and paste the URL ( http://localhost:8081/db/News_feed/feeds )
+4. If you want to see the database, then open a browser and paste the URL ( http://localhost:8081/db/News_feed/feeds )
 
-11. If you want to get and view the HTML or PDF file, execute the following commands:
+5. If you want to get and view the HTML or PDF file, execute the following commands:
     ```
         docker ps -a
     ```

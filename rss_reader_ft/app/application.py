@@ -48,6 +48,9 @@ class Application:
             if self.dict_args["to_html"]:
                 Output.to_html_format(news)
 
+            if self.dict_args["to_pdf"]:
+                Output.to_pdf_format(news)
+
         if self.dict_args["verbose"]:
             ApplicationLog.print_log()
             sys.exit(1)

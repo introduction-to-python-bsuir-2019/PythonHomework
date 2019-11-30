@@ -8,6 +8,7 @@ from rss_reader_ft.config import __version__
 
 class ArgumentParser:
     """ArgumentParser class"""
+
     @staticmethod
     def parse_args() -> Dict:
         """
@@ -15,7 +16,7 @@ class ArgumentParser:
         indicate what objects we expect from it,
         and return the dictionary
         """
-        parser = argparse.ArgumentParser(description='Python command-line RSS reader.')
+        parser = ErrorCatchingArgumentParser(description='Python command-line RSS reader.')
         parser.add_argument(
             'source',
             help='Enter the link to the information portal(RSS url)',
@@ -64,3 +65,21 @@ class ArgumentParser:
         )
         logging.info('Parsed arguments')
         return vars(parser.parse_args())
+
+
+class ArgParserError(Exception):
+    """The exception class
+    The exception that is thrown when
+    the arguments are entered incorrectly
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
+class ErrorCatchingArgumentParser(argparse.ArgumentParser):
+    """Overloading method error()"""
+
+    def error(self, message) -> None:
+
+        raise ArgParserError('Ooops.. Error))) check link and arguments (-h)')
