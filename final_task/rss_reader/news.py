@@ -64,7 +64,7 @@ class News:
         if json_object:
             json_news = json_object.get('news', None)
             if json_news:
-                news = News(json_news.get('source', ''))
+                news = News(json_object.get('source', ''))
                 news.items = [NewsItem.from_json(item) for item in json_news.get('items', [])]
                 news.feed = json_news.get('feed', '')
                 return news
@@ -162,10 +162,11 @@ class NewsContent:
     def __str__(self):
         result = ''
         link_index = len(self.links)
-
+        img_index = 1
         for img in self.images:
             link_index += 1
-            result += f'[image {link_index}: {img.alt}][{link_index}]'
+            result += f'[image {img_index}: {img.alt}][{link_index}]'
+            img_index += 1
 
         result += f'{self.text}\n\n\nLinks:\n'
 

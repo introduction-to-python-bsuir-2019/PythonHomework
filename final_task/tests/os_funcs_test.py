@@ -34,11 +34,11 @@ class OSFuncsTest(unittest.TestCase):
         result = os_funcs.create_directory(self.dir_path, self.new_dir_name)
         self.assertEqual(result, path)
 
-    def get_project_directory_path_test(self):
+    def test_get_project_directory_path(self):
         self.assertEqual(os.path.dirname(sys.argv[0]), os_funcs.get_project_directory_path())
 
     @patch('rss_reader.image.Image.download')
-    def download_images_test(self, download_mock):
+    def test_download_images(self, download_mock):
         image = Image('link', 'alt')
         news_content = NewsContent('text', [image], [])
         news_item = NewsItem('title', 'date', 'link', news_content)
