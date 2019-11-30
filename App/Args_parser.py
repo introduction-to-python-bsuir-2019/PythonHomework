@@ -3,6 +3,7 @@ import sys
 import App
 import logging
 from App.Errors import FatalError
+from App.Colors import Colors
 
 
 def parsing_args():
@@ -16,6 +17,7 @@ def parsing_args():
     parser.add_argument('--date', type=str, help='Date for which you want to display news (format %y%m%d)')
     parser.add_argument('--to_html', type=str, help='Convert data to html to your path')
     parser.add_argument('--to_pdf', type=str, help='Convert data to pdf to your path')
+    parser.add_argument('--colorize', action="store_true", help='colorful output')
     return parser.parse_args()
 
 
@@ -31,3 +33,6 @@ def start_settings(args):
         raise FatalError("Limit cannot be less than 0")
     if args.date is not None and (len(args.date) != 8 or args.date.isdigit() is False):
         raise FatalError("Invalid date format")
+    if not args.colorize:
+        for color in Colors:
+            Colors[color] = "white"

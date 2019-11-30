@@ -1,4 +1,6 @@
 import logging
+from termcolor import colored
+from App.Colors import Colors
 
 
 class ToHtml:
@@ -43,4 +45,4 @@ class ToHtml:
             with open(self.path, 'w') as f:
                 f.write(self.html)
         except:
-            print("Saving file error. Problems with path")
+            print(colored("Saving file error. Problems with path", Colors["error"]))

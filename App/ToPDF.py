@@ -1,5 +1,7 @@
 import weasyprint
 import logging
+from termcolor import colored
+from App.Colors import Colors
 
 
 class ToPDF:
@@ -21,4 +23,4 @@ class ToPDF:
             with open(self.path, "wb") as f:
                 f.write(self.pdf)
         except:
-            print("Saving file error. Problems with path")
+            print(colored("Saving file error. Problems with path", Colors["error"]))

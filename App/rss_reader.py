@@ -2,6 +2,8 @@
 import logging
 from App.RSSListener import RSSListener
 from App import Args_parser
+from termcolor import colored
+from App.Colors import Colors
 
 
 def main():
@@ -12,12 +14,12 @@ def main():
         rss_listener = RSSListener(args.limit, args.json, args.date, args.to_html, args.to_pdf)
         rss_listener.start(args.source)
     except Exception as e:
-        print(str(e))
+        print(colored(str(e), Colors["error"]))
         close_program()
 
 
 def close_program():
-    print("The program suddenly completed its work")
+    print(colored("The program suddenly completed its work", Colors["error"]))
     exit()
 
 

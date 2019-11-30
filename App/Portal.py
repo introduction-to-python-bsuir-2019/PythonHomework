@@ -5,6 +5,8 @@ from App.Errors import FatalError
 from App.News import News
 from App.ToHtml import ToHtml
 from App.ToPDF import ToPDF
+from termcolor import colored
+from App.Colors import Colors
 
 
 class Portal:
@@ -71,9 +73,10 @@ class Portal:
                 print(json.dumps(main_dict, ensure_ascii=False, indent=4))
             else:
                 logging.info("Saving to text")
-                print("\n\nRSS-chanel")
+                print(colored("\n\nRSS-chanel", Colors["other"]))
                 for news in self.news:
-                    print("*" * 20 + "New article" + "*" * 20 + "\n{0}\n".format(news))
+                    print(colored("*" * 20 + "New article" + "*" * 20 + "\n", Colors["article"]))
+                    print(colored(news, Colors["text"]))
         except Exception as e:
             logging.error(str(e))
             raise FatalError("Problems with printing")
@@ -85,7 +88,7 @@ class Portal:
             to_html = ToHtml(self.news, html_path)
             to_html.make_file()
         except Exception as e:
-            print("Error with converting to html")
+            print(colored("Error with converting to html", Colors["error"]))
             logging.info(str(e))
 
     def convert_to_pdf(self, pdf_path):
@@ -96,5 +99,5 @@ class Portal:
             to_pdf = ToPDF(to_html.html, pdf_path)
             to_pdf.make_file()
         except Exception as e:
-            print("Error with converting to pdf")
+            print(colored("Error with converting to pdf", Colors["error"]))
             logging.info(str(e))

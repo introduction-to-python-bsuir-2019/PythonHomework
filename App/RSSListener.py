@@ -2,6 +2,8 @@ import logging
 from App.Portal import Portal
 from App.Errors import FatalError
 from App.Saver import Saver
+from termcolor import colored
+from App.Colors import Colors
 
 
 class RSSListener:
@@ -29,7 +31,7 @@ class RSSListener:
                     self.portal.load_new_news(old_news)
                     self.printing()
                 else:
-                    print("Error: news haven't been founded")
+                    print(colored("Error: news haven't been founded", Colors["error"]))
 
             else:
                 self.printing()
