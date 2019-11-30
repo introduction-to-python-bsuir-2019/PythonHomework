@@ -16,12 +16,13 @@ class RSSReader():
     show_json() - print news to stdout in json format
     """
 
-    def __init__(self, source, limit, verbose, date):
+    def __init__(self, source, limit, verbose, date, sv_path):
         super(RSSReader, self).__init__()
         self.__source = source
         self.__limit = limit
         self.__verbose = verbose
         self.__date = date
+        self.__sv_path = sv_path
         self.__text = ""
 
     def __find_news(self):
@@ -130,3 +131,7 @@ class RSSReader():
         feed, column = self.__read()
         json_text = Converter.to_json(feed, column, self.__verbose)
         stdout_write(json_text)
+
+    def save_fb2(self):
+        feed, column = self.__read()
+        Converter().to_fb2(feed, column, self.__source, self.__sv_path)
