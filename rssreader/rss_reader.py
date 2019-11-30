@@ -25,7 +25,7 @@ import logging
 
 import feedparser
 
-from rssreader.html_parser import *
+from rssreader.feed_parser import *
 from rssreader.output_controller import *
 from rssreader.storage import *
 

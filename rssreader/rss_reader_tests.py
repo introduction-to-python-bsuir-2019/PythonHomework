@@ -51,14 +51,14 @@ class TestRSSReader(unittest.TestCase):
 
     def test_get_articles_from_url(self):
         limit = 1
-        with patch('rssreader.html_parser.Parser.parse') as html_parser_mock:
-            html_parser_mock.return_value = 'Successful'
+        with patch('rssreader.feed_parser.Parser.parse') as feed_parser_mock:
+            feed_parser_mock.return_value = 'Successful'
             with patch('feedparser.parse') as feedparser_mock:
                 feedparser_mock.return_value = self.response
                 self.assertEqual(self.reader._get_articles_from_url(self.source, limit), 'Successful')
 
         feedparser_mock.assert_called_with(self.source.strip())
-        html_parser_mock.assert_called_with(self.response, limit)
+        feed_parser_mock.assert_called_with(self.response, limit)
 
     def test_call_save(self):
         limit = 1

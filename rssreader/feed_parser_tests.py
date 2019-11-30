@@ -2,7 +2,7 @@ import html
 import time
 from unittest import TestCase, main
 
-from rssreader.html_parser import A, Img, HTMLParser
+from rssreader.feed_parser import A, Img, HTMLParser
 
 __all__ = ['TestA', 'TestImg', 'TestHTMLParser']
 
