@@ -2,20 +2,24 @@
 
 import feedparser
 import logging
+from tldextract import extract
 
-from article import Article
-from json_format import Json
+from .article import Article
+from .json_format import Json
+from .articles_cache import ArticlesCacher
 
 
 class Reader:
     logger = logging.getLogger('__main__.py')
 
-    def __init__(self, link, limit, json):
+    def __init__(self, link, limit, json, date):
         self.link = link
         self.limit = limit
         self.articles = []
         self.json = json
         self.hrefs = []
+        self.date = date
+        self.json_object = Json()
 
     def parse_url(self):
         """Get RSS xml-file from url"""
@@ -40,15 +44,18 @@ class Reader:
                         content.append(element['url'])
                 except AttributeError:
                     content.append('No content!')
-                # content.append('No content!')
 
             self.articles.append(Article(item.title, item.published, item.description, item.link, content))
 
+        ext_site_name = extract(self.link)
+        site_name = ext_site_name.domain + '.' + ext_site_name.suffix
+
+        feeds = self.articles_to_array()
+        cacher = ArticlesCacher('cached_news.json', site_name, '20192915')
+        cacher.cache(feeds)
+
         if self.json is True:
-            json_object = Json()
-            feeds = self.articles_to_array()
-            json_object.format(feeds)
-            print(json_object)
+            self.json_object.format(feeds)
 
     def articles_to_array(self):
         self.logger.info('Convert articles to array of dicts')
@@ -68,9 +75,12 @@ class Reader:
     def print_articles(self):
         self.logger.info('Print articles to console')
 
-        for article in self.articles:
-            self.print_article(article)
-            print('\n-------------------------\n')
+        if self.json is True:
+            print(self.json_object)
+        else:
+            for article in self.articles:
+                self.print_article(article)
+                print('\n-------------------------\n')
 
     def print_article(self, article):
         """Print article to console"""

@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from rss_reader import Reader
+from .rss_reader import Reader
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
     else:
         logging.basicConfig(format="%(levelname)s: %(message)s")
 
-    reader = Reader(args.source, args.limit, args.json)
+    reader = Reader(args.source, args.limit, args.json, args.date)
     reader.parse_url()
 
     reader.print_articles()
@@ -26,6 +26,7 @@ def parse_args():
     parser.add_argument('--json', help='Print result as JSON in stdout', action='store_true')
     parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
     parser.add_argument('--limit', help='Limit news topics if this parameter provided', type=int)
+    parser.add_argument('--date', help='Show cached news by input date', type=str)
 
     return parser.parse_args()
 

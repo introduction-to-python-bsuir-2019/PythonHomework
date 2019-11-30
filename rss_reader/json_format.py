@@ -1,7 +1,6 @@
 """Module with tools for working with Json"""
 
 import json
-import codecs
 import logging
 
 
@@ -17,17 +16,11 @@ class Json:
 
         return json.dumps(self.data, ensure_ascii=False, indent=4)
 
-    # def print(self):
-    #     """Print JSON-file to console"""
-    #     self.logger.info('Print JSON-data to file')
-
-        print(json.dumps(self.data, ensure_ascii=False, indent=4))
-
     def write_to_file(self):
         """Write JSON-data to file"""
         self.logger.info('Write JSON-data to file')
 
-        with codecs.open('data.json', 'w', encoding='utf-8') as outfile:
+        with open('data.json', 'w', encoding='utf-8') as outfile:
             json.dump(self.data, outfile, ensure_ascii=False, indent=4)
 
     def format(self, data):
