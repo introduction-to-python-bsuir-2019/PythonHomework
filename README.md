@@ -28,7 +28,7 @@ ooptional arguments:
 </pre>
 
 ## News caching
-The RSS news are stored in a local storage while reading. Local storage is implemented using shelve. The cached news are dicts with the news itself and its row (html) description which are stored by key. Key consists of date and RSS URL. The cashed news can be read with optional argument --date.
+The RSS news are stored in a local storage while reading. Local storage is implemented using shelve. The cached news are dicts with the news itself and its row (html) description which are stored by key. The key consists of date and RSS URL. The cashed news can be read with optional argument --date. Utility creates binary db file 'cache.db' in current directory. If you change current directory, db file from previoгs will not be copied to the current directory.
 
 ## JSON structure
 <pre>

@@ -3,6 +3,7 @@
 import argparse
 import logging
 import sys
+from pathlib import Path
 
 from rss.news import News
 from rss.cache import Cache
@@ -29,6 +30,15 @@ def add_args(parser):
                         Argument receives the path where new file will be saved.""", type=str)
     return parser
 
+
+def check_path(input_path: str):
+    """Check file path."""
+
+    logging.info('Check path')
+    try:
+        Path(input_path)
+    except Exception as e:
+        ptint("Invalid path: ", e)
 
 def start_parsing(url: str, limit: int, json_mode: bool,
                   fb2_path: str, html_path: str):
@@ -75,6 +85,12 @@ def main():
     args = parser.parse_args()
 
     set_verbose_mode(args.verbose)
+
+    if args.to_fb2:
+        check_path(args.to_fb2)
+
+    if args.to_html:
+        check_path(args.to_html)
 
     if args.date:
         try:
