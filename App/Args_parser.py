@@ -6,7 +6,7 @@ from App.Errors import FatalError
 
 
 def parsing_args():
-    """Парсим аргументы"""
+    """Parsing arguments"""
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
     parser.add_argument('source', type=str, help='RSS URL')
     parser.add_argument('--version', action="store_true", help='Print version info')
@@ -20,7 +20,7 @@ def parsing_args():
 
 
 def start_settings(args):
-    """Проверяем аргументы и действуем согласно их сценарию"""
+    """Check the arguments and act according to their scenario"""
     if args.version:
         print("*" * 50 + "\n" + "Version: " + App.__version__ + "\n" + "*" * 50 + "\n" * 2)
     if args.verbose:

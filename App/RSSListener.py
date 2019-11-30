@@ -5,9 +5,7 @@ from App.Saver import Saver
 
 
 class RSSListener:
-    """Класс листенер. Обрабатывает новые rss ссылки.
-    Постороен так, что в будущем при добавлении минимального функционала,
-    будет обрабатывать и сохранять новости из разных источников"""
+    """"""
 
     def __init__(self, limit, json_flag, date, html_path, pdf_path):
         logging.info("Creating object RSSListener")
@@ -19,7 +17,7 @@ class RSSListener:
         self.pdf_path = pdf_path
 
     def start(self, url):
-        """Метод принимает url и пускает его в обработку"""
+        """Class listener. Handles new rss links and saved news"""
         logging.info("We begin to process the url")
         try:
             self.portal = Portal(url, self.limit)

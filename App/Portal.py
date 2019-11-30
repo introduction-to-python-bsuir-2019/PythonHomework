@@ -8,7 +8,7 @@ from App.ToPDF import ToPDF
 
 
 class Portal:
-    """Класс служит для хранения и обработки информации свзянной с одним новостным порталом."""
+    """The class is used to store and process information associated with one news portal"""
 
     def __init__(self, url, limit):
         logging.info("Creating object Portal")
@@ -26,7 +26,7 @@ class Portal:
             raise FatalError("Problems with rss processing")
 
     def get_rss(self):
-        """Получает rss файл"""
+        """Get rss file"""
         logging.info("Getting rss file")
         try:
             return feedparser.parse(self.url)
@@ -34,7 +34,7 @@ class Portal:
             raise FatalError("Problems getting rss file")
 
     def update(self, entries):
-        """Метод служит для получения(добавления новых в будущем) статей"""
+        """The method is used to obtain articles"""
         logging.info("Start processing article")
         if self.limit is None or self.limit > len(entries):
             limit = len(entries)
@@ -58,7 +58,7 @@ class Portal:
             self.news = news[:self.limit]
 
     def print(self, json_flag):
-        """Метод выводит информацию о портале и о статьях"""
+        """The method displays information about the portal and articles"""
         try:
             if json_flag:
                 logging.info("Saving to json")

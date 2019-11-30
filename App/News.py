@@ -3,7 +3,7 @@ from App.Errors import FatalError
 
 
 class News:
-    """Класс служит для хранения и обработки информации свзянной с отдельной новостью."""
+    """The class is used to store and process information related to a separate news item."""
 
     def __init__(self, entry, channel_name):
         logging.info("Creating object News")
@@ -32,8 +32,7 @@ class News:
         return year + mon + day
 
     def del_tags(self, ind1, ind2, ind3, delta=0, items=None):
-        """В зависимости от входных параметров, метод может удалять ишние теги или
-        сохранять ссылки на картинки"""
+        """Depending on the input parameters, the method may remove unnecessary tags or save links to images"""
         logging.info("Tag processing")
         while self.summary.find(ind1) != -1:
             index1 = self.summary.index(ind1)
@@ -44,8 +43,8 @@ class News:
             self.summary = self.summary[0:index1] + self.summary[index1 + index3 + 2:]
 
     def clear_text(self):
-        """Метод запускающий del_tags() в различной конфигурации
-        Это требуется, потому что на некоторых порталах в summary чатсть информации является \"мусором\""""
+        """Method running del_tags () in a different configuration.
+This is required because on some portals in summary, some of the information is unnecessary."""
         logging.info("Improvement summary and and search for pictures and links")
         try:
             self.del_tags("<img src=", "\"", "/>", 10, self.images)
