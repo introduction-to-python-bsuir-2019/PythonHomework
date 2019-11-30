@@ -4,12 +4,12 @@ import logging
 import feedparser
 
 from abc import ABCMeta, abstractmethod
-from colorama import Fore, Back, Style, init
+from colorama import Fore
 from pathlib import Path
 from terminaltables import SingleTable
 from textwrap import wrap
 
-from ..utils.data_structures import NewsItem, News, ConsoleArgs
+from ..utils.data_structures import NewsItem, News, ConsoleArgs, Colors
 from ..utils.decorators import call_save_news_after_method
 from ..utils.exceptions import RssException
 from ..utils.sqlite import RssDB
@@ -33,6 +33,18 @@ class RssBotInterface(metaclass=ABCMeta):
         self.limit = args.limit
         self.screen_width = args.width
 
+        # Set colors
+        if args.colorize:
+            self.colors = Colors(
+                green=Fore.GREEN,
+                blue=Fore.BLUE,
+                red=Fore.RED,
+                magenta=Fore.MAGENTA,
+                cyan=Fore.CYAN,
+            )
+        else:
+            self.colors = Colors()  # without colors
+
         if not args.date:  # Load news from url
             self.logger.debug(f'Downloading news from {args.url}')
             self.url = args.url
@@ -41,10 +53,13 @@ class RssBotInterface(metaclass=ABCMeta):
         else:  # load from storage
             self.logger.debug(f'Loading news from storage')
             self.news = self._load_news(args.date)
-        if args.to_pdf:
+
+        if args.to_pdf:  # parse to pdf and save pdf file
             self._print_news_to_pdf(args.to_pdf)
-        if args.to_html:
+
+        if args.to_html: # parse to html and save html file
             self._print_news_to_html(args.to_html)
+
         self.logger.info(f'Bot initialization is completed')
 
     @abstractmethod
@@ -180,9 +195,9 @@ class BaseRssBot(RssBotInterface):
 
         :return: str with news
         """
-        table = [[f'{Fore.GREEN}Feed',
-                  f"{Fore.GREEN}Title: {self.news.feed}{Fore.RESET}\n"
-                  f"{Fore.GREEN}Link: {Fore.BLUE}{self.news.link}{Fore.RESET}"]]
+        table = [[f'{self.colors.green}Feed',
+                  f"{self.colors.green}Title: {self.news.feed}{Fore.RESET}\n"
+                  f"{self.colors.green}Link: {self.colors.blue}{self.news.link}{Fore.RESET}"]]
         news_items = self.news.items
         for n, item in enumerate(news_items):
             # table.append([1, item.get('human_text')])
@@ -196,7 +211,7 @@ class BaseRssBot(RssBotInterface):
                         splitted_by_paragraphs.insert(i, wrapped_line)
                         i += 1
 
-            table.append([f'{Fore.GREEN}{n + 1}{Fore.RESET}', '\n'.join(splitted_by_paragraphs)])
+            table.append([f'{self.colors.green}{n + 1}{Fore.RESET}', '\n'.join(splitted_by_paragraphs)])
 
         table_inst = SingleTable(table)
         table_inst.inner_heading_row_border = False
@@ -241,9 +256,9 @@ class BaseRssBot(RssBotInterface):
         """
         self.logger.info(f'Extending {news_item.title}')
         out_str = ''
-        out_str += f"\n{Fore.GREEN}Title: {Fore.CYAN} {news_item.title} {Fore.RESET}\n" \
-                   f"{Fore.GREEN}Date: {Fore.CYAN}{news_item.published}{Fore.RESET}\n" \
-                   f"{Fore.GREEN}Link: {Fore.BLUE}{news_item.link}{Fore.RESET}\n"
+        out_str += f"\n{self.colors.green}Title: {self.colors.cyan} {news_item.title} {Fore.RESET}\n" \
+                   f"{self.colors.green}Date: {self.colors.cyan}{news_item.published}{Fore.RESET}\n" \
+                   f"{self.colors.green}Link: {self.colors.cyan}{news_item.link}{Fore.RESET}\n"
 
         html = bs4.BeautifulSoup(news_item.html, "html.parser")
 
@@ -266,10 +281,10 @@ class BaseRssBot(RssBotInterface):
                 out_str += f'\n[image {img_idx}:  {tag.attrs.get("title")}][{img_idx}]'
 
         out_str += f'{html.getText()}\n'
-        out_str += f'{Fore.RED}Links:{Fore.RESET}\n'
-        out_str += '\n'.join([f'{Fore.LIGHTMAGENTA_EX}[{i + 1}]{Fore.RESET}: '
-                              f'{Fore.BLUE}{link}{Fore.RESET} (link)' for i, link in enumerate(links)]) + '\n'
-        out_str += '\n'.join([f'{Fore.LIGHTMAGENTA_EX}[{i + len(links) + 1}]{Fore.RESET}: '
+        out_str += f'{self.colors.red}Links:{Fore.RESET}\n'
+        out_str += '\n'.join([f'{self.colors.magenta}[{i + 1}]{Fore.RESET}: '
+                              f'{self.colors.blue}{link}{Fore.RESET} (link)' for i, link in enumerate(links)]) + '\n'
+        out_str += '\n'.join([f'{self.colors.magenta}[{i + len(links) + 1}]{Fore.RESET}: '
                               f'{link} (image)' for i, link in enumerate(imgs)]) + '\n'
 
         return out_str

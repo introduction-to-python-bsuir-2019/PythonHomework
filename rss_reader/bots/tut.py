@@ -59,12 +59,12 @@ class Bot(BaseRssBot):
         self.logger.info(f'_parse_news_item_tut.by  Extending {news_item.title}')
 
         out_str = ''
-        out_str += f"\n{Fore.GREEN}Title: {Fore.CYAN} {news_item.title} {Fore.RESET}\n" \
-                   f"{Fore.GREEN}Date: {Fore.CYAN}{news_item.published}{Fore.RESET}\n" \
-                   f"{Fore.GREEN}Link: {Fore.BLUE}{news_item.link}{Fore.RESET}\n"
+        out_str += f"\n{self.colors.green}Title: {self.colors.cyan} {news_item.title} {Fore.RESET}\n" \
+                   f"{self.colors.green}Date: {self.colors.cyan}{news_item.published}{Fore.RESET}\n" \
+                   f"{self.colors.green}Link: {self.colors.blue}{news_item.link}{Fore.RESET}\n"
         if type(news_item) == TutNewItem:
-            out_str += f"{Fore.GREEN}Authors: {Fore.CYAN}{', '.join(news_item.authors)}{Fore.RESET}\n"
-            out_str += f"{Fore.GREEN}Tags: {Fore.CYAN}{', '.join(news_item.tags)}{Fore.RESET}\n"
+            out_str += f"{self.colors.green}Authors: {self.colors.cyan}{', '.join(news_item.authors)}{Fore.RESET}\n"
+            out_str += f"{self.colors.green}Tags: {self.colors.cyan}{', '.join(news_item.tags)}{Fore.RESET}\n"
 
         html = bs4.BeautifulSoup(news_item.html, "html.parser")
 
@@ -89,7 +89,7 @@ class Bot(BaseRssBot):
             elif tag.name == 'br':
                 out_str += '\n'
         out_str += f'\n{html.getText()}\n'
-        out_str += f'{Fore.RED}Links:{Fore.RESET}\n'
+        out_str += f'{self.colors.red}Links:{Fore.RESET}\n'
         out_str += '\n'.join([f'[{i + 1}]: {link} (link)' for i, link in enumerate(links)]) + '\n'
         out_str += '\n'.join([f'[{i + len(links) + 1}]: {link} (image)' for i, link in enumerate(imgs)]) + '\n'
 
