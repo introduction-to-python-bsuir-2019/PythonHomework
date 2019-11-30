@@ -1,9 +1,9 @@
-# euesand's RSS-reader
+# euseand's RSS-reader
 My RSS-reader is a command line utility which parses RSS URL and prints news in human-readable format.
 ## installation
 You can use pip to install my package from test pypi index:
 ```bash
-pip install --extra-index-package https://test.pypi.org/simple/ rss-reader-euseand==0.4
+pip install --extra-index-url https://test.pypi.org/simple/ rss-reader-euseand==0.4
 ```
 Or simply clone the repo and use pip install:
 ```bash
