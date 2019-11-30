@@ -5,10 +5,9 @@ from flask import Flask, render_template, request, send_from_directory, jsonify
 from flask_restful import Api
 from pathlib import Path
 from rss_reader import rss
-from rss_reader.utils.data_structures import ConsoleArgs, News
+from rss_reader.utils.data_structures import ConsoleArgs
 from rss_reader.bots import default
 from rss_reader.utils.rss_utils import get_date
-from rss_reader.utils.pdf import PdfWriter
 
 app = Flask(__name__)
 api = Api(app)
@@ -20,12 +19,11 @@ def index():
 
 
 #
-#
 @app.route('/v6.0/news', methods=['GET', 'POST'])
 def get_news():
     logger = rss.logger_init()
-    path_to_html = Path('templates/here.html')
-    path_to_pdf = Path('templates/pdf.pdf')
+    path_to_html = Path('static/here.html')
+    path_to_pdf = Path('static/pdf.pdf')
     is_pdf = False
     is_json = False
     date = ''
@@ -41,12 +39,6 @@ def get_news():
         date = form_data.get('date') if form_data.get('is_date') else ''
         if date:
             date = get_date(date).strftime('%Y%m%d')
-
-        ttf_pickle_files_to_remove = Path('../../static_files/dejavu_font/').glob('**/*.pkl')
-        PdfWriter.djvu_font_path = Path('../../static_files/dejavu_font/DejaVuSansCondensed.ttf')
-
-        for pkl in ttf_pickle_files_to_remove:
-            os.remove(pkl)
 
     else:
         url = request.args.get('url', 'https://news.google.com/news/rss')
@@ -64,7 +56,7 @@ def get_news():
     except Exception as ex:
         return str(ex)
     if is_pdf:
-        return send_from_directory(directory=path_to_pdf.parent,
+        return send_from_directory(directory=path_to_pdf.parent.absolute().as_posix(),
                                    filename=path_to_pdf.name,
                                    mimetype='application/pdf')
     if is_json:

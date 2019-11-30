@@ -30,11 +30,6 @@ class TestMainModule(unittest.TestCase):
     def test_pdf_and_html_writers(self):
         file_pdf_path = Path('tests/data/test.pdf')
         file_html_path = Path('tests/data/test.html')
-        ttf_pickle_files_to_remove = Path('static_files/dejavu_font/').glob('**/*.pkl')
-        PdfWriter.djvu_font_path = Path('static_files/dejavu_font/DejaVuSansCondensed.ttf')
-
-        for pkl in ttf_pickle_files_to_remove:
-            os.remove(pkl)
 
         url_google = Path('tests/data/google_news.xml')
         args = ConsoleArgs(

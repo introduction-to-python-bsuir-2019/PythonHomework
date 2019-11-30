@@ -16,7 +16,7 @@ from ..utils.exceptions import RssException, RssValueException
 class PdfWriter(IConverter):
     """Class to convert news into pdf format"""
 
-    djvu_font_path = Path('../static_files/dejavu_font/DejaVuSansCondensed.ttf')
+    djvu_font_path = Path('static/dejavu_font/DejaVuSansCondensed.ttf')
 
     def __init__(self, logger: Logger):
         self.row_space = 5
@@ -26,12 +26,6 @@ class PdfWriter(IConverter):
         self._set_djvu_font()
         self.pdf.add_page()
         super().__init__(logger)
-
-        # In the case of the tests were running before pkl files contain wrong info about font's path
-        # That's why we need to clear it before importing fonts
-        ttf_pickle_files_to_remove = self.djvu_font_path.parent.glob('**/*.pkl')
-        for pkl in ttf_pickle_files_to_remove:
-            os.remove(pkl)
 
     def store_news(self, news: News, path_to_file: str) -> None:
         """Converts News obj to pdf and stores it to path_to_file"""
