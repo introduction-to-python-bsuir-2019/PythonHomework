@@ -9,7 +9,7 @@ def main():
         args = Args_parser.parsing_args()
         Args_parser.start_settings(args)
         logging.info("Program launch")
-        rss_listener = RSSListener(args.limit, args.json, args.date)
+        rss_listener = RSSListener(args.limit, args.json, args.date, args.to_html, args.to_pdf)
         rss_listener.start(args.source)
     except Exception as e:
         print(str(e))

@@ -3,6 +3,9 @@ import feedparser
 import json
 from App.Errors import FatalError
 from App.News import News
+from App.ToHtml import ToHtml
+from App.ToPDF import ToPDF
+import traceback
 
 
 class Portal:
@@ -75,3 +78,24 @@ class Portal:
         except Exception as e:
             logging.error(str(e))
             raise FatalError("Problems with printing")
+
+    def convert_to_html(self, html_path):
+        """Convert news to html"""
+        logging.info("Start converting news to html")
+        try:
+            to_html = ToHtml(self.news, html_path)
+            to_html.make_file()
+        except Exception as e:
+            print("Error with converting to html")
+            logging.info(str(e))
+
+    def convert_to_pdf(self, pdf_path):
+        """Convert news to pdf"""
+        logging.info("Start converting news to pdf")
+        try:
+            to_html = ToHtml(self.news)
+            to_pdf = ToPDF(to_html.html, pdf_path)
+            to_pdf.make_file()
+        except Exception as e:
+            print("Error with converting to pdf")
+            logging.info(str(e))

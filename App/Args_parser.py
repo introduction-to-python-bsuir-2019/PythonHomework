@@ -5,7 +5,6 @@ import logging
 from App.Errors import FatalError
 
 
-
 def parsing_args():
     """Парсим аргументы"""
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader.')
@@ -15,6 +14,8 @@ def parsing_args():
     parser.add_argument('--verbose', action="store_true", help='Outputs verbose status messages')
     parser.add_argument('--limit', type=int, help='Limit news topics if this parameter provided')
     parser.add_argument('--date', type=str, help='Date for which you want to display news (format %y%m%d)')
+    parser.add_argument('--to_html', type=str, help='Convert data to html to your path')
+    parser.add_argument('--to_pdf', type=str, help='Convert data to pdf to your path')
     return parser.parse_args()
 
 

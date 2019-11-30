@@ -1,6 +1,6 @@
 import logging
-import time
 from App.Errors import FatalError
+
 
 class News:
     """Класс служит для хранения и обработки информации свзянной с отдельной новостью."""
@@ -14,14 +14,14 @@ class News:
             self.summary = entry.summary
             self.link = entry.link
             self.channel_name = channel_name
-        except Exception as e:
+        except:
             raise FatalError("Problems with article processing")
         self.images = []
         self.links = []
         self.clear_text()
 
     def pars_date(self, struct):
-        """Parsed date to string"""
+        """Parse date to string"""
         year = str(struct.tm_year)
         mon = str(struct.tm_mon)
         if len(mon) < 2:
@@ -30,7 +30,6 @@ class News:
         if len(day) < 2:
             day = "0" + day
         return year + mon + day
-
 
     def del_tags(self, ind1, ind2, ind3, delta=0, items=None):
         """В зависимости от входных параметров, метод может удалять ишние теги или
