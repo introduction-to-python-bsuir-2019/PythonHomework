@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name='rss_reader',
-    version='1.3',
+    version='1.5',
     author='Boris Dashko',
     author_email='borya.dashko@gmail.com',
     url='https://github.com/BoryaD/PythonHomework/tree/FinalTask',

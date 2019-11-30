@@ -6,7 +6,7 @@ import logging
 import sys
 
 
-version = '1.3'
+version = '1.5'
 
 
 def main():
@@ -67,8 +67,8 @@ def main():
         print(news.to_json().decode())
         logger.info('News is displayed in stdout in a json format')
     else:
+        news.print()
         logger.info('News is displayed in stdout in a readability format')
-    news.print()
 
     logger.info('Program is over')
 
