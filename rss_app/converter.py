@@ -1,9 +1,17 @@
+"""
+File with a class Converter designed to convert data to pdf and html formats
+"""
+
+
 import fpdf
 from bs4 import BeautifulSoup
 import os
 
 
 class Converter:
+
+    """ News conversion class """
+
     fpdf.set_global("SYSTEM_TTFONTS", os.path.join(os.path.dirname(__file__),'fonts','ttf'))  
 
     def __init__(self, args, log):
@@ -11,19 +19,22 @@ class Converter:
         self.log=log
 
     def pdf_converter(self,entries):
+
+        """ Convert data to pdf file """
+
         self.log.info("Converter in pdf format")
         pdf = fpdf.FPDF()
         pdf.add_page()
         pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
         pdf.set_font('DejaVu', size=14)
-        for thefeedentry in entries:
+        for thefeedentry in entries[:self.args.limit]:
             path = self.get_path_image(thefeedentry)            
             pdf.multi_cell(0, 10, txt="{}".format(thefeedentry['Title']))
             pdf.multi_cell(0, 10, txt="{}".format(thefeedentry['Links']['News']))
             try:
                 pdf.image(path)
             except RuntimeError:
-                print("Error")
+                self.log.info("Error add image")
                 pdf.multi_cell(0, 10, txt="{}".format(thefeedentry['Alt image']))           
             pdf.multi_cell(0, 10, txt="{}".format(thefeedentry['Discription']))
             pdf.multi_cell(0, 10, txt="{}".format(thefeedentry['Date']))
@@ -32,12 +43,15 @@ class Converter:
         print(self.args.to_pdf)
 
     def html_converter(self, entries):
+
+        """ Convert data to html file """
+
         self.log.info("Converter in html format")
         with open(self.args.to_html, "w", encoding="utf-8") as file_text:
             file_text.write("<html>")
             file_text.write("<body>")
             file_text.write("<p>")
-            for thefeedentry in entries:
+            for thefeedentry in entries[:self.args.limit]:
                 file_text.write("{}<br />".format(thefeedentry['Title']))
                 file_text.write("<a href = "">{}</a><br />".format(thefeedentry['Links']['News']))
                 file_text.write("<img src= {} > <br />".format(thefeedentry['Links']['Image']))
@@ -48,6 +62,9 @@ class Converter:
             file_text.write("</html>")
 
     def get_path_image(self, thefeedentry):
+
+        """ Get the path of the image to add to the pdf file """
+
         self.log.info("Getting path image")
         file_name_list = self.args.source.split("//")
         file_name = file_name_list[1].replace("/", "")

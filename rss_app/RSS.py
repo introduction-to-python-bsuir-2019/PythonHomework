@@ -1,3 +1,8 @@
+"""
+A file with the RssAggregator class that parses the URL 
+and performs various actions with the received data
+"""
+
 import feedparser
 from bs4 import BeautifulSoup
 import json
@@ -8,6 +13,9 @@ import os
 
 
 class RssAggregator():
+
+    """ Class for rss feed """
+
     feedurl = ""
 
     def __init__(self, args, log):
@@ -15,12 +23,18 @@ class RssAggregator():
         self.log=log
 
     def get_news(self):
+
+        """ Returns parsed news and caches it"""
+
         self.log.info("Getting rss feed")
         thefeed = feedparser.parse(self.args.source)
         self.save_to_json_file(thefeed.entries)      
         return thefeed.entries[:self.args.limit]        
 
     def print_news(self, entries):
+
+        """ Print rss news """
+
         self.log.info("Printing news")      
         for thefeedentry in entries:
             try:
@@ -36,6 +50,9 @@ class RssAggregator():
                 self.log.info("TypeError: 'NoneType'")
 
     def print_json(self, entries):
+
+        """ Print rss news in json format"""
+
         self.log.info("RSS news to json")
         for thefeedentry in entries:
             try:
@@ -54,6 +71,9 @@ class RssAggregator():
                 self.log.info("TypeError: 'NoneType'")
 
     def save_to_json_file(self,entries):
+
+        """ Save rss news to json file"""
+
         self.log.info("Save news to json file")
         news_list = list()
         file_name = self.get_file_name()
@@ -77,6 +97,9 @@ class RssAggregator():
             json.dump(news_list, write_file, indent=3)
 
     def get_file_name(self):
+
+        """ Getting the file name for storing news """
+
         self.log.info("Getting file name")
         file_name_list = self.args.source.split("//")
         file_name = file_name_list[1].replace("/", "")
@@ -84,6 +107,10 @@ class RssAggregator():
         return file_name
 
     def save_image(self, thefeedentry, file_name):
+
+        """ Save image to file"""
+
+        self.log.info("Save image")  
         file_path = self.get_path_image(thefeedentry)
         h = httplib2.Http('.cache')
         response, content = h.request(BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])      
@@ -92,10 +119,13 @@ class RssAggregator():
             out.write(content)
             out.close()
         except FileNotFoundError:
-            print("Error")      
+            self.log.info("Error: image not found")      
 
     def get_path_image(self, thefeedentry):
-        self.log.info("Getting image name")
+
+        """ Get path image """
+
+        self.log.info("Getting path image")
         file_name_list = self.args.source.split("//")
         file_name = file_name_list[1].replace("/", "")
         folder_path = "image_" + file_name + os.path.sep
@@ -111,6 +141,9 @@ class RssAggregator():
         return file_path
 
     def get_from_json_file(self):
+
+        """ Get news on the argument --date from json file"""
+
         self.log.info("Getting news by date")
         file_name = self.get_file_name()
         news_by_date = list()
@@ -123,9 +156,12 @@ class RssAggregator():
                     news_by_date.append(thefeedentry)  
             return news_by_date
         except FileNotFoundError:  
-            print("File not found error") 
+            self.log.info("File not found error") 
 
     def get_news_for_converter(self):
+
+        """ Get news from json file for converter in pdf or html"""
+
         self.log.info("Getting news for converter")
         file_name = self.get_file_name()
         news = list()
@@ -134,9 +170,12 @@ class RssAggregator():
                 news = json.load(read_file)
             return news
         except FileNotFoundError:  
-            print("File not found error")
+            self.log.info("File not found error")
 
     def print_news_from_file(self,entries):
+
+        """ Print a certain amount of news by date """
+
         self.log.info("Printing news by date")        
         for thefeedentry in entries[:self.args.limit]:                  
             print("--------------------------------------------------")       

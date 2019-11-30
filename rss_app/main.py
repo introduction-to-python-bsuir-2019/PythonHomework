@@ -1,3 +1,8 @@
+"""
+The main file to run the script
+"""
+
+
 import argparse
 from rss_app.RSS import RssAggregator
 from rss_app.converter import Converter
@@ -7,8 +12,11 @@ from datetime import datetime
 
 __version__="0.4.0"
 
-def get_args():        
-    parser=argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
+def get_args():
+
+    """ Reads and returns arguments """
+
+    parser=argparse.ArgumentParser( description="Pure Python command-line RSS reader.")
     parser.add_argument('source', help="RSS URL")
     parser.add_argument("-v","--version", action="version", version="%(prog)s version {version}".format(version=__version__), default=None, help="Print version info")
     parser.add_argument("--json",action="store_true", help="Print result as JSON in stdout")
@@ -23,6 +31,9 @@ def get_args():
     return args
 
 def main():
+
+    """ Reads arguments and print news """
+
     args=get_args()
     if args.version:
         print(args.version)
@@ -55,7 +66,10 @@ def main():
     logger.info("Exit")
      
 
-def get_log():    
+def get_log():
+    
+    """ Returns logger with DEBUG level for creating logs in stdout """
+
     logger = logging.getLogger(__name__)
     logger.level = logging.DEBUG
     formatter = logging.Formatter('%(levelname)s: %(message)s')
