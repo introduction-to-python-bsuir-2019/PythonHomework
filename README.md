@@ -20,5 +20,6 @@ optional arguments:
   --json         Print result as JSON in stdout
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
+  --date DATE    Show cached news by input date
   ```
   JSON scheme is described in `json_schema.json`
