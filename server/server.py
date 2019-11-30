@@ -22,7 +22,7 @@ def index():
 @app.route('/v6.0/news', methods=['GET', 'POST'])
 def get_news():
     logger = rss.logger_init()
-    path_to_html = Path('static/here.html')
+    path_to_html = Path('server/templates/here.html')
     path_to_pdf = Path('static/pdf.pdf')
     is_pdf = False
     is_json = False

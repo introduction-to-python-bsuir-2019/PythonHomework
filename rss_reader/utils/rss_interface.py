@@ -57,7 +57,7 @@ class RssBotInterface(metaclass=ABCMeta):
         if args.to_pdf:  # parse to pdf and save pdf file
             self._print_news_to_pdf(args.to_pdf)
 
-        if args.to_html: # parse to html and save html file
+        if args.to_html:  # parse to html and save html file
             self._print_news_to_html(args.to_html)
 
         self.logger.info(f'Bot initialization is completed')
