@@ -1,44 +1,58 @@
 import logging
 import argparse
 from SourseReader import NewsReader
-
-PROJECT_VERSION = 'Version 1.1 : '
-PROJECT_STATUS = 'FIGHTING WITH SUMMARY'
+from cash import StoreCashSql
+from Converters.parserXML import FB2
+PROJECT_VERSION = 'Version 1.3 : '
+PROJECT_STATUS = 'UnitTesing'
 
 
 def Main():
-	parser = argparse.ArgumentParser(prog = 'RSS-READER',description=' Provide simple "one shot" RSS Reader')
-	parser.add_argument('url', help = "Provide url please", type = str)
-	parser.add_argument("--version", help = "Show initial version",action="store_true")
-	parser.add_argument("--json", help = "Convert output to json",action="store_true")
-	parser.add_argument("--verbose", help = "Outputs verbose status messages",action="store_true")
-	parser.add_argument("--limit",default=3,
-						 help = "Limit news topics if this parameter provided.Default value is 3",type = int)
+    parser = argparse.ArgumentParser(prog='RSS-READER', description=' Provide simple "one shot" RSS Reader')
+    parser.add_argument('url', help='Provide url please', type=str)
+    parser.add_argument('--version', help='Show initial version', action='store_true')
+    parser.add_argument('--json', help='Convert output to json', action='store_true')
+    parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
+    parser.add_argument('--date', help='Outputs news that was previously added to cashe by date in Ymd format',
+                        type=int)
+    parser.add_argument('--limit', default=3,
+                        help='Limit news topics if this parameter provided.Default value is 3', type=int)
+    parser.add_argument('--fb2', help='Create fb2 file.File path and name need to be provided ', type=str)
+    parser.add_argument('--html', help='Create html file.Please provide file path and name ', type=str)
+    args = parser.parse_args()
 
+    news = NewsReader(args.url, args.limit)
+    cash = StoreCashSql(args.url)
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO, format='%(relativeCreated)6d %(threadName)s %(message)s')
 
-	args = parser.parse_args()
+    if args.version:
+        print(PROJECT_VERSION + PROJECT_STATUS, end='\n')
+        return
 
-	news = NewsReader(args.url,args.limit)
-	
-	if args.verbose:
-		logging.basicConfig(level=logging.INFO, format='%(relativeCreated)6d %(threadName)s %(message)s')
+    elif args.json:
+        for item in news.make_json():
+            print(item)
 
-	if args.version:
-		print(PROJECT_VERSION + PROJECT_STATUS, end='\n')
-		return
+    elif args.date:
+        cash.show_logs(args.url, args.date, args.limit)
 
-	if args.json:
-		news.parse_rss()
-		print(news.make_json())
-		print('-'*80)
+    elif args.fb2:
+        try:
+            FB2().get_news_as_fb2(news.parse_rss(), args.fb2, news.desc_of_resourse())
+        except NameError:
+            logging.info('FB2 converting failed in case of unavailable data')
 
-	else:
-		news.parse_rss()
-		news.print_rss()
-				
+    elif args.html:
+        news.json_html(args.html)
 
+    else:
+        news.print_rss()
+        try:
+            cash.SqlCashing(news.parse_rss())
+        except NameError:
+            logging.info('SqlCashing failed in case of no data were given')
 
-	
 
 if __name__ == '__main__':
-		Main()
+    Main()

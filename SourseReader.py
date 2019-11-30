@@ -74,21 +74,24 @@ class NewsReader():
         '''Tuple container for resourse determining'''
         logging.info('Add resourse description')
         self.rss = feedparser.parse(self.url)
-        image = self.rss.feed.image.url
+        try:
+            image = self.rss.feed.image.url
+        except AttributeError:
+            image = 'No image'
         title = self.rss.feed.title
         link = self.rss.feed.link
         return title, link, image
 
     def make_json(self):
         '''Create json output with help of json.dumps and list of entries '''
+        logging.info('Make readable json format...')
         try:
             self.parse_rss()
         except NameError:
             return 'Connection to rss feed failed'
-
-        logging.info('Make readable json format...')
+        emp_list = []
         for feed in self.entries[0:self.limit]:
-            print(json.dumps({
+            emp_list.append((json.dumps({
                 "item": {
                     "link": feed['link'],
                     "body": {
@@ -99,7 +102,8 @@ class NewsReader():
                          "description": feed['description']
                     }
                 }
-            }, indent=4, ensure_ascii=False))
+            }, indent=4, ensure_ascii=False)))
+        return emp_list
 
     def json_for_html(self):
         '''Add special tags for nice html creating '''
