@@ -49,6 +49,17 @@ Utility provides the following interface:
     ```
     docker run -it -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock python /bin/bash
     ```
+2. Input this commands:
+
+    ```
+    git clone https://github.com/ZayJob/PythonHomework
+
+    cd PythonHomework
+    
+    git branch --track finalTask remotes/origin/finalTask
+    git checkout finalTask
+    ```
+
 2. Input command:
 
     ```
