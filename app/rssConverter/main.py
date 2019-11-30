@@ -4,8 +4,10 @@ import app
 import os
 from datetime import datetime
 from app.rssConverter.RssConverter import RssConverter
-from app.rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDateOrURL
+from app.rssConverter.Exeptions import RssGetError, IncorrectLimit, IncorrectDateOrURL, IncorrectAddress
 from app.rssConverter.DataSafer import NewsGetterSafer
+from app.rssConverter.NewsPrinter import NewsPinter
+from app.rssConverter.HtmlConverter import HtmlConverter
 
 
 def main():
@@ -20,7 +22,9 @@ def main():
     try:
         if args.url:
             if args.date:
+                logger.info("try to get saved news")
                 news_list = NewsGetterSafer.get_data(args.date, args.url)
+                logger.info("saved news are gotten")
             else:
                 not_parsed_news = rss.get_news(args.url)
                 logger.info("got news")
@@ -30,10 +34,15 @@ def main():
                 logger.info("news saved")
             if args.json:
                 logger.info("print json")
-                rss.in_json_format(news_list, args.limit)
+                NewsPinter.in_json_format(news_list, args.limit)
                 logger.info("json is printed")
+            if args.html:
+                image_dir = creating_image_dir(logger)
+                html_converter = HtmlConverter(image_dir, news_list)
+                html_converter.create_html_file(args.html)
+                html_converter.parse_news()
             else:
-                rss.print_news(news_list, args.limit)
+                NewsPinter.print_news(news_list, args.limit)
                 logger.info("news are printed")
             if args.verbose:
                 with open(log_file) as log_file:
@@ -53,20 +62,23 @@ def main():
         logger.info("incorrect limit")
         print(
             'Limit should not be more than {0}'.format(ex.max_quantity))
+    except IncorrectAddress as ex:
+        logger.info("incorrect address")
+        print('Can not create file at {0}'.format(ex.address))
     except Exception as ex:
         logger.info("Something has gone wrong. Exception is  {0}".format(ex))
     else:
         logger.info("Everything have worked without problems")
 
 
-def creating_image_dir():
+def creating_image_dir(logger):
     current_dir = os.getcwd()
     image_path = os.path.join(current_dir, 'images')
     if not os.path.exists(image_path):
         os.makedirs(image_path)
-        print("create folder with path {0}".format(image_path))
+        logger.info("create folder with path {0}".format(image_path))
     else:
-        print("folder exists {0}".format(image_path))
+        logger.info("folder exists {0}".format(image_path))
     return image_path
 
 
@@ -114,5 +126,10 @@ def args_adding(parser):
     parser.add_argument(
         '--date',
         help='input date',
+    )
+    parser.add_argument(
+        '--to-html',
+        type=str,
+        help='Address, at which you want to save file'
     )
     return parser

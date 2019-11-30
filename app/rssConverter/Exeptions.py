@@ -12,3 +12,8 @@ class IncorrectDateOrURL(Exception):
     def __init__(self, date, url):
         self.date = date
         self.url = url
+
+
+class IncorrectAddress(Exception):
+    def __init__(self, address):
+        self.address = address
