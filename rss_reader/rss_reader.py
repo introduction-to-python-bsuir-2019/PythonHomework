@@ -43,14 +43,12 @@ class RssReader(object):
                 for feed in list_of_news:
                     text_of_the_feed = self.parse_html(feed['summary_detail']['value'])
                     title = self.parse_html(feed['title'])
-                    if 'media_content' in feed.keys():
-                        media_content = feed['media_content'][0]['url']
                     feed_object = News(news['feed']['title'],
                                     title,
                                     datetime.fromtimestamp(mktime(feed['published_parsed'])),
                                     feed['link'],
                                     text_of_the_feed,
-                                    [image['url'] for image in feed['media_content']],
+                                    [image.get('url') for image in feed.get('media_content')],
                                     datetime.today())
                     current_feed_in_table = s.query(News).filter(News.link==feed['link']).first()
                     if not current_feed_in_table:
@@ -101,7 +99,7 @@ class RssReader(object):
             print('='*77)
     
     def exec(self):
-        #try:
+        try:
             if self.date:
                 self.get_cached_news()
             elif self.all:
@@ -110,6 +108,9 @@ class RssReader(object):
                 self.get_and_parse_news()
                 self.get_news_to_print()
             self.print_news()
-            PdfConverter(self.news_to_print, './').convert()
-        #except Exception as e:
-        #    print(e)
+            if 'pdf' in self.configuration_for_conversion:
+                PdfConverter(self.news_to_print, self.configuration_for_conversion.get('pdf')).convert()
+            if 'html' in self.configuration_for_conversion:
+                HtmlConverter(self.news_to_print, self.configuration_for_conversion.get('html')).convert()
+        except Exception as e:
+            print(e)

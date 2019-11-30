@@ -4,7 +4,8 @@ from rss_reader import __version__ as version
 
 with open('requirements.txt') as f:
     requirements = f.read()
-    
+
+
 setup(
     name='rss-reader',
     version=version,

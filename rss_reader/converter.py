@@ -45,14 +45,17 @@ class ConverterBase(ABC):
             images = feed.media_content
             for number_of_image, image in zip(range(len(images)), images):
                 if not image:
-                    continue
+                    continue                    
+                image = self.check_image_link(image)
                 response, content = h.request(image)
                 image = Image.open(io.BytesIO(content))
-                #image.convert('RGB')
                 image_file_name = path.join(self.dir_for_images, '%d%d.png'%(feed.id, number_of_image))
                 image.save(image_file_name, 'PNG')
-                #with open(image_file_name, 'wb') as out:
-                 #   out.write(content)
+
+    def check_image_link(self, image_link):
+        where_sub_link = image_link.rfind('http')
+        if where_sub_link:
+            return image_link[where_sub_link:]
 
 
 class HtmlConverter(ConverterBase): 
@@ -99,39 +102,62 @@ class HtmlConverter(ConverterBase):
         return self.save_file(converted_data) if self.saving_file else converted_data        
 
 
-class HTML2PDF(FPDF, HTMLMixin):
-    pass
-
-
 class PdfConverter(ConverterBase):
     def __init__(self, news, dir_for_save):
         super().__init__(news, dir_for_save)
         self.filename = 'news.pdf'
     
-    def convert(self):
-        pdf = HTML2PDF('P','mm', 'A4')
-        pdf.add_font('TimesNewRoman', '', 'times-new-roman.ttf', uni=True)
-        pdf.add_page()
-        pdf.set_font('TimesNewRoman', size=22)
-        pdf.set_left_margin(20)
-        pdf.set_right_margin(15)
-        pdf.cell(0, 20, 'News you were looking for', ln=1, align='C')
-        for feed in self.news:
-            pdf.set_font('TimesNewRoman', size=18)
-            pdf.multi_cell(0, 10, feed.title, align='C')
-            pdf.set_font('TimesNewRoman', 'U', 12)
-            pdf.set_text_color(r=0, g=0, b=255)
-            pdf.cell(210, 15, 'Link to that news', ln=1, align='L', link=feed.link)
-            pdf.set_text_color(0,0,0)
-            pdf.set_font('TimesNewRoman', size=14)
-            pdf.write(6, feed.description)
-            pdf.ln(10)
-            for number_of_image in range(len(feed.media_content)):
-                pdf.image(path.join(self.dir_for_images, '%d%d.png'%(feed.id, number_of_image)), 20, w=120, h=80)         
+    class PDF(FPDF):
+        def __init__(self):
+            super().__init__('P','mm', 'A4')
+            self.add_font('TimesNewRoman', '', 'times-new-roman.ttf', uni=True)
+            self.set_margins(30, 20, 10)
+            self.set_auto_page_break(True, 20)
+            self.add_page()
+            self.set_font('TimesNewRoman', size=22)
+            self.cell(0, 20, 'News you were looking for', ln=1, align='C')
             
-        #html_news = HtmlConverter(self.news, self.dir_for_images, False).convert()
-        #pdf.write_html(html_news)
-        pdf.output(self.filename)
+        def footer(self):
+            self.set_y(-20)
+            self.set_font('TimesNewRoman', size=12)
+            self.cell(0, 20, '%s' % self.page_no(), 0, 0, 'R')
+            
+        def add_link(self, link):
+            self.set_font('TimesNewRoman', 'U', 12)
+            self.set_text_color(r=0, g=0, b=255)
+            self.cell(210, 15, 'Link to that news', ln=1, align='L', link=link)
+            
+            
+        def add_title(self, title):
+            self.set_font('TimesNewRoman', size=18)
+            self.multi_cell(0, 10, title, align='C')
+        
+        def add_description(self, description):
+            self.set_text_color(0,0,0)
+            self.set_font('TimesNewRoman', size=14)        
+            self.write(6, feed.description)
+            self.ln(10)
+        
+        def add_images_from_the_feed(self, id, media_content):
+            for number_of_image in range(len(media_content)):
+                if not media_content[0]:
+                    continue
+                self.set_x(50)
+                self.image(path.join(self.dir_for_images, '%d%d.png'%(id, number_of_image)), w=120, h=80)
+                self.ln(10)
+            
+        def add_feed(self, feed):
+            self.add_title(feed.title)
+            self.add_link(feed.link)
+            self.add_description(feed.description)            
+            self.add_images_from_the_feed(feed.id, feed.media_content)
+            self.ln(20)
+                
+    def convert(self):
+        pdf = self.PDF()        
+        for feed in self.news:
+            pdf.add_feed(feed)
+        pdf.output(path.join(self.dir_for_save, self.filename))
         
 
 class EpubConverte(ConverterBase):
@@ -144,6 +170,3 @@ class MobiConverter(ConverterBase):
 
 class Fb2Converter(ConverterBase):
     pass
-
-if __name__=='__main__':
-    PdfConverter(123,'123').convert()
