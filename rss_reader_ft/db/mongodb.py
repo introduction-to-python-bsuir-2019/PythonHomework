@@ -68,9 +68,13 @@ class MongoDatabase:
         logging.info('We get data from the database')
 
         if date is not None:
-            news_feed = self.feed_collection.find_one(
-                {"Url": source, "Date_Parsed": str(date)}
-            )
+            if date > (datetime.datetime.today().strftime("%Y%m%d")):
+                news_feed = self.feed_collection.find_one(
+                    {"Url": source, "Date_Parsed": str(date)}
+                )
+            else:
+                logging.info(f'Data not found in date - {date}')
+                print("Incorrect date")
         else:
             news_feed = self.feed_collection.find_one(
                 {"Url": source, "Date_Parsed": datetime.datetime.today().strftime("%Y%m%d")}

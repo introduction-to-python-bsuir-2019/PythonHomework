@@ -5,7 +5,9 @@ RSS reader is a command-line utility which receives RSS URL and prints results i
 
 ## Specification
 
-**Is used Docker + docker-compose**
+**Is used Docker + docker-compose and --to-pdf NOT WORK WITH RU NEWS FEEDS!**
+**If you want check valid or not news feeds for converted, add arg --verbose if he work - PDF file create)))**
+**If PDF not create add arg --limit 1**
 
 Utility provides the following interface:
   + positional arguments:
@@ -16,7 +18,7 @@ Utility provides the following interface:
     + --json     - Print result as JSON in stdout.
     + --verbose  - Outputs verbose status messages.
     + --limit    - Limit news topics if this parameter is provided.
-    + --date     - Return cached news from the specified day. Format is %Y%M%D. Shows the news of the day when you viewed them
+    + --date     - Return cached news from the specified day. Format is %Y%M%D. **Shows the news of the day when you viewed them**
     + --to-html  - Print result as in HTML file
     + --to-pdf   - Print result as in PDF file
 
@@ -49,7 +51,7 @@ Utility provides the following interface:
     ```
     docker run -it -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock python /bin/bash
     ```
-2. Input this commands:
+2. Paste this commands into the console:
 
     ```
     git clone https://github.com/ZayJob/PythonHomework
@@ -60,15 +62,15 @@ Utility provides the following interface:
     git checkout finalTask
     ```
 
-2. Input command:
+2. Paste this command into the console:
 
     ```
-    chmod +x install.sh && . install.sh
+    chmod +x install_script.sh && . install_script.sh
     ```
 
 3. Use for run app:
     ```
-    docker-compose run app python -m rss_reader_ft "https://news.yahoo.com/rss" --limit 2 --json
+    docker-compose run app python -m rss_reader_ft "https://news.yahoo.com/rss" --limit 2 --colorize --to-html --to-pdf --verbose
     ```
 4. If you want to see the database, then open a browser and paste the URL ( http://localhost:8081/db/News_feed/feeds )
 
