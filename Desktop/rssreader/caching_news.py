@@ -3,7 +3,7 @@
 import logging
 import sqlite3
 
-from rss_reader_consts import *
+from rssreader.rss_reader_consts import *
 
 
 ROOT_LOGGER_NAME = 'RssReader'

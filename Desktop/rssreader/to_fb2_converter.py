@@ -4,7 +4,7 @@ import xml.etree.ElementTree as tree
 import xml.dom.minidom as minidom
 from xml.etree.ElementTree import Element
 
-from image_handle import get_image_as_base64
+from rssreader.image_handle import get_image_as_base64
 
 
 ROOT_LOGGER_NAME = 'RssReader'

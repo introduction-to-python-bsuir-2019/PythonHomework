@@ -11,11 +11,11 @@ from bs4 import BeautifulSoup
 import logging
 import json
 
-from rss_reader_consts import *
+from rssreader.rss_reader_consts import *
 
-import caching_news
-import to_fb2_converter
-import to_pdf_converter
+import rssreader.caching_news as caching_news
+import rssreader.to_fb2_converter as to_fb2_converter
+import rssreader.to_pdf_converter as to_pdf_converter
 
 
 ROOT_LOGGER_NAME = 'RssReader'

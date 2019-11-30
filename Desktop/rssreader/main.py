@@ -7,10 +7,10 @@ import argparse
 from logging import config
 
 PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(PACKAGE_PATH)
+# sys.path.append(PACKAGE_PATH)
 
-from rss_parser import RssReader
-import caching_news
+from rssreader.rss_parser import RssReader
+import rssreader.caching_news as caching_news
 
 VERSION = '4.0'
 

@@ -3,9 +3,8 @@ import logging
 import os
 import sys
 from fpdf import FPDF
-from image_handle import save_image_by_url
+from rssreader.image_handle import save_image_by_url
 
-# from fpdf.py3k import PY3K
 
 ROOT_LOGGER_NAME = 'RssReader'
 MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.to_pdf_converter'
