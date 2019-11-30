@@ -2,14 +2,14 @@ from .components.helper.singleton import Singleton
 from .components.parser.parser import Parser
 from .components.feed import *
 from .components.logger.logger import Logger
-
+import conf
 
 class App(Singleton):
 
     def __init__(self) -> None:
         console = Parser(
             'Pure Python command-line RSS reader.',
-            'src.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] source'
+            conf.__description__
         )
 
         self._console_args = console.get_args()

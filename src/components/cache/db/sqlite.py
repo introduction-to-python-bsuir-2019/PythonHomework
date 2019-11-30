@@ -15,6 +15,7 @@ class Sqlite:
 
         try:
             self.conn = sqlite3.connect(path,  isolation_level=None)
+            self.conn.row_factory = sqlite3.Row
             self.cursor = self.conn.cursor()
 
         except sqlite3.Error as e:
@@ -41,16 +42,24 @@ class Sqlite:
         except sqlite3.Error as e:
             sys.exit(e)
 
-    def get(self, table, columns, limit=None):
+    def get(self, table, columns, limit=100):
 
-        query = scripts.get('get').format(columns, table)
+        query = scripts.get('get').format(columns, table, limit)
         self.cursor.execute(query)
 
-        rows = self.cursor.fetchall()
+        return self.cursor.fetchall()
 
-        return rows[len(rows) - limit if limit else 0:]
+    def get_last(self, table, columns):
+        return self.get(table, columns, limit=1)[0]
 
-    def findWhere(self, table, column, value, type='='):
+    def where(self, table, column, value, type='=', limit=100):
+
+        query = scripts.get('where').format(table, value, type, limit)
+        self.cursor.execute(query)
+
+        return self.cursor.fetchall()
+
+    def find_where(self, table, column, value, type='='):
 
         query = scripts.get('find_where').format(table, column, type,value)
 
@@ -58,10 +67,6 @@ class Sqlite:
         row = self.cursor.fetchone()
 
         return row[0] if row is not None else False
-
-    def getLast(self, table, columns):
-
-        return self.get(table, columns, limit=1)[0]
 
     def write(self, table, columns, data):
 
@@ -73,9 +78,10 @@ class Sqlite:
 
         return self.cursor.fetchall() or False
 
-    def query(self, sql):
-        self.cursor.execute(sql)
+    def query(self, sql, *args):
+        self.cursor = self.conn.cursor()
+
+        return self.cursor.execute(sql, args)
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
-

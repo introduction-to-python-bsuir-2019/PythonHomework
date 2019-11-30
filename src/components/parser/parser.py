@@ -10,6 +10,7 @@ class Parser:
         'json',
         'verbose',
         'limit',
+        'date',
         'colorize',
     )
 

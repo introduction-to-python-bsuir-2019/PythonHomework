@@ -27,4 +27,4 @@ class FeedEntry:
         )
 
     def _process_published(self, entry):
-        datetime(*entry.published_parsed[:6])
+        return datetime(*entry.published_parsed[:6])

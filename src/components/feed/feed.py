@@ -1,4 +1,5 @@
 import feedparser
+from datetime import timedelta
 
 from src.components.feed.feed_entry import FeedEntry
 from src.components.feed.feed_formatter import FeedFormatter
@@ -10,17 +11,26 @@ class Feed:
 
     def __init__(self, args):
         self._is_json = args.json
+        self._cache_date = args.date
         self._limit = args.limit
         self._url = args.source
         self._entities_list = []
 
         Logger.log('Initialize console variables')
 
+        self._pre_validate_params()
+
+        self._parse_feeds()
+
+    def _pre_validate_params(self):
         if self._limit <= 0:
             Logger.log_error('Limit must be up to zero')
             raise ValueError('limit equal or less 0')
 
-        self._parse_feeds()
+        if not Cache().get_specify_by_date(self._cache_date, self._limit):
+            raise Exception(f'There is no cached news '
+                            f'{self._cache_date.strftime("from %d, %b %Y")}'
+                            f'{(self._cache_date + timedelta(days=1)).strftime(" to %d, %b %Y")}')
 
     def show_feeds(self) -> object:
         Logger.log(f'Preparation for output feeds. '
@@ -28,11 +38,18 @@ class Feed:
                    f'Feeds choosen: {self._limit}')
 
         FeedFormatter.is_json = self._is_json
+
         output = FeedFormatter.generate_output(
-            self._entities_list, self._limit, self._feeds_title
+            self._decide_output(), self._limit, self._feeds_title
         )
 
         print(output)
+
+    def _decide_output(self):
+        if self._cache_date:
+            return Cache().load_feeds_entries(self._cache_date, self._limit)
+
+        return self._entities_list
 
     def _parse_feeds(self):
 
