@@ -2,11 +2,12 @@
 
 import feedparser
 import logging
+
 from tldextract import extract
 
 from .article import Article
 from .json_format import Json
-from .articles_cache import ArticlesCacher
+from .articles_cache import NewsCacher
 
 
 class Reader:
@@ -20,6 +21,11 @@ class Reader:
         self.hrefs = []
         self.date = date
         self.json_object = Json()
+
+        ext_site_name = extract(self.link)
+        site_name = ext_site_name.domain + '.' + ext_site_name.suffix
+        
+        self.cacher_object = NewsCacher('cached_news.json', site_name)
 
     def parse_url(self):
         """Get RSS xml-file from url"""
@@ -47,17 +53,15 @@ class Reader:
 
             self.articles.append(Article(item.title, item.published, item.description, item.link, content))
 
-        ext_site_name = extract(self.link)
-        site_name = ext_site_name.domain + '.' + ext_site_name.suffix
-
         feeds = self.articles_to_array()
-        cacher = ArticlesCacher('cached_news.json', site_name, '20192915')
-        cacher.cache(feeds)
+        if self.date == None:
+            self.cacher_object.cache(feeds)
 
         if self.json is True:
             self.json_object.format(feeds)
 
     def articles_to_array(self):
+        """Convert articles to array of dicts"""
         self.logger.info('Convert articles to array of dicts')
 
         array = []
@@ -73,14 +77,25 @@ class Reader:
         return array
 
     def print_articles(self):
+        """Print articles to console"""
         self.logger.info('Print articles to console')
 
         if self.json is True:
             print(self.json_object)
+        elif self.date != None:  
+            news = self.cacher_object.get_cached_news(self.date, self.limit)
+
+            if news == []:
+                print('News for this date not found :(')
+                return
+                
+            for article in news:
+                self.print_cached_article(article)
+                print('\n'*5)
         else:
             for article in self.articles:
                 self.print_article(article)
-                print('\n-------------------------\n')
+                print('\n'*5)
 
     def print_article(self, article):
         """Print article to console"""
@@ -88,8 +103,19 @@ class Reader:
         print(f'Title: {article.title}')
         print(f'Date:  {article.date}')
         print(f'Link: {article.link}')
-        print('\nArticle text:')
+        print('Article text:')
         print(article.text)
-        print('\nHrefs:')
+        print('Hrefs:')
         for href in article.hrefs:
-            print(href)
+            print('| ' + href)
+
+    def print_cached_article(self, article):
+        """Print cached article to console"""
+
+        print(f'Title: {article["title"]}')
+        print(f'Link: {article["link"]}')
+        print('Article text:')
+        print(article["text"])
+        print('Hrefs:')
+        for href in article["hrefs"]:
+            print('| ' + href)
