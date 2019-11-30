@@ -12,7 +12,7 @@ styles=getSampleStyleSheet()
 
 def save_img(url, number):
     """Downloads the image and saves it (example: image1) in the application directory"""
-    logging.info("Downloading images for pdf")
+    logging.info("Downloading image for pdf")
     img = requests.get(url)
     file_name = "image" + str(number)
     fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name)
@@ -20,10 +20,10 @@ def save_img(url, number):
         img_file.write(img.content)
         img_file.close()
 
-def remove_image(i): #TODO
+def remove_image(i):
     """Trying to delete downloaded for pdf images"""
     try:
-        logging.info("Deleting images for pdf")
+        logging.info("Deleting image for pdf")
         fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'image'+str(i))
         os.remove(fn)
     except OSError:
@@ -49,6 +49,8 @@ def convert_to_pdf(news):
         date = "Date: " + news[i].date
         if news[i].text != "" and news[i].text != " ":
             text = "Description: " + news[i].text
+        else:
+            text = "Description: No description" 
         feed = "Feed: " + news[i].feed
         title = "Title: " + news[i].title
         main_link = "Link: " + news[i].link

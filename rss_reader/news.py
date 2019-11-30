@@ -8,6 +8,8 @@ import pickle
 from rss_reader import arg
 from bs4 import BeautifulSoup
 from datetime import datetime
+from colored import fore
+
 
 class News():
     def __init__(self, feed, link, title, date, text, images):
@@ -19,24 +21,49 @@ class News():
         self.url_images = images
 
     def show_feed(self):
-        print('Feed: ', self.feed, end = "\n\n")
+        if arg.args.colorize:
+            print(fore.YELLOW + "Feed: ", end = "")
+            print(fore.MAGENTA + self.feed, end = "\n\n")
+        else:
+            print("Feed: ", self.feed, end = "\n\n")
 
     def show_link(self):
-        print("Link: ", self.link, end = "\n\n")
+        if arg.args.colorize:
+            print(fore.RED + "Link: ", end = "")
+            print(fore.LIGHT_BLUE + self.link, end = "\n\n")
+        else:
+            print("Link: ", self.link, end = "\n\n")
 
     def show_title(self):
-        print("Title: ", self.title, end = "\n\n")
+        if arg.args.colorize:
+            print(fore.WHITE + "Title: ", end = "")
+            print(fore.YELLOW + self.title, end = "\n\n")
+        else:
+            print("Title: ", self.title, end = "\n\n")
 
     def show_text(self):
-        if self.text != "" and self.text != " ":
-            print("Description: ", self.text, end = "\n\n")
+        if arg.args.colorize:
+            if self.text != "" and self.text != " ":
+                print(fore.YELLOW + "Description: ", end = "")
+                print(fore.GREEN +  self.text, end = "\n\n")
+            else:
+                print(fore.CYAN + "Description: No description", end = "\n\n")
         else:
-            print("Description: No description", end = "\n\n")
+            if self.text != "" and self.text != " ":
+                print("Description: ", self.text, end = "\n\n")
+            else:
+                print("Description: No description", end = "\n\n")
 
     def show_date(self):
-        print("Date: ", self.date, end = "\n\n")
+        if arg.args.colorize:
+            print(fore.CYAN +"Date: ", end = "")
+            print(fore.RED + self.date, end = "\n\n")
+        else:
+            print("Date: ", self.date, end = "\n\n")
 
     def show_images(self):
+        if arg.args.colorize:
+            print(fore.YELLOW)
         if self.url_images != [''] and self.url_images != None and self.url_images != []:
             print("URL Images: ")
             for i in range(len(self.url_images)):
