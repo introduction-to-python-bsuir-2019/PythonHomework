@@ -1,3 +1,4 @@
+'''Module contain class related to news'''
 from sqlalchemy import create_engine, Column, String, DateTime, PickleType, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -7,8 +8,8 @@ Base = declarative_base()
 
 
 class News(Base):
+    '''News class'''
     __tablename__ = 'news'
-
     id = Column(Integer, primary_key=True, autoincrement=True)
     feed = Column(String)
     title = Column(String)
@@ -28,6 +29,7 @@ class News(Base):
         self.date_of_addition = date_of_addition
 
     def __str__(self, json=None):
+        '''Method returns full text of the feed'''
         str_to_print = 'Feed: %s\nTitle: %s\nDate: %s\nLink: %s\n\n%s\n\nLinks:\n[1] %s --feed\n' % \
             (self.feed, self.title, self.date, self.link, self.description, self.link)
         if self.media_content[0]:

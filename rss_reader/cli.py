@@ -1,3 +1,4 @@
+'''Module implements a CLI of the application'''
 import argparse
 import logging
 from datetime import datetime
@@ -7,6 +8,7 @@ from .rss_reader import RSSReader
 
 
 def main():
+    '''Entry point of the app'''
     parser = adding_arguments()
     args = parser.parse_args()
     init_logging(args.verbose)
@@ -16,6 +18,7 @@ def main():
 
 
 def adding_arguments():
+    '''Function initializes arguments of the RSS Reader'''
     parser = argparse.ArgumentParser(description='Pure Python command-line RSS reader')
     parser.add_argument('source', metavar='source', type=url, help='RSS URL')
     parser.add_argument('--version', action='version', version='ver 1.4', help='Print version info')
@@ -31,6 +34,7 @@ def adding_arguments():
 
 
 def directory(dir_for_save):
+    '''Function validates the path where the exported file will be saved'''
     if path.exists(dir_for_save):
         logging.info(f'Directory {dir_for_save} already exists')
     else:
@@ -40,6 +44,7 @@ def directory(dir_for_save):
 
 
 def url(source):
+    '''Function validates the URL that is the source of the news'''
     logging.info('URL validation')
     if not is_url(source):
         raise argparse.ArgumentError('Invalid url')
@@ -47,6 +52,7 @@ def url(source):
 
 
 def date(date):
+    '''Function validates date'''
     logging.info('Date validation')
     try:
         checked_date = datetime.strptime(date, '%Y%m%d').date()
@@ -56,6 +62,7 @@ def date(date):
 
 
 def init_logging(verbose):
+    '''Logging initialization'''
     if verbose:
         logging.basicConfig(format='%(module)s %(asctime)s  %(message)s',
                             datefmt='%I:%M:%S', level=logging.INFO)
@@ -63,6 +70,7 @@ def init_logging(verbose):
 
 
 def mk_config_for_conversion(pdf, html):
+    '''Function creates a dictionary which contain which type of files and where news will be saved'''
     logging.info('Making dict with configuration of conversion')
     from collections import defaultdict
     dict_with_directories = defaultdict(str)

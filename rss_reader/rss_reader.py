@@ -13,13 +13,12 @@ from .converter import HtmlConverter, PdfConverter
 
 @contextmanager
 def create_session(adding=None):
-    Session = sessionmaker(bind=engine)
+    "Context manager that creates a session for exchanging data with a database"
+    Session = sessionmaker(bind=engine, autocommit=True)
     s = Session()
     try:
         yield s
     finally:
-        if adding:
-            s.commit()
         s.close()
 
 
@@ -43,7 +42,7 @@ class RSSReader(object):
             raise Exception('Entered URL is not a RSS source')
         if news.get('status')/100 != 2:
             raise ConnectionError
-        with create_session('adding') as s:
+        with create_session() as s:
             list_of_news = news['entries'][:self.limit] if self.limit else news['entries']
             for feed in list_of_news:
                 text_of_the_feed = self.parse_html(feed['summary_detail']['value'])

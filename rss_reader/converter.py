@@ -1,3 +1,4 @@
+'''Module contains classes that implement converters in different formats'''
 import logging
 from os import path, mkdir
 from abc import ABC, abstractmethod
@@ -5,6 +6,7 @@ from fpdf import FPDF
 
 
 class ConverterBase(ABC):
+    '''Base class of converters'''
     def __init__(self, news, dir_for_save):
         self.news = news
         self.dir_for_images = path.join(dir_for_save, '.images_from_news')
@@ -13,6 +15,7 @@ class ConverterBase(ABC):
         self.get_images(news)
 
     def init_dir_for_images_from_news(self):
+        '''Method creates directory where images from the news wiil be saved'''
         if path.exists(self.dir_for_images):
             logging.info('Directory %s already exists' % self.dir_for_images)
         else:
@@ -24,11 +27,13 @@ class ConverterBase(ABC):
         return news
 
     def save_file(self, data):
+        '''Method that save converted file'''
         logging.info('Saving file with news')
         with open(self.generate_filename(), 'w') as f:
             f.write(data)
 
     def generate_filename(self):
+        '''Method that generate unique filename in the directory'''
         filename = path.join(self.dir_for_save, self.filename)
         number_of_files = 1
         while number_of_files:
@@ -39,6 +44,7 @@ class ConverterBase(ABC):
                 return filename
 
     def get_images(self, news):
+        '''Method that getting images that were in the news from their sources'''
         import httplib2             # this lib selected because it is much faster than urllib or requests(if you use caching of course)
         from PIL import Image
         import io
@@ -57,6 +63,12 @@ class ConverterBase(ABC):
 
     @staticmethod
     def check_image_link(image_link):
+        '''
+        Method checks nested links in the source of image.
+        
+        For example, in news.yahoo.com link to the image has nested link 
+        that contains the address of this image in its original form.
+        '''
         logging.info('Checking for nested links')
         where_sub_link = image_link.rfind('http')
         if where_sub_link:
@@ -64,6 +76,7 @@ class ConverterBase(ABC):
 
 
 class HtmlConverter(ConverterBase):
+    '''Class implements conversion into HTML format'''
     def __init__(self, news, dir_for_save):
         logging.info('Initialization of HtmlConverter')
         super().__init__(news, dir_for_save)
@@ -100,6 +113,7 @@ class HtmlConverter(ConverterBase):
         self.image_template = '<center><img src="{path}" width="720" height="468"></center>'
 
     def convert(self):
+        '''Method that doing conversion'''
         logging.info('Converting news to HTML format')
         news_str = ''
         for feed in self.news:
@@ -112,12 +126,14 @@ class HtmlConverter(ConverterBase):
 
 
 class PdfConverter(ConverterBase):
+    '''Class that implements conversion into PDF format'''
     def __init__(self, news, dir_for_save):
         logging.info('Initialization of PdfConverter')
         super().__init__(news, dir_for_save)
         self.filename = 'news.pdf'
 
     class PDF(FPDF):
+        '''Class implements PDF document'''
         def __init__(self, dir_with_images):
             logging.info('Initialization of PDF document')
             self.dir_with_images = dir_with_images
@@ -130,26 +146,39 @@ class PdfConverter(ConverterBase):
             self.cell(0, 20, 'News you were looking for', ln=1, align='C')
 
         def footer(self):
+            '''Method that adds footer to document'''
             self.set_y(-20)
             self.set_font('TimesNewRoman', size=12)
             self.cell(0, 20, '%s' % self.page_no(), 0, 0, 'R')
 
+        def add_feed(self, feed):
+            '''Method that adds feed to document'''
+            self.add_title(feed.title)
+            self.add_link(feed.link)
+            self.add_description(feed.description)
+            self.add_images_from_the_feed(feed.id, feed.media_content)
+            self.ln(20)
+            
         def add_link(self, link):
+            '''Method that adds link to document'''
             self.set_font('TimesNewRoman', 'U', 12)
             self.set_text_color(r=0, g=0, b=255)
             self.cell(210, 15, 'Link to that news', ln=1, align='L', link=link)
 
         def add_title(self, title):
+            '''Method that adds title of the feed to document'''
             self.set_font('TimesNewRoman', size=18)
             self.multi_cell(0, 10, title, align='C')
 
         def add_description(self, description):
+            '''Method that adds description of the feed to document'''
             self.set_text_color(0, 0, 0)
             self.set_font('TimesNewRoman', size=14)
             self.write(6, description)
             self.ln(10)
 
         def add_images_from_the_feed(self, id, media_content):
+            '''Method that adds images from the news to document'''
             for number_of_image in range(len(media_content)):
                 if not media_content[0]:
                     continue
@@ -157,14 +186,8 @@ class PdfConverter(ConverterBase):
                 self.image(path.join(self.dir_with_images, f'{id}{number_of_image}.png'), w=120, h=80)
                 self.ln(10)
 
-        def add_feed(self, feed):
-            self.add_title(feed.title)
-            self.add_link(feed.link)
-            self.add_description(feed.description)
-            self.add_images_from_the_feed(feed.id, feed.media_content)
-            self.ln(20)
-
     def convert(self):
+        '''Method that doing conversion'''
         logging.info('Converting news to PDF format')
         pdf = self.PDF(self.dir_for_images)
         for feed in self.news:
