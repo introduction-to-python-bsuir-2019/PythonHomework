@@ -101,8 +101,6 @@ def download_image(url, dest_filepath):
     """
     with open(dest_filepath, 'wb') as f:
         response = requests.get(url, stream=True)
-        if not response.ok:
-            print(response)
         for block in response.iter_content(1024):
             if not block:
                 break

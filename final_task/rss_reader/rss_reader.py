@@ -137,12 +137,11 @@ def main():
         logger.addHandler(logging.StreamHandler(sys.stdout))
         logger.info(f"verbose notifications are turned on")
 
-    if args.limit:
+    if args.limit or args.limit == 0:
         if args.limit < 1:
-            if not args.verbose:
-                print("error: invalid limit value")
-            logger.error(f"invalid limit value")
-            logger.info(f"end of work -->|")
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.error(f"error: invalid limit value\n")
             return
 
     if args.date:
@@ -156,16 +155,14 @@ def main():
                 raise IndexError
             news = news[:args.limit if args.limit else len(news)]
         except ValueError:
-            if not args.verbose:
-                print("error: invalid date")
-            logger.error(f"invalid date")
-            logger.info(f"end of work -->|")
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.error(f"error: invalid date\n")
             return
         except IndexError:
-            if not args.verbose:
-                print("no news for this date")
-            logger.info(f"no news for this date")
-            logger.info(f"end of work -->|")
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.info(f"error: no news for this date\n")
             return
 
     if args.source:
@@ -176,43 +173,49 @@ def main():
             cacher.cache_news(connection, cursor, news)
             news = news[:args.limit if args.limit else len(news)]
         except ValueError:
-            if not args.verbose:
-                print(f"error: not well-formed xml or no access to the Internet")
-            logger.error(f"not well-formed xml or no access to the Internet")
-            logger.info(f"end of work -->|")
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.error(f"error: not well-formed xml or no access to the Internet\n")
             return
 
     if args.limit:
         logger.info(f"the limit of publications to print - {args.limit}")
 
     if not args.json and not args.html and not args.pdf:
-        logger.info(f"displaying news..\n")
+        logger.info(f"displaying news..")
         display_news(news)
     elif args.json:
-        logger.info(f"displaying news in json format..\n")
+        logger.info(f"displaying news in json format..")
         print(to_json(news))
     elif args.html:
         logger.info(f"writing news in {args.html} file in html format..")
-        format_converter.to_html(news, args.html)
-        logger.info(f"file {args.html} was successfully rewrited")
-        logger.info(f"end of work -->|")
+        try:
+            format_converter.to_html(news, args.html)
+        except (OSError, FileNotFoundError):
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.error("error: invalid directory\n")
+            return
+        logger.info(f"file {args.html} was successfully rewrited\n")
         return
     elif args.pdf:
         logger.info(f"writing news in {args.pdf} file in pdf format..")
         try:
             format_converter.to_pdf(news, args.pdf)
         except ConnectionError:
-            if not args.verbose:
-                print(f"error: no access to the Internet")
-            logger.error("no access to the Internet")
-            logger.info(f"end of work -->|")
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.error("error: no access to the Internet\n")
             return
-        logger.info(f"file {args.pdf} was successfully rewrited")
-        logger.info(f"end of work -->|")
+        except (OSError, FileNotFoundError):
+            if len(logger.handlers) == 1:
+                logger.addHandler(logging.StreamHandler(sys.stdout))
+            logger.error("error: invalid directory\n")
+            return
+        logger.info(f"file {args.pdf} was successfully rewrited\n")
         return
 
-    logger.info(f"\npublications were successfully shown - {len(news)}")
-    logger.info(f"end of work -->|")
+    logger.info(f"publications were successfully shown - {len(news)}\n")
 
     return
 
