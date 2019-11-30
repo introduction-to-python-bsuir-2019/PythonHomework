@@ -2,6 +2,7 @@
 This module provides tools for working with OS
 """
 import os
+import sys
 
 
 def create_directory(path, name):
@@ -23,7 +24,7 @@ def get_project_directory_path():
     This function returns path to project directory
     :return: str
     """
-    return os.path.abspath(os.path.dirname(__file__))
+    return os.path.dirname(sys.argv[0])
 
 
 def download_images(news_item, path_to_dir, item_index):

@@ -24,7 +24,7 @@ def convert_news_to_pdf(news, path):
     document = FPDF()
     document.add_page()
     document.set_right_margin(margin=10)
-    path_to_font = os.path.join(project_directory_path, 'fonts', 'ttf', 'DejaVuSansCondensed.ttf')
+    path_to_font = os.path.join(os.path.dirname(__file__), 'fonts', 'ttf', 'DejaVuSansCondensed.ttf')
     document.add_font('DejaVu', '', path_to_font, uni=True)
     document.set_font('DejaVu', size=14)
 
