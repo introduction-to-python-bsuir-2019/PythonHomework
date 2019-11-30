@@ -36,3 +36,5 @@ usage: rss-reader [-h] [--version] [--json] [--verbose] [--limit LIMIT]
                   [--colorize]
                   source
 
+## Install
+python setup.py install
