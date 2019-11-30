@@ -75,7 +75,7 @@ class Portal:
                 logging.info("Saving to text")
                 print(colored("\n\nRSS-chanel", Colors["other"]))
                 for news in self.news:
-                    print(colored("*" * 20 + "New article" + "*" * 20 + "\n", Colors["article"]))
+                    print(colored("\n" + "*" * 20 + "New article" + "*" * 20 + "\n", Colors["article"]))
                     print(colored(news, Colors["text"]))
         except Exception as e:
             logging.error(str(e))
