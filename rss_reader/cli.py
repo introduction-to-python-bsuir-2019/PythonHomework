@@ -1,9 +1,9 @@
 import argparse
 import logging
 from datetime import datetime
-from pathlib import Path
+from os import path, makedirs
 from validator_collection.checkers import is_url
-from .rss_reader import RssReader
+from .rss_reader import RSSReader
 
 
 def main():
@@ -11,7 +11,7 @@ def main():
     args = parser.parse_args()
     init_logging(args.verbose)
     configuration_for_conversion = mk_config_for_conversion(args.to_pdf, args.to_html)
-    rss = RssReader(args.source, args.limit, args.date, args.json, configuration_for_conversion, args.all)
+    rss = RSSReader(args.source, args.limit, args.date, args.json, configuration_for_conversion, args.all)
     rss.exec()
 
 
@@ -30,35 +30,42 @@ def adding_arguments():
     return parser
 
 
-def directory(path):
-    if not Path.exists(path):
-        raise ValueError('Wrong path to save file')
-    return path
+def directory(dir_for_save):
+    if path.exists(dir_for_save):
+        logging.info(f'Directory {dir_for_save} already exists')
+    else:
+        makedirs(dir_for_save)
+        logging.info(f'Create directory {dir_for_save} for saving file')
+    return dir_for_save
 
 
 def url(source):
+    logging.info('URL validation')
     if not is_url(source):
         raise argparse.ArgumentError('Invalid url')
     return source
 
 
 def date(date):
+    logging.info('Date validation')
     try:
         checked_date = datetime.strptime(date, '%Y%m%d').date()
         return checked_date
-    except:
-        raise argparse.ArgumentError('Wrong date')
-    
-    
+    except ValueError:
+        print('Wrong date')
+
+
 def init_logging(verbose):
     if verbose:
         logging.basicConfig(format='%(module)s %(asctime)s  %(message)s',
                             datefmt='%I:%M:%S', level=logging.INFO)
+        logging.info('Initialization of logging')
 
 
 def mk_config_for_conversion(pdf, html):
+    logging.info('Making dict with configuration of conversion')
     from collections import defaultdict
-    dict_with_directories = defaultdict(Path)
+    dict_with_directories = defaultdict(str)
     if pdf:
         dict_with_directories['pdf'] = pdf
     if html:

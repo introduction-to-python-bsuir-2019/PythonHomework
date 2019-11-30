@@ -31,7 +31,7 @@ class News(Base):
         str_to_print = 'Feed: %s\nTitle: %s\nDate: %s\nLink: %s\n\n%s\n\nLinks:\n[1] %s --feed\n' % \
             (self.feed, self.title, self.date, self.link, self.description, self.link)
         if self.media_content[0]:
-            for i in range(len(self.media_content)):    
+            for i in range(len(self.media_content)):
                 str_to_print += '[%d] %s --image\n' % (i+2, self.media_content[i])
         return str_to_print
 

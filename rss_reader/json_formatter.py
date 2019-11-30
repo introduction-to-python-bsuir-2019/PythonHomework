@@ -1,10 +1,12 @@
 import json
+import logging
 from .news import News
 
 class FeedEncoder(json.JSONEncoder):
     def default(self, obj: object):
         names_of_sections = ('Feed source', 'Title', 'Date', 'Link', 'Description', 'Media_content')
         if isinstance(obj, Json):
+            logging.info('Encoding news into JSON format')
             number_of_news = len(obj.news_to_convert)
             return {'News':
                         [{'Feed'+str(number):
@@ -18,7 +20,9 @@ class FeedEncoder(json.JSONEncoder):
 class Json(object):
     
     def __init__(self, news):
+        logging.info('Initialization of JSON formatter')
         self.news_to_convert = news
         
     def __str__(self):
+        logging.info('Receiving news in JSON fromat')
         return json.dumps(self, cls=FeedEncoder, indent=4, ensure_ascii=False)
