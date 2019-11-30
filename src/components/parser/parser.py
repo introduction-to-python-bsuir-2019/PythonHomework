@@ -12,6 +12,7 @@ class Parser:
         'limit',
         'date',
         'colorize',
+        'to_html',
     )
 
     def __init__(self, description, usage):
@@ -25,6 +26,10 @@ class Parser:
         module = importlib.import_module('src.components.parser.arguments')
 
         for argument in self._arguments_list:
-            argument_class = getattr(module, argument[0].upper() + argument[1:])
+            argument_class = getattr(module, self.to_camel_case(argument))
             argument_class(self._parser).add_argument()
 
+    @staticmethod
+    def to_camel_case(string: str) -> str:
+        parts = string.split('_')
+        return parts[0].capitalize() + ''.join(part.title() for part in parts[1:])

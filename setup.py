@@ -1,16 +1,16 @@
 import setuptools
 import conf
-import os
+from pathlib import Path
 
-here = os.path.abspath(os.path.dirname(__file__))
+here = Path(__file__).resolve()
 
 
 def get_install_requirements():
-    with open(os.path.join(here,'requirements.txt'), 'r') as file:
+    with open(here.joinpath('requirements.txt'), 'r') as file:
         return [requirement.strip() for requirement in file]
 
 
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(here.joinpath('README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 

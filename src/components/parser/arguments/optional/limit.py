@@ -1,6 +1,6 @@
 from src.components.parser.arguments import ArgumentsAbstract
 import argparse
-import sys
+
 
 class Limit(ArgumentsAbstract):
 

@@ -2,6 +2,7 @@ from .components.helper.singleton import Singleton
 from .components.parser.parser import Parser
 from .components.feed import *
 from .components.logger.logger import Logger
+from .components.converter.html import HtmlConverter
 import conf
 
 
@@ -9,7 +10,6 @@ import conf
 class App(Singleton):
 
     def __init__(self) -> None:
-
         console = Parser(
             'Pure Python command-line RSS reader.',
             conf.__description__
@@ -21,6 +21,11 @@ class App(Singleton):
             Logger.initialize(self._console_args.colorize)
 
         self._feed = Feed(self._console_args)
+
+        if self._console_args.to_html:
+            HtmlConverter(self._console_args.to_html).render(
+                self._feed.entities_list, self._feed.feeds_title
+            )
 
     @classmethod
     def start(cls) -> object:

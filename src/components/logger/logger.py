@@ -1,10 +1,9 @@
-import os
 import logging
 import logging.config
 import yaml
 from src.components.helper.singleton import Singleton
 import coloredlogs
-
+from pathlib import Path
 
 class Logger(Singleton):
 
@@ -13,7 +12,7 @@ class Logger(Singleton):
     @classmethod
     def initialize(cls, is_colorize):
 
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),'conf.yml'), 'r') as file:
+        with open(Path.cwd().joinpath('conf.yml'), 'r') as file:
             config = yaml.safe_load(file.read())
             logging.config.dictConfig(config)
 

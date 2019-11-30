@@ -9,7 +9,7 @@ class FeedEntry:
         self.title = html.unescape(entry.title)
         self.description = self._process_description(entry.description)
         self.link = entry.link
-        self.links = self._process_links(entry.links)
+        self.links: list= self._process_links(entry.links)
         self.date = entry.published
         self.published = self._process_published(entry)
 

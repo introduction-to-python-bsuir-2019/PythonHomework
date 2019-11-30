@@ -2,6 +2,7 @@ from src.components.cache.db.sqlite import Sqlite
 from src.components.logger import Logger
 from src.components.helper import Singleton
 from src.components.helper import Map
+from src.components.feed.feed_entry import FeedEntry
 from .db.sqlite_scripts import scripts
 
 from datetime import timedelta
@@ -63,7 +64,7 @@ class Cache(Singleton):
 
         self.db.close()
 
-    def _insert_feed_entry_into_cache(self, entry: "src.components.feed.feed_entry.FeedEntry", feed_id):
+    def _insert_feed_entry_into_cache(self, entry: FeedEntry, feed_id):
         return self.db.write('feeds_entries', [
             'feed_id',
             'title',

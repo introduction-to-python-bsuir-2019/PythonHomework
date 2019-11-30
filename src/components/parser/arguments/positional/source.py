@@ -1,7 +1,7 @@
 from src.components.parser.arguments.arguments_abstract import ArgumentsAbstract
 import argparse
 import urllib.request as url
-import sys
+
 
 class Source(ArgumentsAbstract):
 
