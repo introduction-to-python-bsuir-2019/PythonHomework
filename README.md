@@ -2,7 +2,7 @@
 [Introduction to Python] Homework Repository for EPAM courses
 
 # How to use
-1.  install git `apt-get install git`
+1.  install git `apt-get install git` (necessary to get a package with git)
 2.  `pip3 install .`
 3.  `rss-reader "https://www.androidpolice.com/feed/" --limit 3 --json --verbose --date`
 
@@ -12,9 +12,10 @@
 -  **--verbose** (print verbose log messages)
 -  **--limit** (limit printed entries)
 -  **--date** (print cached entries if exist)
--  **--colorize** (colorize output)
 -  **--to-html** (convert rss feed to html document)
 -  **--to-pdf** (convert rss feed to pdf document)
+-  **--to-epub** (convert rss feed to epub document)
+-  **--colorize** (colorize output)
 
 ## JSON structure
 `{"feed": "rss_title", "entries": [{"title": "title", "date": "date", "link": "link", "summary": "summary"}, ...]}`
@@ -34,6 +35,7 @@ Example: `cache/20191117/www.androidpolice.com.rss`
 Examples:
 -  `--to-html folder_name` will create "out.html" and "images" folder in folder_name, 
 -  `--to-pdf folder_name` will create "out.pdf" in folder_name
+-  `--to-epub folder_name` will create "out.epub" in folder_name
 
 # TODO
 -   [x] [Iteration 1] One-shot command-line RSS reader.

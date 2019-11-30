@@ -9,9 +9,12 @@ import shutil
 from pathlib import Path
 
 import requests
+from lxml import etree
 from xhtml2pdf import pisa
 from jinja2 import Template
 from bs4 import BeautifulSoup
+from ebooklib import epub
+from ebooklib.utils import parse_html_string
 
 from rss_reader.exceptions import RSSFeedException
 
@@ -101,6 +104,17 @@ class Converter:
 
         return entry
 
+    def _get_entry_html(self, entry):
+        template = """<div class='entry'>
+                            <h2 class='title'>{{entry.title}}</h2>
+                            <p><span class='date'>{{entry.published}}</span></p>
+                            <p><a class='link' href='{{entry.link}}'>{{entry.link}}</a></p>
+                            <div class='description'>{{entry.summary}}</div>
+                      </div>"""
+        temp_entry = self._replace_urls_to_local(entry)
+        html = Template(template).render(title=self.title, entry=temp_entry)
+        return html
+
     def _gen_html(self, is_cyrillic_font=False, is_absolute_urls=False):
         """ Generates HTML
 
@@ -150,14 +164,14 @@ class Converter:
                                          is_cyrillic_font=is_cyrillic_font, font_path=self.font_path)
         return html
 
-    def rss_to_html(self):
+    def entries_to_html(self):
         """ Generate HTML file in self.out_dir """
         html = self._gen_html()
 
         with open(Path(self.out_dir) / 'out.html', 'w') as file_object:
             file_object.write(html)
 
-    def rss_to_pdf(self):
+    def entries_to_pdf(self):
         """ Generate PDF file in self.out_dir """
         html = self._gen_html(is_cyrillic_font=True, is_absolute_urls=True)
 
@@ -171,3 +185,63 @@ class Converter:
 
         if pdf.err:
             raise RSSFeedException(message="Error during PDF generation")
+
+    def entries_to_epub(self):
+        """ Generate EPUB file in self.out_dir """
+        html = self._gen_html()
+
+        def add_images_to_book():
+            html_tree = parse_html_string(chapter.content)
+
+            for img_elem in html_tree.iterfind('.//img'):
+                href = img_elem.attrib['src']
+                img_local_filename = self.out_dir / href
+
+                with open(img_local_filename, 'br') as file_object:
+                    epimg = epub.EpubImage()
+                    epimg.file_name = href
+                    epimg.set_content(file_object.read())
+
+                    book.add_item(epimg)
+
+            chapter.content = etree.tostring(html_tree, pretty_print=True, encoding='utf-8')
+
+        book = epub.EpubBook()
+
+        # set metadata
+        book.set_identifier('id1337')
+        book.set_title(self.title)
+        book.set_language('en, ru')
+
+        book.add_author('DiSonDS')
+
+        # create chapter
+        chapter = epub.EpubHtml(title='Intro', file_name=f'chap_01.xhtml', lang='en, ru')
+        chapter.content = html
+
+        add_images_to_book()
+
+        # add chapter
+        book.add_item(chapter)
+
+        # define Table Of Contents
+        book.toc = (epub.Link('chap_01.xhtml', 'Introduction', 'intro'),
+                    (epub.Section(self.title),
+                     (chapter,))
+                    )
+
+        # add default NCX and Nav file
+        book.add_item(epub.EpubNcx())
+        book.add_item(epub.EpubNav())
+
+        # define CSS style
+        style = 'BODY {color: white;}'
+        nav_css = epub.EpubItem(uid="style_nav", file_name="style/nav.css", media_type="text/css", content=style)
+
+        # add CSS file
+        book.add_item(nav_css)
+        # basic spine
+        book.spine = ['nav', chapter]
+
+        # write to the file
+        epub.write_epub(Path(self.out_dir) / 'out.epub', book, {})

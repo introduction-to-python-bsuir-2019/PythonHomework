@@ -154,14 +154,21 @@ class RSSFeed:
         """ Create html file with rss news in out_dir """
         logging.info("Converting RSS to HTML")
         converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
-        converter.rss_to_html()
+        converter.entries_to_html()
         logging.info("Done.")
 
     def convert_to_pdf(self, out_dir, limit):
         """ Create pdf file with rss news in out_dir """
         logging.info("Converting RSS to PDF")
         converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
-        converter.rss_to_pdf()
+        converter.entries_to_pdf()
+        logging.info("Done.")
+
+    def convert_to_epub(self, out_dir, limit):
+        """ Create epub file with rss news in out_dir """
+        logging.info("Converting RSS to EPUB")
+        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
+        converter.entries_to_epub()
         logging.info("Done.")
 
 
@@ -190,6 +197,8 @@ def get_args():
                         help="Generate TO_HTML/out.html with news")
     parser.add_argument("--to-pdf", action="store", type=str,
                         help="Generate TO_HTML/out.pdf with news")
+    parser.add_argument("--to-epub", action="store", type=str,
+                        help="Generate TO_EPUB/out.epub with news")
 
     return parser.parse_args()
 
@@ -213,6 +222,8 @@ def main():
             feed.convert_to_html(out_dir=args.to_html, limit=args.limit)
         if args.to_pdf:
             feed.convert_to_pdf(out_dir=args.to_pdf, limit=args.limit)
+        if args.to_epub:
+            feed.convert_to_epub(out_dir=args.to_epub, limit=args.limit)
     except RSSFeedException as ex:
         print(f"{ex.message}")
         sys.exit(0)

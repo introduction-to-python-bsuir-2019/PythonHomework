@@ -4,3 +4,5 @@ bs4 # for xml and html
 colorama  # colored output https://pypi.org/project/colorama/
 jinja2  # for generating html
 git+https://github.com/xhtml2pdf/xhtml2pdf.git
+ebooklib
+lxml
