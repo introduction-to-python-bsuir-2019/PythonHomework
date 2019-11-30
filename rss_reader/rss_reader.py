@@ -40,7 +40,7 @@ def main():
         state = Cache.print_news(args.date)
         if state == 1:
             print(f'''There are not exist news with date of publication at {args.date}
-            \nMake sure that your format date in %Y%m%d', file=sys.stderr''')
+            \nMake sure that your format date in %Y%m%d''', file=sys.stderr)
         else:
             logger.info('News from cache ware read')
         exit()
@@ -48,7 +48,9 @@ def main():
     feeds = feedparser.parse(args.URL)
 
     if feeds.bozo:
-        logger.error('Feed is not well-formed XML')
+        print('This is not well formed XML', file=sys.stderr)
+        exit()
+
     else:
         logger.info('The XML file with news is received and correct')
 
@@ -65,8 +67,8 @@ def main():
         print(news.to_json().decode())
         logger.info('News is displayed in stdout in a json format')
     else:
-        news.print()
         logger.info('News is displayed in stdout in a readability format')
+    news.print()
 
     logger.info('Program is over')
 

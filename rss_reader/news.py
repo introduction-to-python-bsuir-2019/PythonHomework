@@ -4,12 +4,14 @@ import re
 import json
 import logging
 from .cache import Cache
+import base64
+import requests
 
 
 class News:
     """This class contains news and methods of work whit news"""
     http_header = 'http'
-    img_description = 'image / ?'
+    err_media_type = 'No type'
     def __init__(self, feeds_dict, limit):
 
         logger = logging.getLogger('rss_reader')
@@ -61,7 +63,10 @@ class News:
                             j = 1
 
                             while j < len(links):
-                                media.append({'url': self.http_header + links[j], 'type': self.img_description})
+                                if j == 2:
+                                    media.append({'url': self.http_header + links[j], 'type': "img"})
+                                else:
+                                    media.append({'url': self.http_header + links[j], 'type': self.err_media_type})
                                 list_to_links.append(self.http_header + links[j])
                                 list_to_links.append(ids)
                                 cursor.execute('''INSERT or IGNORE INTO media (link, news) VALUES(?,?)''',
@@ -70,10 +75,11 @@ class News:
                                 j = j + 1
                                 Cache.commit()
                         else:
-                            media.append({'url': elem.setdefault('url', None), 'type': elem.setdefault('type', None)})
-                            list_to_links.append(elem.setdefault('url', None))
-                            list_to_links.append(ids)
-                            cursor.execute('''INSERT or IGNORE INTO media (link, news) VALUES(?,?)''', list_to_links)
+                            if elem.setdefault('url', None):
+                                media.append({'url': elem.setdefault('url', None), 'type': elem.setdefault('type', None)})
+                                list_to_links.append(elem.setdefault('url', None))
+                                list_to_links.append(ids)
+                                cursor.execute('''INSERT or IGNORE INTO media (link, news) VALUES(?,?)''', list_to_links)
                             list_to_links.clear()
                             Cache.commit()
                 self.news['media'] = media.copy()
@@ -124,14 +130,39 @@ class News:
         return json.dumps({'Source:': self.name_of_source, 'Feeds': self.all_news}, ensure_ascii=False).encode('utf8')
 
     def to_fb2(self, filepath):
-        """This function create file in fb2 format with news"""
-        pass
+        if filepath[-4::] != ".fb2":
+            filename = filepath + ".fb2"
+        with open(filename, 'w', encoding="utf-8") as fb2_file:
+            fb2_file.write('<?xml version="1.0" ?>\n')
+            fb2_file.write(f'''<FictionBook xmlns:l="http://www.w3.org/1999/xlink"><description/><body>''')
+            fb2_file.write(f'''<title><p>{self.name_of_source.replace("&", "&amp;")}</p></title><empty-line/>''')
+            for elem in self.all_news:
+                fb2_file.write(f'<section><title><p>{elem["title"].replace("&", "&amp;")}</p></title>')
+                fb2_file.write(f'<p>Date of posting: {elem["date"].replace("&", "&amp;")}</p>')
+                fb2_file.write(f'<p>{elem["description"].replace("&", "&amp;")}</p><empty-line/>')
+                fb2_file.write(f'<p>Source: {elem["link"]}</p></section>'.replace("&", "&amp;"))
+
+                for media in elem['media']:
+                    if media['type'] != self.err_media_type:
+                        fb2_file.write(f'''<empty-line/><empty-line/>
+                        <image l:href="#{media["url"]}"/><empty-line/><empty-line/>''')
+                        pass
+            fb2_file.write('</body>')
+            for elem in self.all_news:
+                for media in elem['media']:
+                    if media['type'] != self.err_media_type:
+                        fb2_file.write(f'<binary content-type="image/png" id="{media["url"]}">')
+                        content = base64.b64encode(requests.get(media["url"]).content)
+                        fb2_file.write(content.decode('ascii'))
+                        fb2_file.write('</binary>')
+            fb2_file.write('</FictionBook>')
+
+        print(f'All news you can find at {os.path.realpath(filename)}')
 
     def to_html(self, filepath):
-        print(filepath[-5::])
         if filepath[-5::] != ".html":
             filename = filepath + ".html"
-        with open(filename, 'w') as html_file:
+        with open(filename, 'w', encoding="utf-8") as html_file:
             html_file.write(f'<html>\n<head>{self.name_of_source}</head>\n<body>\n')
             for elem in self.all_news:
                 html_file.write(f'<h3>{elem["title"]}</h3>')
@@ -140,8 +171,8 @@ class News:
                 html_file.write(f'<p><a href="{elem["link"]}">Link to source</a></p>')
 
                 for media in elem['media']:
-                    print(f'<p><img src="{media["url"]}></p>')
-                    html_file.write(f'<p><img src="{media["url"]}"></p>')
-                    html_file.write('<hr>')
+                    if media['type'] != self.err_media_type:
+                        html_file.write(f'<p><img src="{media["url"]}"></p>'.encode("utf-8"))
+                html_file.write('<hr>')
             html_file.write('</body></html>')
         print(f'All news you can find at {os.path.realpath(filename)}')
