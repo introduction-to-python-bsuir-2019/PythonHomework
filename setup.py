@@ -15,6 +15,7 @@ setup(
     author_email='artem.klimec8@gmail.com',
     description='simple command-line rss reader',
     install_requires=requirements,
+    include_package_data=True,
     entry_points={
         'console_scripts': ['rss-reader = rss_reader.cli:main']
     }

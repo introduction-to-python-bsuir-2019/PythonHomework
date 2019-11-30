@@ -8,7 +8,7 @@ from sqlalchemy import func, desc, asc, Date
 from .news import News, engine, Base
 from .json_formatter import Json
 from contextlib import contextmanager
-from .converter import HtmlConverter
+from .converter import HtmlConverter, PdfConverter
 
 @contextmanager
 def create_session(adding=None):
@@ -66,7 +66,7 @@ class RssReader(object):
     def parse_html(self, html):
         from bs4 import BeautifulSoup
         parser = BeautifulSoup(html, 'html.parser')
-        return parser.get_text()
+        return parser.getText()
     
     def get_cached_news(self):
         with create_session() as s:
@@ -110,6 +110,6 @@ class RssReader(object):
                 self.get_and_parse_news()
                 self.get_news_to_print()
             self.print_news()
-            HtmlConverter(self.news_to_print, '/home/zavxoz/Pictures').convert()
+            PdfConverter(self.news_to_print, './').convert()
         #except Exception as e:
         #    print(e)
