@@ -1,7 +1,9 @@
 import feedparser
-from components.feed.feed_entry import FeedEntry
-from components.feed.feed_formatter import FeedFormatter
-from components.logger.logger import Logger
+
+from src.components.feed.feed_entry import FeedEntry
+from src.components.feed.feed_formatter import FeedFormatter
+from src.components.logger.logger import Logger
+from src.components.cache.cache import Cache
 
 
 class Feed:
@@ -11,7 +13,6 @@ class Feed:
         self._limit = args.limit
         self._url = args.source
         self._entities_list = []
-        self._feeds_title = ''
 
         Logger.log('Initialize console variables')
 
@@ -36,18 +37,30 @@ class Feed:
     def _parse_feeds(self):
 
         Logger.log(f'Start parsing data from url: {self._url}')
-        feeds = feedparser.parse(self._url)
 
-        self._set_global_feed_data(feeds.feed)
+        feed = feedparser.parse(self._url)
+
+        self._set_global_feed_data(feed)
 
         Logger.log('Generate feeds instances')
-        for feed in feeds.entries:
-            self._append_feed_entry(feed)
+
+        for item in feed.entries:
+            self._append_feed_entry(item)
+
+        if self._entities_list:
+            self._store_cache_instances()
 
     def _set_global_feed_data(self, feed):
         Logger.log('Setting global feed data')
 
-        self._feeds_title = feed.title
+        self._feeds_title = feed.feed.title
+        self._feeds_encoding = feed.encoding
 
-    def _append_feed_entry(self, feed):
-        self._entities_list.append(FeedEntry(feed))
+    def _append_feed_entry(self, item):
+        self._entities_list.append(FeedEntry(item))
+
+    def _store_cache_instances(self):
+        Cache().append_feeds({
+            'url': self._url,
+            'encoding': self._feeds_encoding,
+        }, self._entities_list)

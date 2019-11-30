@@ -1,4 +1,4 @@
-from components.parser.arguments.arguments_abstract import ArgumentsAbstract
+from .. import ArgumentsAbstract
 import conf
 
 

@@ -1,15 +1,17 @@
 import html
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 
 class FeedEntry:
 
-    def __init__(self, feed):
-        self.title = html.unescape(feed.title)
-        self.date = feed.published
-        self.link = feed.link
-        self.description = self._process_description(feed.description)
-        self.links = self._process_links(feed.links)
+    def __init__(self, entry):
+        self.title = html.unescape(entry.title)
+        self.description = self._process_description(entry.description)
+        self.link = entry.link
+        self.links = self._process_links(entry.links)
+        self.date = entry.published
+        self.published = self._process_published(entry)
 
     def _process_links(self, links):
         def format_links(link, count):
@@ -23,3 +25,6 @@ class FeedEntry:
         return html.unescape(
             BeautifulSoup(description, 'html.parser').get_text()
         )
+
+    def _process_published(self, entry):
+        datetime(*entry.published_parsed[:6])

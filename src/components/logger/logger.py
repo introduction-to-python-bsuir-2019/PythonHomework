@@ -2,7 +2,7 @@ import os
 import logging
 import logging.config
 import yaml
-from components.helper.singleton import Singleton
+from src.components.helper.singleton import Singleton
 
 
 class Logger(Singleton):

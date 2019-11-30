@@ -21,7 +21,7 @@ class Parser:
         return self._parser.parse_args()
 
     def _init_arguments(self):
-        module = importlib.import_module('components.parser.arguments')
+        module = importlib.import_module('src.components.parser.arguments')
 
         for argument in self._arguments_list:
             argument_class = getattr(module, argument[0].upper() + argument[1:])

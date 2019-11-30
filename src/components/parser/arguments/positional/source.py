@@ -1,4 +1,4 @@
-from components.parser.arguments.arguments_abstract import ArgumentsAbstract
+from src.components.parser.arguments.arguments_abstract import ArgumentsAbstract
 
 
 class Source(ArgumentsAbstract):
