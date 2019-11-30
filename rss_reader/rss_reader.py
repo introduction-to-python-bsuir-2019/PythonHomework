@@ -5,7 +5,7 @@ Simple RSS reader
 """
 
 __author__ = "DiSonDS"
-__version__ = "0.3.0"
+__version__ = "0.5.0"
 __license__ = "MIT"
 
 import os
@@ -151,14 +151,14 @@ class RSSFeed:
                           f"{entry['summary']}\n\n")
 
     def convert_to_html(self, out_dir, limit):
-        """ Create html file with rss news in DIR """
+        """ Create html file with rss news in out_dir """
         logging.info("Converting RSS to HTML")
         converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
         converter.rss_to_html()
         logging.info("Done.")
 
     def convert_to_pdf(self, out_dir, limit):
-        """ Create pdf file with rss news in DIR """
+        """ Create pdf file with rss news in out_dir """
         logging.info("Converting RSS to PDF")
         converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
         converter.rss_to_pdf()
@@ -180,11 +180,16 @@ def get_args():
         action="count",
         default=False,
         help="Outputs verbose status messages")
-    parser.add_argument("-l", "--limit", action="store", type=int, dest="limit")
-    parser.add_argument("-d", "--date", action="store", type=int, dest="date")
-    parser.add_argument("-c", "--colorize", action="store_true", help="Print colorized result in stdout")
-    parser.add_argument("--to-html", action="store", type=str)
-    parser.add_argument("--to-pdf", action="store", type=str)
+    parser.add_argument("-l", "--limit", action="store", type=int, dest="limit",
+                        help="Limit news topics if this parameter is provided")
+    parser.add_argument("-d", "--date", action="store", type=int, dest="date",
+                        help="Trying to get cached news for DATE if this parameter is provided.")
+    parser.add_argument("-c", "--colorize", action="store_true",
+                        help="Print colorized result in stdout")
+    parser.add_argument("--to-html", action="store", type=str,
+                        help="Generate TO_HTML/out.html with news")
+    parser.add_argument("--to-pdf", action="store", type=str,
+                        help="Generate TO_HTML/out.pdf with news")
 
     return parser.parse_args()
 

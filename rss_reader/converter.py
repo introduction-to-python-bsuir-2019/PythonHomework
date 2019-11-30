@@ -35,26 +35,33 @@ class Converter:
 
         self.font_path = Path(__file__).resolve().parent / 'fonts/Roboto-Regular.ttf'
 
-    def _download_img(self, url, image_dir):
+    def _create_directories(self, image_dir):
+        """ Create directories if not exist (self.out_dir and self.out_dir/image_dir) """
+        if not self.out_dir.is_dir():
+            logging.info("Creating directory /%s", self.out_dir)
+            self.out_dir.mkdir(parents=True, exist_ok=True)
+
+        if not image_dir.is_dir():
+            logging.info("Creating directory /%s", image_dir)
+            image_dir.mkdir(parents=True, exist_ok=True)
+
+    def _download_image(self, url, image_dir):
         """ Download image in self.out_dir/image_dir
 
             Returns:
                 filename: image name
         """
-
         logging.info("Starting image download")
+
+        image_dir = self.out_dir / image_dir
+
+        try:
+            self._create_directories(image_dir)
+        except OSError:
+            raise RSSFeedException(message="Сan not create directory")
 
         filename = url.split('/')[-1]
         response = requests.get(url, allow_redirects=True)
-
-        if not self.out_dir.is_dir():
-            logging.info("Creating directory /%s", self.out_dir)
-            self.out_dir.mkdir()
-
-        image_dir = self.out_dir / image_dir
-        if not image_dir.is_dir():
-            logging.info("Creating directory /%s", image_dir)
-            image_dir.mkdir()
 
         with open(image_dir / filename, 'wb') as handler:
             handler.write(response.content)
@@ -71,7 +78,7 @@ class Converter:
         soup = BeautifulSoup(entry.summary, "html.parser")
         images = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
         for image in images:
-            filename = self._download_img(image, self.image_dir)
+            filename = self._download_image(image, self.image_dir)
             downloaded_img_local_path = Path(self.image_dir / filename)
             entry.summary = entry.summary.replace(image, str(downloaded_img_local_path))
 
@@ -80,7 +87,7 @@ class Converter:
     def _replace_urls_to_absolute(self, entry):
         """ Replace img URLs in entry to local absolute file path
 
-            Special for pdfkit (pdfkit support only absolute file path)
+            Special for xhtml2pdf (xhtml2pdf support only absolute file path)
 
             Args:
                 entry (dict): News dict
@@ -88,7 +95,7 @@ class Converter:
         soup = BeautifulSoup(entry.summary, "html.parser")
         images = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
         for image in images:
-            filename = self._download_img(image, self.temp_image_dir)
+            filename = self._download_image(image, self.temp_image_dir)
             downloaded_img_absolute_path = Path(self.out_dir / self.temp_image_dir / filename).absolute()
             entry.summary = entry.summary.replace(image, str(downloaded_img_absolute_path))
 
@@ -154,10 +161,10 @@ class Converter:
         """ Generate PDF file in self.out_dir """
         html = self._gen_html(is_cyrillic_font=True, is_absolute_urls=True)
 
-        with open(Path(self.out_dir) / 'out.pdf', "w+b") as file:
+        with open(Path(self.out_dir) / 'out.pdf', 'w+b') as file:
             pdf = pisa.CreatePDF(html, dest=file, encoding='UTF-8')
 
-        # Delete temp DIRECTORY/TEMP_IMAGE_DIR
+        # Delete temp folder (self.out_dir/self.temp_image_dir)
         temp_img_dir = Path(self.out_dir / self.temp_image_dir)
         logging.info("Cleaning up %s", temp_img_dir)
         shutil.rmtree(temp_img_dir)
