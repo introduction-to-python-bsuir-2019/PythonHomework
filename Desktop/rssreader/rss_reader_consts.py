@@ -27,3 +27,9 @@ MONTHS = {
     'Nov': '11',
     'Dec': '12',
 }
+
+COLOR_WHITE = 'white'
+COLOR_YELLOW = 'yellow'
+COLOR_GREEN = 'green'
+COLOR_BLUE = 'blue'
+COLOR_RED = 'red'

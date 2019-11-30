@@ -7,7 +7,7 @@ from rssreader.rss_reader_consts import *
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.caching_news'
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
 
 
 DB_NAME = 'news.db'

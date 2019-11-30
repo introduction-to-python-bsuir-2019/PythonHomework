@@ -6,18 +6,17 @@ import logging
 import argparse
 from logging import config
 
-PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
-# sys.path.append(PACKAGE_PATH)
-
 from rssreader.rss_parser import RssReader
 import rssreader.caching_news as caching_news
 
 VERSION = '4.0'
 
+PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
+
 LOGS_FPATH = PACKAGE_PATH + "/rss_reader.log"
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.main'
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
 
 CORRECT_END_LOG = 'END (correct)'
 
@@ -83,6 +82,12 @@ def init_args(parser: argparse.ArgumentParser) -> None:
         action='store_true'
     )
     parser.add_argument(
+        "--colorize",
+        action="store_true",
+        help="Print news with colorize mode. It's works obly with default output.\
+        Sorry, but you can not change colors :( Wait for update..."
+    )
+    parser.add_argument(
         "--to_fb2",
         type=str,
         help="Convert news to fb2 format.\
@@ -146,7 +151,7 @@ def main() -> None:
         elif args.to_pdf is not None:
             rss_reader.get_news_as_pdf(limit=limit, filepath=args.to_pdf)
         else:
-            news = rss_reader.get_news_as_string(limit=limit)
+            news = rss_reader.get_news_as_string(limit=limit, colorize=args.colorize)
             print(news)
         logger.info(CORRECT_END_LOG)
         # except AttributeError:

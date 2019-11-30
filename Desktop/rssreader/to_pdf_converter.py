@@ -7,7 +7,7 @@ from rssreader.image_handle import save_image_by_url
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.to_pdf_converter'
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
 
 
 TITLE_IMG_NAME = 'title.png'

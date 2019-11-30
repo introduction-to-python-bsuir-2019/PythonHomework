@@ -9,7 +9,7 @@ from PIL import Image
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.image_handle'
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
 
 
 TEMP_IMG_NAME = 'temp_img.jpg'

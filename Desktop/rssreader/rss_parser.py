@@ -10,6 +10,7 @@ from feedparser import parse, FeedParserDict
 from bs4 import BeautifulSoup
 import logging
 import json
+from termcolor import colored
 
 from rssreader.rss_reader_consts import *
 
@@ -19,7 +20,7 @@ import rssreader.to_pdf_converter as to_pdf_converter
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.rss_reader'
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
 
 
 class RssReader:
@@ -171,7 +172,11 @@ class RssReader:
 
         return news
 
-    def get_news_as_string(self, limit: int=0) -> str:
+    def _colorize(self, src: str, color: str=COLOR_WHITE) -> str:
+        """Colorize the string with 'bold' argument."""
+        return colored(src, color, attrs=['bold'])
+
+    def get_news_as_string(self, limit: int=0, colorize: bool=False) -> str:
         """Get news as string.
 
         Takes a limit:int - limit of news, which will be returned.
@@ -190,12 +195,33 @@ class RssReader:
             for key, value in one_news.items():
                 if key == KEYWORD_IMGS_LINKS:
                     if value:  # img_links list is not empty
+                        
+                        # colorize block
+                        if colorize:
+                            key = self._colorize(key, COLOR_RED)
+
                         news += key + ' '
                         for img_link in value:
+
+                            # colorize block
+                            if colorize:
+                                img_link = self._colorize(img_link, COLOR_BLUE)
+
                             news += img_link + EN
                 else:
-                    if key == KEYWORD_CONTENT:
+                    if key == KEYWORD_TITLE and colorize:
+                        value = self._colorize(value, COLOR_YELLOW)
+                    elif key == KEYWORD_DATE and colorize:
+                        value = self._colorize(value, COLOR_GREEN)
+                    elif key == KEYWORD_LINK and colorize:
+                        value = self._colorize(value, COLOR_BLUE)
+                    elif key == KEYWORD_CONTENT  and colorize:
                         news += EN
+                        value = self._colorize(value, COLOR_WHITE)
+                    
+                    if colorize:
+                        key = self._colorize(key, COLOR_RED)
+
                     news += key + value + EN
 
         return feed + DEN + news
