@@ -134,4 +134,7 @@ class RSSReader():
 
     def save_fb2(self):
         feed, column = self.__read()
-        Converter().to_fb2(feed, column, self.__source, self.__sv_path)
+        if self.__sv_path:
+            Converter().to_fb2(feed, column, self.__source, self.__sv_path)
+        else:
+            Converter().to_fb2(feed, column, self.__source)

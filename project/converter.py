@@ -42,7 +42,7 @@ class Converter():
         json_text += ']\n}'
         return json_text
 
-    def to_fb2(self, feed, column, url, sv_path, verbose=False):
+    def to_fb2(self, feed, column, url, sv_path=os.getcwd(), verbose=False):
 
         def next_article(id, title, images, description, feed, date="Unknown"):
             binary = []
@@ -61,7 +61,7 @@ class Converter():
 
         def download_image(url):
             try:
-                local_name, headers = urllib.request.urlretrieve(url)
+                local_name, headers = urllib.request.urlretrieve(url, sv_path + url.split('/')[-1])
                 stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
                 return local_name
             except (urllib.error.URLError, urllib.error.HTTPError):
@@ -70,9 +70,6 @@ class Converter():
             except ValueError:
                 stdout_write("Error: image not found")
                 return ""
-
-        if sv_path:
-            os.chdir(sv_path)
 
         fb2_begin = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             '<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"' + \
@@ -129,8 +126,9 @@ class Converter():
         for img in binary:
             fb2_text += '\n'+img+'\n'
         fb2_text += fb2_end
-
-        with open(f"{str(time()).split('.')[-1]}-{randint(0, 100)}.fb2", "w") as file:
+        file_path = f"{sv_path}/{hash(time())}-{randint(0, 100)}.fb2"
+        open(file_path, 'a').close()
+        with open(file_path, "w") as file:
             file.write(fb2_text)
 
     def to_html(self, feed, column, url, sv_path, verbose=False):
