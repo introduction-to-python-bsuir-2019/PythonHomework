@@ -52,8 +52,11 @@ class RSSReader:
         return item
 
     def to_cache(self):
-        with open('cache.json', 'r') as f:
-            feeds_f = json.load(f)
+        with open('./cache.json', 'w+') as f:
+            try:
+                feeds_f = json.load(f)
+            except Exception:
+                feeds_f = {'news': []}
             for item in self.feeds['news']:
                 if item not in feeds_f['news']:
                     feeds_f['news'].append(item)
@@ -61,12 +64,12 @@ class RSSReader:
         if feeds_f['news'][0].get('title') == '':
             del feeds_f['news'][0]
 
-        with open('cache.json', 'w') as f:
+        with open('./cache.json', 'w+') as f:
             json.dump(feeds_f, f, indent=1)
 
     def from_cache(self):
         to_print = []
-        with open('cache.json', 'r') as f:
+        with open('./cache.json', 'r') as f:
             feeds_f = json.load(f)
             for item in feeds_f['news']:
                 item_date = datetime.datetime.strptime(item['date'], '%a, %d %b %Y %H:%M:%S %z').strftime('%Y%m%d')
