@@ -6,8 +6,10 @@ import sys
 
 from rss.news import News
 from rss.cache import Cache
+from rss.converter_to_fb2 import Fb2Converter
+from rss.converter_to_html import HTMLConverter
 
-VERSION = "3.0"
+VERSION = "4.0"
 
 
 def add_args(parser):
@@ -21,10 +23,15 @@ def add_args(parser):
     parser.add_argument('--limit', help='Limit news topics if this parameter provided', type=int)
     parser.add_argument('--date', help="""Take a date in %%Y%%m%%d format.
                          The news from the specified day will be printed out.""", type=str)
+    parser.add_argument('--to-html', help="""Convers news into html and print in stdout.
+                        Argument receives the path where new file will be saved.""", type=str)
+    parser.add_argument('--to-fb2', help="""Convers news into fb2  and print in stdout.
+                        Argument receives the path where new file will be saved.""", type=str)
     return parser
 
 
-def start_parsing(url: str, limit: int, json_mode: bool):
+def start_parsing(url: str, limit: int, json_mode: bool,
+                  fb2_path: str, html_path: str):
     """This function create rss feed and print news.
 
     :param url: RSS URL
@@ -33,11 +40,20 @@ def start_parsing(url: str, limit: int, json_mode: bool):
     """
 
     logging.info('Create feed')
-    feed = News(url, limit)
+    news = News(url, limit)
     if json_mode:
-        print(feed.convert_to_json(limit))
+        print(news.convert_to_json(limit))
     else:
-        feed.print_news(limit)
+        news.print_news(limit)
+
+    if fb2_path:
+        conv = Fb2Converter(fb2_path)
+        conv.convert_to_fb2(news.list_of_news[:limit])
+        conv.save_fb2()
+    if html_path:
+        conv = HTMLConverter(html_path)
+        conv.save_html(conv.convert_to_html(news.list_of_news[:limit],
+                                            news.list_of_row_descriptions[:limit]))
 
 
 def set_verbose_mode(verbose_mode: bool):
@@ -63,12 +79,14 @@ def main():
     if args.date:
         try:
             cache = Cache()
-            cache.set_printing_news(args.source, args.date, args.limit, args.json)
+            cache.set_printing_news(args.source, args.date, args.limit,
+                                    args.json, args.to_fb2, args.to_html)
         except Exception as e:
             print('Errors with cache:', e)
     else:
         try:
-            start_parsing(args.source, args.limit, args.json)
+            start_parsing(args.source, args.limit, args.json,
+                          args.to_fb2, args.to_html)
         except Exception as e:
             print('Errors with parsing:', e)
 

@@ -8,6 +8,9 @@ import json
 
 import dateparser
 
+from rss.converter_to_fb2 import Fb2Converter
+from rss.converter_to_html import HTMLConverter
+
 
 class Cache:
     """This class creates cache file, updates it and prints cached news."""
@@ -17,7 +20,7 @@ class Cache:
         self.db_file_name = 'cache.db'
 
     def _create_key(self, date: str, url: str) -> str:
-        """Create key for db"""
+        """Create key for db."""
 
         logging.info('Create key')
         return date + url
@@ -37,7 +40,7 @@ class Cache:
                 raise Exception('Something wrong with date')
         return converted_date.strftime('%Y%m%d')
 
-    def insert_news(self, news, url: str):
+    def insert_news(self, news, row_description, url: str):
         """Insert news into cache file.
            Create cache file if it doesn't exist.
         """
@@ -49,13 +52,17 @@ class Cache:
             if db.get(key):
                 logging.info("Update record")
                 record = db[key]
-                if not record.count(news):
-                    record.append(news)
+                if not list(record['list_of_news']).count(news):
+                    record['list_of_news'].append(news)
+                    record['list_of_row_descriptions'].append(row_description)
                 db[key] = record
             else:
                 logging.info("Create new record")
-                record = []
-                record.append(news)
+                record = {}
+                record['list_of_news'] = []
+                record['list_of_news'].append(news)
+                record['list_of_row_descriptions'] = []
+                record['list_of_row_descriptions'].append(row_description)
                 db[key] = record
 
     def _check_entered_date(self, key: str):
@@ -76,7 +83,9 @@ class Cache:
             except KeyError:
                 raise Exception("Can't find the news")
 
-    def set_printing_news(self, url: str, date: str, limit=None, json_mode=None):
+    def set_printing_news(self, url: str, date: str,
+                          limit: int, json_mode: bool,
+                          fb2_path: str, html_path: str):
         """Set print format"""
 
         logging.info("Set print format")
@@ -88,9 +97,18 @@ class Cache:
         db = self._get_news(key)
 
         if json_mode:
-            print(json.dumps(db[:limit], indent=4, ensure_ascii=False))
+            print(json.dumps(db['list_of_news'][:limit], indent=4, ensure_ascii=False))
         else:
-            self.print_news(db, limit)
+            self.print_news(db['list_of_news'], limit)
+
+        if fb2_path:
+            conv = Fb2Converter(fb2_path)
+            conv.convert_to_fb2(db['list_of_news'][:limit])
+            conv.save_fb2()
+        if html_path:
+            conv = HTMLConverter(html_path)
+            conv.save_html(conv.convert_to_html(db['list_of_news'][:limit],
+                                                db['list_of_row_descriptions'][:limit]))
 
     def _check_limit(self, limit):
         """Check if the limit > 0."""
@@ -100,11 +118,11 @@ class Cache:
             raise ValueError('Invalid limit: limit <= 0')
 
     def print_news(self, list_of_news, limit):
-        """Print news"""
+        """Print news."""
 
         logging.info('Start printing cached news')
         news_number = 1
-        # if self.list_of_news consists of 1 element
+        # check if self.list_of_news consists of 1 element
         if type(list_of_news) == dict:
             print('№', news_number)
             self._print_entries(list_of_news)

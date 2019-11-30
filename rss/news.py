@@ -50,7 +50,7 @@ class News:
         print('\nFeed:', self.feed_title, "\n\n")
 
         news_number = 1
-        # if self.list_of_news consists of 1 element
+        # check if self.list_of_news consists of 1 element
         if type(self.list_of_news) == dict:
             print('№', news_number)
             self._print_entries(self.list_of_news)
@@ -118,7 +118,7 @@ class News:
             one_news.update(self._read_description(news))
 
             self.list_of_news.append(one_news)
-            cache.insert_news(one_news, self.url)
+            cache.insert_news(one_news, self.list_of_row_descriptions[-1], self.url)
 
     def _read_description(self, news: dict) -> dict:
         """Return dict with keys 'text', 'images', 'links'.
