@@ -5,11 +5,12 @@ from bs4 import BeautifulSoup
 
 
 class RSSReader:
-    def __init__(self, source, limit=1, json=False, date=''):
+    def __init__(self, source, limit=1, json=False, date='', to_html=''):
         self.source = source
         self.limit = limit
         self.json = json
         self.date = date
+        self.to_html = to_html
         self.feeds = {}
 
     def parse_source(self):
@@ -23,6 +24,9 @@ class RSSReader:
 
         if self.date:
             self.from_cache()
+        elif self.to_html:
+            self.convert_to_html(self.feeds['news'])
+            self.to_cache()
         else:
             self.print_feeds(self.feeds['news'])
             self.to_cache()
@@ -77,6 +81,21 @@ class RSSReader:
                     to_print.append(item)
 
         self.print_feeds(to_print)
+
+    def convert_to_html(self, convert):
+        html_string = '<!DOCTYPE html><html><head>RSSFeed</head><body>'
+        for item in convert:
+            html_string += f'<p>{item["feed_name"]}</p>'
+            html_string += f'<p>{item["title"]}</p>'
+            html_string += f'<p>{item["date"]}</p>'
+            html_string += f'<a href="{item["link"]}">Original feed</a><br>'
+            html_string += f'<p>{item["image_title"]}</p>'
+            html_string += f'<p>{item["image_description"]}</p>'
+            html_string += f'<img src="{item["image_link"]}"><br><br>'
+        html_string += '</body></html>'
+
+        with open(f'{self.to_html}/html_news.html', 'w') as f:
+            f.write(html_string)
 
     def print_feeds(self, to_print):
         if self.json:
