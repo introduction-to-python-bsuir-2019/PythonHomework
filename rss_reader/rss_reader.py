@@ -8,7 +8,6 @@ from base64 import b64encode
 from pathlib import Path
 from bs4 import BeautifulSoup
 from rss_reader import version as vers
-# import version as vers
 
 
 class Converter:
@@ -36,7 +35,7 @@ class Converter:
         path_object = Path(path)
         path_object.mkdir(parents=True, exist_ok=True)
         path_object /= 'news feed.html'
-        with path_object.open('w', encoding=self.encoding) as html_file:
+        with path_object.open('w', encoding="utf-8") as html_file:
             html_file.write(self.create_html(limit, date))
 
         logging.info('Converting to html successful')
@@ -294,7 +293,6 @@ class Item:
         :rtype: str
         """
 
-        logging.info('href inserted')
         description = self.insert_images(html.escape(description), date)
         description = self.insert_videos(description)
         for href_link in self.links['href_links']:
@@ -302,6 +300,7 @@ class Item:
             href_content = href_raw[href_raw.find(' | ')+3:len(href_raw)-1]
             href_html = '<a href="{href}">{content}</a>'.format(href=href_link[href_link.find(': ')+2:], content=href_content)
             description = description.replace(href_raw, href_html)
+        logging.info('href inserted')
         return description
 
     def insert_images(self, description, date):
@@ -318,7 +317,6 @@ class Item:
             image_raw = description[description.find(' [image '):description.find(']', description.find(' [image '))+1]
             image_alt = image_raw[image_raw.find(' | ') + 3:len(image_raw) - 1]
             source = image_link[image_link.find(': ') + 2:]
-            logging.info(source)
             if date:
                 image_name = source.split('/')[-1]
                 image_name = image_name.translate(str.maketrans('', '', '.?><"*:|')) + '.jpg'
@@ -361,7 +359,6 @@ class Item:
             return ''
         for image_link in self.links['images_links']:
             source = image_link[image_link.find(': ') + 2:]
-            logging.info(source)
             image_name = source.split('/')[-1]
             if source == '':
                 image_name = '.jpg'
