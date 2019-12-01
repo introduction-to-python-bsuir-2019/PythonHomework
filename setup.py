@@ -20,7 +20,7 @@ setup(
     keywords='simple rss reader',
     packages=find_packages(),
     package_data={
-        'rss_app':[
+        'rss_app': [
             'fonts/ttf/DejaVuSansCondensed.ttf'
         ]
     },

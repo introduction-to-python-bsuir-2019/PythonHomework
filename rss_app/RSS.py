@@ -1,5 +1,5 @@
 """
-A file with the RssAggregator class that parses the URL 
+A file with the RssAggregator class that parses the URL
 and performs various actions with the received data
 """
 
@@ -19,8 +19,8 @@ class RssAggregator():
     feedurl = ""
 
     def __init__(self, args, log):
-        self.args=args
-        self.log=log
+        self.args = args
+        self.log = log
 
     def get_news(self):
 
@@ -28,19 +28,19 @@ class RssAggregator():
 
         self.log.info("Getting rss feed")
         thefeed = feedparser.parse(self.args.source)
-        self.save_to_json_file(thefeed.entries)      
-        return thefeed.entries[:self.args.limit]        
+        self.save_to_json_file(thefeed.entries)
+        return thefeed.entries[:self.args.limit]
 
     def print_news(self, entries):
 
         """ Print rss news """
 
-        self.log.info("Printing news")      
+        self.log.info("Printing news")
         for thefeedentry in entries:
             try:
-                print("--------------------------------------------------")        
+                print("--------------------------------------------------")
                 print("Title: ", thefeedentry.title)
-                print("Date: ", thefeedentry.published, end="\n\n")                    
+                print("Date: ", thefeedentry.published, end="\n\n")
                 print("Alt image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'])
                 print(BeautifulSoup(thefeedentry.description, "html.parser").text, end="\n\n")
                 print("Links:")
@@ -56,21 +56,21 @@ class RssAggregator():
         self.log.info("RSS news to json")
         for thefeedentry in entries:
             try:
-                news={
+                news = {
                     "Title": thefeedentry.title,
                     "Date": thefeedentry.published,
                     "Alt image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'],
                     "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text,
-                    "Links":{
+                    "Links": {
                         "News": thefeedentry.link,
                         "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
-                    }                
-                } 
+                    }
+                }
                 print(json.dumps(news, indent=3))
             except TypeError:
                 self.log.info("TypeError: 'NoneType'")
 
-    def save_to_json_file(self,entries):
+    def save_to_json_file(self, entries):
 
         """ Save rss news to json file"""
 
@@ -80,12 +80,12 @@ class RssAggregator():
         with open(file_name, "w", encoding="utf-8") as write_file:
             for thefeedentry in entries:
                 try:
-                    news={
+                    news = {
                         "Title": thefeedentry.title,
                         "Date": thefeedentry.published,
                         "Alt image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'],
                         "Discription": BeautifulSoup(thefeedentry.description, "html.parser").text,
-                        "Links":{
+                        "Links": {
                             "News": thefeedentry.link,
                             "Image": BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
                         }
@@ -93,7 +93,7 @@ class RssAggregator():
                     self.save_image(thefeedentry, file_name)
                     news_list.append(news)
                 except TypeError:
-                    self.log.info("TypeError: 'NoneType'")                             
+                    self.log.info("TypeError: 'NoneType'")
             json.dump(news_list, write_file, indent=3)
 
     def get_file_name(self):
@@ -110,16 +110,16 @@ class RssAggregator():
 
         """ Save image to file"""
 
-        self.log.info("Save image")  
+        self.log.info("Save image")
         file_path = self.get_path_image(thefeedentry)
         h = httplib2.Http('.cache')
-        response, content = h.request(BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])      
+        response, content = h.request(BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
         try:
             out = open(file_path, "wb")
             out.write(content)
             out.close()
         except FileNotFoundError:
-            self.log.info("Error: image not found")      
+            self.log.info("Error: image not found")
 
     def get_path_image(self, thefeedentry):
 
@@ -131,7 +131,7 @@ class RssAggregator():
         folder_path = "image_" + file_name + os.path.sep
         if not os.path.exists(folder_path):
             self.log.info('Creating directory images')
-            os.mkdir(folder_path)        
+            os.mkdir(folder_path)
         img = BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src']
         image = img.split("/")
         file_path = os.path.abspath('') + os.path.sep + folder_path + image[-1]
@@ -148,15 +148,15 @@ class RssAggregator():
         file_name = self.get_file_name()
         news_by_date = list()
         try:
-            with open(file_name, "r") as read_file:                          
+            with open(file_name, "r") as read_file:
                 news = json.load(read_file)
-            for thefeedentry in news: 
+            for thefeedentry in news:
                 published = parse(thefeedentry['Date']).strftime('%Y%m%d')
                 if published >= self.args.date:
-                    news_by_date.append(thefeedentry)  
+                    news_by_date.append(thefeedentry)
             return news_by_date
-        except FileNotFoundError:  
-            self.log.info("File not found error") 
+        except FileNotFoundError:
+            self.log.info("File not found error")
 
     def get_news_for_converter(self):
 
@@ -166,24 +166,23 @@ class RssAggregator():
         file_name = self.get_file_name()
         news = list()
         try:
-            with open(file_name, "r") as read_file:                          
+            with open(file_name, "r") as read_file:
                 news = json.load(read_file)
             return news
-        except FileNotFoundError:  
+        except FileNotFoundError:
             self.log.info("File not found error")
 
-    def print_news_from_file(self,entries):
+    def print_news_from_file(self, entries):
 
         """ Print a certain amount of news by date """
 
-        self.log.info("Printing news by date")        
-        for thefeedentry in entries[:self.args.limit]:                  
-            print("--------------------------------------------------")       
+        self.log.info("Printing news by date")
+        for thefeedentry in entries[:self.args.limit]:
+            print("--------------------------------------------------")
             print("Title: ", thefeedentry['Title'])
             print("Date: ", thefeedentry['Date'], end="\n\n")
-            print("Alt image: ", thefeedentry['Alt image'])                    
+            print("Alt image: ", thefeedentry['Alt image'])
             print(thefeedentry['Discription'], end="\n\n")
             print("Links: ")
             print("News: ", thefeedentry['Links']['News'])
             print("Image: ", thefeedentry['Links']['Image'])
-            
