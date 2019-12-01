@@ -11,9 +11,9 @@ class MongoDatabase:
 
     def __init__(self, URL_CONNECTION: str, DB_NAME: str, COLLECTION_NAME: str):
         """Init MongoDatabase class"""
-        self.url_connection: str = URL_CONNECTION
-        self.db_name: str = DB_NAME
-        self.collection_name: str = COLLECTION_NAME
+        self.url_connection = URL_CONNECTION
+        self.db_name = DB_NAME
+        self.collection_name = COLLECTION_NAME
 
     def database_connection(self) -> None:
         """Method for connecting to the database"""
@@ -63,7 +63,7 @@ class MongoDatabase:
         else:
             self._update_news_feed(data)
 
-    def _check_date_in_database(self, date: int, source: str):
+    def _check_date_in_database(self, date: int, source: str) -> bool:
         logging.info('Date was found in db')
         return self.feed_collection.find({"Url": source, "Date_Parsed": str(date)}).count() == 1
 

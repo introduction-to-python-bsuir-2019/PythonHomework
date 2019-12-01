@@ -2,7 +2,7 @@
 import logging
 import datetime
 import time
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 from bs4 import BeautifulSoup
 
@@ -11,10 +11,10 @@ class RSSFeed:
     """RSSFeed class"""
     def __init__(self, dict_args: Dict[str, Any], data: Dict[str, Any]):
         """Init RSSFeed class"""
-        self.rss_url: str = dict_args['source']
-        self.rss_feed: Dict[str, Any] = data
-        self.news: List = []
-        self.rss_feed_dict: Dict[str, Any] = {}
+        self.rss_url = dict_args['source']
+        self.rss_feed = data
+        self.news = []
+        self.rss_feed_dict = {}
 
     def data_processing(self) -> Dict[str, Any]:
         """

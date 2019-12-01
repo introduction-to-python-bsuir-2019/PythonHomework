@@ -20,6 +20,7 @@ class ApplicationLog:
     def print_log() -> None:
         """Method displays logs to the console"""
         logging.info('Print the logs from the apps.log file to stdout')
+
         with open("apps.log", "r") as file_handler:
             for line in file_handler:
                 print(line)

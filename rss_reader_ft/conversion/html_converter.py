@@ -12,7 +12,7 @@ class HtmlConverter(FormatConverter):
     """
     def __init__(self, rss_feed_dict: Dict[str, Any]):
         """Init HtmlConverter class"""
-        self.convert_data: Dict[str, Any] = rss_feed_dict
+        self.convert_data = rss_feed_dict
 
     def convert_to_format(self) -> str:
         """Сonversion method to HTML format"""

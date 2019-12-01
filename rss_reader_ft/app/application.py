@@ -16,13 +16,13 @@ class Application:
     """Application class"""
     def __init__(self):
         """Init Application class"""
-        self.dict_args: Dict[str, Any] = ArgumentParser.parse_args()
+        self.dict_args = ArgumentParser.parse_args()
 
     def run_app(self) -> None:
         """Мethod sets application behavior"""
 
         logging.info(f'args{self.dict_args}')
-        
+
         mongo_db = MongoDatabase(URL_CONNECTION, DB_NAME, COLLECTION_NAME)
         mongo_db.database_connection()
 

@@ -19,7 +19,7 @@ class PdfConverter(FormatConverter):
     """
     def __init__(self, rss_feed_dict: Dict[str, Any]):
         """Init PdfConverter class"""
-        self.convert_data: Dict[str, Any] = rss_feed_dict
+        self.convert_data = rss_feed_dict
 
     def convert_to_format(self) -> None:
         """Сonversion method to PDF format"""
@@ -32,14 +32,6 @@ class PdfConverter(FormatConverter):
         logging.info('Generate_pdf_file')
         """
         Method to generate PDF file
-
-        If you wonder why he did not support the Russian language, I will answer you,
-        because the stars are not on my side and the moon is in the wrong phase,
-        I tried to connect the font DejaVuSans.ttf with a friend,
-        but it does not work like several other options that were on the internet.
-        Therefore, he works only with the Latin alphabet and sometimes there are articles with some data
-        that he does not want to convert.
-        8:00 AM scream of the soul (((
         """
 
         pdf_file = canvas.Canvas(file_name, landscape(letter))
@@ -80,6 +72,7 @@ class PdfConverter(FormatConverter):
 
     @staticmethod
     def _edit_link(pdf_file, y: int, string: str) -> int:
+        """A method that breaks a link to 2 honor"""
         if len(string) >= 80:
             link_start = string[:50]
             link_end = string[50:]
@@ -98,6 +91,11 @@ class PdfConverter(FormatConverter):
 
     @staticmethod
     def _edit_text(pdf_file, y: int, string: str) -> int:
+        """
+        A method that breaks text into words
+        and gathers lines of a certain length
+        from them so that the text does not go beyond the page
+        """
         if len(string) >= 70:
             words = string.split(" ")
             line = ''

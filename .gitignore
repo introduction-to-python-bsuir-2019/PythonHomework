@@ -110,3 +110,8 @@ apps.log
 
 #file
 News_feed.html
+
+.nginx
+config
+.vscode
+.pytest_cache

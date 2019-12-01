@@ -9,7 +9,7 @@ class DataLoader:
     """DataLoader class"""
     def __init__(self, url_source: str):
         """Init DataLoader class"""
-        self.url_source: str = url_source
+        self.url_source = url_source
 
     def upload(self) -> Dict[str, Any]:
         """Method of loading data from a site by URL"""

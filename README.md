@@ -2,7 +2,6 @@
 
 RSS reader is a command-line utility which receives RSS URL and prints results in human-readable format.
 
-
 ## Specification
 
 Utility provides the following interface:
@@ -41,6 +40,10 @@ Utility provides the following interface:
     ```
     rss-reader "https://news.yahoo.com/rss/" --limit 1
     ```
+
+## About my unittests )))
+
+![](https://raw.githubusercontent.com/ZayJob/Telegram-bot/master/CryptoTower/6gGLqaT30sw.jpg)
 
 ## Install RSS reader v5.0 (work)
 1. Create docker container:
@@ -100,6 +103,7 @@ Utility provides the following interface:
         tar -xf latest.tar code/News_feed.pdf
     ```
     Go to folder /code
+
 ## Distribution
 Utility is wrapped into package named rss_reader_ft. Additionally this package exports CLI utility named rss-reader.
 
