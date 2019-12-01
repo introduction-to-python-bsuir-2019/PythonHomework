@@ -1,7 +1,11 @@
+import base64
+import datetime
 import feedparser
 import json
-import datetime
+import requests
 from bs4 import BeautifulSoup
+from io import BytesIO
+from PIL import Image
 
 
 class RSSReader:
@@ -154,16 +158,59 @@ class RSSReader:
         :param convert: List of news to convert
         :return: Nothing to return
         """
-        fb2_string = '<?xml version="1.0" encoding="UTF-8"?><NEWS>'
+        fb2_string = f'<?xml version="1.0" encoding="UTF-8"?>' \
+            f'<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">' \
+            f'<description>' \
+            f'<title-info>' \
+            f'<genre>antique</genre>' \
+            f'<author><first-name></first-name><last-name>Unknown</last-name></author>' \
+            f'<book-title>99ae0c9b60239ce04eded964c2dd198d</book-title>' \
+            f'<lang>en</lang>' \
+            f'</title-info>' \
+            f'<document-info>' \
+            f'<author><first-name></first-name><last-name>Unknown</last-name></author>' \
+            f'<program-used>calibre 4.4.0</program-used>' \
+            f'<date>1.12.2019</date>' \
+            f'<id>6ad0484e-3669-44b5-bda1-78ddac516e9b</id>' \
+            f'<version>1.0</version>' \
+            f'</document-info>' \
+            f'<publish-info>' \
+            f'</publish-info>' \
+            f'</description>' \
+            f'<body>' \
+            f'<section>'
+        imgs_base64 = []
+        i = 0
         for item in convert:
-            fb2_string += f'<p><FEED_NAME>{item["feed_name"]}</FEED_NAME></p><br>'
-            fb2_string += f'<p><TITLE>{item["title"]}</TITLE></p><br>'
-            fb2_string += f'<p><DATE>{item["date"]}</DATE></p><br>'
-            fb2_string += f'<p><LINK>{item["link"]}</LINK></p><br>'
-            fb2_string += f'<p><IMAGE_TITLE>{item["image_title"]}</IMAGE_TITLE></p><br>'
-            fb2_string += f'<p><IMAGE_DESCRIPTION>{item["image_description"]}</IMAGE_DESCRIPTION></p><br>'
-            fb2_string += f'<p><IMAGE_LINK>{item["image_link"]}"</IMAGE_LINK></p><br>'
-        fb2_string += '</NEWS>'
+            fb2_string += f'<p>Feed name: {item["feed_name"]}</p>'
+            fb2_string += f'<p>Title: {item["title"]}</p>'
+            fb2_string += f'<p>Original feed link: {item["link"]}</p>'
+            fb2_string += f'<p>News date: {item["date"]}</p>'
+            fb2_string += f'<p>Image title: {item["image_title"]}</p>'
+            fb2_string += f'<p>Image description: {item["image_description"]}</p>'
+
+            # Get 64base image
+            if item["image_link"] != 'No image link':
+                fb2_string += f'<p><image l:href="#img_{i}"/></p>'
+                response = requests.get(item["image_link"])
+                img_file = Image.open(BytesIO(response.content))
+                buffered = BytesIO()
+                try:
+                    img_file.save(buffered, format="JPEG")
+                    img_str = str(base64.b64encode(buffered.getvalue()))
+                    imgs_base64.append(img_str[2:-1])
+                except Exception:
+                    imgs_base64.append('No image here')
+                i += 1
+
+        fb2_string += '<empty-line/></section></body>'
+
+        i = 0
+        for item in imgs_base64:
+            fb2_string += f'<binary id="img_{i}" content-type="image/jpeg">{item}</binary>'
+            i += 1
+
+        fb2_string += '</FictionBook>'
 
         with open(f'{self.to_fb2}/fb2_news.fb2', 'w') as f:
             f.write(fb2_string)
