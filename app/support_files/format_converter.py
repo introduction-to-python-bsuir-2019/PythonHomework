@@ -2,20 +2,20 @@
 This module contains class for converting parsed data from RSS.
 """
 import base64
-import textwrap
+import dataclasses
 import functools
 import json
-import dataclasses
+import textwrap
 from typing import List
 from time import strftime, altzone, mktime, localtime, ctime, time, struct_time
 
 import urllib3
-from colored import fg, bg, attr
+from colored import fg, attr
 
+from app.support_files.app_logger import get_logger
+from app.support_files.config import APP_NAME
 from app.support_files.dtos import Feed
 from app.support_files.rss_parser import Parser
-from app.support_files.config import APP_NAME
-from app.support_files.app_logger import get_logger
 
 
 def convert_date(date: struct_time) -> str:
@@ -43,7 +43,7 @@ def set_length(str_len: str):
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
-            text = textwrap.fill(args[0], width=str_len)
+            text = textwrap.fill(args[0], width=str_len)  # first argument mast be str
             result = func(text, *args[1:], **kwargs)
             return result
         return wrapper
@@ -115,7 +115,7 @@ class Converter:
                 strings.append(in_separator)
             strings.append(out_separator)
 
-        strings = map(lambda s: s + "\n", strings)
+        strings = "\n".join(strings)
 
         result_string = functools.reduce(lambda a, b: a + b, strings)
 

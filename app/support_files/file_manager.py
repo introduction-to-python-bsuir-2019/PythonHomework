@@ -1,8 +1,8 @@
 """
 This module contains functions to work with files.
 """
-from re import findall
 from pathlib import Path
+from re import findall
 
 from app.support_files.exeptions import DirError, DirExistsError
 

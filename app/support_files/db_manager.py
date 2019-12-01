@@ -3,15 +3,15 @@ This module contains class to work with database.
 """
 import os
 from dataclasses import asdict
-from typing import Optional
 from time import strptime, mktime, altzone, localtime, struct_time
+from typing import Optional
 
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 
-from app.support_files.dtos import Feed, Item
-from app.support_files.exeptions import FindFeedError, DateError
-from app.support_files.config import APP_NAME
 from app.support_files.app_logger import get_logger
+from app.support_files.config import APP_NAME
+from app.support_files.dtos import Feed, Item
+from app.support_files.exeptions import FindFeedError, DateError, DBConnectError
 
 
 class DBManager:
@@ -22,6 +22,10 @@ class DBManager:
     def __init__(self) -> None:
         mongo_host = os.getenv('MONGO_HOST', '127.0.0.1')
         client = MongoClient(f"mongodb://{mongo_host}:27017/")
+        try:
+            client.server_info()
+        except errors.ServerSelectionTimeoutError:
+            raise DBConnectError(f"Can't connect to database with host - {mongo_host} and port - 27017")
         self._db = client["feed_db"]
         self._collection = self._db["feed_collection"]
         self._logger = get_logger(APP_NAME)
@@ -79,8 +83,8 @@ class DBManager:
         result_items = []
         count = limit
         for item in feed.items:
-            i_date = struct_time(item.published_parsed)
-            l_i_date = localtime(mktime(tuple(i_date)) - altzone)
+            item_date = struct_time(item.published_parsed)
+            l_i_date = localtime(mktime(tuple(item_date)) - altzone)
             if (l_i_date.tm_year, l_i_date.tm_mon, l_i_date.tm_mday) == (date.tm_year, date.tm_mon, date.tm_mday):
                 result_items.append(item)
                 count -= 1
@@ -97,4 +101,4 @@ class DBManager:
 
 
 if __name__ == "__main__":
-    DBManager().truncate_collection()
+    DBManager()

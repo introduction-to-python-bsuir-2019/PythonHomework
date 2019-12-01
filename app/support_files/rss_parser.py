@@ -53,8 +53,11 @@ class Parser:
         feed = data.get("feed", {})
         feed_data = apply_field_mapping(FEED_FIELD_MAPPING, feed)
         feed_data["rss_link"] = self.url
+        entries = data.get("entries", [])
+        if items_limit > 0:
+            entries = entries[:items_limit]
         items_data = [apply_field_mapping(ITEM_FIELD_MAPPING, item)
-                      for item in data.get("entries", [])[:items_limit]]
+                      for item in entries]
         for item_data in items_data:
             soup = BeautifulSoup(item_data.get("description", ""), 'html.parser')
             item_data["description"] = soup.text
@@ -68,4 +71,4 @@ class Parser:
 
 if __name__ == "__main__":
     parser = Parser("http://www.bbc.co.uk/music/genres/classical/reviews.rss")
-    print(parser.parse_feed(2))
+    print(parser.parse_feed(1))

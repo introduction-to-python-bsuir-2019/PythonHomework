@@ -2,8 +2,8 @@
 This module provides functions to work with logging.
 """
 import logging
-from logging import Logger
 import sys
+from logging import Logger
 
 
 def init_logger(name: str) -> Logger:

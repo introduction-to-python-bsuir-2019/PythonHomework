@@ -8,8 +8,8 @@ from app.support_files import (
     app_logger,
     db_manager,
     exeptions)
-from app.support_files.file_manager import store_str_to_file
 from app.support_files.config import APP_NAME
+from app.support_files.file_manager import store_str_to_file
 
 
 class Reader:
@@ -41,7 +41,11 @@ class Reader:
             return None
 
         logger.info("Connecting with database")
-        db = db_manager.DBManager()
+        try:
+            db = db_manager.DBManager()
+        except exeptions.DBConnectError as err:
+            print(err)
+            return None
         if _args.date is None:
             try:
                 feed = parser.parse_feed(limit)

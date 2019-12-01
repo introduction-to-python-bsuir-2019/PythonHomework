@@ -29,3 +29,10 @@ class DirExistsError(Exception):
     This class should be raised, if directory which was received by bath not exists.
     """
     pass
+
+
+class DBConnectError(Exception):
+    """
+    This class should be raised, if received some problems with connection with database.
+    """
+    pass

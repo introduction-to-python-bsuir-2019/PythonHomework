@@ -4,9 +4,15 @@ Clone this repository and run
 ```text
 pip install . --user
 ```
+Also, you must have installed and running MongoDB.
+Run
+```text
+service mongod status
+```
+to make sure that Mongodb is running.
 ### User interface
 ```text
-usage: rss-reader [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] [--date DATE] [--to_html PATH] [--to_fb2 PATH] source
+usage: rss-reader [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] [--date DATE] [--to_html PATH] [--to_fb2 PATH] [--colorize] source
 
 positional arguments:
   source                RSS URL
@@ -22,6 +28,7 @@ optional arguments:
   --date DATE           Search past news by date in format yeardaymonth (19991311)
   --to_html PATH        Save news by path in html format
   --to_fb2 PATH         Save news by path in fb2 format
+  --colorize            Make console text display colorful
 ```
 
 ### Json structure
