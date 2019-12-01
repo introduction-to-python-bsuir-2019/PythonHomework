@@ -102,5 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-.html
-
+*.html
+data/
+*.pdf
+*.jpg
+loglist.txt

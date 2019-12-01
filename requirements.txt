@@ -1,0 +1,7 @@
+beautifulsoup4==4.8.1
+bs4==0.0.1
+fpdf==1.7.2
+logger==1.4
+lxml==4.4.1
+urlib3==1.25.7
+argparser==1.4.0
