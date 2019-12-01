@@ -128,36 +128,32 @@ class RssFeed:
         right = self.args.source[8:].find('/')
         name = self.args.source[8:right + 8] + '.json'
         if os.path.isfile(name):
-            f = open(name, 'r+')
-            data = json.load(f)
-            for number in range(0, len(self.title)):
-                flag = True
-                for dates in data['news']:
-                    if dates['Date'] == self.date[number]:
-                        flag = False
-                if flag:
-                    data['news'].append({'Title': self.title[number],
-                                         'Date': self.date[number],
-                                         'Link': self.link[number],
-                                         'Feed': self.description[number],
-                                         'Image link': self.image_link[number]
-                                         })
-            f.close()
-            f = open(name, 'w')
-            f.write(json.dumps(data, indent=4, ensure_ascii=False))
-            f.close()
+            with open(name, 'r+') as f:
+                data = json.load(f)
+                for number in range(0, len(self.title)):
+                    flag = True
+                    for dates in data['news']:
+                        if dates['Date'] == self.date[number]:
+                            flag = False
+                    if flag:
+                        data['news'].append({'Title': self.title[number],
+                                            'Date': self.date[number],
+                                            'Link': self.link[number],
+                                            'Feed': self.description[number],
+                                            'Image link': self.image_link[number]
+                                            })
+            with open(name, 'w') as f:
+                f.write(json.dumps(data, indent=4, ensure_ascii=False))
         else:
-            f = open(name, 'w')
-            newsJson = json.dumps({'title': self.soup.find('title').string,
-                                   'news': [{'Title': self.title[number],
-                                             'Date': self.date[number],
-                                             'Link': self.link[number],
-                                             'Feed': self.description[number],
-                                             'Image link': self.image_link[number]
-                                             } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4)
-
-            f.write(newsJson)
-            f.close()
+            with open(name, 'w') as f:
+                newsJson = json.dumps({'title': self.soup.find('title').string,
+                                    'news': [{'Title': self.title[number],
+                                                'Date': self.date[number],
+                                                'Link': self.link[number],
+                                                'Feed': self.description[number],
+                                                'Image link': self.image_link[number]
+                                                } for number in range(0, len(self.title))]}, ensure_ascii=False, indent=4)
+                f.write(newsJson)
         if self.args.json:
             print(json.dumps({'title': self.soup.find('title').string,
                               'news': [{'Title': self.title[number],
@@ -191,22 +187,21 @@ def print_date():
     logging.info('Check if this file ' + name + ' was create')
     if os.path.isfile(name):
         logging.info(name + ' was create!')
-        f = open(name, 'r+')
-        data = json.load(f)
-        logging.info('Print news from cache file')
-        for news in data['news']:
-            if get_num_date(news['Date']) == str(parsargument().date[0]):
-                print('Title: ' + news['Title'])
-                print('Date: ' + news['Date'])
-                print('Link: ' + news['Link'])
-                print('\nNews: ' + news['Feed'])
-                if news['Image link']:
-                    print('\nImage link: ')
-                    print('\n'.join(news['Image link']))
-                    print('\n\n')
-                else:
-                    print('\nImage link: None\n\n')
-        f.close()
+        with open(name, 'r+') as f:
+            data = json.load(f)
+            logging.info('Print news from cache file')
+            for news in data['news']:
+                if get_num_date(news['Date']) == str(parsargument().date[0]):
+                    print('Title: ' + news['Title'])
+                    print('Date: ' + news['Date'])
+                    print('Link: ' + news['Link'])
+                    print('\nNews: ' + news['Feed'])
+                    if news['Image link']:
+                        print('\nImage link: ')
+                        print('\n'.join(news['Image link']))
+                        print('\n\n')
+                    else:
+                        print('\nImage link: None\n\n')
     else:
         logging.info(name + 'was not create(')
         print('No cache')
