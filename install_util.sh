@@ -5,7 +5,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}Installing requirements: ${NC}"
-pyhton3 -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 echo -e "${GREEN}Installing rss_reader: ${NC}"
 python3 -m pip install .
 
