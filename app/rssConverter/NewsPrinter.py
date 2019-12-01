@@ -42,27 +42,28 @@ class NewsPinter:
         for new in news_list:
             json_str += ' ' + '{'
             for key, item in new.items.items():
-                if key == 'links':
-                    key = NewsPinter.to_str_for_json(key)
-                    json_str += " " + key + ':'
-                    json_str += " " + '['
-                    for link in item:
-                        link = NewsPinter.to_str_for_json(link)
-                        json_str += " " + link + ','
-                    json_str = json_str[:-1]
-                    json_str += " " + '],'
-                else:
-                    if item == 'Unknown' and key in ['pubDate', 'published']:
-                        continue
-                    key = NewsPinter.to_str_for_json(key)
-                    item = NewsPinter.to_str_for_json(item)
-                    json_str += " " + key + ':' + item + ','
+                if item is not None:
+                    if key == 'links':
+                        key = NewsPinter.to_str_for_json(key)
+                        json_str += " " + key + ':'
+                        json_str += " " + '['
+                        for link in item:
+                            link = NewsPinter.to_str_for_json(link)
+                            json_str += " " + link + ','
+                        json_str = json_str[:-1]
+                        json_str += " " + '],'
+                    else:
+                        if item == 'Unknown' and key in ['pubDate', 'published']:
+                            continue
+                        key = NewsPinter.to_str_for_json(key)
+                        item = NewsPinter.to_str_for_json(item)
+                        json_str += " " + key + ':' + item + ','
             json_str = json_str[:-1]
             json_str += " " + '},'
         json_str = json_str[:-1]
         json_str += " " + ']'
         json_str += '}'
-        print(json_str)
+        return json_str
 
     @staticmethod
     def to_str_for_json(value):

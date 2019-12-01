@@ -46,7 +46,7 @@ def main():
                 fb2_converter.parse_news()
             if args.json:
                 logger.info("print json")
-                NewsPinter.in_json_format(news_list, args.limit)
+                print(NewsPinter.in_json_format(news_list, args.limit))
                 logger.info("json is printed")
             else:
                 NewsPinter.print_news(news_list, args.limit)
@@ -87,6 +87,9 @@ def creating_image_dir(logger):
         logger.info("create folder with path {0}".format(image_path))
     else:
         logger.info("folder exists {0}".format(image_path))
+        file_list = [file for file in os.listdir(image_path)]
+        for file in file_list:
+            os.remove(os.path.join(image_path, file))
     return image_path
 
 

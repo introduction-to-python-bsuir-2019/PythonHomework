@@ -22,6 +22,7 @@ class HtmlConverter:
             self.file_name = os.path.join(address, "news.html")
         except Exception:
             raise IncorrectAddress(address)
+        return self.file_name
 
     def parse_news(self):
         """Writing news to html file"""

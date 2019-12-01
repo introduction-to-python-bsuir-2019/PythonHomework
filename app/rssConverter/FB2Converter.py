@@ -15,7 +15,7 @@ class FB2Converter:
                             'content-type="image/jpeg">{image}</binary> '
         self.fb2_start = '<?xml version="1.0" encoding="utf-8"?><FictionBook ' \
                          'xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" ' \
-                         'xmlns:l="http://www.w3.org/1999/xlink"><description><title-info><genre>home_entertain' \
+                         'xmlns:xlink="http://www.w3.org/1999/xlink"><description><title-info><genre>home_entertain' \
                          '</genre><book-title>news</book-title><author><last-name>RSS</last-name></author></title' \
                          '-info><document-info><date>{date}</date><id>{' \
                          'id}</id><version>1.0</version></document-info></description> '
@@ -30,6 +30,7 @@ class FB2Converter:
             self.file_name = os.path.join(address, "news.fb2")
         except Exception:
             raise IncorrectAddress(address)
+        return self.file_name
 
     def parse_news(self):
         """Writing news to fb2 file"""
