@@ -1,4 +1,5 @@
 import argparse
+import base64
 from bs4 import BeautifulSoup
 from datetime import datetime
 import feedparser
@@ -135,29 +136,44 @@ def insert_cache(cache_files, cache):
     '''Writes newly formed cache to respective files'''
     jsonpickle.set_encoder_options('json', ensure_ascii=False)
     for date, cached_content in zip(cache_files, cache):
-        with open('cache/'+date+'.json', 'w') as cache:
+        for source in cached_content:
+            for news in source.news:
+                logging.info('Caching images...')
+                for image in news.images:
+                    with open(os.path.join('cache', image.replace('/', '')+'.jpg'), 'wb') as handle:
+                        response = requests.get(image, stream=True)
+                        for block in response.iter_content(1024):
+                            handle.write(block)
+        with open(os.path.join('cache', date+'.json'), 'w') as cache:
             cache.write(jsonpickle.encode(cached_content))
 
 
 def make_fb2(news):
     '''Creates an .fb2 file that contains news designed for output'''
     logging.info('Creating an FB2 file...')
-    filename = os.path.join(os.path.expanduser('~/Desktop'), datetime.now().strftime('%H%M%S%b%d%Y'))
+    filename = datetime.now().strftime('%H%M%S%b%d%Y')
     with open(filename+'.fb2', 'w') as filer:
-        filer.write('<?xml version="1.0" encoding="UTF-8"?><FictionBook><description></description><body>')
+        filer.write('<?xml version="1.0" encoding="UTF-8"?><FictionBook xmlns:l="https://www.w3.org/1999/xlink">')
+        filer.write('<description></description><body>')
         try:
+            images = []
             for source in news:
                 filer.write('<title><p>Source: '+source.title+'</p></title>')
                 for item in source.news:
-                    filer.write('<title><p>'+item.title+'</p></title>')
-                    filer.write('<p>Posted at: '+item.date+'</p>')
-                    filer.write('<p>'+item.content+'</p>')
+                    filer.write('<section><title><p>'+item.title+'</p></title>')
+                    filer.write('<p>Posted at: '+item.date+'</p><empty-line/>')
+                    filer.write('<p>'+item.content+'</p><empty-line/>')
                     filer.write('<p><strong>Source: '+item.source+'</strong></p>')
-                    filer.write('<p>Related images: ')
                     for image in item.images:
-                        filer.write('<p>'+image+'</p>')
-                    filer.write('</p>')
-            filer.write('</body></FictionBook>')
+                        filer.write('<p><image l:href="#'+image.replace('/', '')+'.jpg"/></p>')
+                        images.append(image.replace('/', ''))
+                    filer.write('</section>')
+            filer.write('</body>')
+            for image in images:
+                with open(os.path.join('cache', image.replace('/', '')+'.jpg'), 'rb') as handle:
+                    filer.write('<binary id="'+image.replace('/', '')+'.jpg" content-type="image/jpeg">')
+                    filer.write(base64.b64encode(handle.read()).decode('ascii'))
+                    filer.write('</binary>')
         except TypeError:
             for source in news:
                 filer.write('<p>'+source+'</p>')
@@ -174,7 +190,7 @@ def make_json(news):
 def make_html(news):
     '''Creates an .html file that contains news designed for output'''
     logging.info('Creating an HTML file...')
-    filename = os.path.join(os.path.expanduser('~/Desktop'), datetime.now().strftime('%H%M%S%b%d%Y'))
+    filename = datetime.now().strftime('%H%M%S%b%d%Y')
     with open(filename+'.html', 'w') as filer:
         filer.write('<html>\n<head></head><body>')
         try:
@@ -186,14 +202,14 @@ def make_html(news):
                     filer.write('<br><br><p>'+item.content+'</p>')
                     filer.write('<p><a href="'+item.source+'">Source</a></p>')
                     for image in item.images:
-                        filer.write('<img src="'+image+'">')
+                        filer.write('<img src="cache/'+image.replace('/', '')+'.jpg">')
                     filer.write('<hr>')
                 filer.write('</div></div>')
         except TypeError:
             for source in news:
                 filer.write(source)
         filer.write('</body></html>')
-    print('All news can be found in '+filename+'.html on your desktop')
+    print('All news can be found in '+filename+'.html')
 
 
 def parse_arguments():
@@ -205,7 +221,7 @@ def parse_arguments():
     parser.add_argument('--limit', type=int, action='store', help='Limit news topics if this parameter provided')
     parser.add_argument('--to-html', action='store_true', help='Creates an .html file with news designed to be printed')
     parser.add_argument('--to-fb2', action='store_true', help='Creates an .fb2 file with news designed to be printed')
-    exclusive.add_argument('--version', action='store_true', help='Print version info')
+    exclusive.add_argument('--version', action='version', version='%(prog)s v'+cfg.VERSION, help='Print version info')
     exclusive.add_argument('source', nargs='?', help='RSS URL', default=None)
     exclusive.add_argument('--date', type=str, action='store', help='Print news posted at a certain date')
     return parser.parse_args()
@@ -228,10 +244,10 @@ def retrieve_cached_news(filenames):
     cached = []
     for filename in filenames:
         try:
-            with open('cache/'+filename+'.json', 'r') as cache:
+            with open(os.path.join('cache', filename+'.json'), 'r') as cache:
                 cached.append(jsonpickle.decode(cache.read()))
         except FileNotFoundError:
-            with open('cache/'+filename+'.json', 'w') as cache:
+            with open(os.path.join('cache', filename+'.json'), 'w') as cache:
                 cache.write(jsonpickle.encode([]))
             cached.append([])
     return cached
@@ -264,48 +280,43 @@ def update_cache(fresh_news, dates, cached):
 
 def main():
     args = parse_arguments()
-    if args.version and (args.json or args.limit or args.to_html or args.to_fb2):
-        raise ValueError('You don\'t use --version together with other arguments')
-    if not (args.version or args.source or args.date):
+    if not (args.source or args.date):
         raise ValueError('Source, --date or --version expected')
     if args.limit and args.limit < 1:
         raise ValueError('Incorrect limit input (likely to be non-positive)')
-    if args.version:
-        print('RSS-reader '+cfg.VERSION)
-    else:
-        if args.verbose:
-            logging.basicConfig(level=logging.INFO,
-                                format='%(asctime)s - %(message)s',
-                                datefmt='%H:%M:%S')
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s - %(message)s',
+                            datefmt='%H:%M:%S')
+    try:
+        os.mkdir('cache')
+        logging.info('Cache folder successfully created')
+    except FileExistsError:
+        pass
+    feed = []
+    if args.date:
         try:
-            os.mkdir('cache')
-            logging.info('Cache folder successfully created')
-        except FileExistsError:
-            pass
-        feed = []
-        if args.date:
-            try:
-                datetime.strptime(args.date, '%Y%m%d')
-                with open('cache/'+args.date+'.json', 'r') as cache:
-                    feed = retrieve_cached_news([args.date])[0]
-            except ValueError:
-                raise ValueError('Incorrect date input')
-            except FileNotFoundError:
-                raise FileNotFoundError('There is no cached news for this date')
-        else:
-            feed = [NewsFeed(args.source)]
-            cache_files = get_all_filenames(feed[0].news)
-            cached = retrieve_cached_news(cache_files)
-            cached = update_cache(feed, cache_files, cached)
-            insert_cache(cache_files, cached)
-        feed = cut_news_off(args.limit, feed)
-        if args.json:
-            feed = make_json(feed)
-        if args.to_html:
-            make_html(feed)
-        if args.to_fb2:
-            make_fb2(feed)
-        print_news(feed)
+            datetime.strptime(args.date, '%Y%m%d')
+            with open(os.path.join('cache', args.date+'.json'), 'r') as cache:
+                feed = retrieve_cached_news([args.date])[0]
+        except ValueError:
+            raise ValueError('Incorrect date input')
+        except FileNotFoundError:
+            raise FileNotFoundError('There is no cached news for this date')
+    else:
+        feed = [NewsFeed(args.source)]
+        cache_files = get_all_filenames(feed[0].news)
+        cached = retrieve_cached_news(cache_files)
+        cached = update_cache(feed, cache_files, cached)
+        insert_cache(cache_files, cached)
+    feed = cut_news_off(args.limit, feed)
+    if args.json:
+        feed = make_json(feed)
+    if args.to_html:
+        make_html(feed)
+    if args.to_fb2:
+        make_fb2(feed)
+    print_news(feed)
 
 
 if __name__ == '__main__':
