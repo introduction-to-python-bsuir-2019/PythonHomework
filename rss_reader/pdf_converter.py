@@ -2,7 +2,10 @@
 
 import logging
 import requests
+import convertapi
 
+from PIL import Image
+from io import BytesIO
 from fpdf import SYSTEM_TTFONTS, FPDF
 
 SYSTEM_TTFONTS = ''
@@ -16,9 +19,11 @@ class PDFConverter:
     def dump(self):
         """Create and fill PDF-file"""
         logging.info("Create and fill PDF-file")
-        
+
+        margin = 5
+
         self.pdf.add_page()
-        self.pdf.set_auto_page_break(True, 50)
+        self.pdf.set_auto_page_break(True, 10 * margin)
 
         for element in self.data:
             self.pdf.add_font('FreeSans', '', 'FreeSans.ttf', uni=True)
@@ -42,26 +47,21 @@ class PDFConverter:
             self.pdf.set_text_color(0, 0, 0)
             self.pdf.set_font("FreeSans", size=10)
 
-            self.pdf.ln(5)
+            self.pdf.ln(margin)
 
             for href in element["hrefs"]:
                 page_height = 300
                 image_height = 50
-                margin = 5
 
                 try:
-                    img_data = requests.get(href).content
-
-                    with open('image_name.jpg', 'wb') as handler:
-                        handler.write(img_data)
-
                     if page_height - self.pdf.get_y() < image_height + margin:
                         self.pdf.add_page()
-
-                    self.pdf.image('image_name.jpg', x = self.pdf.get_x() + image_height + margin, y = self.pdf.get_y(), h = image_height)
-                    self.pdf.ln(image_height + margin)
-                except:
-                    pass
+                    
+                    if href[-4:] == '.png':
+                        self.pdf.image(href, x = self.pdf.get_x() + image_height + margin, y = self.pdf.get_y(), h = image_height)
+                        self.pdf.ln(image_height + margin)
+                except Exception:
+                    logging.error('Cant get an image from url')
 
             self.pdf.multi_cell(0, margin, txt="", align="J")
 

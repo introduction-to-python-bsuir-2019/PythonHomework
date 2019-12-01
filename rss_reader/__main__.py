@@ -1,10 +1,14 @@
 import argparse
 import logging
 
-from .rss_reader import NewsReader
+from colorama import init
+
+from rss_reader import NewsReader
 
 
 def main():
+    init() # colorama init
+
     args = parse_args()
 
     if args.verbose:

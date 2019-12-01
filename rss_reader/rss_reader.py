@@ -3,13 +3,16 @@
 import re
 import logging
 import feedparser
+import lxml.html
+import lxml.html.clean
 
 from tldextract import extract
+from colorama import Fore, Back, Style
 
-from .news_cacher import NewsCacher
-from .json_formatter import NewsJsonFormatter
-from .pdf_converter import PDFConverter
-from .html_converter import HTMLConverter
+from news_cacher import NewsCacher
+from json_formatter import NewsJsonFormatter
+from pdf_converter import PDFConverter
+from html_converter import HTMLConverter
 
 
 class NewsReader:
@@ -29,6 +32,9 @@ class NewsReader:
         
         self.cacher_object = NewsCacher('cached_news.json', site_name)
 
+        self.DATE_KEYS = ['published', 'updated', 'pubDate']
+        self.MEDIA_KEYS = ['media_thumbnail', 'media_content']
+
     def parse_url(self):
         """Get RSS xml-file from url"""
         logging.info('Get RSS XML-file from url')
@@ -42,42 +48,25 @@ class NewsReader:
 
         for item in source:
             content = []
+            pub_date = ''
 
-            try:
-                for element in item.media_content:
-                    content.append(element['url'])
-            except AttributeError:
-                try:
-                    for element in item.media_thumbnail:
+            for key in self.DATE_KEYS:
+                if key in item:
+                    pub_date = key
+
+            for key in self.MEDIA_KEYS:
+                if key in item:
+                    for element in item[key]:
                         content.append(element['url'])
-                except AttributeError:
-                    content.append('No content!')
 
-            self.news.append({"title": item.title, "date": item.published, 
-                "text": self.strip_html_string(item.description), "link": item.link.split('?')[0], "hrefs": content})
+            self.news.append({"title": self.clean_html_text(item.title), "date": item[pub_date], 
+                "text": self.clean_html_text(self.strip_html_string(item.description)), "link": item.link.split('?')[0], "hrefs": content})
 
         if self.date == None:
             self.cacher_object.cache(self.news)
 
         if self.json is True:
             self.json_object.format(self.news)
-
-        if self.convert_to_pdf == True:
-            if self.date != None:
-                try:
-                    news = self.cacher_object.get_cached_news(self.date, self.limit)
-                except ValueError:
-                    logging.error("News for this date not found")
-                    exit()
-                except FileNotFoundError:
-                    logging.error("Cache file not found")
-                    exit()
-
-                pdf = PDFConverter(news, 'rss_reader_news')
-            else:
-                pdf = PDFConverter(self.news, 'rss_reader_news')
-            pdf.dump()
-            print('PDF file created in current directory')
 
         if self.convert_to_html == True:
             if self.date != None:
@@ -95,6 +84,24 @@ class NewsReader:
                 html = HTMLConverter(self.news, 'rss_reader_news')
             html.dump()
             print('HTML file created in current directory')
+
+        if self.convert_to_pdf == True:
+            if self.date != None:
+                try:
+                    news = self.cacher_object.get_cached_news(self.date, self.limit)
+                except ValueError:
+                    logging.error("News for this date not found")
+                    exit()
+                except FileNotFoundError:
+                    logging.error("Cache file not found")
+                    exit()
+
+                pdf = PDFConverter(news, 'rss_reader_news')
+            else:
+                pdf = PDFConverter(self.news, 'rss_reader_news')
+            
+            pdf.dump()
+            print('PDF file created in current directory')
 
     def print_news(self):
         """Print news to console"""
@@ -124,18 +131,17 @@ class NewsReader:
                 self.print_one_news(element)
                 print('\n'*5)
 
-    def print_one_news(self, element, cached=False):
+    def print_one_news(self, element):
         """Print one news to console"""
 
-        print(f'Title: {element["title"]}')
-        if cached == True:
-            print(f'Date:  {element["date"]}')
-        print(f'Link: {element["link"]}')
-        print('News text:')
-        print(element["text"])
-        print('Hrefs:')
+        print(f'{Fore.YELLOW + Back.BLACK + Style.BRIGHT}Title:{Fore.GREEN + Back.BLACK} {element["title"]}')
+        print(f'{Fore.YELLOW + Back.BLACK}Date: {Fore.RED + Back.BLACK} {element["date"]}')
+        print(f'{Fore.YELLOW + Back.BLACK}Link: {Fore.CYAN} {element["link"]}')
+        print(f'{Fore.YELLOW + Back.BLACK}News text:')
+        print(f'{Fore.WHITE + Back.BLACK}{element["text"]}')
+        print(f'{Fore.YELLOW + Back.BLACK}Hrefs:')
         for href in element["hrefs"]:
-            print('| ' + href)
+            print(f'{Fore.CYAN}| {href}')
 
     def strip_html_string(self, string):
         """Remove html tags from a string"""
@@ -143,3 +149,11 @@ class NewsReader:
 
         strip_string = re.compile('<.*?>')
         return re.sub(strip_string, '', string)
+
+    def clean_html_text(self, string):
+        """Clean html string"""
+
+        doc = lxml.html.fromstring(string)
+        cleaner = lxml.html.clean.Cleaner(style=True)
+        doc = cleaner.clean_html(doc)
+        return doc.text_content()

@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 from os.path import abspath, getsize, exists
 
-from .json_formatter import NewsJsonFormatter
+from json_formatter import NewsJsonFormatter
 
 
 class NewsCacher:
