@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.idea/
+
+*.db
+
+*.fb2
+
+*.html
