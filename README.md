@@ -6,6 +6,9 @@
 2.  `pip3 install .`
 3.  `rss-reader "https://www.androidpolice.com/feed/" --limit 3 --json --verbose --date`
 
+# Important information
+"--to-pdf" convertation is unstable
+
 # Parameters
 -  **--help** (help text)
 -  **--json** (print rss feed in json format)
@@ -13,8 +16,8 @@
 -  **--limit** (limit printed entries)
 -  **--date** (print cached entries if exist)
 -  **--to-html** (convert rss feed to html document)
--  **--to-pdf** (convert rss feed to pdf document)
 -  **--to-epub** (convert rss feed to epub document)
+-  **--to-pdf** (convert rss feed to pdf document)
 -  **--colorize** (colorize output)
 
 ## JSON structure
@@ -33,9 +36,9 @@ Example: `cache/20191117/www.androidpolice.com.rss`
 ## Convertation
 
 Examples:
--  `--to-html folder_name` will create "out.html" and "images" folder in folder_name, 
--  `--to-pdf folder_name` will create "out.pdf" in folder_name
+-  `--to-html folder_name` will create "out.html" and "images" folder in folder_name
 -  `--to-epub folder_name` will create "out.epub" in folder_name
+-  `--to-pdf folder_name` will create "out.pdf" in folder_name (*UNSTABLE*)
 
 # TODO
 -   [x] [Iteration 1] One-shot command-line RSS reader.

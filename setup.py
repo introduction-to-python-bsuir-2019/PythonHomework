@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     package_data={'rss_reader': ['fonts/*.ttf']},
     python_requires='>=3.8',
-    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'colorama', 'jinja2', 'ebooklib', 'lxml'
+    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'colorama', 'jinja2', 'ebooklib', 'lxml',
                       'xhtml2pdf @ git+https://github.com/xhtml2pdf/xhtml2pdf/'],
     entry_points={
         'console_scripts': [

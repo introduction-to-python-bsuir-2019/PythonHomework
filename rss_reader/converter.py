@@ -6,6 +6,7 @@ Convert RSS feed to HTML/PDF
 
 import logging
 import shutil
+import random
 from pathlib import Path
 
 import requests
@@ -71,7 +72,7 @@ class Converter:
 
         return filename
 
-    def _replace_urls_to_local(self, entry):
+    def _replace_urls_to_local_path(self, entry):
         """ Replace img URLs in entry to local file path
 
             Args:
@@ -87,7 +88,7 @@ class Converter:
 
         return entry
 
-    def _replace_urls_to_absolute(self, entry):
+    def _replace_urls_to_absolute_path(self, entry):
         """ Replace img URLs in entry to local absolute file path
 
             Special for xhtml2pdf (xhtml2pdf support only absolute file path)
@@ -111,16 +112,16 @@ class Converter:
                             <p><a class='link' href='{{entry.link}}'>{{entry.link}}</a></p>
                             <div class='description'>{{entry.summary}}</div>
                       </div>"""
-        temp_entry = self._replace_urls_to_local(entry)
+        temp_entry = self._replace_urls_to_local_path(entry)
         html = Template(template).render(title=self.title, entry=temp_entry)
         return html
 
-    def _gen_html(self, is_cyrillic_font=False, is_absolute_urls=False):
-        """ Generates HTML
+    def _generate_html(self, is_cyrillic_font=False, is_absolute_path=False):
+        """ Generate HTML
 
             Args:
                 is_cyrillic_font (bool) Should we generate HTML with cyrillic_font (to convert to PDF)?
-                is_absolute_urls (bool): Should we generate HTML with absolute URLs (to convert to PDF)?
+                is_absolute_path (bool): Should we generate HTML with absolute image PATH (to convert to PDF)?
 
             Returns:
                 html: String with HTML code
@@ -139,8 +140,13 @@ class Converter:
                     }
                     div 
                     { 
-                      margin: 10px; 
+                      {% if is_cyrillic_font %}
+                      margin: 2px;
+                      font-size: 15px; 
+                      {% else %}
+                      margin: 20px;
                       font-size: 20px; 
+                      {% endif %}
                     }
                 </style> 
             </head>
@@ -155,10 +161,12 @@ class Converter:
                 {% endfor %}
             </body>
         </html>'''
-        if is_absolute_urls:
-            self.entries = [self._replace_urls_to_absolute(entry) for entry in self.entries]
+
+        # replacing image url to downloaded image path
+        if is_absolute_path:
+            self.entries = [self._replace_urls_to_absolute_path(entry) for entry in self.entries]
         else:
-            self.entries = [self._replace_urls_to_local(entry) for entry in self.entries]
+            self.entries = [self._replace_urls_to_local_path(entry) for entry in self.entries]
 
         html = Template(template).render(title=self.title, entries=self.entries,
                                          is_cyrillic_font=is_cyrillic_font, font_path=self.font_path)
@@ -166,14 +174,14 @@ class Converter:
 
     def entries_to_html(self):
         """ Generate HTML file in self.out_dir """
-        html = self._gen_html()
+        html = self._generate_html()
 
         with open(Path(self.out_dir) / 'out.html', 'w') as file_object:
             file_object.write(html)
 
     def entries_to_pdf(self):
         """ Generate PDF file in self.out_dir """
-        html = self._gen_html(is_cyrillic_font=True, is_absolute_urls=True)
+        html = self._generate_html(is_cyrillic_font=True, is_absolute_path=True)
 
         with open(Path(self.out_dir) / 'out.pdf', 'w+b') as file:
             pdf = pisa.CreatePDF(html, dest=file, encoding='UTF-8')
@@ -188,7 +196,7 @@ class Converter:
 
     def entries_to_epub(self):
         """ Generate EPUB file in self.out_dir """
-        html = self._gen_html()
+        html = self._generate_html()
 
         def add_images_to_book():
             html_tree = parse_html_string(chapter.content)
@@ -209,18 +217,16 @@ class Converter:
         book = epub.EpubBook()
 
         # set metadata
-        book.set_identifier('id1337')
+        book.set_identifier(f'id{random.randint(100000, 999999)}')
         book.set_title(self.title)
         book.set_language('en, ru')
-
-        book.add_author('DiSonDS')
+        book.add_author('rss-reader')
 
         # create chapter
         chapter = epub.EpubHtml(title='Intro', file_name=f'chap_01.xhtml', lang='en, ru')
         chapter.content = html
-
+        # add images
         add_images_to_book()
-
         # add chapter
         book.add_item(chapter)
 
@@ -229,15 +235,12 @@ class Converter:
                     (epub.Section(self.title),
                      (chapter,))
                     )
-
         # add default NCX and Nav file
         book.add_item(epub.EpubNcx())
         book.add_item(epub.EpubNav())
-
         # define CSS style
         style = 'BODY {color: white;}'
         nav_css = epub.EpubItem(uid="style_nav", file_name="style/nav.css", media_type="text/css", content=style)
-
         # add CSS file
         book.add_item(nav_css)
         # basic spine
