@@ -1,5 +1,4 @@
 """Module, which allows to cache news while program is called."""
-
 import logging
 import sqlite3
 
@@ -7,10 +6,10 @@ from rssreader.rss_reader_consts import *
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + 'caching_news'
 
 
-DB_NAME = 'news.db'
+DB_PATH = PACKAGE_PATH + '/news.db'
 
 HEADER_TABLE_NAME = 'date_'
 
@@ -44,7 +43,7 @@ class DataBaseConn:
 def table_create(table_name: str) -> None:
     """Create table on datebase."""
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.table_create')
-    logger.info(f'Create table in database: {DB_NAME} if it doesn\'t exist with name: {table_name}')
+    logger.info(f'Create table in database: {DB_PATH} if it doesn\'t exist with name: {table_name}')
 
     command = '''CREATE TABLE if not exists
                             {}
@@ -57,7 +56,7 @@ def table_create(table_name: str) -> None:
                             )
                             '''.format(table_name)
 
-    with DataBaseConn(DB_NAME) as connection:
+    with DataBaseConn(DB_PATH) as connection:
         cursor = connection.cursor()
         cursor.execute(command)
 
@@ -67,11 +66,11 @@ def db_write(date: str, title: str, link: str, imgs_links: list, short_content: 
     YYYYMMDD_date = _convert_date_to_YYYYMMDD(date)
 
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.db_write')
-    logger.info(f'Write to table "{YYYYMMDD_date}" in database "{DB_NAME}"')
+    logger.info(f'Write to table "{YYYYMMDD_date}" in database "{DB_PATH}"')
 
     table_create(HEADER_TABLE_NAME + YYYYMMDD_date)
 
-    with DataBaseConn(DB_NAME) as connection:
+    with DataBaseConn(DB_PATH) as connection:
         cursor = connection.cursor()
         cursor.execute("INSERT INTO {} VALUES (?,?,?,?,?)"
                        .format(HEADER_TABLE_NAME + YYYYMMDD_date),
@@ -83,7 +82,7 @@ def get_list_of_tables() -> str:
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.get_list_of_tables')
     logger.info('Getting list of names of tables in database')
 
-    with DataBaseConn(DB_NAME) as connection:
+    with DataBaseConn(DB_PATH) as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM sqlite_master where type='table'")
 
@@ -101,7 +100,7 @@ def db_read(date: str) -> str:
     logger = logging.getLogger(MODULE_LOGGER_NAME + '.db_read')
     logger.info(f'Read cached news with date: {date}')
 
-    with DataBaseConn(DB_NAME) as connection:
+    with DataBaseConn(DB_PATH) as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT DISTINCT * FROM {}".format(HEADER_TABLE_NAME + date))
 

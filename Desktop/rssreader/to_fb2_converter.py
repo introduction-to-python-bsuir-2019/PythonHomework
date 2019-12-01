@@ -8,7 +8,7 @@ from rssreader.image_handle import get_image_as_base64
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + 'to_fb2_converter'
 
 
 class FB2:

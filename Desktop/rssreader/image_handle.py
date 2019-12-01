@@ -7,12 +7,14 @@ import base64
 import shutil
 from PIL import Image
 
+from rssreader.rss_reader_consts import *
+
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + 'image_handle'
 
 
-TEMP_IMG_NAME = 'temp_img.jpg'
+TEMP_IMG_NAME =  PACKAGE_PATH + '/temp_img.jpg'
 
 
 def save_image_by_url(image_url: str, filepath: str):
@@ -27,7 +29,7 @@ def save_image_by_url(image_url: str, filepath: str):
         shutil.copyfileobj(resp.raw, img)
 
     im = Image.open(filepath)
-    im.convert('RGB').save(filepath, "PNG")
+    im.convert('RGBA').save(filepath, "PNG")
 
 
 def get_image_as_base64(image_url: str) -> str:

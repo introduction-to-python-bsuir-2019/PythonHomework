@@ -4,3 +4,4 @@ fpdf==1.7.2
 colorize==1.1.0
 sqlparse==0.3.0
 termcolor==1.0.0
+image==1.5.27

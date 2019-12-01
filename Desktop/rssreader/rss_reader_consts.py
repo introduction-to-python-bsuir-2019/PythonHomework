@@ -1,3 +1,7 @@
+import os
+
+PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
+
 NEWS_SEPARATOR_LEN = 100  # magic number
 NEWS_SEPARATOR = '=' * NEWS_SEPARATOR_LEN
 

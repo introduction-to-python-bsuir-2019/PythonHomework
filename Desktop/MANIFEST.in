@@ -1,4 +1,4 @@
 include requirements.txt
-include rss_reader/FreeSans.ttf
-include rss_reader/logger_config.conf
-include rss_reader/news.db
+include rssreader/FreeSans.ttf
+include rssreader/news.db
+include rssreader/rss_reader.log

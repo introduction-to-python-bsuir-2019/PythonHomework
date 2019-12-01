@@ -4,13 +4,14 @@ import os
 import sys
 from fpdf import FPDF
 from rssreader.image_handle import save_image_by_url
+from rssreader.rss_reader_consts import *
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + 'to_pdf_converter'
 
 
-TITLE_IMG_NAME = 'title.png'
+TITLE_IMG_NAME = PACKAGE_PATH + '/title.png'
 
 
 class PDF(FPDF):
@@ -34,7 +35,7 @@ class PDF(FPDF):
         logger.info('Remove temp img-files')
 
         for index in range(self.iter):
-            os.remove('temp' + str(index) + '.png')
+            os.remove(PACKAGE_PATH + '/temp' + str(index) + '.png')
         if self.title_img_url != '':
             os.remove(TITLE_IMG_NAME)
 
@@ -109,11 +110,12 @@ class PDF(FPDF):
         """Insert image of piece of news."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._add_img_of_news')
         logger.info('Insert image of piece of news')
-
-        save_image_by_url(img_url, 'temp' + str(self.iter) + '.png')
-        self.image('temp' + str(self.iter) + '.png', x=50, y=None, w=100, h=0)
-
-        self.iter += 1
+        try:
+            save_image_by_url(img_url, PACKAGE_PATH + '/temp' + str(self.iter) + '.png')
+            self.image(PACKAGE_PATH + '/temp' + str(self.iter) + '.png', x=50, y=None, w=100, h=0)
+            self.iter += 1
+        except OSError:
+            logger.info('Cannot identify image')
 
     def add_piece_of_news(self, title: str, date: str, link: str, imgs_urls: list, content: str):
         """Insert piece of news to pdf."""

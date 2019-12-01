@@ -8,16 +8,14 @@ from logging import config
 
 from rssreader.rss_parser import RssReader
 import rssreader.caching_news as caching_news
-
+from rssreader.rss_reader_consts import *
 
 VERSION = '4.0'
-
-PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 LOGS_FPATH = PACKAGE_PATH + "/rss_reader.log"
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + 'main'
 
 CORRECT_END_LOG = 'END (correct)'
 
@@ -99,17 +97,22 @@ def init_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def config_logger(logger: logging.Logger) -> None:
+def config_logger() -> logging.Logger:
+    logger = logging.getLogger(ROOT_LOGGER_NAME)
+    logger.setLevel(logging.INFO)
+
     fh = logging.FileHandler(LOGS_FPATH)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
+    return logging.getLogger(MODULE_LOGGER_NAME)
+
 
 def main() -> None:
     """Main func, which starts app."""
-    logger = logging.getLogger(MODULE_LOGGER_NAME)
-    config_logger(logger)
+    # logger = logging.getLogger(ROOT_LOGGER_NAME)
+    logger = config_logger()
 
     logger.info('START')
 
@@ -120,7 +123,7 @@ def main() -> None:
     if args.verbose is True:
         logger.info('Output logs')
 
-        with open(LOGS_FILENAME, 'r') as file:
+        with open(LOGS_FPATH, 'r') as file:
             print(file.read())
 
         logger.info(CORRECT_END_LOG)

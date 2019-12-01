@@ -14,9 +14,9 @@ setup(
     packages=find_packages(),
     package_dir={'rssreader': 'rssreader'},
     include_package_data=True,
-    package_data={'': ['FreeSans.ttf', 'rss_reader.log', 'news.db']},
+    package_data={'': ['FreeSans.ttf', 'rss_reader.log', 'news.db',]},
     python_requires='>=3.6',
-    install_requires=['feedparser', 'bs4', 'lxml', 'fpdf', 'sqlparse', 'termcolor'],
+    install_requires=['feedparser', 'bs4', 'lxml', 'fpdf', 'sqlparse', 'termcolor', 'image'],
     entry_points={'console_scripts' : ['rss-reader = rssreader.main:main']},
     zip_safe=False
 )

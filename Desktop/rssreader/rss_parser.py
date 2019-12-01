@@ -20,7 +20,7 @@ import rssreader.to_pdf_converter as to_pdf_converter
 
 
 ROOT_LOGGER_NAME = 'RssReader'
-MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + __file__.replace('.py', '')
+MODULE_LOGGER_NAME = ROOT_LOGGER_NAME + '.' + 'rss_parser'
 
 
 class RssReader:
@@ -130,6 +130,9 @@ class RssReader:
 
     def _fix_symbols(self, item: str) -> str:
         """Replace symbols from xml to ascii."""
+        logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._fix_symbols')
+        logger.info(f'Replace service symbols')
+        
         return item.replace('&#39;', "'").replace('&amp;', '&')
 
     def _get_news_as_list(self, limit: int=0) -> list:
@@ -215,10 +218,10 @@ class RssReader:
                         value = self._colorize(value, COLOR_GREEN)
                     elif key == KEYWORD_LINK and colorize:
                         value = self._colorize(value, COLOR_BLUE)
-                    elif key == KEYWORD_CONTENT and colorize:
+                    elif key == KEYWORD_CONTENT  and colorize:
                         news += EN
                         value = self._colorize(value, COLOR_WHITE)
-
+                    
                     if colorize:
                         key = self._colorize(key, COLOR_RED)
 
@@ -287,7 +290,7 @@ class RssReader:
         news_list = self._get_news_as_list(limit)
 
         pdf = to_pdf_converter.PDF()
-        pdf.add_font('FreeSans', '', 'FreeSans.ttf', uni=True)
+        pdf.add_font('FreeSans', '', PACKAGE_PATH + '/FreeSans.ttf', uni=True)
 
         title = self._get_feed_title()
         pdf.set_meta_info('', self._get_feed_image_url())
