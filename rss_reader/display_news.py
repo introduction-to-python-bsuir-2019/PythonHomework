@@ -41,7 +41,6 @@ class DisplayNewsText:
     def _get_news_text(self, number: int, news: Dict[str, Union[str, List[Dict[str, str]]]]) -> str:
         """Format news to correct text string."""
         links_values = DictionaryValues(news.get('links', {}))
-
         return '{7}[News: {0}]{6}\nTitle: {1}\nDate: {2}\nLink: {3}\n\n{4}\n\n{8}Links:{6}\n{5}\n\n'.format(
             number,
             news.get('title', ''),
@@ -54,8 +53,8 @@ class DisplayNewsText:
             Fore.CYAN if self._colorize else Fore.RESET)
 
 
-class DisplayNewsJson:
-    """Class display news in json format."""
+class DisplayNewsJSON:
+    """Class display news in JSON format."""
 
     def __init__(self, news_data: Dict[str, List[Dict[str, Union[str, List[Dict[str, str]]]]]]) -> None:
         """Initialze news displaing."""
@@ -69,7 +68,7 @@ class DisplayNewsJson:
 
     def validate_json(self) -> None:
         """Validate news data through JSON schema."""
-        schema = self.read_json_schema_file()
+        schema = self.read_json_schema_file(JSON_SCHEMA)
         try:
             jsonschema.Draft7Validator.check_schema(schema)
             jsonschema.Draft7Validator(schema).validate(self._news_data)
@@ -81,12 +80,11 @@ class DisplayNewsJson:
             logging.info('Successful validation of JSON schema and data')
 
     @staticmethod
-    def read_json_schema_file() -> Dict[str, List[Dict[str, Any]]]:
+    def read_json_schema_file(json_file: str) -> Dict[str, List[Dict[str, Any]]]:
         """Read JSON schema file and load them."""
-        if not os.path.isfile(JSON_SCHEMA):
-            raise RSSNewsDisplayError('Can\'t read json schema.')
-
-        with open(JSON_SCHEMA, 'r') as schema_file:
+        if not os.path.isfile(json_file):
+            raise RSSNewsDisplayError('Can\'t read json schema.', None)
+        with open(json_file, 'r') as schema_file:
             try:
                 schema = json.load(schema_file)
             except json.decoder.JSONDecodeError as error:

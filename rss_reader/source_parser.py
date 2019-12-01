@@ -9,9 +9,10 @@ from urllib.parse import urljoin, urlparse
 
 from typing import Dict, List, Optional, Union
 
-from bs4 import BeautifulSoup
+import bs4
+import feedparser
 from dateutil import parser
-from feedparser import parse, FeedParserDict
+from feedparser import FeedParserDict
 from bs4.element import Tag, NavigableString
 
 from rss_reader.exceptions import RSSReaderParseException
@@ -36,7 +37,7 @@ class SourceParser:
             news.update({'title': title,
                          'published': published,
                          'link': link,
-                         'text': unescape(' '.join(element for element in description.text)),
+                         'text': ' '.join(element for element in description.text),
                          'links': description.links,
                          'description': description.structure})
             return news
@@ -58,7 +59,7 @@ class SourceParser:
         logging.info('Start parse RSS source data')
         feed_title = unescape(source_data.get('feed', {}).get('title', ''))
         self.__cache_news.update({'feed': feed_title})
-        for item in sorted(source_data.get('entries', []), key=itemgetter('published'), reverse=True):
+        for item in sorted(source_data.get('entries', []), key=itemgetter('published_parsed'), reverse=True):
             title = unescape(item.get('title', ''))
             link = urllib.parse.quote(item.get('link', ''), safe=':/')
             published = item.get('published', '')
@@ -71,7 +72,7 @@ class SourceParser:
 
     def get_source_data(self) -> FeedParserDict:
         """Parse source link RSS into dictionary."""
-        source_data = parse(self._source)
+        source_data = feedparser.parse(self._source)
         if source_data.bozo == 1:
             raise RSSReaderParseException('Invalid or inaccessible RSS URL')
         logging.info('Successful get RSS data from RSS URL')
@@ -93,13 +94,13 @@ class DescriptionParser:
 
     def parse_description(self, data: str) -> None:
         """Parse news description into well-formed text and list of links."""
-        self._parse_description_data(BeautifulSoup(data, features='html.parser'))
+        self._parse_description_data(bs4.BeautifulSoup(data, features='html.parser'))
 
     def _parse_description_data(self, data: Union[Tag, NavigableString], skip_text: Optional[bool] = False) -> None:
         """Parse tag to well-formed text."""
         for tag in data.childGenerator():
             if not skip_text and not tag.name and not tag.string.isspace():
-                formated_text = self.format_string(tag.string)
+                formated_text = self.format_string(unescape(tag.string))
                 self.text.append(formated_text)
                 self._update_structure({'text': formated_text, 'type': 'text'})
             elif tag.name == 'a':
@@ -133,7 +134,7 @@ class DescriptionParser:
             control_last_link()
         self.links.append({'link': link, 'type': tag_type})
         tag_number = len(self.links)
-        tag_text = self.format_string(str(tag.string or '')).strip()
+        tag_text = self.format_string(unescape(str(tag.string or ''))).strip()
         self.text.append('{0}{1}'.format(f'[{tag_type} {tag_number}',
                                          f': {tag_text}][{tag_number}]' if tag_text else ']'))
         self._update_structure({'text': tag_text, 'type': tag_type, 'link': link})

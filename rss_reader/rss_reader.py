@@ -8,9 +8,9 @@ from typing import Dict, List, Union
 from sys import exit
 
 from rss_reader.cache_storage import ReadCache, WriteCache
-from rss_reader.config import NAME, VERSION
-from rss_reader.display_news import DisplayNewsText, DisplayNewsJson, format_to_display
-from rss_reader.exceptions import RSSReaderException
+from rss_reader.config import CACHE_DB, NAME, VERSION
+from rss_reader.display_news import DisplayNewsText, DisplayNewsJSON, format_to_display
+from rss_reader.exceptions import RSSReaderException, RSSReaderCriticalError
 from rss_reader.format_converter import Converter, format_to_convert
 from rss_reader.source_parser import SourceParser
 
@@ -87,7 +87,7 @@ class RSSReader:
     def _init_verbose() -> None:
         """Initialze verbose mode."""
         logging.basicConfig(level=logging.INFO,
-                            format='[%(asctime)s | %(module)s]: %(message)s',
+                            format='[%(asctime)s | %(module)s| %(levelname)s]: %(message)s',
                             datefmt='%m.%d.%Y %H:%M:%S')
 
     def run_rss_reader(self) -> None:
@@ -97,7 +97,7 @@ class RSSReader:
             self.execute_rss_reader()
         except Exception as error:
             if not issubclass(type(error), RSSReaderException):
-                RSSReaderException('Unidentified error', error)
+                RSSReaderCriticalError('Unidentified error', error)
             exit('RSS reader has beed completed unsuccessfully')
         else:
             logging.info('RSS reader has beed completed successfully')
@@ -108,7 +108,8 @@ class RSSReader:
             """Get news data from souce or from cache."""
             if self.arguments.date:
                 read_cache = ReadCache(self.arguments.source, self.arguments.date)
-                cache_data = read_cache.read_cache()
+                db_table = read_cache.init_cache_db(CACHE_DB)
+                cache_data = read_cache.read_cache(db_table)
                 logging.info('News reading from cache has been completed successfully')
             else:
                 source_parser = SourceParser(self.arguments.source)
@@ -121,14 +122,16 @@ class RSSReader:
             """Display news data in text or JSON formats."""
             display_data = format_to_display(news_data)
             if self.arguments.json:
-                display_news = DisplayNewsJson(display_data)
+                display_news = DisplayNewsJSON(display_data)
             else:
                 display_news = DisplayNewsText(display_data, self.arguments.colorize)
             display_news.print_news()
 
         def cache_news_data() -> None:
             """Cache news data to database."""
-            WriteCache(self.arguments.source, cache_data).cache_news_list()
+            write_cache = WriteCache(self.arguments.source, cache_data)
+            db_table = write_cache.init_cache_db(CACHE_DB)
+            write_cache.cache_news_list(db_table)
 
         def convert_news_data() -> None:
             """Cache news data to database."""
