@@ -15,7 +15,7 @@ class App(Singleton):
     def __init__(self) -> None:
         """
         This constructor parse program arguments,
-        initialize all module params decide witch logic to run
+        initialize all module params decide which logic to run
         """
         console = Parser(
             'Pure Python command-line RSS reader.',

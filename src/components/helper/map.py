@@ -1,4 +1,9 @@
+"""This module contain class representing map dictionaries pattern"""
+
+
 class Map(dict):
+    """This class wrap dictionary to proper work with them"""
+
     def __init__(self, *args, **kwargs):
         super(Map, self).__init__(*args, **kwargs)
         for arg in args:

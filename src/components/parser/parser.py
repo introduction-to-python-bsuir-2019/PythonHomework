@@ -12,7 +12,7 @@ class Parser:
             _arguments_list attribute contains all presenting cli options in utility
     """
 
-    _arguments_list:  tuple=(
+    _arguments_list: tuple = (
         'source',
         'version',
         'json',

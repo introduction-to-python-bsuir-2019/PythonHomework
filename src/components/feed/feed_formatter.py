@@ -19,7 +19,7 @@ class FeedFormatter:
     @classmethod
     def generate_output(cls, entries: list, limit: int, top_data_output: Map, is_colorize: bool=False) -> str:
         """
-        This method decide witch way rss feed should be printed
+        This method decide which way rss feed should be printed
         :param entries: list
         :param limit: int
         :param top_data_output: Map

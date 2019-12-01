@@ -17,7 +17,7 @@ class Logger(Singleton):
             logger_name  logger_name containt logger settings default name
     """
 
-    logger_name:  str='standard'
+    logger_name:  str = 'standard'
 
     @classmethod
     def initialize(cls, is_colorize: bool) -> None :

@@ -11,7 +11,7 @@ from src.components.cache.cache import Cache
 
 
 class FeedProperty(ABC):
-    """Trait for Feed class.Contain all properties, witch Feed use out of class """
+    """Trait for Feed class.Contain all properties, which Feed use out of class """
 
     @property
     def entities_list(self) -> list:
@@ -40,7 +40,8 @@ class FeedProperty(ABC):
 
 
 class Feed(FeedProperty):
-    """Feed class """
+    """This class represent parsing feed process,
+    manage caching module, output data in proper way to console output"""
 
     def __init__(self, args: ArgumentParser) -> None:
         """

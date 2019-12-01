@@ -25,10 +25,10 @@ class Limit(ArgumentsAbstract):
         :return: int
         """
         try:
-            if not limit > 0:
+            if not int(limit) > 0:
                 raise argparse.ArgumentTypeError
 
-            return limit
+            return int(limit)
 
         except argparse.ArgumentTypeError:
             raise argparse.ArgumentTypeError('Argument limit equal or less 0')
