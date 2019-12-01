@@ -25,4 +25,5 @@ optional arguments:
   --to-html      Convert news to html format
   ```
   JSON scheme is described in `json_schema.json`.
+  
   News caching in json file `cached_news.json` in root application directory.
