@@ -6,10 +6,10 @@ import feedparser
 
 from tldextract import extract
 
-from news_cacher import NewsCacher
-from json_formatter import NewsJsonFormatter
-from pdf_converter import PDFConverter
-from html_converter import HTMLConverter
+from .news_cacher import NewsCacher
+from .json_formatter import NewsJsonFormatter
+from .pdf_converter import PDFConverter
+from .html_converter import HTMLConverter
 
 
 class NewsReader:

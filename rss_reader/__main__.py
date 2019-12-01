@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from rss_reader import NewsReader
+from .rss_reader import NewsReader
 
 
 def main():
