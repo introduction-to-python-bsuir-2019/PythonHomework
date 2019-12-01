@@ -21,5 +21,6 @@ echo -e "${NC}"
 #echo -e "${GREEN}Docker-compose builing is finished. Server should be started. ${NC}"
 #
 echo -e "${GREEN}Launching server: ${NC}"
-python3 -m server
+docker build . -t flask:v1
+docker run -p 5000:5000 flask:v1
 echo -e "${GREEN}Server should be started. ${NC}"

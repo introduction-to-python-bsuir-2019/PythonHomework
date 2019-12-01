@@ -118,7 +118,33 @@ cd PythonHomework
 pip install ./dist/rss_reader-4.0-py3-none-any.whl
 python -m rss_reader --help
 ```
+## Iteration 5
+Defined class Colors with stored attributes for text color.
+Without console arg --colorize class initialises with no colors,
+but with --colorize class initialises with colors. News classe
+use Colors's attributes to print their text
 
+## Iteration 6
+Web app is a simple flask app that do the only think - launch 
+rss_reader's modules. That's why there is no rest api and 'big' DB.
 
+To run server you may create a docker image:
+`docker build . -t flask:v1`
 
+And run it in a docker container:
+`docker run -p 5000:5000 flask:v1`
+
+App will be accessible on the 0.0.0.0:5000 socket.
+BTW those commands will install rss_reader utility.
+
+## Installing
+Use the script `./install_util.sh`.
+- it will install all dependencies and launch the server in a 
+docker container.
+- to use rss_reader utility enter:
+`python -m rss_reader`
+
+If you don't have docker server will not be launched. But you can do it 
+manually by entering (in the root folder 'PythonHomework'):
+`python -m server`
 
