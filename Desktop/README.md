@@ -46,7 +46,7 @@ Utility provides the following interface:
 |  -l LIMIT, --limit LIMIT|  Limit news topics if this parameter provided
 |  --date DATE      |     Argument, which allows to get cashed news by date. Format: YYYYMMDD. For getting list of existing dates you can enter any value with this argument. For example: '$ rssreader --date .' 
 |  -V, --verbose     |    Print all logs in stdout
-| --colorize        |    Print news with colorize mode. It's works obly with default output. Sorry, but you can not change colors :( Wait for update...
+| --colorize        |    Print news with colorize mode. It's works only with default output. Sorry, but you can not change colors :( Wait for update...
 |  --to_fb2 PATH    |     Convert news to fb2 format. Path must contain exsisting directories Supports LIMIT
 |  --to_pdf PATH   |      Convert news to pdf format. Convertation to PDF supports only latin resource. Path must contain exsisting directories Supports LIMIT|
 
