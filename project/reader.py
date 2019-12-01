@@ -14,6 +14,8 @@ class RSSReader():
     Methods:
     show_news() - print news to stdout
     show_json() - print news to stdout in json format
+    save_fb2()  - save news as fb2 file
+    save-html() - save news as html file
     """
 
     def __init__(self, source, limit, verbose, date, sv_path, colorize):
