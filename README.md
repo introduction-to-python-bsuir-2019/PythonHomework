@@ -30,6 +30,15 @@
 
 Выполнена
 
+## 6 iter
+
+Частично выполнил
+К сожалению не успел сдлеать из-за ряда причин. 
+Сразу извиняюсь за код в этом задании)
+Установка:
+Перейти в директорию с проектом и запустить команду:
+sudo docker-compose up --build
+
 ## Help
 usage: rss-reader [-h] [--version] [--json] [--verbose] [--limit LIMIT]
                   [--date DATE] [--to_html TO_HTML] [--to_pdf TO_PDF]
