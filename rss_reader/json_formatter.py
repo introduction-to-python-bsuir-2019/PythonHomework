@@ -12,7 +12,7 @@ class FeedEncoder(json.JSONEncoder):
             logging.info('Encoding news into JSON format')
             return {'News':
                         [{'Feed'+str(number):
-                                {section_name:str(feed_section) for section_name, feed_section
+                                {section_name: feed_section for section_name, feed_section
                                                                     in zip(names_of_sections, feed())}\
                                                                         for number, feed 
                                                                             in enumerate(obj.news_to_convert)}]}

@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "News": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "Feed#": {
+              "type": "object",
+              "title": "Feed",
+              "properties": {
+                "Feed source": {
+                  "type": "string",
+                  "title": "Source ",
+                  "description": "Source where the news came from"
+                },
+                "Title": {
+                  "type": "string",
+                  "title": "Title",
+                  "description": "Title of the feed"
+                },
+                "Date": {
+                  "type": "string",
+                  "title": "Publication date",
+                  "description": "Date when the news was published"
+                },
+                "Link": {
+                  "type": "string",
+                  "title": "Link",
+                  "description": "News link"
+                },
+                "Description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the feed"
+                },
+                "Media_content": {
+                  "type": "array",
+                  "title": "Image links",
+                  "description": "Array of image links", 
+                  "items": [
+                    {
+                      "type": "string"
+                      "title": "URL",
+                      "description": "URL of image"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "Feed source",
+                "Title",
+                "Date",
+                "Link",
+                "Description",
+                "Media_content"
+              ]
+            }
+          },
+          "required": [
+            "Feed0"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "News"
+  ]
+}

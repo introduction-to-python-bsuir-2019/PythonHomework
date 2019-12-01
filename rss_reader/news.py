@@ -37,4 +37,4 @@ class News(Base):
         return str_to_print
 
     def __call__(self):
-        return self.feed, self.title, self.date, self.link, self.description, self.media_content
+        return self.feed, self.title, str(self.date), self.link, self.description, self.media_content
