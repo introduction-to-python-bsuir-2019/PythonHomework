@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+.idea/
 develop-eggs/
 dist/
 downloads/
@@ -99,6 +100,10 @@ venv.bak/
 
 # mkdocs documentation
 /site
+#json files
+*.json
+#Some python file
+example.py
 
 # mypy
 .mypy_cache/
