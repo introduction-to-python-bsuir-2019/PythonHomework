@@ -37,6 +37,7 @@ class RSSFeed:
             title (str): Title of RSS feed
             entries (list): List of pretty RSS news
             raw_entries (list): List of raw RSS news
+            cache_dir (str): Main directory of cache files
     """
 
     def __init__(self, source, cache_dir="cache"):
@@ -90,7 +91,7 @@ class RSSFeed:
     def _get_pretty_entries(self):
         """ Prettify entries
 
-        Remove HTML code from summary, parse date, photos, links
+        Remove HTML code from summary; parse date, photos, links
         """
         pretty_entries = []
         for entry in self.raw_entries:
@@ -160,26 +161,23 @@ class RSSFeed:
                           f"Photos: {', '.join(entry['photos'])}\n"
                           f"Links: {', '.join(entry['links'])}\n\n")
 
-    def convert_to_html(self, out_dir, limit):
-        """ Create html file with rss news in out_dir """
-        logging.info("Converting RSS to HTML")
-        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
-        converter.entries_to_html()
-        logging.info("Done.")
+    def convert_to(self, to_html, to_pdf, to_epub, limit):
+        """ Сonvert rss_feed to the appropriate format (HTML/PDF/EPUB) """
+        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]))
+        if to_html:
+            logging.info("Converting RSS to HTML")
+            converter.out_dir = to_html
+            converter.entries_to_html()
+        if to_pdf:
+            logging.info("Converting RSS to PDF")
+            converter.out_dir = to_pdf
+            converter.entries_to_pdf()
+        if to_epub:
+            logging.info("Converting RSS to EPUB")
+            converter.out_dir = to_epub
+            converter.entries_to_epub()
 
-    def convert_to_pdf(self, out_dir, limit):
-        """ Create pdf file with rss news in out_dir """
-        logging.info("Converting RSS to PDF")
-        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
-        converter.entries_to_pdf()
-        logging.info("Done.")
-
-    def convert_to_epub(self, out_dir, limit):
-        """ Create epub file with rss news in out_dir """
-        logging.info("Converting RSS to EPUB")
-        converter = Converter(title=self.title, entries=copy.deepcopy(self.raw_entries[:limit]), out_dir=out_dir)
-        converter.entries_to_epub()
-        logging.info("Done.")
+        logging.info("Convertation successful.")
 
 
 def get_args():
@@ -228,12 +226,7 @@ def main():
         feed = RSSFeed(source=args.source)
         feed.get_rss(date=args.date)
         feed.print_rss(limit=args.limit, is_json=args.json, colorize=args.colorize)
-        if args.to_html:
-            feed.convert_to_html(out_dir=args.to_html, limit=args.limit)
-        if args.to_pdf:
-            feed.convert_to_pdf(out_dir=args.to_pdf, limit=args.limit)
-        if args.to_epub:
-            feed.convert_to_epub(out_dir=args.to_epub, limit=args.limit)
+        feed.convert_to(to_html=args.to_html, to_pdf=args.to_pdf, to_epub=args.to_epub, limit=args.limit)
     except RSSFeedException as ex:
         print(f"{ex.message}")
         sys.exit(0)

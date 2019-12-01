@@ -3,19 +3,17 @@
 """
 Convert RSS feed to HTML/PDF
 """
-
+import copy
 import logging
 import shutil
 import random
 from pathlib import Path
 
 import requests
-from lxml import etree
 from xhtml2pdf import pisa
 from jinja2 import Template
 from bs4 import BeautifulSoup
 from ebooklib import epub
-from ebooklib.utils import parse_html_string
 
 from rss_reader.exceptions import RSSFeedException
 
@@ -29,21 +27,21 @@ class Converter:
             out_dir (str): Directory where output will be saved
     """
 
-    def __init__(self, title, entries, out_dir, image_dir="images", temp_image_dir="_temp_images"):
+    def __init__(self, title, entries, out_dir="out", image_dir="images", temp_image_dir="_temp_images"):
         self.title = title
         self.entries = entries
-        self.out_dir = Path(out_dir)
+        self.out_dir = out_dir
 
-        self.image_dir = Path(image_dir)
-        self.temp_image_dir = Path(temp_image_dir)
+        self.image_dir = image_dir
+        self.temp_image_dir = temp_image_dir
 
         self.font_path = Path(__file__).resolve().parent / 'fonts/Roboto-Regular.ttf'
 
     def _create_directories(self, image_dir):
         """ Create directories if not exist (self.out_dir and self.out_dir/image_dir) """
-        if not self.out_dir.is_dir():
-            logging.info("Creating directory /%s", self.out_dir)
-            self.out_dir.mkdir(parents=True, exist_ok=True)
+        if not Path(self.out_dir).is_dir():
+            logging.info("Creating directory /%s", Path(self.out_dir))
+            Path(self.out_dir).mkdir(parents=True, exist_ok=True)
 
         if not image_dir.is_dir():
             logging.info("Creating directory /%s", image_dir)
@@ -57,7 +55,7 @@ class Converter:
         """
         logging.info("Starting image download")
 
-        image_dir = self.out_dir / image_dir
+        image_dir = Path(self.out_dir) / image_dir
 
         try:
             self._create_directories(image_dir)
@@ -73,23 +71,34 @@ class Converter:
         return filename
 
     def _replace_urls_to_local_path(self, entry):
-        """ Replace img URLs in entry to local file path
+        """ Replace img URLs in entry.summary to local file path
 
             Args:
                 entry (dict): News dict
 
         """
         soup = BeautifulSoup(entry.summary, "html.parser")
-        images = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
-        for image in images:
-            filename = self._download_image(image, self.image_dir)
-            downloaded_img_local_path = Path(self.image_dir / filename)
-            entry.summary = entry.summary.replace(image, str(downloaded_img_local_path))
+
+        for img in soup.findAll('img'):
+            # use placeholder
+            if not img['src']:
+                # copy placeholder to self.out_dir/self.image_dir
+                filename = Path(__file__).resolve().parent / 'placeholder/placeholder.jpg'
+                shutil.copyfile(filename, Path(self.out_dir) / self.image_dir / 'placeholder.jpg')
+                img['src'] = str(Path(self.image_dir) / 'placeholder.jpg')
+                entry.summary = str(soup)
+                return entry
+
+            filename = self._download_image(img['src'], self.image_dir)
+            downloaded_img_local_path = Path(self.image_dir) / filename
+
+            img['src'] = str(downloaded_img_local_path)
+            entry.summary = str(soup)
 
         return entry
 
     def _replace_urls_to_absolute_path(self, entry):
-        """ Replace img URLs in entry to local absolute file path
+        """ Replace img URLs in entry.summary to local absolute file path
 
             Special for xhtml2pdf (xhtml2pdf support only absolute file path)
 
@@ -97,24 +106,22 @@ class Converter:
                 entry (dict): News dict
         """
         soup = BeautifulSoup(entry.summary, "html.parser")
-        images = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
-        for image in images:
-            filename = self._download_image(image, self.temp_image_dir)
-            downloaded_img_absolute_path = Path(self.out_dir / self.temp_image_dir / filename).absolute()
-            entry.summary = entry.summary.replace(image, str(downloaded_img_absolute_path))
+
+        for img in soup.findAll('img'):
+            # use placeholder
+            if not img['src']:
+                filename = Path(__file__).resolve().parent / 'placeholder/placeholder.jpg'
+                img['src'] = str(filename.absolute())
+                entry.summary = str(soup)
+                return entry
+
+            filename = self._download_image(img['src'], self.temp_image_dir)
+            downloaded_img_absolute_path = (Path(self.out_dir) / self.temp_image_dir / filename).absolute()
+
+            img['src'] = str(downloaded_img_absolute_path)
+            entry.summary = str(soup)
 
         return entry
-
-    def _get_entry_html(self, entry):
-        template = """<div class='entry'>
-                            <h2 class='title'>{{entry.title}}</h2>
-                            <p><span class='date'>{{entry.published}}</span></p>
-                            <p><a class='link' href='{{entry.link}}'>{{entry.link}}</a></p>
-                            <div class='description'>{{entry.summary}}</div>
-                      </div>"""
-        temp_entry = self._replace_urls_to_local_path(entry)
-        html = Template(template).render(title=self.title, entry=temp_entry)
-        return html
 
     def _generate_html(self, is_cyrillic_font=False, is_absolute_path=False):
         """ Generate HTML
@@ -145,7 +152,7 @@ class Converter:
                       font-size: 15px; 
                       {% else %}
                       margin: 20px;
-                      font-size: 20px; 
+                      font-size: 18px; 
                       {% endif %}
                     }
                 </style> 
@@ -163,12 +170,13 @@ class Converter:
         </html>'''
 
         # replacing image url to downloaded image path
+        temp_entries = copy.deepcopy(self.entries)
         if is_absolute_path:
-            self.entries = [self._replace_urls_to_absolute_path(entry) for entry in self.entries]
+            entries = [self._replace_urls_to_absolute_path(entry) for entry in temp_entries]
         else:
-            self.entries = [self._replace_urls_to_local_path(entry) for entry in self.entries]
+            entries = [self._replace_urls_to_local_path(entry) for entry in temp_entries]
 
-        html = Template(template).render(title=self.title, entries=self.entries,
+        html = Template(template).render(title=self.title, entries=entries,
                                          is_cyrillic_font=is_cyrillic_font, font_path=self.font_path)
         return html
 
@@ -187,7 +195,7 @@ class Converter:
             pdf = pisa.CreatePDF(html, dest=file, encoding='UTF-8')
 
         # Delete temp folder (self.out_dir/self.temp_image_dir)
-        temp_img_dir = Path(self.out_dir / self.temp_image_dir)
+        temp_img_dir = Path(self.out_dir) / self.temp_image_dir
         logging.info("Cleaning up %s", temp_img_dir)
         shutil.rmtree(temp_img_dir)
 
@@ -199,20 +207,24 @@ class Converter:
         html = self._generate_html()
 
         def add_images_to_book():
-            html_tree = parse_html_string(chapter.content)
+            soup = BeautifulSoup(chapter.content, "html.parser")
+            image_urls = [img['src'] for img in soup.findAll('img') if img.has_attr('src')]
 
-            for img_elem in html_tree.iterfind('.//img'):
-                href = img_elem.attrib['src']
-                img_local_filename = self.out_dir / href
+            added_images = []
+            for image_url in image_urls:
+                # Images can repeat, check
+                if image_url in added_images:
+                    continue
+
+                added_images.append(image_url)
+                img_local_filename = Path(self.out_dir) / image_url
 
                 with open(img_local_filename, 'br') as file_object:
                     epimg = epub.EpubImage()
-                    epimg.file_name = href
+                    epimg.file_name = image_url
                     epimg.set_content(file_object.read())
 
                     book.add_item(epimg)
-
-            chapter.content = etree.tostring(html_tree, pretty_print=True, encoding='utf-8')
 
         book = epub.EpubBook()
 
