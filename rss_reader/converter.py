@@ -33,19 +33,20 @@ class ConverterBase(ABC):
     def save_file(self, data):
         '''Method that save converted file'''
         logging.info('Saving file with news')
-        with open(self.generate_filename(), 'w') as f:
+        with open(self.generate_filename(self.dir_for_save, self.filename), 'w') as f:
             f.write(data)
 
-    def generate_filename(self):
+    @staticmethod
+    def generate_filename(dir_for_save, filename):
         '''Method that generate unique filename in the directory'''
-        filename = path.join(self.dir_for_save, self.filename)
+        new_filename = path.join(dir_for_save, filename)
         number_of_files = 1
         while number_of_files:
-            if path.exists(filename):
-                filename = path.join(self.dir_for_save, str(number_of_files) + self.filename)
+            if path.exists(new_filename):
+                new_filename = path.join(dir_for_save, str(number_of_files) + filename)
                 number_of_files += 1
             else:
-                return filename
+                return new_filename
 
     def get_images(self, news):
         '''Method that getting images that were in the news from their sources'''
@@ -194,7 +195,7 @@ class PdfConverter(ConverterBase):
         for feed in self.news:
             pdf.add_feed(feed)
         logging.info('Saving news in PDF format')
-        pdf.output(self.generate_filename())
+        pdf.output(self.generate_filename(self.dir_for_save, self.filename))
 
 
 class EpubConverte(ConverterBase):

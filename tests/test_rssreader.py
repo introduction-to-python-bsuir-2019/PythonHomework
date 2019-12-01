@@ -40,15 +40,22 @@ align="left" title="Ilhan Omar GOP challenger bannedfrom Twitter after saying sh
             self.assertEqual(one_news, cached_news)
 
     def test_get_all_news(self):
-        rss_example1 = RSSReader('source', None, datetime(2019, 12, 1).date(), True, {}, True, 'tests/data_for_testing/news')
+        rss_example = RSSReader('source', None, datetime(2019, 12, 1).date(), True, {}, True, 'tests/data_for_testing/news')
         with open('tests/data_for_testing/all_news(date also 01-12-2019).txt', 'r') as f:
             all_news = f.read()
-            rss_example1.get_all_news()
+            rss_example.get_all_news()
             cached_news = ''
-            for feed in rss_example1.news_to_print:
+            for feed in rss_example.news_to_print:
                 cached_news += feed.__str__()
             self.assertEqual(all_news, cached_news)
 
-
+    def test_get_news(self):
+        news = RSSReader.get_news(r'tests/data_for_testing/example_of_rss.xml')
+        self.assertEqual(news.feed.title, 'Yahoo News - Latest News & Headlines')
+        self.assertEqual(news.feed.link, 'https://www.yahoo.com/news')
+        self.assertEqual(news.feed.subtitle, 'The latest news and headlines from Yahoo! News. Get breaking news stories and in-depth coverage with videos and photos.')
+        self.assertEqual(news.feed.rights, 'Copyright (c) 2019 Yahoo! Inc. All rights reserved')
+                
+                
 if __name__ == '__main__':
     unittest.main()

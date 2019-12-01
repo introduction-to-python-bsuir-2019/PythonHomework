@@ -40,17 +40,22 @@ class RSSReader(object):
         engine = create_engine(f'sqlite:///{name_of_database}')
         Base.metadata.create_all(engine)
         self.session = sessionmaker(bind=engine, autocommit=True)
-     
-    def get_and_parse_news(self):
-        '''Method for getting, parsing and saving news from the Internet'''
+    
+    @staticmethod
+    def get_news(source):
+        '''Method for getting news from the Internet'''
         logging.info('Getting news')
-        news = feedparser.parse(self.source)
+        news = feedparser.parse(source)
         logging.info('Parsing news')
         if news.bozo:
             if news.bozo_exception.args[0].endswith('name\n'):
                 raise Exception('Entered URL is not a RSS source')
             else:
                 raise news.bozo_exception
+        return news
+    
+    def parse_and_save_news(self, news):
+        '''Method for parsing and saving news'''
         with create_session(self.session) as s:
             list_of_news = news.entries[:self.limit+1] if self.limit else news.entries
             for feed in list_of_news:
@@ -133,7 +138,8 @@ class RSSReader(object):
             elif self.date:
                 self.get_cached_news()
             else:
-                self.get_and_parse_news()
+                news = self.get_news(self.source)
+                self.parse_and_save_news(news)
                 self.get_news_to_print()
             self.print_news()
             if 'pdf' in self.configuration_for_conversion:
