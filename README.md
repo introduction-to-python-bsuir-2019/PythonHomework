@@ -26,4 +26,4 @@ optional arguments:
   ```
   JSON scheme is described in `json_schema.json`.
   
-  News caching in json file `cached_news.json` in root application directory.
+  News cache in json file `cached_news.json` in root application directory.
