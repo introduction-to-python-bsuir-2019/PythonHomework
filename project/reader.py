@@ -63,11 +63,12 @@ class RSSReader():
     def __read_news(self):
         """Read data from link"""
         try:
-            stdout_write(f"Reading information from {self.__source}", end='...\n', verbose=self.__verbose, color="blue", colorize=self.__colorize)
+            stdout_write(f"Reading information from {self.__source}", end='...\n', 
+                         verbose=self.__verbose, color="blue", colorize=self.__colorize)
             with urllib.request.urlopen(self.__source) as rss:
                 bytestr = rss.read()
                 self.__text = bytestr.decode("utf8")
-            stdout_write("Complete.", verbose=self.__verbose,, color="green", colorize=self.__colorize)
+            stdout_write("Complete.", verbose=self.__verbose, color="green", colorize=self.__colorize)
         except ValueError:
             stdout_write("Error: Can't connect, please try with https://", color="red", colorize=self.__colorize)
             sys.exit()
@@ -139,7 +140,8 @@ class RSSReader():
         """Read data, convert to fb2 & save it as file"""
         feed, column = self.__read()
         if self.__sv_path:
-            Converter().to_fb2(feed, column, self.__source, self.__sv_path, verbose=self.__verbose, color=self.__colorize)
+            Converter().to_fb2(feed, column, self.__source, self.__sv_path, 
+                               verbose=self.__verbose, color=self.__colorize)
         else:
             Converter().to_fb2(feed, column, self.__source, verbose=self.__verbose, color=self.__colorize)
 

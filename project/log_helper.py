@@ -5,7 +5,7 @@ def stdout_write(string, sep=' ', end='\n', flush=False, verbose=True, color="",
         BLUE = '\033[34m'
         GREEN = '\033[92m'
         RESET = '\033[0m'
-        
+
         if color == "red":
             color = RED
         elif color == "blue":
