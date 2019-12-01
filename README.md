@@ -32,6 +32,10 @@ rss_reader [-h] [--version] [--json] [--verbose] [--limit LIMIT]
    - ```--verbose```      Outputs verbose status messages
    - ```--limit LIMIT```  Limit news topics if this parameter provided
    - ```--date DATE```    Returns news for requested date and source if this parameter provided. Date format is YYYYmmdd
+   - ```--to-fb2 file_path```    Convert fed to fb2 format and save to given file path
+   - ```--to-fb2 file_path```    Convert feed html format and save to given file path
+
+
 
 Notes:
 
@@ -57,6 +61,3 @@ From version 3.0 all RSS feeds stored in local SQLite database
 while reading. You can find a database in */home/.rss/feeds.db*.
 
 The cashed news can be by read optional argument ```--date```. The news from the specified day and sourse will be printed out. If the news are not found returns an error.
-
-
-
