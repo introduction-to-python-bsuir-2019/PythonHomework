@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "title": "feed",
+    "type": "object",
+    "required": ["title", "date", "text", "link", "hrefs"],
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "News title"
+      },
+      "date": {
+        "type": "date",
+        "description": "News published date"
+      },
+      "text": {
+        "type": "string",
+        "description": "News text"
+      },
+      "link": {
+        "type": "string",
+        "description": "News static link"
+      },
+      "hrefs": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "News hrefs"
+        }
+      }
+    }
+  }
