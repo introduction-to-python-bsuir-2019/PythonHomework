@@ -13,6 +13,8 @@ Example of installation:
    
 After installation you may to call application everywhere, where ever you are.
 
+## Running application
+
 For running Rss Reader you should enter command:
 
     $ rss-reader
