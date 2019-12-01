@@ -6,6 +6,16 @@ from bs4 import BeautifulSoup
 
 class RSSReader:
     def __init__(self, source, limit=1, json=False, date='', to_html='', to_fb2=''):
+        """
+        RSSReader class constructor
+
+        :param source: Link to the news site
+        :param limit: Limit of news to print
+        :param json: If the value is true, program will print news in .json format
+        :param date: String param to print news by date from cache
+        :param to_html: Path to save news in .html file
+        :param to_fb2: Path to save news in .fb2 file
+        """
         self.source = source
         self.limit = limit
         self.json = json
@@ -15,7 +25,12 @@ class RSSReader:
         self.feeds = {}
 
     def parse_source(self):
-        d = feedparser.parse(self.source)
+        """
+        Main method to call all another class methods
+
+        :return: Nothing to return
+        """
+        d = feedparser.parse(self.source)  # Parse rss from given source
 
         self.feeds['news'] = []
         channel = d['channel']['title']
@@ -23,6 +38,7 @@ class RSSReader:
         for news in d['entries'][0:self.limit]:
             self.feeds['news'].append(self.read_news(news, channel))
 
+        # Method calls
         if self.date:
             self.from_cache()
         elif self.to_html:
@@ -37,8 +53,16 @@ class RSSReader:
 
     @staticmethod
     def read_news(news, channel):
+        """
+        Method to get dict object with news, that we need
+
+        :param news: Current parsing news
+        :param channel: Feed, where did the news come from
+        :return: Dictionary with parsed news
+        """
         item = dict()
 
+        # Create new dict keys and give them values
         item['feed_name'] = channel
         item['title'] = news['title'].replace('&#39;', "'")
         item['date'] = news['published']
@@ -48,10 +72,14 @@ class RSSReader:
 
         item['image_title'] = soup.find('img')['title']
         description = soup.p.contents[-2]
+
+        # If there no image description we will write about that
         if str(description)[0] == '<':
             item['image_description'] = 'No image description'
         else:
             item['image_description'] = description
+
+        # If there no image in news we will write about that
         if soup.find('img')['src'] == "":
             item['image_link'] = 'No image link'
         else:
@@ -60,6 +88,13 @@ class RSSReader:
         return item
 
     def to_cache(self):
+        """
+        Method to cache your parsed news
+
+        It create a new cache.json file and store your parsed news
+
+        :return: Nothing to return
+        """
         with open('./cache.json', 'w+') as f:
             try:
                 feeds_f = json.load(f)
@@ -76,6 +111,11 @@ class RSSReader:
             json.dump(feeds_f, f, indent=1)
 
     def from_cache(self):
+        """
+        Method, that load news by given date from cache
+
+        :return: Nothing to return
+        """
         to_print = []
         with open('./cache.json', 'r') as f:
             feeds_f = json.load(f)
@@ -87,6 +127,12 @@ class RSSReader:
         self.print_feeds(to_print)
 
     def convert_to_html(self, convert):
+        """
+        Convert given news to .html format
+
+        :param convert: List of news to convert
+        :return: Nothing to return
+        """
         html_string = '<!DOCTYPE html><html><head>RSSFeed</head><body>'
         for item in convert:
             html_string += f'<p>{item["feed_name"]}</p>'
@@ -102,6 +148,12 @@ class RSSReader:
             f.write(html_string)
 
     def convert_to_fb2(self, convert):
+        """
+        Convert given news to .fb2 format
+
+        :param convert: List of news to convert
+        :return: Nothing to return
+        """
         fb2_string = '<?xml version="1.0" encoding="UTF-8"?><NEWS>'
         for item in convert:
             fb2_string += f'<p><FEED_NAME>{item["feed_name"]}</FEED_NAME></p><br>'
@@ -117,6 +169,12 @@ class RSSReader:
             f.write(fb2_string)
 
     def print_feeds(self, to_print):
+        """
+        Print given news to console
+
+        :param to_print: List of news to print
+        :return: Nothing to return
+        """
         if self.json:
             print(json.dumps(self.feeds, indent=1))
         else:
