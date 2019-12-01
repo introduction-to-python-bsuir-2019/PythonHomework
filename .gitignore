@@ -84,6 +84,7 @@ celerybeat-schedule
 # Environments
 .env
 .venv
+.vscode
 env/
 venv/
 ENV/
@@ -102,3 +103,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#logging
+.idea
+apps.log
+
+#file
+News_feed.html
+
+.nginx
+config
+.vscode
+.pytest_cache

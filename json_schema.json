@@ -1,0 +1,126 @@
+{
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+      "Feed",
+      "Url",
+      "News"
+    ],
+    "properties": {
+      "Feed": {
+        "$id": "#/properties/Feed",
+        "type": "string",
+        "title": "The Feed Schema",
+        "default": "",
+        "examples": [
+          "Yahoo News - Latest News & Headlines"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "Url": {
+        "$id": "#/properties/Url",
+        "type": "string",
+        "title": "The Url Schema",
+        "default": "",
+        "examples": [
+          "http://rss.news.yahoo.com/rss/"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "News": {
+        "$id": "#/properties/News",
+        "type": "array",
+        "title": "The News Schema",
+        "items": {
+          "$id": "#/properties/News/items",
+          "type": "object",
+          "title": "The Items Schema",
+          "required": [
+            "Title",
+            "Date",
+            "Link",
+            "Description",
+            "Links"
+          ],
+          "properties": {
+            "Title": {
+              "$id": "#/properties/News/items/properties/Title",
+              "type": "string",
+              "title": "The Title Schema",
+              "default": "",
+              "examples": [
+                "House Democrat warns Trump could be reelected despite impeachment inquiry"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "Date": {
+              "$id": "#/properties/News/items/properties/Date",
+              "type": "string",
+              "title": "The Date Schema",
+              "default": "",
+              "examples": [
+                "Fri, 15 Nov 2019 18:07:20 -0500"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "Link": {
+              "$id": "#/properties/News/items/properties/Link",
+              "type": "string",
+              "title": "The Link Schema",
+              "default": "",
+              "examples": [
+                "https://news.yahoo.com/house-democrat-warns-trump-could-be-reelected-despite-impeachment-inquiry-230720070.html"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "Description": {
+              "$id": "#/properties/News/items/properties/Description",
+              "type": "string",
+              "title": "The Description Schema",
+              "default": "",
+              "examples": [
+                "Michigan Democrat Debbie Dingell thinks Trump could win reelection in 2020."
+              ],
+              "pattern": "^(.*)$"
+            },
+            "Links": {
+              "$id": "#/properties/News/items/properties/Links",
+              "type": "object",
+              "title": "The Links Schema",
+              "required": [
+                "Source_link",
+                "Img_links"
+              ],
+              "properties": {
+                "Source_link": {
+                  "$id": "#/properties/News/items/properties/Links/properties/Source_link",
+                  "type": "string",
+                  "title": "The Source_link Schema",
+                  "default": "",
+                  "examples": [
+                    "https://news.yahoo.com/house-democrat-warns-trump-could-be-reelected-despite-impeachment-inquiry-230720070.html"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "Img_links": {
+                  "$id": "#/properties/News/items/properties/Links/properties/Img_links",
+                  "type": "array",
+                  "title": "The Img_links Schema",
+                  "items": {
+                    "$id": "#/properties/News/items/properties/Links/properties/Img_links/items",
+                    "type": "string",
+                    "title": "The Items Schema",
+                    "default": "",
+                    "examples": [
+                      "http://l.yimg.com/uu/api/res/1.2/xLjRXbrMf4Uu4liSopZAig--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-11/68be2920-07fb-11ea-baff-2733831db38e"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
