@@ -5,12 +5,13 @@ from bs4 import BeautifulSoup
 
 
 class RSSReader:
-    def __init__(self, source, limit=1, json=False, date='', to_html=''):
+    def __init__(self, source, limit=1, json=False, date='', to_html='', to_fb2=''):
         self.source = source
         self.limit = limit
         self.json = json
         self.date = date
         self.to_html = to_html
+        self.to_fb2 = to_fb2
         self.feeds = {}
 
     def parse_source(self):
@@ -26,6 +27,9 @@ class RSSReader:
             self.from_cache()
         elif self.to_html:
             self.convert_to_html(self.feeds['news'])
+            self.to_cache()
+        elif self.to_fb2:
+            self.convert_to_fb2(self.feeds['news'])
             self.to_cache()
         else:
             self.print_feeds(self.feeds['news'])
@@ -96,6 +100,21 @@ class RSSReader:
 
         with open(f'{self.to_html}/html_news.html', 'w') as f:
             f.write(html_string)
+
+    def convert_to_fb2(self, convert):
+        fb2_string = '<?xml version="1.0" encoding="UTF-8"?><NEWS>'
+        for item in convert:
+            fb2_string += f'<p><FEED_NAME>{item["feed_name"]}</FEED_NAME></p><br>'
+            fb2_string += f'<p><TITLE>{item["title"]}</TITLE></p><br>'
+            fb2_string += f'<p><DATE>{item["date"]}</DATE></p><br>'
+            fb2_string += f'<p><LINK>{item["link"]}</LINK></p><br>'
+            fb2_string += f'<p><IMAGE_TITLE>{item["image_title"]}</IMAGE_TITLE></p><br>'
+            fb2_string += f'<p><IMAGE_DESCRIPTION>{item["image_description"]}</IMAGE_DESCRIPTION></p><br>'
+            fb2_string += f'<p><IMAGE_LINK>{item["image_link"]}"</IMAGE_LINK></p><br>'
+        fb2_string += '</NEWS>'
+
+        with open(f'{self.to_fb2}/fb2_news.fb2', 'w') as f:
+            f.write(fb2_string)
 
     def print_feeds(self, to_print):
         if self.json:
