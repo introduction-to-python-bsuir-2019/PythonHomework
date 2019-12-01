@@ -98,10 +98,13 @@ class FB2:
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._add_image')
         logger.info('Insert <image l:href="#img_name"/> in xml-tree with parent-node')
 
-        image = tree.SubElement(parent, 'image')
-        image.set('l:href', '#' + img_name)
+        try:
+            self._add_image_binary(img_url, img_name)
+            image = tree.SubElement(parent, 'image')
+            image.set('l:href', '#' + img_name)
 
-        self._add_image_binary(img_url, img_name)
+        except OSError:
+            logger.info('Cannot identify image')
 
     def add_section(self, title_info: str, date: str, link: str, imgs_links: list, content: str) -> None:
         """Insert <section>{}</section> in xml-tree with parent-node."""
