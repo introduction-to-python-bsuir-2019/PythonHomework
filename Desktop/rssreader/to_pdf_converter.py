@@ -127,7 +127,7 @@ class PDF(FPDF):
         self._add_title_of_news(title)
         self._add_date_of_news(date)
         self._add_link_of_news(link)
-        if imgs_urls: #  if imgs_urls list is not empty
+        if imgs_urls:  # if imgs_urls list is not empty
             # for img_url in imgs_urls:
                 # self._add_img_of_news(img_url)
             self._add_img_of_news(imgs_urls[0])

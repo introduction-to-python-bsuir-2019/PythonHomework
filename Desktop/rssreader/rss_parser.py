@@ -195,7 +195,7 @@ class RssReader:
             for key, value in one_news.items():
                 if key == KEYWORD_IMGS_LINKS:
                     if value:  # img_links list is not empty
-                        
+
                         # colorize block
                         if colorize:
                             key = self._colorize(key, COLOR_RED)
@@ -215,10 +215,10 @@ class RssReader:
                         value = self._colorize(value, COLOR_GREEN)
                     elif key == KEYWORD_LINK and colorize:
                         value = self._colorize(value, COLOR_BLUE)
-                    elif key == KEYWORD_CONTENT  and colorize:
+                    elif key == KEYWORD_CONTENT and colorize:
                         news += EN
                         value = self._colorize(value, COLOR_WHITE)
-                    
+
                     if colorize:
                         key = self._colorize(key, COLOR_RED)
 

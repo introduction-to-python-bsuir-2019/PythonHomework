@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.getcwd() + '/rssreader')
 
-from rss_reader.rss_parser import RssReader
+from rssreader.rss_parser import RssReader
 
 CORRECT_LINK = 'https://news.yahoo.com/rss/'
 INCORRECT_LINK = 'qwerty'
@@ -49,8 +49,8 @@ class TestRssParser(unittest.TestCase):
     def test_fix_symbols(self):
         rss = RssReader(CORRECT_LINK)
 
-        test_string = 'qwerty&#39; && &#39; #12__&#39;'
-        assertion_string = "qwerty' && ' #12__'"
+        test_string = 'qwerty&#39; && &#39; #1$amp;2__&#39;'
+        assertion_string = "qwerty' && ' #1&2__'"
 
         self.assertEqual(rss._fix_symbols(test_string), assertion_string)
         self.assertEqual(rss._fix_symbols(assertion_string), assertion_string)

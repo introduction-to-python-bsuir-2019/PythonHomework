@@ -29,7 +29,7 @@ class FB2:
 
         self.image_iter = 0
 
-    def _get_xml_as_string(self) -> None:
+    def _get_xml_as_string(self) -> str:
         """Convert xml-tree to string."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '._get_xml_as_string')
         logger.info('Convert xml-tree to string')
@@ -62,7 +62,7 @@ class FB2:
         binary.set('content-type', 'image/png')
         binary.text = get_image_as_base64(image_url)
 
-    def add_description_of_resource(self, title_info: str, subtitle_info: str, image_url: str) -> None:
+    def add_description_of_resource(self, title_info: str, subtitle_info: str, image_url: str='') -> None:
         """Insert description of resource to xml-tree."""
         logger = logging.getLogger(self.CLASS_LOGGER_NAME + '.add_description_of_resource')
         logger.info('Insert description of resource to xml-tree')
@@ -75,7 +75,8 @@ class FB2:
         title_descr.text = title_info
         subtitle_descr.text = subtitle_info
 
-        self._add_image(self.body, image_url, 'cover.png')
+        if image_url != '':
+            self._add_image(self.body, image_url, 'cover.png')
 
     def _add_tag_p(self, parent: Element, text: str) -> None:
         """Insert <p>{text}</p> in xml-tree with parent-node."""

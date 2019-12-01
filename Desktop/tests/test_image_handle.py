@@ -7,7 +7,7 @@ import requests
 
 sys.path.append(os.getcwd() + '/rssreader')
 
-from rss_reader.image_handle import *
+from rssreader.image_handle import *
 
 
 CORRECT_IMG_LINK = 'http://l2.yimg.com/uu/api/res/1.2/IxBCyyfTvHOinsGnZblALA--\
