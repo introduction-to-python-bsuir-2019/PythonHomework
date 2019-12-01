@@ -10,6 +10,7 @@ import os
 
 
 def argsparsing():
+    """arguments creating and control"""
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="RSS URL", type=str)
     parser.add_argument("--version", action='version', version='%(prog)s ' + 'v 2.0', help="Print version info", )
@@ -33,6 +34,7 @@ def making_log(operation, message, file='loglist.log'):
 
 
 def spliting_items(lst, index1, tag):
+    """help to create pdf files"""
     try:
         line_list = ''
         split_list = []
@@ -61,6 +63,7 @@ class NewsRss:
         self.datalist = []
 
     def feed_find(self):
+        """find rss news by url and save it to memory"""
         try:
             urllib.request.urlopen(self.arguments.source)
         except:
@@ -95,6 +98,7 @@ class NewsRss:
                 break
 
     def convert_to_html(self):
+        """convert news to html"""
         making_log(1, "Convertation to html opened.")
         try:
             for index in range(len(self.title)):
@@ -124,6 +128,7 @@ class NewsRss:
         else: making_log(1, "All news converted to html.(all_goods)")
 
     def convert_to_pdf(self):
+        """convert news to pdf"""
         for index in range(len(self.title)):
             try:
                 string = str(self.title[index])[:-2].replace("?", " ")
@@ -151,6 +156,7 @@ class NewsRss:
             except: making_log(1, "Feed with index %s can't convert to pdf." % index)
 
     def print_news(self):
+        """print news to stdout"""
         making_log(1, "Print news in stdout opened.")
         try:
             for index in range(len(self.title)):
@@ -171,12 +177,14 @@ class NewsRss:
         else: making_log(1, "All news were printed.(all_goods)")    
     
     def date_check(self):
+        """check date arg by length"""
         if len(str(self.arguments.date)) > 8 or len(str(self.arguments.date)) < 8 :
             print("Error in date input")
             return False
         return True
 
     def filewrite(self):
+        """write news in .txt file"""
         making_log(1, "Writing news in file opened. News saved in datafeed.txt")
         for index in range(len(self.title)):
                 with open("data\datafeed.txt", "a") as fp:
@@ -195,7 +203,8 @@ class NewsRss:
                         making_log(1, "Error. Can't write feed with index=%s on file." % index)
                     else: making_log(1, "Feed wited in file.(all_goods)")
 
-    def fileread(self):     
+    def fileread(self):
+        """read news from .txt file"""  
         with open("data\datafeed.txt", "r") as fp:
             flag = True
             check = 0
@@ -237,6 +246,7 @@ class NewsRss:
             if flag: print("No news on this date (")
 
     def create_dir(self):
+        """check if directory is created. If not-create dir"""
         if self.arguments.pdf:
             if not os.path.exists(self.arguments.pdf):
                 os.mkdir(self.arguments.pdf)
@@ -248,6 +258,7 @@ class NewsRss:
 
 
 def main():
+    """main func"""
     if not os.path.exists("data"):
         os.mkdir("data")
     news = NewsRss()
