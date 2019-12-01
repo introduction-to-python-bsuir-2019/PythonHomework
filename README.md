@@ -15,12 +15,26 @@ Utility provides the following interface:
     * --verbose  .. Outputs verbose status messages.
     * --limit    .. Limit news topics if this parameter is provided.
     * --date     .. Return cached news from the specified day. Format is YYYYMMDD.
+    * --html     .. Create html file in provided folder.You need to use it like /folder1/folder2/filename
+    * --fb2     .. Create fb2 file in provided folder.You need to use it like /folder1/folder2/filename
 
 
 
 
+JSON SCHEMA:
+    "item": {
+        "link": Provided link,
+        "body": {
+            "title": Title of provided news,
+            "date": Date in <Y-m-dTH:M:SZ> format
+            "links": Links from description,
+            "image": Image from description,
+            "description": Description from feed
+        }
+    }
+}
 
-
+Hope to see your feedback even if you don’t like my application, I really need it.
 
 
 

@@ -1,0 +1,6 @@
+feedparser==6.0.0b1
+argparse
+requests
+json2html
+lxml
+Pillow

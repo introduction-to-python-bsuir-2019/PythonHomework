@@ -115,7 +115,7 @@ class NewsReader():
         logging.info('Сreating json for html converting format...')
         emp_list = []
 
-        for feed in self.entries:
+        for feed in self.entries[0:self.limit]:
             emp_list.append((json.dumps({
                                          "item": {
                                             "link": f"<a href={feed['link']}>Go to sourse</a> ",
@@ -128,7 +128,7 @@ class NewsReader():
                                             }
                                          }
                                     }, indent=4, ensure_ascii=False)))
-            return emp_list
+        return emp_list
 
     def json_html(self, filepath):
         '''Creating html with help of json2html module and regular expressions'''

@@ -1,10 +1,10 @@
 import logging
 import argparse
-from SourseReader import NewsReader
-from cash import StoreCashSql
+from Rssreader.SourseReader import NewsReader
+from Rssreader.cash import StoreCashSql
 from Converters.parserXML import FB2
-PROJECT_VERSION = 'Version 1.3 : '
-PROJECT_STATUS = 'UnitTesing'
+PROJECT_VERSION = 'Version 1.5 : '
+PROJECT_STATUS = 'Completed'
 
 
 def Main():
@@ -15,7 +15,7 @@ def Main():
     parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
     parser.add_argument('--date', help='Outputs news that was previously added to cashe by date in Ymd format',
                         type=int)
-    parser.add_argument('--limit', default=3,
+    parser.add_argument('--limit', default=6,
                         help='Limit news topics if this parameter provided.Default value is 3', type=int)
     parser.add_argument('--fb2', help='Create fb2 file.File path and name need to be provided ', type=str)
     parser.add_argument('--html', help='Create html file.Please provide file path and name ', type=str)
