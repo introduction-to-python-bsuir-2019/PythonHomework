@@ -43,8 +43,17 @@ class Converter():
         return json_text
 
     def to_fb2(self, feed, column, url, sv_path=os.getcwd(), verbose=False):
-
+        """Function convert data to fb2 and save as file
+        Params:
+        feed - rss_channel feed
+        column - data from rss_channel
+        sv_path - path for html doc
+        url - link to source
+        """
         def next_article(id, title, images, description, feed, date="Unknown"):
+            """return code for single article and 
+                      binary files for used images
+            """
             binary = []
             for img in images:
                 binary += [f'<binary id="{hash(img)}.jpg" content-type="image/jpeg">{img}</binary>']
@@ -60,8 +69,10 @@ class Converter():
 """, binary
 
         def download_image(url):
+        """download image from Internet to your PC"""
             try:
-                local_name, headers = urllib.request.urlretrieve(url, sv_path + url.split('/')[-1])
+                local_name, headers = urllib.request.urlretrieve(
+                    url, sv_path + '/' + url.split('/')[-1])
                 stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
                 return local_name
             except (urllib.error.URLError, urllib.error.HTTPError):
@@ -119,7 +130,8 @@ class Converter():
                                              title=news["title"],
                                              images=images,
                                              date=news["date"],
-                                             description=news["text"] + 'links' + "\n".join(text_links),
+                                             description=news["text"] +
+                                             'links' + "\n".join(text_links),
                                              feed=feed
                                              )
             fb2_text += article
@@ -134,11 +146,18 @@ class Converter():
         with open(file_path, "w") as file:
             file.write(fb2_text)
 
-    def to_html(self, feed, column, url, sv_path=os.getcwd(), verbose=False):
-        
+    def to_html(self, feed, column, sv_path=os.getcwd(), verbose=False):
+        """Function convert data to html and save as file
+        Params:
+        feed - rss_channel feed
+        column - data from rss_channel
+        sv_path - path for html doc
+        """
         def download_image(url):
+            """download image from Internet to your PC"""
             try:
-                local_name, headers = urllib.request.urlretrieve(url, sv_path + url.split('/')[-1])
+                local_name, headers = urllib.request.urlretrieve(url,
+                                                                 sv_path + '/' + url.split('/')[-1])
                 stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
                 return local_name
             except (urllib.error.URLError, urllib.error.HTTPError):
@@ -149,6 +168,7 @@ class Converter():
                 return ""
 
         def next_article(title, images, description, feed, links, date="Unknown"):
+            """create html-code for single article"""
             return f"""
         <div>
             <h3>{title}</h3>
@@ -192,7 +212,7 @@ class Converter():
                                           description=news["text"],
                                           feed=feed
                                           )
-        html_text = create_html(feed, html_text)        
+        html_text = create_html(feed, html_text)
         file_path = f"{sv_path}/{hash(time())}-{randint(0, 100)}.html"
         open(file_path, 'a').close()
         with open(file_path, "w") as file:

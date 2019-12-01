@@ -109,7 +109,7 @@ class RSSReader():
         return self.__find_news()
 
     def show_news(self):
-        """Read and print info in stdout"""
+        """Read data and print info in stdout"""
         feed, column = self.__read()
         stdout_write(f"{feed}", end="\n\n")
         for news in column:
@@ -127,12 +127,13 @@ class RSSReader():
             stdout_write("\n\n")
 
     def show_json(self):
-        """Read, parse, convert into json and print info in stdout"""
+        """Read data, convert into json and print info in stdout"""
         feed, column = self.__read()
         json_text = Converter.to_json(feed, column, self.__verbose)
         stdout_write(json_text)
 
     def save_fb2(self):
+        """Read data, convert to fb2 & save it as file"""
         feed, column = self.__read()
         if self.__sv_path:
             Converter().to_fb2(feed, column, self.__source, self.__sv_path, verbose=self.__verbose)
@@ -140,8 +141,9 @@ class RSSReader():
             Converter().to_fb2(feed, column, self.__source, verbose=self.__verbose)
 
     def save_html(self):
+        """Read data, convert to fb2 & save it into files"""
         feed, column = self.__read()
         if self.__sv_path:
-            Converter().to_html(feed, column, self.__source, self.__sv_path, verbose=self.__verbose)
+            Converter().to_html(feed, column, self.__sv_path, verbose=self.__verbose)
         else:
-            Converter().to_html(feed, column, self.__source, verbose=self.__verbose)
+            Converter().to_html(feed, column, verbose=self.__verbose)
