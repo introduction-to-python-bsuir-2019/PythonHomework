@@ -7,6 +7,22 @@ import urllib.request
 import urllib.error
 
 
+def _download_image(url, verbose):
+    """download image from Internet to your PC"""
+    stdout_write("Downloading image", verbose=verbose)
+    try:
+        local_name, headers = urllib.request.urlretrieve(
+            url, sv_path + '/' + url.split('/')[-1])
+        stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
+        return local_name
+    except (urllib.error.URLError, urllib.error.HTTPError):
+        stdout_write("Error occurred during downloading image")
+        return ""
+    except ValueError:
+        stdout_write("Error: image not found")
+        return ""
+
+
 class Converter():
     """Converter class. Convert data to some format"""
 
@@ -54,6 +70,7 @@ class Converter():
             """return code for single article and 
                       binary files for used images
             """
+            stdout_write("Converting an article...", verbose=verbose)
             binary = []
             for img in images:
                 binary += [f'<binary id="{hash(img)}.jpg" content-type="image/jpeg">{img}</binary>']
@@ -68,20 +85,7 @@ class Converter():
         </section>
 """, binary
 
-        def download_image(url):
-        """download image from Internet to your PC"""
-            try:
-                local_name, headers = urllib.request.urlretrieve(
-                    url, sv_path + '/' + url.split('/')[-1])
-                stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
-                return local_name
-            except (urllib.error.URLError, urllib.error.HTTPError):
-                stdout_write("Error occurred during downloading image")
-                return ""
-            except ValueError:
-                stdout_write("Error: image not found")
-                return ""
-
+        stdout_write("Creating FB2 file", verbose=verbose)
         fb2_begin = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             '<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"' + \
             '\n  xmlns:l="http://www.w3.org/1999/xlink">'
@@ -110,6 +114,7 @@ class Converter():
         binary = []
         fb2_text = fb2_begin + fb2_desc
 
+        stdout_write("Convert news", verbose=verbose)
         for news in column:
             image_links = []
             text_links = []
@@ -120,7 +125,7 @@ class Converter():
                     text_links += [link[:-7]]
             images = []
             for link in image_links:
-                img_path = download_image(link)
+                img_path = _download_image(link, verbose)
                 try:
                     with open(img_path, 'rb') as binfile:
                         images += [b64encode(binfile.read()).decode()]
@@ -136,15 +141,19 @@ class Converter():
                                              )
             fb2_text += article
             binary += temp_bin
+        stdout_write("Text data converted", verbose=verbose)
         binary = set(binary)
         fb2_text += "   </body>"
         for img in binary:
             fb2_text += '\n'+img+'\n'
         fb2_text += fb2_end
+        stdout_write("Add binary part", verbose=verbose)
+
         file_path = f"{sv_path}/{hash(time())}-{randint(0, 100)}.fb2"
         open(file_path, 'a').close()
         with open(file_path, "w") as file:
             file.write(fb2_text)
+        stdout_write("FB2 document created", verbose=verbose)
 
     def to_html(self, feed, column, sv_path=os.getcwd(), verbose=False):
         """Function convert data to html and save as file
@@ -153,19 +162,6 @@ class Converter():
         column - data from rss_channel
         sv_path - path for html doc
         """
-        def download_image(url):
-            """download image from Internet to your PC"""
-            try:
-                local_name, headers = urllib.request.urlretrieve(url,
-                                                                 sv_path + '/' + url.split('/')[-1])
-                stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
-                return local_name
-            except (urllib.error.URLError, urllib.error.HTTPError):
-                stdout_write("Error occurred during downloading image")
-                return ""
-            except ValueError:
-                stdout_write("Error: image not found")
-                return ""
 
         def next_article(title, images, description, feed, links, date="Unknown"):
             """create html-code for single article"""
@@ -180,6 +176,7 @@ class Converter():
             """
 
         def create_html(feed, main_part):
+            stdout_write("Finish HTML document", verbose=verbose)
             return f"""
 <!DOCTYPE html>
 <html>
@@ -193,6 +190,7 @@ class Converter():
 """
 
         html_text = ""
+        stdout_write("Creating HTML version", verbose=verbose)
         for news in column:
             image_links = []
             text_links = []
@@ -203,7 +201,7 @@ class Converter():
                     text_links += [link[:-7]]
             images = []
             for link in image_links:
-                img_path = download_image(link)
+                img_path = _download_image(link, verbose)
                 images += [img_path]
                 html_text += next_article(links=text_links,
                                           title=news["title"],
