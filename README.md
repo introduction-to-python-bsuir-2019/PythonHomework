@@ -1,0 +1,18 @@
+# PythonHomework
+[Introduction to Python] Homework Repository
+# How to use
+* pip install .
+* python rss-reader https://news.tut.by/rss/economics.rss --limit 2 --json
+# Parameters
+* --help (Show this help message and exit)
+* source (RSS URL)
+* --limit LIMIT (Limit news topics if this parameter provided)
+* --json (Prints result as JSON in stdout)
+* --verbose (Outputs verbose status messages)
+* --version (Print version info)
+* --date ()
+* --to-pdf (Converter in pdf)
+* --to-html (Converter in html)
+* --colorize
+# JSON structure
+news = {"Title": "title", "Date":"date", "Alt image":"alt", "Discription":"discription", "Links":{"News":"link", "Image":"src"} }
