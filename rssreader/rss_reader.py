@@ -71,6 +71,10 @@ class RSSReader:
             logging.info("Date is correct. Start loading by date")
             articles = StorageController().load(source, date, limit)
 
+        if len(articles['articles']) < 1:
+            print(f"No news articles for output")
+            exit(0)
+
         logging.info("All articles was successfully loaded")
 
         OutputController.print(articles, **kwargs)
