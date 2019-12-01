@@ -35,15 +35,15 @@ class RssHandler:
     def rss_dict(self):
         """Make dictionary from RSS-Feed"""
 
-        self.feed_dict['source'] = self.feed['feed']['title']
+        self.feed_dict['Name'] = self.feed['feed']['title']
         self.feed_dict['news'] = []
 
         for descr in self.feed['entries']:
             soup = BeautifulSoup(descr['summary'], 'lxml')
             links = set(link.get('href') for link in soup.find_all('a'))
             media = set(pic.get('src') for pic in soup.find_all('img'))
-            self.feed_dict['news'].append({'title': descr['title'], 'pubDate': descr['published'],
-                                          'text': soup.get_text(), 'links': links,
+            self.feed_dict['news'].append({'title': descr['title'], 'published': descr['published'],
+                                          'content': soup.get_text(), 'links': links,
                                            'media': media, 'src_link': descr['link']})
 
         logging.info('Created dictionary from parsed RSS-Feed.')
@@ -62,16 +62,16 @@ class RssHandler:
 
         logging.info('Printing RSS-Feed in stdout.')
         if not json_param:
-            print(f"\nFeed: {self.feed_dict['source']}")
+            print(f"\nFeed: {self.feed_dict['Name']}")
             for elem in self.feed_dict['news']:
                 if self.feed_dict['news'].index(elem) == limit:
                     break
                 print(f"""
 Title: {elem['title']}
-Published: {elem['pubDate']}
+Published: {elem['published']}
 Source link: {elem['src_link']}
 
-{elem['text']}
+{elem['content']}
 
                       """)
 
@@ -91,7 +91,7 @@ class CacheControl:
         self.conn = None
         self.cursor = None
         self.date = date
-        self.cache_dict = {'Date':self.date, 'news':[]}
+        self.cache_dict = {'Name':self.date, 'news':[]}
 
     def connect_db(self):
         dbpath = os.path.join(os.path.dirname(__file__), 'newscache.db')
@@ -150,9 +150,9 @@ class CacheControl:
         logging.info('Printing RSS-Feed in stdout.')
         self.cursor.execute(f"SELECT * FROM {self.date} ORDER BY puBtime")
         feed_list = self.cursor.fetchall()
+        for row in feed_list:
+            self._cache_to_dict(self.date, row)
         if json_param:
-            for row in feed_list:
-                self._cache_to_dict(self.date, row)
             print(self.cache_to_json(limit))
             logging.info('Printing JSON object created from RSS-Feed in stdout.')
             print()
@@ -207,10 +207,10 @@ Source link: {row[5]}
         logging.info('Creating dictionary from cache output.')
         self.cache_dict['news'].append({
                                         'title':values[0],
-                                        'puBtime':values[1],
+                                        'published':values[1],
                                         'content':values[2],
-                                        'other_links':values[3],
-                                        'media_links':values[4],
+                                        'links':values[3].split(),
+                                        'media':values[4].split(),
                                         'src_link':values[5],
                                         'feed':values[6]
                                         })
@@ -219,7 +219,6 @@ Source link: {row[5]}
         "Create JSON from cache output"
 
         json_dict = self.cache_dict.copy()
-        self.cache_dict = None
         if limit is not None:
             del(json_dict['news'][limit:])
         json_feed = json.dumps(json_dict)

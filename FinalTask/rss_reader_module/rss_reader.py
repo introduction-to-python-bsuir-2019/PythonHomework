@@ -5,6 +5,7 @@ import logging
 import datetime
 from dateutil.parser import parse
 from rss_reader_module.module.RSSHandle import RssHandler, CacheControl
+from rss_reader_module.module.convert import ConvertTo
 
 
 def main():
@@ -39,6 +40,11 @@ def main():
                        type=str,
                        help='Print cached news that was published on given date')
 
+    parser.add_argument('--to-html',
+                        action='store',
+                        type=str,
+                        help='Create HTML file from RSS feed in given path')
+
     args = parser.parse_args()
 
     if args.verbose:
@@ -59,19 +65,24 @@ def main():
     else:
         rss_object = RssHandler(args.source)
         for news in rss_object.feed_dict['news']:
-            date_parsed = parse(news['pubDate'])
+            date_parsed = parse(news['published'])
             name = datetime.datetime.strftime(date_parsed, '%Y%m%d')
             values = news.copy()
-            values['pubDate'] = datetime.datetime.strftime(parse(news['pubDate']), '%H%M%S')
-            values['source'] = rss_object.feed_dict['source']
+            values['published'] = datetime.datetime.strftime(parse(news['published']), '%H%M%S')
+            values['source'] = rss_object.feed_dict['Name']
             values['links'] = ' '.join(values['links'])
             values['media'] = ' '.join(values['media'])
             cache.insert_values('date'+name, tuple(values.values()))
 
     if args.date is not None:
         cache.cache_output(args.limit, args.json)
+        convert = ConvertTo(cache.cache_dict, args.to_html)
     else:
         rss_object.output(args.json, args.limit)
+        convert = ConvertTo(rss_object.feed_dict, args.to_html)
+
+    if args.to_html is not None:
+        convert.to_html()
 
 
 if __name__ == '__main__':

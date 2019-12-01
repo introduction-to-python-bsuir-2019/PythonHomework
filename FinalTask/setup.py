@@ -10,7 +10,7 @@ setuptools.setup(
                 python_requires='>=3',
                 install_requires=['feedparser==5.2.1', 'beautifulsoup4==4.8.0',
                                   'python-dateutil==2.8.0', 'lxml==4.4.1'],
-                packages=setuptools.find_packages(exclude=["tests"]),
+                packages=setuptools.find_packages(),
                 py_modules=['rss_reader_module.module.RSSHandle', 'rss_reader_module.rss_reader',
                             'rss_reader_module.module.convert'],
                 entry_points={
@@ -20,6 +20,7 @@ setuptools.setup(
                     ]
                 },
                 package_data={
-                    '': ['*.txt', '*.in', '*.md']
+                    '': ['*.txt', '*.in', '*.md'],
+                    'rss_reader_module':['module/templates/html/*.html']
                 }
 )
