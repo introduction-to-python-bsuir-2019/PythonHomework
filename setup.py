@@ -18,7 +18,8 @@ setuptools.setup(
     install_requires=[
         'feedparser==5.2.1',
         'requests==2.22.0',
-        'tldextract==2.2.2'
+        'tldextract==2.2.2',
+        'fpdf=1.7.2'
     ],
     python_requires='>=3.8'
 )

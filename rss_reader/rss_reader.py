@@ -8,10 +8,11 @@ from tldextract import extract
 
 from news_cacher import NewsCacher
 from json_formatter import NewsJsonFormatter
+from pdf_converter import PDFConverter
 
 
 class NewsReader:
-    def __init__(self, link, limit, json, date):
+    def __init__(self, link, limit, json, date, convert_to_pdf, convert_to_html):
         self.link = link
         self.limit = limit
         self.json = json
@@ -19,6 +20,8 @@ class NewsReader:
         self.news = []
         self.date = date
         self.json_object = NewsJsonFormatter()
+        self.convert_to_pdf = convert_to_pdf
+        self.convert_to_html = convert_to_html
 
         ext_site_name = extract(self.link)
         site_name = f'{ext_site_name.domain}.{ext_site_name.suffix}'
@@ -58,6 +61,15 @@ class NewsReader:
         if self.json is True:
             self.json_object.format(self.news)
 
+        if self.convert_to_pdf == True:
+            pdf = PDFConverter(self.news, 'rss_reader_news')
+            pdf.dump()
+            print('PDF file created in current directory')
+
+        # if self.convert_to_html == True:
+        #     pdf = PDFConverter(self.news)
+        #     pdf.dump()
+
     def print_news(self):
         """Print news to console"""
         logging.info('Print news to console')
@@ -65,12 +77,13 @@ class NewsReader:
         if self.date != None:
             try:
                 news = self.cacher_object.get_cached_news(self.date, self.limit)
-            except FileNotFoundError:
-                print('Cache file not found :(')
-                return
-
-            if news == []:
+            except ValueError:
+                logging.error("News for this date not found")
                 print('News for this date not found :(')
+                return
+            except FileNotFoundError:
+                logging.error("Cache file not found")
+                print('Cache file not found :(')
                 return
 
             if self.json is True:
@@ -102,5 +115,7 @@ class NewsReader:
 
     def strip_html_string(self, string):
         """Remove html tags from a string"""
+        logging.info("Remove html tags from a string")
+
         strip_string = re.compile('<.*?>')
         return re.sub(strip_string, '', string)

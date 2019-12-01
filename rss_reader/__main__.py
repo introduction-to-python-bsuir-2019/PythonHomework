@@ -12,7 +12,7 @@ def main():
     else:
         logging.basicConfig(format="%(levelname)s: %(message)s")
 
-    reader = NewsReader(args.source, args.limit, args.json, args.date)
+    reader = NewsReader(args.source, args.limit, args.json, args.date, args.to_pdf, args.to_html)
     reader.parse_url()
 
     reader.print_news()
@@ -27,6 +27,8 @@ def parse_args():
     parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
     parser.add_argument('--limit', help='Limit news topics if this parameter provided', type=int)
     parser.add_argument('--date', help='Show cached news by input date', type=str)
+    parser.add_argument('--to-pdf', help='Convert news to pdf format', action='store_true')
+    parser.add_argument('--to-html', help='Convert news to html format', action='store_true')
 
     return parser.parse_args()
 

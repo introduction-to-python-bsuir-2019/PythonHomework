@@ -18,16 +18,19 @@ class NewsCacher:
 
     def get_cached_news(self, date, limit):
         """Get cached news from json file"""
+        logging.info("Get cached news from json file")
+        
         with open(self.file_name, 'r', encoding='utf-8') as json_file:
             self.data = json.load(json_file)
 
         try:
             return self.data[self.source][date][:limit]
         except (KeyError, TypeError):
-            return []
+            raise ValueError
 
     def cache(self, json_object):
         """Cache news to json file"""
+        logging.info("Cache news to json file")
 
         self.data = {
             self.source: {
