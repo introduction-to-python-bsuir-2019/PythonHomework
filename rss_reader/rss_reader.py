@@ -43,32 +43,32 @@ def main():
             \nMake sure that your format date in %Y%m%d''', file=sys.stderr)
         else:
             logger.info('News from cache ware read')
-        exit()
-
-    feeds = feedparser.parse(args.URL)
-
-    if feeds.bozo:
-        print('This is not well formed XML', file=sys.stderr)
-        exit()
-
     else:
-        logger.info('The XML file with news is received and correct')
 
-    news = News(feeds, args.limit)
-    logger.info('News is parsed')
+        feeds = feedparser.parse(args.URL)
 
-    if args.to_html:
-        news.to_html(args.to_html)
+        if feeds.bozo:
+            print('This is not well formed XML', file=sys.stderr)
+            exit()
 
-    elif args.to_fb2:
-        news.to_fb2(args.to_fb2)
+        else:
+            logger.info('The XML file with news is received and correct')
 
-    elif args.json:
-        print(news.to_json().decode())
-        logger.info('News is displayed in stdout in a json format')
-    else:
-        news.print()
-        logger.info('News is displayed in stdout in a readability format')
+        news = News(feeds, args.limit)
+        logger.info('News is parsed')
+
+        if args.to_html:
+            news.create_html(args.to_html)
+
+        elif args.to_fb2:
+            news.create_fb2(args.to_fb2)
+
+        elif args.json:
+            print(news.to_json().decode())
+            logger.info('News is displayed in stdout in a json format')
+        else:
+            news.print()
+            logger.info('News is displayed in stdout in a readability format')
 
     logger.info('Program is over')
 

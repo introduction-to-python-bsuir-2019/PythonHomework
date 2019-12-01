@@ -12,18 +12,22 @@ class Cache:
 
     def __init__(self):
         """This method initialize cursor to database"""
-        if self.cursor:
+        if self.cursor is None:
+            Cache._init_cursor()
+        else:
             logger = logging.getLogger('rss_reader')
             logger.error("This is singleton class. Use get_cursor")
-            exit()
+
+    @staticmethod
+    def _init_cursor():
         Cache.conn = sqlite3.connect(file_path)
         Cache.cursor = Cache.conn.cursor()
         Cache.cursor.execute('''CREATE TABLE IF NOT EXISTS news(id INTEGER PRIMARY KEY, 
-        title text, pub_date_key numeric, pub_date text, link text, description text, UNIQUE(link))''')
+         title text, pub_date_key numeric, pub_date text, link text, description text, UNIQUE(link))''')
         Cache.cursor.execute('''CREATE TABLE IF NOT EXISTS links( id INTEGER PRIMARY KEY, 
-        link text, news numeric)''')
+         link text, news numeric)''')
         Cache.cursor.execute('''CREATE TABLE IF NOT EXISTS media( id INTEGER PRIMARY KEY,
-        link text, news numeric)''')
+         link text, news numeric)''')
 
     @staticmethod
     def get_cursor():

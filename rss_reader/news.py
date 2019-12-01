@@ -58,7 +58,8 @@ class News:
             self.all_news.append(self.news.copy())
         Cache.close()
 
-    def _parse_links(self, news_dict):
+    @staticmethod
+    def _parse_links(news_dict):
         """This function parse links of feed"""
         list_of_links = list()
         if news_dict.links:
@@ -136,7 +137,7 @@ class News:
         """This function returns JSON-string with news"""
         return json.dumps({'Source:': self.name_of_source, 'Feeds': self.all_news}, ensure_ascii=False).encode('utf8')
 
-    def to_fb2(self, filepath):
+    def create_fb2(self, filepath):
         if filepath[-4::] != ".fb2":
             filename = filepath + ".fb2"
         with open(filename, 'w', encoding="utf-8") as fb2_file:
@@ -166,7 +167,7 @@ class News:
 
         print(f'All news you can find at {os.path.realpath(filename)}')
 
-    def to_html(self, filepath):
+    def create_html(self, filepath):
         if filepath[-5::] != ".html":
             filename = filepath + ".html"
         with open(filename, 'w', encoding="utf-8") as html_file:
