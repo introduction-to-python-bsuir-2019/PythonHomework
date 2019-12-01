@@ -69,4 +69,6 @@ class NewsPinter:
     def to_str_for_json(value):
         """Converting python string to json string"""
         value = value.replace('"', "'")
+        value = value.replace('/', " ")
+        value = value.replace('\\', " ")
         return '"' + str(value) + '"'
