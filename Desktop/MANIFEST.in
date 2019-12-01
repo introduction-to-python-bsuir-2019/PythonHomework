@@ -1,0 +1,4 @@
+include requirements.txt
+include rssreader/FreeSans.ttf
+include rssreader/news.db
+include rssreader/rss_reader.log

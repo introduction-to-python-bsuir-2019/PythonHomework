@@ -1,0 +1,23 @@
+{% extends 'rss_reader/base_rss_reader.html' %}
+
+{% block content %}
+
+{% for piece_of_news in news %}
+
+<div class="card text-center">
+	<div class="card-header">
+		{{ piece_of_news.date  }}
+	</div>
+	<div class="card-body">
+		<h5 class="card-title"> {{ piece_of_news.title  }} </h5>
+		{%if piece_of_news.img_link %}
+		<p><img src=" {{ piece_of_news.img_link }} " width="450" height="300" align="middle"></p>
+		{% endif %}
+		<p class="card-text"> {{ piece_of_news.content  }} </p>
+		<a href=" {{ piece_of_news.link }} " class="btn btn-primary">More</a>
+	</div>
+</div>
+
+{% endfor %}
+
+{% endblock %}
