@@ -6,5 +6,5 @@ COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY . /code/
 
-#EXPOSE 5000
-#CMD ["python", "manage.py", "runserver", "0.0.0.0:5000"]
+CMD ["python", "-m", "server"]
+EXPOSE 5000
