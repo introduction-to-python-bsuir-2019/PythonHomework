@@ -1,0 +1,5 @@
+feedparser==2.2.1
+bs4==0.0.1
+dateparser==0.7.2
+requests==2.22.0
+lxml==4.4.2
