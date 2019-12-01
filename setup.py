@@ -28,6 +28,6 @@ setuptools.setup(
         ],
 
     },
-    install_requires=['feedparser', 'bs4'],
+    install_requires=['feedparser', 'bs4', 'colorama'],
     python_requires='>=3.6',
 )

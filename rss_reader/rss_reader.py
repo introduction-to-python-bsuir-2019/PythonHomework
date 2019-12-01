@@ -4,6 +4,7 @@ import logging
 import html
 import json
 import urllib
+import colorama
 from base64 import b64encode
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -62,7 +63,7 @@ class Converter:
         This function creates a html version of news feed
 
         :param int limit: The number of news to be created
-        :param str date: Optional: if exists than resulting html implementation will only contain news from specific date
+        :param str date: Optional: if exists than resulting html implementation will contain news from specific date
         :return: a html like news feed
         :rtype: str
         """
@@ -132,10 +133,11 @@ class NewsFeed:
         self.feed_title = feed_title
         self.items = items
 
-    def print_feed(self, _json, limit):
+    def print_feed(self, _json, limit, colorize):
         """
         This function allows to print news in cmd either in json or str format
 
+        :param colorize: If true than colorize the output in cmd
         :param bool _json: If true than the news will be in json format, otherwise in str format
         :param int limit: The number of news to be printed
         """
@@ -144,7 +146,7 @@ class NewsFeed:
         if _json:
             self.print_to_json(limit)
         else:
-            self.print_to_console(limit)
+            self.print_to_console(limit, colorize)
 
     def create_json(self, is_cached, limit):
         """
@@ -168,17 +170,18 @@ class NewsFeed:
         logging.info('Printing news in json format')
         print(json.dumps(self.create_json(0, limit)))
 
-    def print_to_console(self, limit):
+    def print_to_console(self, limit, colorize):
         """
         This function allows to print news in cmd in str format
 
+        :param colorize: If true than colorize the output in cmd
         :param int limit: The number of news to be printed
         """
 
         logging.info('Printing news in console format')
         print('Feed: {0}'.format(self.feed_title))
         for item in self.items[:limit]:
-            item.print_to_console()
+            item.print_to_console(colorize)
         logging.info('Printed %s news', limit)
 
     def save_news(self, limit):
@@ -190,7 +193,7 @@ class NewsFeed:
         logging.info('Saving news')
         news_to_save = self.create_json(1, limit)['Items']
         existing_news = load_from_cache()
-        news_to_save += [item for item in existing_news if not item in news_to_save]
+        news_to_save += [item for item in existing_news if item not in news_to_save]
         path = Path.home().joinpath('rss_reader_cache')
         cache_file = "cache.json"
         path.mkdir(parents=True, exist_ok=True)
@@ -198,6 +201,7 @@ class NewsFeed:
         with filepath.open('w') as json_file:
             json.dump(news_to_save, json_file)
         logging.info('Saving news successful')
+
 
 class Item:
     """
@@ -217,31 +221,53 @@ class Item:
         for key in news_dict:
             setattr(self, key, news_dict[key])
 
-    def print_to_console(self):
+    def print_to_console(self, colorize):
         """
         This function allows to print one news item in console
+
+        :param colorize: If true than colorize the output in cmd
         """
-        print('\nTitle: {0}'.format(self.title))
-        print('Date: {0}'.format(self.pubDate))
-        print('Link: {0} \n'.format(self.link))
-        print(self.description)
+        title_color = ''
+        date_color = ''
+        link_color = ''
+        description_color = ''
+        href_color = ''
+        image_color = ''
+        video_color = ''
+        divider_color = ''
+        if colorize:
+            colorama.init(autoreset=True)
+            title_color = colorama.Fore.MAGENTA
+            date_color = colorama.Fore.WHITE
+            link_color = colorama.Fore.LIGHTBLACK_EX
+            description_color = colorama.Fore.LIGHTYELLOW_EX + colorama.Back.BLACK
+            href_color = colorama.Fore.GREEN
+            image_color = colorama.Fore.LIGHTGREEN_EX
+            video_color = colorama.Fore.CYAN
+            divider_color = colorama.Fore.LIGHTWHITE_EX + colorama.Back.LIGHTWHITE_EX
+        print(colorama.Fore.GREEN)
+        print(title_color + '\nTitle: {0}'.format(self.title))
+        print(date_color + 'Date: {0}'.format(self.pubDate))
+        print(link_color + 'Link: {0} \n'.format(self.link))
+        print(description_color + self.description)
         print()
 
         if self.links['href_links']:
-            print('\nLinks:')
+            print(href_color + '\nLinks:')
             for link in self.links['href_links']:
-                print(link)
+                print(href_color + link)
 
         if self.links['images_links']:
-            print('\nImages:')
+            print(image_color + '\nImages:')
             for link in self.links['images_links']:
-                print(link)
+                print(image_color + link)
 
         if self.links['video_links']:
-            print('\nVideos:')
+            print(video_color + '\nVideos:')
             for link in self.links['video_links']:
-                print(link)
-        print('\n//////////////////////////////////////////////////////////////////////////')
+                print(video_color + link)
+
+        print(divider_color + '\n//////////////////////////////////////////////////////////////////////////')
 
     def create_div(self, date):
         """
@@ -298,7 +324,8 @@ class Item:
         for href_link in self.links['href_links']:
             href_raw = description[description.find(' [link '):description.find(']', description.find(' [link '))+1]
             href_content = href_raw[href_raw.find(' | ')+3:len(href_raw)-1]
-            href_html = '<a href="{href}">{content}</a>'.format(href=href_link[href_link.find(': ')+2:], content=href_content)
+            href_html = '<a href="{href}">{content}</a>'.format(href=href_link[href_link.find(': ')+2:],
+                                                                content=href_content)
             description = description.replace(href_raw, href_html)
         logging.info('href inserted')
         return description
@@ -392,7 +419,8 @@ class Item:
         for href_link in self.links['href_links']:
             href_raw = description[description.find(' [link '):description.find(']', description.find(' [link '))+1]
             href_content = href_raw[href_raw.find(' | ')+3:len(href_raw)-1]
-            href_fb2 = '<a l:href="#{href}">{content}</a>'.format(href=href_link[href_link.find(': ')+2:], content=href_content)
+            href_fb2 = '<a l:href="#{href}">{content}</a>'.format(href=href_link[href_link.find(': ')+2:],
+                                                                  content=href_content)
             description = description.replace(href_raw, href_fb2)
         return description
 
@@ -444,15 +472,16 @@ def set_argparse():
     parser.add_argument('source', type=str, help='RSS URL')
 
     parser.add_argument('--version', action='version', version='%(prog)s v'+vers.__version__,
-                        help='Print version info')
-    parser.add_argument('--json', action='store_true', help='Print result as JSON in stdout')
+                        help='Prints version info')
+    parser.add_argument('--json', action='store_true', help='Prints result as JSON in stdout')
     parser.add_argument('--verbose', action='store_true', help='Outputs verbose status messages')
-    parser.add_argument('--limit', type=int, default=-1, help='Limit news topics if this parameter provided')
+    parser.add_argument('--limit', type=int, default=-1, help='Limits news topics if this parameter provided')
     parser.add_argument('--date', type=str, help='Shows news of specific date')
     parser.add_argument('--to-html', dest='to_html', type=str,
-                        help='Convert news into html format and save to a specified path')
+                        help='Converts news into html format and save to a specified path')
     parser.add_argument('--to-fb2', dest='to_fb2', type=str,
-                        help='Convert news into fb2 format and save to a specified path')
+                        help='Converts news into fb2 format and save to a specified path')
+    parser.add_argument('--colorize', action='store_true', help='Colorizes the cmd output')
     return parser.parse_args()
 
 
@@ -635,7 +664,7 @@ def main():
         elif args.to_fb2:
             Converter(news_feed).convert_to_fb2(args.to_fb2, args.limit)
         else:
-            news_feed.print_feed(args.json, args.limit)
+            news_feed.print_feed(args.json, args.limit, args.colorize)
         logging.info('Application completed')
 
     except Exception as e:
