@@ -12,7 +12,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='rss-reader',
-    version='0.4.0',
+    version='0.5.0',
     description='A simple Python3.8 rss reader',
     long_description=long_description,
     long_description_content_type='text/markdown',
