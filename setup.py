@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="rss-reader-kis",
-    version="1.82",
+    version="1.83",
     author="Anton Kiselevich",
     author_email="kiselevichanton@gmail.com",
     description="Simple command line rss-reader.",
