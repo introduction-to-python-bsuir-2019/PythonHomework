@@ -125,6 +125,7 @@ rss_reader/my_html.html
 my_html.html
 static/*.pdf
 static/*.html
+server/templates/here.html
 
 # Unused files
 static/dejavu_font/DejaVuSansCondensed.cw127.pkl

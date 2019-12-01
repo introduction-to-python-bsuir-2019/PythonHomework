@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 COPY . /code/
 
 CMD ["python", "-m", "server"]
-EXPOSE 5000
+#EXPOSE 5000
