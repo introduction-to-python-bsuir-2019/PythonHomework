@@ -1,5 +1,5 @@
 import feedparser
-from datetime import timedelta
+from abc import ABC
 from src.components.helper import Map
 
 from src.components.feed.feed_entry import FeedEntry
@@ -8,19 +8,29 @@ from src.components.logger.logger import Logger
 from src.components.cache.cache import Cache
 
 
-class Feed:
-
+class FeedProperty(ABC):
     @property
     def entities_list(self):
-        return self._entities_list
+        return self._decide_output()
 
     @property
     def feeds_title(self):
         return self._feeds_title
 
     @property
+    def feeds_url(self):
+        return self._url
+
+    @property
+    def feeds_image(self):
+        return self._feeds_image
+
+    @property
     def feeds_encoding(self):
         return self._feeds_encoding
+
+
+class Feed(FeedProperty):
 
     def __init__(self, args):
         self._is_json = args.json
@@ -88,7 +98,13 @@ class Feed:
 
         self._feeds_title = parse_data.feed.title
         self._feeds_encoding = parse_data.encoding
-        self._feeds_image = parse_data.feed.image.href
+
+        try:
+            self._feeds_image = parse_data.feed.image.href
+
+        except (AttributeError, KeyError):
+            self._feeds_image = ''
+            Logger.log('Cannot find feed image.')
 
     def _append_feed_entry(self, item):
         self._entities_list.append(FeedEntry(item))

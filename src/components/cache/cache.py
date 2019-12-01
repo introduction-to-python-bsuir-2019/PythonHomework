@@ -52,9 +52,9 @@ class Cache(Singleton):
 
         for feed_entry in feed_entities_list:
             if not self._db.find_where('feeds_entries', 'link', feed_entry.link, 'like'):
-                Logger.log(f'Caching feed  {color.blue(feed_entry.title)}  INSERTED')
+                Logger.log(f'Caching feed  {color.blue(feed_entry.link)}  INSERTED')
             else:
-                Logger.log(f'Caching feed  {color.blue(feed_entry.title)}  UPDATED')
+                Logger.log(f'Caching feed  {color.blue(feed_entry.link)}  UPDATED')
 
             self._insert_feed_entry_into_cache(feed_id, feed_entry)
 

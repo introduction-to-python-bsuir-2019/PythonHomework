@@ -3,3 +3,4 @@ bs4==0.0.1
 coloredlogs==10.0.0
 fabulous==0.3.0
 jinja2==2.10.3
+WeasyPrint==50

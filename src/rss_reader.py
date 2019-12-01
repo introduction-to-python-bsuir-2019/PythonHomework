@@ -3,6 +3,7 @@ from .components.parser.parser import Parser
 from .components.feed import *
 from .components.logger.logger import Logger
 from .components.converter.html import HtmlConverter
+from .components.converter.pdf import PdfConverter
 import conf
 
 
@@ -22,9 +23,10 @@ class App(Singleton):
         self._feed = Feed(self._console_args)
 
         if self._console_args.to_html:
-            HtmlConverter(self._console_args.to_html, self._console_args.limit).render(
-                self._feed.entities_list, self._console_args.source, self._feed.feeds_title, self._feed.feeds_encoding
-            )
+            HtmlConverter(self._console_args.to_html, self._console_args.limit).render(self._feed)
+
+        if self._console_args.to_pdf:
+            PdfConverter(self._console_args.to_pdf, self._console_args.limit).render(self._feed)
 
     @classmethod
     def start(cls) -> object:

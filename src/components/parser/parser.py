@@ -13,6 +13,7 @@ class Parser:
         'date',
         'colorize',
         'to_html',
+        'to_pdf',
     )
 
     def __init__(self, description, usage):

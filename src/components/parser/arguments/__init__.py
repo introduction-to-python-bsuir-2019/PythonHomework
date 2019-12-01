@@ -7,5 +7,6 @@ from .optional.verbose import *
 from .optional.colorize import *
 from .optional.date import *
 from .optional.to_html import *
+from .optional.to_pdf import *
 
 from .positional.source import *
