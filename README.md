@@ -30,5 +30,8 @@ Utility wrapped into distribution package 'rss_reader' with setuptools. This pac
 ## Caching
 The RSS news are stored in a local storage while reading. Local storage is based on TinyDB. Cached information is stored in a file 'cache_db.json'. All news read from the RSS feed are written to the repository. To read news from the cache implement '--date' argument
 
-##Format converter
+## Format converter
 News can be converted into HTML and PDF formats. To convert news to a file implement '--to-html' or '--to-pdf' argument and specify the path to the local file.
+
+## Unit tests
+The program code can be checked by running the command 'nosetests' from the root of the repository. The package 'nose' is required.

@@ -34,21 +34,21 @@ class Converter:
             self.create_image_folder(self.html_path or self.pdf_path)
             html_document = self.get_html(True)
         except RSSCreateImageFolderException:
-            print('News is not converted to any format')
+            print('News is not converted, because can\'t create a folder for images')
         except RSSCreateImageException:
-            print('News is not converted to any format')
+            print('News is not converted, because can\'t save pictures to a images folder')
             self.remove_image_folder()
         else:
             if self.html_path:
                 try:
                     self.conver_to_html(html_document)
                 except RSSConvertationException:
-                    print('News is not converted to HTML format')
+                    print('News is not converted to HTML format, because can\'t save .html file')
             if self.pdf_path:
                 try:
                     self.conver_to_pdf(html_document)
                 except RSSConvertationException:
-                    print('News is not converted to PDF format')
+                    print('News is not converted to PDF format, because can\'t save .pdf file')
 
     def create_image_folder(self, image_path: str) -> None:
         """Create folder for news images."""

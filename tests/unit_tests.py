@@ -9,8 +9,9 @@ import rss_reader.rss_reader
 from rss_reader.cache_storage import CacheStorage, ReadCache, WriteCache
 from rss_reader.containers import DictionaryValues, DateTimeSerializer
 from rss_reader.display_news import DisplayNewsJSON, DisplayNewsText, format_to_display
-from rss_reader.exceptions import RSSNewsCacheError, RSSNewsDisplayError, RSSReaderParseException
-from rss_reader.format_converter import format_to_convert
+from rss_reader.exceptions import (RSSNewsCacheError, RSSConvertationException, RSSCreateImageException,
+                                   RSSCreateImageFolderException, RSSNewsDisplayError, RSSReaderParseException)
+from rss_reader.format_converter import Converter, format_to_convert
 from rss_reader.source_parser import DescriptionParser, SourceParser
 
 
@@ -610,6 +611,112 @@ class TestWriteCache(TestCase):
         self.cache_storage.cache_news_list(moked_tiny_db_table)
 
 
+class TestConverter(TestCase):
+    def setUp(self):
+        self.data = self.get_converted_data()
+        self.converter = Converter(self.data, 'test_html.html', 'test_pdf.pdf')
+        self.correct_html_file = 'tests/correct_html_conversion_file.html'
+
+    @mock.patch('rss_reader.format_converter.Converter.conver_to_pdf')
+    @mock.patch('rss_reader.format_converter.Converter.conver_to_html')
+    @mock.patch('rss_reader.format_converter.Converter.remove_image_folder')
+    @mock.patch('rss_reader.format_converter.Converter.get_html')
+    @mock.patch('rss_reader.format_converter.Converter.create_image_folder')
+    def test_convert_news_valid_params(self, mocked_create_image_folder, mocked_get_html, mocked_remove_image_folder,
+                                       mocked_conver_to_html, mocked_conver_to_pdf):
+        self.converter.convert_news()
+
+    @mock.patch('rss_reader.format_converter.Converter.conver_to_pdf')
+    @mock.patch('rss_reader.format_converter.Converter.conver_to_html')
+    @mock.patch('rss_reader.format_converter.Converter.remove_image_folder')
+    @mock.patch('rss_reader.format_converter.Converter.get_html')
+    @mock.patch('rss_reader.format_converter.Converter.create_image_folder')
+    def test_convert_news_invalid_params(self, mocked_create_image_folder, mocked_get_html, mocked_remove_image_folder,
+                                         mocked_conver_to_html, mocked_conver_to_pdf):
+        mocked_conver_to_html.side_effect = RSSConvertationException('Can\'t create HTML file', None)
+        mocked_conver_to_pdf.side_effect = RSSConvertationException('Can\'t create FDP file', None)
+        self.assertTrue(self.capture_output().getvalue() == (
+            'News is not converted to HTML format, because can\'t save .html file\n'
+            'News is not converted to PDF format, because can\'t save .pdf file\n'
+        ))
+        mocked_get_html.side_effect = RSSCreateImageException('Can\'t create image with path', None)
+        self.assertTrue(self.capture_output().getvalue() == (
+            'News is not converted, because can\'t save pictures to a images folder\n'
+        ))
+        mocked_create_image_folder.side_effect = RSSCreateImageFolderException(
+            'Can\'t create directory for image files', None
+        )
+        self.assertTrue(self.capture_output().getvalue() == (
+            'News is not converted, because can\'t create a folder for images\n'
+        ))
+
+    @mock.patch('os.mkdir')
+    @mock.patch('os.path.exists', return_value=False)
+    def test_create_image_folder_valid_params(self, mocked_path_exists, mocked_mkdir):
+        self.converter.create_image_folder('/test/name.html')
+        img_folder = '/test/name'
+        self.assertEqual(self.converter.img_folder, img_folder, img_folder)
+
+    @mock.patch('os.mkdir', side_effect=OSError('test'))
+    @mock.patch('os.path.exists', return_value=False)
+    def test_create_image_folder_invalid_params(self, mocked_path_exists, mocked_mkdir):
+        with self.assertRaises(RSSCreateImageFolderException) as exception_context:
+            self.converter.create_image_folder('/test/name.html')
+        self.assertTrue(isinstance(exception_context.exception, RSSCreateImageFolderException))
+
+    @mock.patch('shutil.rmtree')
+    def test_download_image_valid_params(self, mocked_rmtree):
+        self.converter.remove_image_folder()
+
+    def test_get_html_valid_params(self):
+        with open(self.correct_html_file) as file_obj:
+            expected_html = file_obj.read()
+            self.assertEqual(self.converter.get_html(False),
+                             expected_html, f'Should be \'{expected_html}\'')
+
+    def capture_output(self):
+        captured_output = StringIO()
+        sys.stdout = captured_output
+        self.converter.convert_news()
+        sys.stdout = sys.__stdout__
+        return captured_output
+
+    @staticmethod
+    def get_converted_data():
+        return {'feed': 'Feed & title', 'news': [
+            {
+                'link': 'http://test1/rss.html',
+                'description':
+                [
+                    {'link': 'http://test/news.html', 'text': 'Mocked second text', 'type': 'link'},
+                    {'link': 'http://test/news.jpg', 'text': 'Mocked third text', 'type': 'image'}
+                ],
+                'published': 'Mon, 21 Oct 2019 04:30:12 +0300',
+                'title': 'Title 1'
+            },
+            {
+                'link': 'http://test2/rss.html',
+                'description':
+                [
+                    {'link': 'http://test/auto_news.html', 'text': 'Mocked first text', 'type': 'text'},
+                    {'link': '', 'text': 'Mocked third text', 'type': 'image'}
+                ],
+                'published': 'Sun, 20 Oct 2019 14:21:44 +0300',
+                'title': 'Title № 2'
+            },
+            {
+                'link': 'http://test3/rss.html',
+                'description':
+                [
+                    {'link': 'http://test/auto_news.html', 'text': 'Mocked first text', 'type': 'text'},
+                    {'link': 'http://test/news.html', 'text': 'Mocked second text', 'type': 'link'},
+                ],
+                'published': 'Sun, 20 Oct 2019 10:12:36 +0300',
+                'title': 'Title 3'
+            }
+        ]}
+
+
 class TestContainers(TestCase):
 
     def test_dictionary_values_valid_params(self):
@@ -631,37 +738,37 @@ class TestContainers(TestCase):
 
 def get_display_data():
     return {'feed': 'Feed & title', 'news': [
-            {
-                'link': 'http://test1/rss.html',
-                'links':
-                [
-                    {'link': 'http://test1/news.html', 'type': 'link'}
-                ],
-                'published': 'Sun, 20 Oct 2019 04:21:44 +0300',
-                'text': 'Mocked first text Mocked second text Mocked third text',
-                'title': 'Title 1'
-            },
-            {
-                'link': 'http://test2/rss.html',
-                'links':
-                [
-                    {'link': 'http://test2/news.html', 'type': 'link'},
-                    {'link': 'http://test2/news.jpg', 'type': 'image'}
-                ],
-                'published': 'Mon, 60 Bum 2019 04:90:44 +0300',
-                'text': 'Mocked first text Mocked second text Mocked third text',
-                'title': 'Title № 2'
-            },
-            {
-                'link': 'http://test3/rss.html',
-                'links':
-                [
-                    {'link': 'http://test3/news.jpg', 'type': 'image'}
-                ],
-                'published': '',
-                'text': 'Mocked first text Mocked second text Mocked third text',
-                'title': 'Title 3'
-            }]}
+        {
+            'link': 'http://test1/rss.html',
+            'links':
+            [
+                {'link': 'http://test1/news.html', 'type': 'link'}
+            ],
+            'published': 'Sun, 20 Oct 2019 04:21:44 +0300',
+            'text': 'Mocked first text Mocked second text Mocked third text',
+            'title': 'Title 1'
+        },
+        {
+            'link': 'http://test2/rss.html',
+            'links':
+            [
+                {'link': 'http://test2/news.html', 'type': 'link'},
+                {'link': 'http://test2/news.jpg', 'type': 'image'}
+            ],
+            'published': 'Mon, 60 Bum 2019 04:90:44 +0300',
+            'text': 'Mocked first text Mocked second text Mocked third text',
+            'title': 'Title № 2'
+        },
+        {
+            'link': 'http://test3/rss.html',
+            'links':
+            [
+                {'link': 'http://test3/news.jpg', 'type': 'image'}
+            ],
+            'published': '',
+            'text': 'Mocked first text Mocked second text Mocked third text',
+            'title': 'Title 3'
+        }]}
 
 
 def get_cache_data():
@@ -673,48 +780,48 @@ def get_cache_data():
                  {'text': 'Mocked second text', 'type': 'link', 'link': 'http://test/news.html'},
                  {'text': 'Mocked third text', 'type': 'image', 'link': 'http://test/news.jpg'}]
     return {'links': links, 'structure': structure, 'data': [
-                {
-                    'source': source,
-                    'feed': 'Feed & title',
-                    'id': '1',
-                    'date': datetime(2019, 10, 20, 4, 21, 44),
-                    'news':
-                    {
-                        'title': 'Title 1',
-                        'published': 'Sun, 20 Oct 2019 04:21:44 +0300',
-                        'link': 'http://test1/rss.html',
-                        'text': 'Mocked first text Mocked second text',
-                        'links': links,
-                        'description': structure
-                    }
-                },
-                {
-                    'source': source,
-                    'feed': 'Feed & title',
-                    'id': '2',
-                    'date': empty_date, 'news':
-                    {
-                        'title': 'Title № 2',
-                        'published': 'Mon, 60 Bum 2019 04:90:44 +0300',
-                        'link': 'http://test2/rss.html',
-                        'text': 'Mocked first text Mocked third text',
-                        'links': links,
-                        'description': structure
-                    }
-                },
-                {
-                    'source': source,
-                    'feed': 'Feed & title',
-                    'id': '3',
-                    'date': empty_date,
-                    'news':
-                    {
-                        'title': 'Title 3',
-                        'published': '',
-                        'link': 'http://test3/rss.html',
-                        'text': 'Mocked second text Mocked third text',
-                        'links': links,
-                        'description': structure
-                    }
-                }
-            ]}
+        {
+            'source': source,
+            'feed': 'Feed & title',
+            'id': '1',
+            'date': datetime(2019, 10, 20, 4, 21, 44),
+            'news':
+            {
+                'title': 'Title 1',
+                'published': 'Sun, 20 Oct 2019 04:21:44 +0300',
+                'link': 'http://test1/rss.html',
+                'text': 'Mocked first text Mocked second text',
+                'links': links,
+                'description': structure
+            }
+        },
+        {
+            'source': source,
+            'feed': 'Feed & title',
+            'id': '2',
+            'date': empty_date, 'news':
+            {
+                'title': 'Title № 2',
+                'published': 'Mon, 60 Bum 2019 04:90:44 +0300',
+                'link': 'http://test2/rss.html',
+                'text': 'Mocked first text Mocked third text',
+                'links': links,
+                'description': structure
+            }
+        },
+        {
+            'source': source,
+            'feed': 'Feed & title',
+            'id': '3',
+            'date': empty_date,
+            'news':
+            {
+                'title': 'Title 3',
+                'published': '',
+                'link': 'http://test3/rss.html',
+                'text': 'Mocked second text Mocked third text',
+                'links': links,
+                'description': structure
+            }
+        }
+    ]}
