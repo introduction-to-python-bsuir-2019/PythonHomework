@@ -1,15 +1,15 @@
 # PythonHomework
 [Introduction to Python] Homework Repository for EPAM courses
 
-# How to use
+## How to use
 1.  install git `apt-get install git` (necessary to get a package with git)
 2.  `pip3 install .`
 3.  `rss-reader "https://www.androidpolice.com/feed/" --limit 3 --json --verbose --date`
 
-# Important information
+## Important information
 "--to-pdf" convertation is unstable
 
-# Parameters
+## Parameters
 -  **--help** (help text)
 -  **--json** (print rss feed in json format)
 -  **--verbose** (print verbose log messages)
@@ -40,7 +40,7 @@ Examples:
 -  `--to-epub folder_name` will create "out.epub" in folder_name
 -  `--to-pdf folder_name` will create "out.pdf" in folder_name (*UNSTABLE*)
 
-# TODO
+## TODO
 -   [x] [Iteration 1] One-shot command-line RSS reader.
 -   [x] [Iteration 2] Distribution
 -   [x] [Iteration 3] News caching
