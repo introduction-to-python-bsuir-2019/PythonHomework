@@ -1,4 +1,4 @@
-"""self.pdf converter module"""
+"""PDF converter module"""
 
 import logging
 import requests
@@ -41,9 +41,6 @@ class PDFConverter:
             self.pdf.set_fill_color(242, 242, 242)
             self.pdf.set_text_color(0, 0, 0)
             self.pdf.set_font("FreeSans", size=10)
-
-            for href in element["hrefs"]:
-                self.pdf.multi_cell(0, 5, txt=href, align="L", fill=1)
 
             self.pdf.ln(5)
 

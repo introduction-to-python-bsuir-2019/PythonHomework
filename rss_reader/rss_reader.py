@@ -9,6 +9,7 @@ from tldextract import extract
 from news_cacher import NewsCacher
 from json_formatter import NewsJsonFormatter
 from pdf_converter import PDFConverter
+from html_converter import HTMLConverter
 
 
 class NewsReader:
@@ -62,13 +63,38 @@ class NewsReader:
             self.json_object.format(self.news)
 
         if self.convert_to_pdf == True:
-            pdf = PDFConverter(self.news, 'rss_reader_news')
+            if self.date != None:
+                try:
+                    news = self.cacher_object.get_cached_news(self.date, self.limit)
+                except ValueError:
+                    logging.error("News for this date not found")
+                    exit()
+                except FileNotFoundError:
+                    logging.error("Cache file not found")
+                    exit()
+
+                pdf = PDFConverter(news, 'rss_reader_news')
+            else:
+                pdf = PDFConverter(self.news, 'rss_reader_news')
             pdf.dump()
             print('PDF file created in current directory')
 
-        # if self.convert_to_html == True:
-        #     pdf = PDFConverter(self.news)
-        #     pdf.dump()
+        if self.convert_to_html == True:
+            if self.date != None:
+                try:
+                    news = self.cacher_object.get_cached_news(self.date, self.limit)
+                except ValueError:
+                    logging.error("News for this date not found")
+                    exit()
+                except FileNotFoundError:
+                    logging.error("Cache file not found")
+                    exit()
+
+                html = HTMLConverter(news, 'rss_reader_news')
+            else:
+                html = HTMLConverter(self.news, 'rss_reader_news')
+            html.dump()
+            print('HTML file created in current directory')
 
     def print_news(self):
         """Print news to console"""
@@ -79,12 +105,10 @@ class NewsReader:
                 news = self.cacher_object.get_cached_news(self.date, self.limit)
             except ValueError:
                 logging.error("News for this date not found")
-                print('News for this date not found :(')
-                return
+                exit()
             except FileNotFoundError:
                 logging.error("Cache file not found")
-                print('Cache file not found :(')
-                return
+                exit()
 
             if self.json is True:
                 self.json_object.format(news)
