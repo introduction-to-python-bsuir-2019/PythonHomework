@@ -1,2 +1,3 @@
 def version_info(smth):
-    print("----------------Almost third version----------------")
+    '''Shows version'''
+    print("----------------Third version----------------")

@@ -1,6 +1,8 @@
 import logging
 
 def log():
+    '''Mouth of program, but it's a quite calm.
+    Here we initialise logs'''
     extra = {'app_name':'rss-reader'}
     logger = logging.getLogger(__name__)
     syslog = logging.StreamHandler()
