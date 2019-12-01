@@ -30,6 +30,6 @@ setuptools.setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts':
-            ['%s = src.__main__:main' % conf.__package__]
+            ['%s = __main__:main' % conf.__package__]
     }
 )
