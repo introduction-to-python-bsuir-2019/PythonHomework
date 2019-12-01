@@ -18,8 +18,10 @@ class RssAggregator():
 
     feedurl = ""
 
-    def __init__(self, args, log):
-        self.args = args
+    def __init__(self, source, limit, date, log):
+        self.source = source
+        self.limit = limit
+        self.date = date
         self.log = log
 
     def get_news(self):
@@ -27,9 +29,12 @@ class RssAggregator():
         """ Returns parsed news and caches it"""
 
         self.log.info("Getting rss feed")
-        thefeed = feedparser.parse(self.args.source)
+        thefeed = feedparser.parse(self.source)
         self.save_to_json_file(thefeed.entries)
-        return thefeed.entries[:self.args.limit]
+        #with open("test.txt", "w", encoding="utf-8") as rf:
+        #    rf.write(str(thefeed.entries[:self.limit]))
+        #print(str(thefeed.entries))
+        return thefeed.entries[:self.limit]
 
     def print_news(self, entries):
 
@@ -101,7 +106,7 @@ class RssAggregator():
         """ Getting the file name for storing news """
 
         self.log.info("Getting file name")
-        file_name_list = self.args.source.split("//")
+        file_name_list = self.source.split("//")
         file_name = file_name_list[1].replace("/", "")
         file_name += ".json"
         return file_name
@@ -109,8 +114,7 @@ class RssAggregator():
     def save_image(self, thefeedentry, file_name):
 
         """ Save image to file"""
-
-        self.log.info("Save image")
+   
         file_path = self.get_path_image(thefeedentry)
         h = httplib2.Http('.cache')
         response, content = h.request(BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
@@ -120,13 +124,14 @@ class RssAggregator():
             out.close()
         except FileNotFoundError:
             self.log.info("Error: image not found")
+        except OSError:
+            self.log.info("[Errno 22] Invalid argument {}".format(file_path))
 
     def get_path_image(self, thefeedentry):
 
         """ Get path image """
 
-        self.log.info("Getting path image")
-        file_name_list = self.args.source.split("//")
+        file_name_list = self.source.split("//")
         file_name = file_name_list[1].replace("/", "")
         folder_path = "image_" + file_name + os.path.sep
         if not os.path.exists(folder_path):
@@ -152,7 +157,7 @@ class RssAggregator():
                 news = json.load(read_file)
             for thefeedentry in news:
                 published = parse(thefeedentry['Date']).strftime('%Y%m%d')
-                if published >= self.args.date:
+                if published >= self.date:
                     news_by_date.append(thefeedentry)
             return news_by_date
         except FileNotFoundError:
@@ -177,7 +182,7 @@ class RssAggregator():
         """ Print a certain amount of news by date """
 
         self.log.info("Printing news by date")
-        for thefeedentry in entries[:self.args.limit]:
+        for thefeedentry in entries[:self.limit]:
             print("--------------------------------------------------")
             print("Title: ", thefeedentry['Title'])
             print("Date: ", thefeedentry['Date'], end="\n\n")

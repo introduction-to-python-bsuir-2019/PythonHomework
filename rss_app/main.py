@@ -18,7 +18,7 @@ def get_args():
     """ Reads and returns arguments """
 
     parser = argparse.ArgumentParser(description="Pure Python command-line RSS reader.")
-    parser.add_argument('source', help="RSS URL")
+    parser.add_argument('source', type=str, help="RSS URL")
     parser.add_argument("-v", "--version", action="version", version="%(prog)s version" +
                         "{version}".format(version=__version__), default=None, help="Print version info")
     parser.add_argument("--json", action="store_true", help="Print result as JSON in stdout")
@@ -44,8 +44,8 @@ def main():
         logger = get_log()
     else:
         logger = logging.getLogger()
-    rssobject = RssAggregator(args, logger)
-    converter = Converter(args, logger)
+    rssobject = RssAggregator(args.source, args.limit, args.date, logger)
+    converter = Converter(args.source, args.limit, args.to_pdf, args.to_html, logger)
     news = rssobject.get_news()
     if args.to_pdf:
         news_for_converter_pdf = rssobject.get_news_for_converter()
