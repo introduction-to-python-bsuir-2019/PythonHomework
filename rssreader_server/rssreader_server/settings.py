@@ -4,12 +4,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'ny#t%v)^98(0afy8#+$dbrp^strv6#+#_nif)w8o2%dbffx5ft'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
