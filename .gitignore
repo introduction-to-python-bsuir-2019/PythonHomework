@@ -111,7 +111,6 @@ venv.bak/
 *.png
 *.jpg
 *.jpeg
-*.ttf
 *.db
 *.log
 *.pkl

@@ -16,7 +16,14 @@ setup(
     include_package_data=True,
     package_data={'': ['FreeSans.ttf', 'rss_reader.log', 'news.db',]},
     python_requires='>=3.6',
-    install_requires=['feedparser', 'bs4', 'lxml', 'fpdf', 'sqlparse', 'termcolor', 'image'],
+    install_requires=['feedparser',
+                      'bs4',
+                      'lxml',
+                      'fpdf',
+                      'sqlparse',
+                      'termcolor',
+                      'image',
+                      'requests'],
     entry_points={'console_scripts' : ['rss-reader = rssreader.main:main']},
     zip_safe=False
 )
