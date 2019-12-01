@@ -17,9 +17,12 @@ After installation you may to call application everywhere, where ever you are.
 
 For running Rss Reader you should enter command:
 
-    $ rss-reader
-or
+    $ rss-reader [url] [option]
+
+For getting help:
     
+    $ rss-reader
+    $ rss-reader -h
     $ rss-reader --help
 (These are the same ways)
  
