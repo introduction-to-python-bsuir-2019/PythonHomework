@@ -1,6 +1,7 @@
 import sqlite3
 from os.path import exists
 import sys
+from .log_helper import stdout_write, write_progressbar
 
 
 class Database():
@@ -31,7 +32,7 @@ class Database():
     def _close(self):
         self.conn.close()
 
-    def write_data(self, data, feed, url, verbose):
+    def write_data(self, data, feed, url, verbose, color):
         """Write news to database
         Params:
         data: turple - article data
@@ -64,11 +65,11 @@ class Database():
         except sqlite3.IntegrityError:
             pass
         except sqlite3.DatabaseError:
-            print("Database error")
+            stdout_write("Database error", color="red", colorize=color)
         finally:
             self._close()
 
-    def read_data(self, url, date):
+    def read_data(self, url, date, color):
         """Get url & date
         Return feed & data
         """
@@ -84,7 +85,7 @@ class Database():
                 """)
             data = self.cursor.fetchall()
         except Exception as e:
-            print("Database reading error", e)
+            stdout_write(f"Database reading error {e}", color="red", colorize=color)
             sys.exit()
         finally:
             self._close()

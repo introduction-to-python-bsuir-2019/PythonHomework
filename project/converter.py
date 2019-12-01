@@ -7,19 +7,19 @@ import urllib.request
 import urllib.error
 
 
-def _download_image(url, verbose):
+def _download_image(url, verbose, color):
     """download image from Internet to your PC"""
-    stdout_write("Downloading image", verbose=verbose)
+    stdout_write("Downloading image", verbose=verbose, color="blue", colorize=color)
     try:
         local_name, headers = urllib.request.urlretrieve(
             url, sv_path + '/' + url.split('/')[-1])
-        stdout_write(f'Image "{url}" was downloaded.', verbose=verbose)
+        stdout_write(f'Image "{url}" was downloaded.', verbose=verbose, color="green", colorize=color)
         return local_name
     except (urllib.error.URLError, urllib.error.HTTPError):
-        stdout_write("Error occurred during downloading image")
+        stdout_write("Error occurred during downloading image", color="red", colorize=color)
         return ""
     except ValueError:
-        stdout_write("Error: image not found")
+        stdout_write("Error: image not found", color="red", colorize=color)
         return ""
 
 
@@ -28,7 +28,7 @@ class Converter():
 
     def to_json(self, feed, column, verbose):
         """Take data and return it in json"""
-        stdout_write("Convert to json...", verbose=verbose)
+        stdout_write("Convert to json...", verbose=verbose, color="blue", colorize=color)
         counter = 0
         if verbose:
             write_progressbar(len(column), counter)
@@ -58,7 +58,7 @@ class Converter():
         json_text += ']\n}'
         return json_text
 
-    def to_fb2(self, feed, column, url, sv_path=os.getcwd(), verbose=False):
+    def to_fb2(self, feed, column, url, sv_path=os.getcwd(), verbose=False, color=False):
         """Function convert data to fb2 and save as file
         Params:
         feed - rss_channel feed
@@ -70,7 +70,7 @@ class Converter():
             """return code for single article and 
                       binary files for used images
             """
-            stdout_write("Converting an article...", verbose=verbose)
+            stdout_write("Converting an article...", verbose=verbose, color="blue", colorize=color)
             binary = []
             for img in images:
                 binary += [f'<binary id="{hash(img)}.jpg" content-type="image/jpeg">{img}</binary>']
@@ -85,7 +85,7 @@ class Converter():
         </section>
 """, binary
 
-        stdout_write("Creating FB2 file", verbose=verbose)
+        stdout_write("Creating FB2 file", verbose=verbose, color="blue", colorize=color)
         fb2_begin = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             '<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"' + \
             '\n  xmlns:l="http://www.w3.org/1999/xlink">'
@@ -114,7 +114,7 @@ class Converter():
         binary = []
         fb2_text = fb2_begin + fb2_desc
 
-        stdout_write("Convert news", verbose=verbose)
+        stdout_write("Convert news", verbose=verbose, color="blue", colorize=color)
         for news in column:
             image_links = []
             text_links = []
@@ -141,21 +141,21 @@ class Converter():
                                              )
             fb2_text += article
             binary += temp_bin
-        stdout_write("Text data converted", verbose=verbose)
+        stdout_write("Text data converted", verbose=verbose, color="green", colorize=color)
         binary = set(binary)
         fb2_text += "   </body>"
         for img in binary:
             fb2_text += '\n'+img+'\n'
         fb2_text += fb2_end
-        stdout_write("Add binary part", verbose=verbose)
+        stdout_write("Add binary part", verbose=verbose, color="green", colorize=color)
 
         file_path = f"{sv_path}/{hash(time())}-{randint(0, 100)}.fb2"
         open(file_path, 'a').close()
         with open(file_path, "w") as file:
             file.write(fb2_text)
-        stdout_write("FB2 document created", verbose=verbose)
+        stdout_write("FB2 document created", verbose=verbose, color="green", colorize=color)
 
-    def to_html(self, feed, column, sv_path=os.getcwd(), verbose=False):
+    def to_html(self, feed, column, sv_path=os.getcwd(), verbose=False, color=False):
         """Function convert data to html and save as file
         Params:
         feed - rss_channel feed
@@ -176,7 +176,6 @@ class Converter():
             """
 
         def create_html(feed, main_part):
-            stdout_write("Finish HTML document", verbose=verbose)
             return f"""
 <!DOCTYPE html>
 <html>
@@ -190,7 +189,7 @@ class Converter():
 """
 
         html_text = ""
-        stdout_write("Creating HTML version", verbose=verbose)
+        stdout_write("Creating HTML version", verbose=verbose, color="blue", colorize=color)
         for news in column:
             image_links = []
             text_links = []
@@ -215,3 +214,4 @@ class Converter():
         open(file_path, 'a').close()
         with open(file_path, "w") as file:
             file.write(html_text)
+        stdout_write("Finish HTML document", verbose=verbose, color="green", colorize=color)

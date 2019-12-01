@@ -11,6 +11,7 @@ def parse_arguments():
     parser.add_argument("--verbose", action="store_true", help="Outputs verbose status messages")
     parser.add_argument("--to_fb2",  action="store_true", help="Save as fb2 file")
     parser.add_argument("--to_html", action="store_true", help="Save as html file")
+    parser.add_argument("--colorize",action="store_true", help="Add colors to console output")
     parser.add_argument("--path",    type=str,            help="Save news to file at entered path.")
     parser.add_argument("--limit",   type=int,            help="Limit news topics if this parameter provided")
     parser.add_argument("--date",    type=int,            help="Start work with cached data. Format YYYYMMDD")
@@ -19,7 +20,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    rss = RSSReader(args.source, args.limit, args.verbose, args.date, args.path)
+    rss = RSSReader(args.source, args.limit, args.verbose, args.date, args.path, args.colorize)
     used = False
     if args.json:
         rss.show_json()

@@ -1,8 +1,25 @@
-def stdout_write(string, sep=' ', end='\n', flush=False, verbose=True):
+def stdout_write(string, sep=' ', end='\n', flush=False, verbose=True, color="", colorize=False):
     """Output function for singe string but convert &#39; to '"""
+    if colorize:
+        RED = '\033[31m'
+        BLUE = '\033[34m'
+        GREEN = '\033[92m'
+        RESET = '\033[0m'
+        
+        if color == "red":
+            color = RED
+        elif color == "blue":
+            color = BLUE
+        elif color == "green":
+            color = GREEN
+        else:
+            color, RESET = "", ""
+    else:
+        RED, BLUE, GREEN, RESET = "", "", "", ""
+
     if verbose:
         string = string.replace("&#39;", "'")
-        print(string, sep=sep, end=end, flush=flush)
+        print(color+string+RESET, sep=sep, end=end, flush=flush)
 
 
 def write_progressbar(elems, done, length=20):
