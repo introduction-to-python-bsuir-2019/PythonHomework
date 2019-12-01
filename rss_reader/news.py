@@ -106,7 +106,10 @@ def recaching_news():
                 break
 
 def compare_dates(newsdate):
-    news_date = datetime.strptime(newsdate[5:len(newsdate)-15], "%d %b %Y")
+    try:
+        news_date = datetime.strptime(newsdate[5:len(newsdate)-15], "%d %b %Y")
+    except ValueError:
+        news_date = datetime.strptime(newsdate[5:len(newsdate)-13], "%d %b %Y")
     news_date = str(news_date)[:10]
     requared_date = arg.args.date
     requared_date = requared_date[0:4] + "-" + requared_date[4:6] + "-" + requared_date[6:8]
