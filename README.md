@@ -7,7 +7,7 @@ Current version: v0.2
 Code checking: Code correspond to pep8
 #### Usage:
 ```shell
-usage: __main__.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] source
+usage: __main__.py [-h] [--version] [--json] [--verbose] [--limit LIMIT] [--date DATE] [--to-pdf] [--to-html] source
 
 Pure Python command-line RSS reader.
 
@@ -21,5 +21,8 @@ optional arguments:
   --verbose      Outputs verbose status messages
   --limit LIMIT  Limit news topics if this parameter provided
   --date DATE    Show cached news by input date
+  --to-pdf       Convert news to pdf format
+  --to-html      Convert news to html format
   ```
-  JSON scheme is described in `json_schema.json`
+  JSON scheme is described in `json_schema.json`.
+  News caching in json file `cached_news.json` in root application directory.
