@@ -9,7 +9,7 @@ from PIL import Image
 
 
 class RSSReader:
-    def __init__(self, source, limit=1, json=False, date='', to_html='', to_fb2=''):
+    def __init__(self, source, limit, json, date, to_html, to_fb2):
         """
         RSSReader class constructor
 
@@ -35,6 +35,8 @@ class RSSReader:
         :return: Nothing to return
         """
         d = feedparser.parse(self.source)  # Parse rss from given source
+        if not self.limit:
+            self.limit = 1
 
         self.feeds['news'] = []
         channel = d['channel']['title']
@@ -43,17 +45,28 @@ class RSSReader:
             self.feeds['news'].append(self.read_news(news, channel))
 
         # Method calls
-        if self.date:
-            self.from_cache()
-        elif self.to_html:
-            self.convert_to_html(self.feeds['news'])
-            self.to_cache()
-        elif self.to_fb2:
-            self.convert_to_fb2(self.feeds['news'])
-            self.to_cache()
-        else:
+        if not self.date and not self.to_html and not self.to_fb2:
             self.print_feeds(self.feeds['news'])
             self.to_cache()
+        elif self.date:
+            try:
+                self.from_cache()
+            except FileNotFoundError:
+                print("No news in cache it doesn't exist. Relax and parse some news. They will appear in cache soon :)")
+            except IndexError:
+                print("No news by that date")
+        elif self.to_html:
+            try:
+                self.convert_to_html(self.feeds['news'])
+                self.to_cache()
+            except FileNotFoundError:
+                print('Incorrect file path. Please use something like: "D:/somedict/somedict" or "D:" or "."')
+        elif self.to_fb2:
+            try:
+                self.convert_to_fb2(self.feeds['news'])
+                self.to_cache()
+            except FileNotFoundError:
+                print('Incorrect file path. Please use something like: "D:/somedict/somedict" or "D:" or "."')
 
     @staticmethod
     def read_news(news, channel):
@@ -123,12 +136,13 @@ class RSSReader:
         to_print = []
         with open('./cache.json', 'r') as f:
             feeds_f = json.load(f)
+
             for item in feeds_f['news']:
                 item_date = datetime.datetime.strptime(item['date'], '%a, %d %b %Y %H:%M:%S %z').strftime('%Y%m%d')
                 if self.date == item_date:
                     to_print.append(item)
 
-        self.print_feeds(to_print)
+            self.print_feeds(to_print)
 
     def convert_to_html(self, convert):
         """
@@ -150,6 +164,7 @@ class RSSReader:
 
         with open(f'{self.to_html}/html_news.html', 'w') as f:
             f.write(html_string)
+            print(f"Your news are successfully save to {self.to_html}/html_news.html file")
 
     def convert_to_fb2(self, convert):
         """
@@ -214,6 +229,7 @@ class RSSReader:
 
         with open(f'{self.to_fb2}/fb2_news.fb2', 'w') as f:
             f.write(fb2_string)
+            print(f"Your news are successfully save to {self.to_fb2}/fb2_news.fb2 file")
 
     def print_feeds(self, to_print):
         """
