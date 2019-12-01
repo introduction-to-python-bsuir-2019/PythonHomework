@@ -5,9 +5,9 @@ entry = Template('''
         <h2>{{title}}</h2>
         <div style="">
             <div style="">
-            # {% for img in images %}
-            #     {{img}}
-            # {% endfor %}
+            {% for item in media %}
+                {{item}}
+            {% endfor %}
             </div>
             <div style="">
                 <h4>{{date}}</h4>
@@ -16,7 +16,7 @@ entry = Template('''
                 </p>
                 <b>Links</b>
                 {% for link in links %}
-                    <a href="{{link}}">{{link}}</a>
+                    <a href="{{link['href']}}" type="{{link['type']}}">{{link['href']}}</a><br>
                 {% endfor %}
                 <br>
                 <b>Source: </b><a href="{{link}}">{{link}}</a>

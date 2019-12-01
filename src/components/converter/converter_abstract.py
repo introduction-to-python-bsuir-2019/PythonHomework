@@ -8,12 +8,12 @@ from src.components.feed import FeedEntry
 
 class ConverterAbstract(ABC):
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, limit: int) -> None:
         self._path_initialize(Path(path))
-
+        self._limit = limit
 
     @abstractmethod
-    def render(self, feeds_entries: list, title: str) -> str:
+    def render(self, feeds_entries: list, url: str, title: str) -> str:
         pass
 
     @abstractmethod
@@ -29,6 +29,8 @@ class ConverterAbstract(ABC):
                 parents=True,
                 exist_ok=True
             )
+        else:
+            Logger.log(f'Caution - file {self._path} would be overriding')
 
         self._media_path = Path.home()\
             .joinpath('.' + conf.__package__)\
@@ -41,9 +43,8 @@ class ConverterAbstract(ABC):
 
     def _download_media(self, media_url: str) -> bool:
 
-        media_file = self._media_path.joinpath(
-            hash(media_url)
-        )
+        exit(print(self._media_path.joinpath(hash(media_url))))
+        media_file = self._media_path.joinpath(hash(media_url))
 
         try:
             data = request.urlretrieve(media_url)

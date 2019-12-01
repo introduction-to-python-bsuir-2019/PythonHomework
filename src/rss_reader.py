@@ -6,7 +6,6 @@ from .components.converter.html import HtmlConverter
 import conf
 
 
-
 class App(Singleton):
 
     def __init__(self) -> None:
@@ -23,8 +22,8 @@ class App(Singleton):
         self._feed = Feed(self._console_args)
 
         if self._console_args.to_html:
-            HtmlConverter(self._console_args.to_html).render(
-                self._feed.entities_list, self._feed.feeds_title
+            HtmlConverter(self._console_args.to_html, self._console_args.limit).render(
+                self._feed.entities_list, self._console_args.source, self._feed.feeds_title, self._feed.feeds_encoding
             )
 
     @classmethod
@@ -36,7 +35,7 @@ def main():
     try:
         App.start()
     except KeyboardInterrupt:
-        Logger.log_error('Stop reader')
+        Logger.log_error('\nStop Rss-Reader')
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import setuptools
 import conf
 from pathlib import Path
 
-here = Path(__file__).resolve()
+here = Path(__file__).parent
 
 
 def get_install_requirements():

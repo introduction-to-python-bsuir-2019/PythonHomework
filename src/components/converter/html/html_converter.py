@@ -1,48 +1,56 @@
 from src.components.converter.converter_abstract import ConverterAbstract
 from src.components.logger import Logger
 from src.components.feed import FeedEntry
-from .templates import *
+from src.components.converter.html import templates as template
 
 
 class HtmlConverter(ConverterAbstract):
 
-    def render(self, feeds_entries: list, title: str, encoding: str='UTF-8') -> str:
+    _extensions = ['html']
+
+    def render(self, feeds_entries: list, url: str, title: str, encoding: str = 'UTF-8') -> str:
+
+        self._template = template
 
         render_feeds_entries = []
-        for entry in feeds_entries:
 
+        for index, entry in zip(range(self._limit), feeds_entries):
             render_feeds_entries.append(
-                entry_templ.render(
-                    # images=images_html,
-                    title=entry.title,
-                    date=entry.date,
-                    text=entry.description,
-                    link=entry.link,
-                    links=entry.links
-                )
+                self._entry_render(entry)
             )
 
         self._save_render_file(
-            layout_templ.render(
+            self._template.layout.render(
                 feeds_entries=render_feeds_entries,
+                url=url,
                 title=title,
                 encoding=encoding
             )
         )
 
-    def _media_render(self, entry: FeedEntry):
-        #make loop!!
-        media = self._download_media(entry)
+    def _media_render(self, media: list):
 
-        if not media:
-            return empty_media_templ.render()
+        media_output = []
 
-        return media_templ.render(src=media, alt=entry.title)
+        for item in media:
+            media_file = self._download_media(item.url)
+
+            if not media_file:
+                return self._template.empty_media.render()
+
+            media_output.append(self._template.media.render(
+                src=media['url'], alt=media['alt'])
+            )
+
+        return media_output
 
     def _entry_render(self, entry: FeedEntry):
-        media = self._download_media(entry)
 
-        if not media:
-            return empty_media_templ.render()
-
-        return media_templ.render(src=media, alt=entry.title)
+        return self._template.entry.render(
+            media=self._media_render(entry.media),
+            title=entry.title,
+            date=entry.published,
+            text=entry.description,
+            link=entry.link,
+            links=entry.links
+        )

@@ -12,7 +12,7 @@ class Logger(Singleton):
     @classmethod
     def initialize(cls, is_colorize):
 
-        with open(Path.cwd().joinpath('conf.yml'), 'r') as file:
+        with open(Path(__file__).parent.joinpath('conf.yml'), 'r') as file:
             config = yaml.safe_load(file.read())
             logging.config.dictConfig(config)
 

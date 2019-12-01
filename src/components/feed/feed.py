@@ -1,5 +1,6 @@
 import feedparser
 from datetime import timedelta
+from src.components.helper import Map
 
 from src.components.feed.feed_entry import FeedEntry
 from src.components.feed.feed_formatter import FeedFormatter
@@ -17,6 +18,10 @@ class Feed:
     def feeds_title(self):
         return self._feeds_title
 
+    @property
+    def feeds_encoding(self):
+        return self._feeds_encoding
+
     def __init__(self, args):
         self._is_json = args.json
         self._is_colorize = args.colorize
@@ -27,28 +32,27 @@ class Feed:
 
         Logger.log('Initialize console variables')
 
-        self._pre_validate_params()
-
         self._parse_feeds()
 
-    def _pre_validate_params(self):
-
-        if self._cache_date and not Cache().get_specify_by_date(self._cache_date, self._limit):
-            raise Exception(f'There is no cached news '
-                            f'{self._cache_date.strftime("from %d, %b %Y")}'
-                            f'{(self._cache_date + timedelta(days=1)).strftime(" to %d, %b %Y")}')
-
     def show_feeds(self) -> object:
-        Logger.log(f'Preparation for output feeds. '
-                   f'Output type: {"JSON" if self._is_json else "DEFAULT"}. '
-                   f'Feeds choosen: {self._limit}')
+        Logger.log(
+            f'Preparation for output feeds. '
+            f'Output type: {"JSON" if self._is_json else "DEFAULT"}. '
+            f'Feeds choosen: {self._limit}'
+        )
 
         FeedFormatter.is_json = self._is_json
+
+        top_data_output = Map({
+            'url': self._url,
+            'title': self._feeds_title,
+            'image': self._feeds_image
+        })
 
         output = FeedFormatter.generate_output(
             self._decide_output(),
             self._limit,
-            self._feeds_title,
+            top_data_output,
             self._is_colorize
         )
 
@@ -56,7 +60,7 @@ class Feed:
 
     def _decide_output(self):
         if self._cache_date:
-            return Cache().load_feeds_entries(self._cache_date, self._limit)
+            return Cache().load_feeds_entries(self._url, self._cache_date, self._limit)
 
         return self._entities_list
 
@@ -64,29 +68,37 @@ class Feed:
 
         Logger.log(f'Start parsing data from url: {self._url}')
 
-        feed = feedparser.parse(self._url)
+        parse_data = feedparser.parse(self._url)
 
-        self._set_global_feed_data(feed)
+        if parse_data['bozo']:
+            raise ValueError("Bozo Exception. Wrong validate or no access to the Internet")
+
+        self._set_global_feed_data(parse_data)
 
         Logger.log('Generate feeds instances')
 
-        for item in feed.entries:
+        for item in parse_data.entries:
             self._append_feed_entry(item)
 
         if self._entities_list:
             self._store_cache_instances()
 
-    def _set_global_feed_data(self, feed):
+    def _set_global_feed_data(self, parse_data):
         Logger.log('Setting global feed data')
 
-        self._feeds_title = feed.feed.title
-        self._feeds_encoding = feed.encoding
+        self._feeds_title = parse_data.feed.title
+        self._feeds_encoding = parse_data.encoding
+        self._feeds_image = parse_data.feed.image.href
 
     def _append_feed_entry(self, item):
         self._entities_list.append(FeedEntry(item))
 
     def _store_cache_instances(self):
-        Cache().append_feeds({
+
+        cache_params = Map({
             'url': self._url,
             'encoding': self._feeds_encoding,
-        }, self._entities_list)
+            'image' : self._feeds_image
+        })
+
+        Cache().append_feeds(cache_params, self._entities_list)

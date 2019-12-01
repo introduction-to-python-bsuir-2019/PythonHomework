@@ -1,29 +1,35 @@
 import html
 from bs4 import BeautifulSoup
 from datetime import datetime
+from src.components.helper import Map
 
 
 class FeedEntry:
 
+    _soup: BeautifulSoup = BeautifulSoup
+
     def __init__(self, entry):
-        self.title = html.unescape(entry.title)
-        self.description = self._process_description(entry.description)
+
         self.link = entry.link
-        self.links: list= self._process_links(entry.links)
-        self.date = entry.published
+        self.title = html.unescape(entry.title)
+        self.description = self._process_description(entry.summary)
         self.published = self._process_published(entry)
 
-    def _process_links(self, links):
-        def format_links(link, count):
-            return f'[{count}]: {link["href"]} ({link["type"]})\n'
+        self.links: list= self._process_links(entry.links)
+        self.media: list= self._process_media(entry.summary)
 
-        return ''.join(
-            format_links(link, count) for count, link in enumerate(links, start=1)
-        )
+    def _process_links(self, links):
+        return [link for link in links if link.get('href', False)]
+
+    def _process_media(self, summary):
+        return [Map({
+            'url': media.get('src'),
+            'alt': html.escape(media.get('alt', ''))
+        }) for media in self._soup(summary, 'lxml').find_all(['img']) if media.get('src', False)]
 
     def _process_description(self, description):
         return html.unescape(
-            BeautifulSoup(description, 'html.parser').get_text()
+            self._soup(description, 'lxml').get_text()
         )
 
     def _process_published(self, entry):

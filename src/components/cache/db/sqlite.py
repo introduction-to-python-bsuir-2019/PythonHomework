@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 from .sqlite_scripts import scripts
+from src.components.helper import Map
 
 
 class Sqlite:
@@ -28,14 +29,24 @@ class Sqlite:
             self.cursor.close()
             self.conn.close()
 
+    def map_data(self, data):
+        if isinstance(data, sqlite3.Cursor):
+            return [Map(row) for row in data.fetchall()]
+
+        return [Map(row) for row in data]
+
+
     @classmethod
     def create_database(self, path: str) -> str:
         try:
             self.conn = sqlite3.connect(path,  isolation_level=None)
+            self.conn.row_factory = sqlite3.Row
             cursor = self.conn.cursor()
 
-            cursor.executescript(scripts['create_db_tables']['feeds'])
-            cursor.executescript(scripts['create_db_tables']['feeds_entries'])
+            cursor.executescript(scripts.create_db_tables['feeds'])
+            cursor.executescript(scripts.create_db_tables['feeds_entries'])
+            cursor.executescript(scripts.create_db_tables['feed_entry_links'])
+            cursor.executescript(scripts.create_db_tables['feed_entry_media'])
 
             cursor.close()
 
@@ -44,7 +55,7 @@ class Sqlite:
 
     def get(self, table, columns, limit=100):
 
-        query = scripts.get('get').format(columns, table, limit)
+        query = scripts.get.format(columns, table, limit)
         self.cursor.execute(query)
 
         return self.cursor.fetchall()
@@ -52,16 +63,19 @@ class Sqlite:
     def get_last(self, table, columns):
         return self.get(table, columns, limit=1)[0]
 
-    def where(self, table, column, value, type='=', limit=100):
+    def where(self, table: str, *where: list, limit: int=100):
 
-        query = scripts.get('where').format(table, value, type, limit)
+        where = ' AND '.join('{} {} "{}" '.format(item[0], item[1], item[2]) for item in where)
+
+        query = scripts.where.format(table, where, limit)
+
         self.cursor.execute(query)
 
         return self.cursor.fetchall()
 
     def find_where(self, table, column, value, type='='):
 
-        query = scripts.get('find_where').format(table, column, type,value)
+        query = scripts.find_where.format(table, column, type, value)
 
         self.cursor.execute(query)
         row = self.cursor.fetchone()
@@ -70,13 +84,11 @@ class Sqlite:
 
     def write(self, table, columns, data):
 
-        query = scripts.get('write').format(
+        query = scripts.write.format(
             table, ', '.join(column for column in columns) , ', '.join( "'" + str(item) + "'" for item in data)
         )
 
         self.cursor.execute(query)
-
-        return self.cursor.fetchall() or False
 
     def query(self, sql, *args):
         self.cursor = self.conn.cursor()

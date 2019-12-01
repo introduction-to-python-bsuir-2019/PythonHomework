@@ -11,12 +11,7 @@ class ToHtml(ArgumentsAbstract):
         )
 
     def _validate_path(self, path):
-
         try:
-
-            if Path(path).exists():
-                print(f'Caution - file {path} would be overriding')
-
             return Path(path)
 
         except argparse.ArgumentTypeError:
