@@ -22,16 +22,16 @@ align="left" title="Ilhan Omar GOP challenger bannedfrom Twitter after saying sh
         self.assertEqual(rss_example.parse_html(html_example), html_result)
 
     def test_get_cached_news(self):
-        rss_example1 = RSSReader('source', None, datetime(2019, 12, 1).date(), True, {}, False, 'tests/news')
-        rss_example2 = RSSReader('source', 1, datetime(2019, 12, 1).date(), False, {}, False, 'tests/news')
-        with open('tests/all_news(date also 01-12-2019).txt', 'r') as f:
+        rss_example1 = RSSReader('source', None, datetime(2019, 12, 1).date(), True, {}, False, 'tests/data_for_testing/news')
+        rss_example2 = RSSReader('source', 1, datetime(2019, 12, 1).date(), False, {}, False, 'tests/data_for_testing/news')
+        with open('tests/data_for_testing/all_news(date also 01-12-2019).txt', 'r') as f:
             all_news = f.read()
             rss_example1.get_cached_news()
             cached_news = ''
             for feed in rss_example1.news_to_print:
                 cached_news += feed.__str__()
             self.assertEqual(all_news, cached_news)
-        with open('tests/one_news_from20191201.txt', 'r') as f:
+        with open('tests/data_for_testing/one_news_from20191201.txt', 'r') as f:
             one_news = f.read()
             rss_example2.get_cached_news()
             cached_news = ''
@@ -40,8 +40,8 @@ align="left" title="Ilhan Omar GOP challenger bannedfrom Twitter after saying sh
             self.assertEqual(one_news, cached_news)
 
     def test_get_all_news(self):
-        rss_example1 = RSSReader('source', None, datetime(2019, 12, 1).date(), True, {}, True, 'tests/news')
-        with open('tests/all_news(date also 01-12-2019).txt', 'r') as f:
+        rss_example1 = RSSReader('source', None, datetime(2019, 12, 1).date(), True, {}, True, 'tests/data_for_testing/news')
+        with open('tests/data_for_testing/all_news(date also 01-12-2019).txt', 'r') as f:
             all_news = f.read()
             rss_example1.get_all_news()
             cached_news = ''
