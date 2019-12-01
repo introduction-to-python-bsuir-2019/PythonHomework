@@ -8,7 +8,7 @@ import pickle
 from rss_reader import arg
 from bs4 import BeautifulSoup
 from datetime import datetime
-from colored import fore
+from colored import fore, style
 
 
 class News():
@@ -121,6 +121,8 @@ def find_news_in_cache():
             isNewsFind = True
     if not isNewsFind:
         print("Nothing found :(")
+    if arg.args.colorize:
+        print(style.RESET)
 
 def write_to_json(news):
     """Creates data.json document in the directory which the application was launched"""
@@ -202,4 +204,6 @@ def show_news(news):
         if arg.args.limit and arg.args.limit > i:
             news[i].show()
             print(80*"_", end = "\n\n")
+    if arg.args.colorize:
+        print(style.RESET)
         
