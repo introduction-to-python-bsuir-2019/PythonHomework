@@ -1,0 +1,4 @@
+include requirements.txt
+include rss_news_schema.json
+include cache_db.json
+include arial.ttf
