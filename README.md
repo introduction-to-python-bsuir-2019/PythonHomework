@@ -21,7 +21,7 @@
 -  **--colorize** (colorize output)
 
 ## JSON structure
-`{"feed": "rss_title", "entries": [{"title": "title", "date": "date", "link": "link", "summary": "summary"}, ...]}`
+`{"feed": "rss_title", "entries": [{"title": "title", "date": "date", "link": "link", "summary": "summary", "photos": [...], "links": [...]}, ...]}`
 
 ## Storage
 Used [Pickle](https://docs.python.org/3/library/pickle.html) for storage

@@ -90,15 +90,21 @@ class RSSFeed:
     def _get_pretty_entries(self):
         """ Prettify entries
 
-        Remove HTML code from summary, parse date
+        Remove HTML code from summary, parse date, photos, links
         """
         pretty_entries = []
         for entry in self.raw_entries:
+            summary_html = bs4.BeautifulSoup(entry.summary, "html.parser")
+            images = [img['src'] for img in summary_html.findAll('img') if img.has_attr('src')]
+            links = [link['href'] for link in entry.links]
+
             pretty_entries.append({
                 "title": entry.title,
                 "date": time.strftime('%Y-%m-%dT%H:%M:%SZ', entry.published_parsed),
                 "link": entry.link,
-                "summary": bs4.BeautifulSoup(entry.summary, "html.parser").text.strip()
+                "summary": summary_html.text.strip(),
+                "photos": images,
+                "links": links
             })
         return pretty_entries
 
@@ -141,14 +147,18 @@ class RSSFeed:
                     print(f"{Fore.GREEN}Title:{Fore.RESET} {entry['title']}\n"
                           f"{Fore.MAGENTA}Date:{Fore.RESET} {entry['date']}\n"
                           f"{Fore.BLUE}Link:{Fore.RESET} {entry['link']}\n\n"
-                          f"{entry['summary']}\n\n")
+                          f"{entry['summary']}\n\n"
+                          f"{Fore.YELLOW}Photos:{Fore.RESET} {', '.join(entry['photos'])}\n"
+                          f"{Fore.CYAN}Links:{Fore.RESET} {', '.join(entry['links'])}\n\n")
             else:
                 print(f"Feed: {self.title}\n")
                 for entry in entries:
                     print(f"Title: {entry['title']}\n"
                           f"Date: {entry['date']}\n"
                           f"Link: {entry['link']}\n\n"
-                          f"{entry['summary']}\n\n")
+                          f"{entry['summary']}\n\n"
+                          f"Photos: {', '.join(entry['photos'])}\n"
+                          f"Links: {', '.join(entry['links'])}\n\n")
 
     def convert_to_html(self, out_dir, limit):
         """ Create html file with rss news in out_dir """
