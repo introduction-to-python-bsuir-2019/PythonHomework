@@ -102,3 +102,18 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# pycharm
+.idea
+
+# vscode
+.vscode
+export_path.sh
+
+# files convertion
+parsing_news.html
+*.pdf
+*.jpg
+
+# file format
+*.pkl

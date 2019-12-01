@@ -1,0 +1,83 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+      "Feed",
+      "Title",
+      "Date",
+      "Link",
+      "Description",
+      "Links"
+    ],
+    "properties": {
+      "Feed": {
+        "$id": "#/properties/Feed",
+        "type": "string",
+        "title": "The Feed Schema",
+        "default": "",
+        "examples": [
+          "TUT.BY: Новости ТУТ"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "Title": {
+        "$id": "#/properties/Title",
+        "type": "string",
+        "title": "The Title Schema",
+        "default": "",
+        "examples": [
+          "В Минске Opel сбил ребенка, который перебегал дорогу на красный"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "Date": {
+        "$id": "#/properties/Data",
+        "type": "string",
+        "title": "The Date Schema",
+        "default": "",
+        "examples": [
+          "Mon, 25 Nov 2019 21:13:00 +0300"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "Link": {
+        "$id": "#/properties/Link",
+        "type": "string",
+        "title": "The Link Schema",
+        "default": "",
+        "examples": [
+          "https://auto.tut.by/news/road/662685.html?utm_campaign=news-feed&utm_medium=rss&utm_source=rss-news"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "Description": {
+        "$id": "#/properties/Description",
+        "type": "string",
+        "title": "The Description Schema",
+        "default": "",
+        "examples": [
+          "Ребенка доставили в больницу и после оказания медпомощи отпустили домой."
+        ],
+        "pattern": "^(.*)$"
+      },
+      "Links": {
+        "$id": "#/properties/Links",
+        "type": "array",
+        "title": "The Links Schema",
+        "items": {
+          "$id": "#/properties/Links/items",
+          "type": "string",
+          "title": "The Items Schema",
+          "default": "",
+          "examples": [
+            "https://img.tyt.by/n/avto/08/c/dtp_rebenok_minsk_rokossovskogo_2511.jpg"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    }
+  }
+  
