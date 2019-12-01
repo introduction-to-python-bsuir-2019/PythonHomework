@@ -1,6 +1,6 @@
 __author__ = 'Mikhan Victor'
 __email__ = 'victormikhan@gmail.com'
 __package__ = 'rss-reader'
-__version__ = '1.4.0'
+__version__ = '1.6.0'
 __description__ = 'RSS Reader'
 __url__ = 'https://github.com/victormikhan/PythonHomework'

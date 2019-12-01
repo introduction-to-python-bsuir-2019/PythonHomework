@@ -127,7 +127,8 @@ class FeedFormatter:
                 "body": {
                      "title": entry.title,
                      "date": str(cls.human_date(entry.published)),
-                     "links": cls.format_links(entry.links),
+                     "links": [link for link in entry.links],
+                     "media": [media for media in entry.media],
                      "description": entry.description
                 }
             }
