@@ -148,4 +148,52 @@ class Converter():
                 stdout_write("Error: image not found")
                 return ""
 
+        def next_article(title, images, description, feed, links, date="Unknown"):
+            return f"""
+        <div>
+            <h3>{title}</h3>
+            {' '.join(f'<img src="{img}" alt="Not found">' for img in images)}
+            <p>{description}</p>
+            {' '.join(f'<a href="{link}">link </a>' for link in links)}
+            <p>Date: {date}</p>
+        </div>
+            """
 
+        def create_html(feed, main_part):
+            return f"""
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{feed}</title>
+    </head>
+    <body>
+{main_part}
+    </body>
+</html>
+"""
+
+        html_text = ""
+        for news in column:
+            image_links = []
+            text_links = []
+            for link in news["links"]:
+                if "(image)" in link:
+                    image_links += [link[:-8]]
+                else:
+                    text_links += [link[:-7]]
+            images = []
+            for link in image_links:
+                img_path = download_image(link)
+                images += [img_path]
+                html_text += next_article(links=text_links,
+                                          title=news["title"],
+                                          images=images,
+                                          date=news["date"],
+                                          description=news["text"],
+                                          feed=feed
+                                          )
+        html_text = create_html(feed, html_text)        
+        file_path = f"{sv_path}/{hash(time())}-{randint(0, 100)}.html"
+        open(file_path, 'a').close()
+        with open(file_path, "w") as file:
+            file.write(html_text)

@@ -135,13 +135,13 @@ class RSSReader():
     def save_fb2(self):
         feed, column = self.__read()
         if self.__sv_path:
-            Converter().to_fb2(feed, column, self.__source, self.__sv_path)
+            Converter().to_fb2(feed, column, self.__source, self.__sv_path, verbose=self.__verbose)
         else:
-            Converter().to_fb2(feed, column, self.__source)
+            Converter().to_fb2(feed, column, self.__source, verbose=self.__verbose)
 
     def save_html(self):
         feed, column = self.__read()
         if self.__sv_path:
-            Converter().to_html(feed, column, self.__source, self.__sv_path)
+            Converter().to_html(feed, column, self.__source, self.__sv_path, verbose=self.__verbose)
         else:
-            Converter().to_html(feed, column, self.__source
+            Converter().to_html(feed, column, self.__source, verbose=self.__verbose)
