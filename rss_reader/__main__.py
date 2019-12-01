@@ -5,7 +5,7 @@ import logging
 
 from colorama import init
 
-from rss_reader import NewsReader
+from .rss_reader import NewsReader
 
 
 def main():

@@ -9,11 +9,11 @@ import lxml.html.clean
 from tldextract import extract
 from colorama import Fore, Back, Style
 
-from news_cacher import NewsCacher
-from json_formatter import NewsJsonFormatter
-from pdf_converter import PDFConverter
-from html_converter import HTMLConverter
-from date_validation import is_valid_date
+from .news_cacher import NewsCacher
+from .json_formatter import NewsJsonFormatter
+from .pdf_converter import PDFConverter
+from .html_converter import HTMLConverter
+from .date_validation import is_valid_date
 
 
 class NewsReader:
