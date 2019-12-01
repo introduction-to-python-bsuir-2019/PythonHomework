@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from .rss_parser import RssParser
 
-current_version = 0.414
+current_version = 0.42
 
 
 def main():
