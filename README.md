@@ -4,12 +4,12 @@ Python RSS-reader.
 Url for cloning:
 `https://github.com/Nenu1985/PythonHomework.git`
 
-Version 4
+Version 6
 ```shell
-usage: rss_reader [-h] [--verbose] [--limit LIMIT] [--json] [-v]
-                  [--width WIDTH] [--date DATE] [--to_pdf TO_PDF]
-                  [--to_html TO_HTML]
-                  url
+usage: __main__.py [-h] [--verbose] [--limit LIMIT] [--json] [-v]
+                   [--width WIDTH] [--date DATE] [--to_pdf TO_PDF]
+                   [--to_html TO_HTML] [--colorize]
+                   url
 
 Rss reader. Just enter rss url from your favorite site and app will print
 latest news.
@@ -27,7 +27,7 @@ optional arguments:
   --date DATE        Date of stored news you want to see. Format: %Y%m%d
   --to_pdf TO_PDF    Convert and store news you are looking for to pdf
   --to_html TO_HTML  Convert and store news you are looking for to html
-
+  --colorize         Colorize text
 
 ```
 
