@@ -5,6 +5,7 @@ from fabulous import image, color
 from fabulous.text import Text
 from datetime import time, datetime
 from src.components.helper import Map
+import conf
 
 
 class FeedFormatter:
@@ -43,6 +44,7 @@ class FeedFormatter:
         """
         if is_colorize:
             print(Text("Console Rss Reader!", fsize=19, color='#f44a41', shadow=False, skew=4))
+
             formatted_feeds = ''.join(cls._colorize_single_feed_format_default(feed) for feed in entries[:limit])
         else:
             formatted_feeds = ''.join(cls._single_feed_format_default(feed) for feed in entries[:limit])
