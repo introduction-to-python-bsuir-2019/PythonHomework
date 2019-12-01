@@ -1,3 +1,5 @@
+"""This module contain class representing cli optional argument"""
+
 from src.components.parser.arguments import ArgumentsAbstract
 
 

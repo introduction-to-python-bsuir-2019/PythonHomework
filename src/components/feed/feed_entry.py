@@ -1,4 +1,4 @@
-"""This module contain classe for structuring feeds entries"""
+"""This module contain class for structuring feeds entries"""
 
 import html
 import feedparser

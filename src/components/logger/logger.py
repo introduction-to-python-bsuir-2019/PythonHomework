@@ -11,7 +11,7 @@ from pathlib import Path
 class Logger(Singleton):
 
     """
-        Logger class using for wrap logger and provide more convinient approach for logging
+        Logger class using for wrap logger and provide more convenient approach for logging
 
         Attributes:
             logger_name  logger_name containt logger settings default name
@@ -22,7 +22,8 @@ class Logger(Singleton):
     @classmethod
     def initialize(cls, is_colorize: bool) -> None :
         """
-        This method initalize logger module for logging in project. Is_colorize using for decide is color cli output
+        This method initalize logger module for logging in project. Is_colorize using
+        for decide is color cli output. Also logger config store in conf.yml
         :param is_colorize: bool
         :return: None
         """

@@ -1,3 +1,5 @@
+"""This module contain main rss-reader class App and entry point to utility"""
+
 from .components.helper.singleton import Singleton
 from .components.parser.parser import Parser
 from .components.feed import *
@@ -12,7 +14,8 @@ class App(Singleton):
 
     def __init__(self) -> None:
         """
-        This constructor parse program arguments, initialize all module params decide witch logic to run
+        This constructor parse program arguments,
+        initialize all module params decide witch logic to run
         """
         console = Parser(
             'Pure Python command-line RSS reader.',
