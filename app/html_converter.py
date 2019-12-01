@@ -12,11 +12,13 @@ from app.RSSReader import RSSReader
 class HTMLConverter:
     """ Writes news in HTML file """
 
-    def __init__(self, args, logger):
-        self.arguments = args
-        self.args = self.arguments.get_args()
+    def __init__(self, url, limit, date, to_html, logger):
+        self.url = url
+        self.limit = limit
+        self.date = date
+        self.to_html = to_html
         self.logger = logger
-        self.rss_reader = RSSReader(self.arguments, self.logger)
+        self.rss_reader = RSSReader(self.url, self.limit, self.date, self.logger)
 
     def create_html_code(self):
         """ Creates HTML code which contains news information """
@@ -100,7 +102,7 @@ class HTMLConverter:
     def write_to_html(self):
         """ Writes HTML code to news.html file """
 
-        if self.args.date:
+        if self.date:
             file_name = 'cached_news.html'
             html_code = self.create_html_code_from_cache()
         else:
@@ -108,8 +110,8 @@ class HTMLConverter:
             html_code = self.create_html_code()
 
         try:
-            file_path = self.args.to_html + os.path.sep + file_name
-            with open(file_path, 'w') as wf:
+            file_path = self.to_html + os.path.sep + file_name
+            with open(file_path, 'w', encoding='utf-8') as wf:
                 wf.write(html_code)
         except FileNotFoundError:
             self.logger.info(f'Path to file {file_path} not found')

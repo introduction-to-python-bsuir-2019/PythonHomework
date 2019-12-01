@@ -2,8 +2,9 @@
 [Introduction to Python] Homework Repository
 
 # How to use
-* pip install -r requirements.txt
-* python rss-reader.py "https://news.yahoo.com/rss/" --limit 2 --json
+* pip install .
+* rss-reader rss-reader.py "https://news.yahoo.com/rss/" --limit 2 --json
+--to-pdf C:\Users\User_name\Desktop
 * --date prints cached news that were parsed previously from the given URL
 Creates folder cache and saves news in JSON files format
 file name = date (like 20191125.json)
@@ -15,7 +16,6 @@ Also --to-html uses pictures from websites, so they wont be displayed without
 internet connection
 * Btw i use fonts for .pdf files to avoid encoding issues,
 hope they will be installed correctly by 'pip install .'
-* P.S. Ля, ребята, 4 курс птуира, уже распред идет во всю, работа нужна кааапец
 
 
 # Parameters
@@ -45,5 +45,5 @@ feed = {
 -   [x] [Iteration 2] Distribution
 -   [x] [Iteration 3] News caching
 -   [x] [Iteration 4] Format converter
--   [ ] * [Iteration 5] Output colorization
+-   [x] * [Iteration 5] Output colorization
 -   [ ] * [Iteration 6] Web-server

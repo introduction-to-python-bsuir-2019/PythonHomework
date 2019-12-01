@@ -64,6 +64,11 @@ class ArgParser:
             type=str,
             help='It should take the path of the directory where new HTML file will be saved'
         )
+        argparser.add_argument(
+            '--colorize',
+            action='store_true',
+            help='Prints the result of the utility in colorized mode'
+        )
         args = argparser.parse_args()
         return args
 

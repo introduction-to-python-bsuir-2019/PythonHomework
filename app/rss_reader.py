@@ -10,6 +10,7 @@ from app.argparser import ArgParser
 from app.RSSReader import RSSReader
 from app.pdf_converter import PDFConverter
 from app.html_converter import HTMLConverter
+from app.rss_exception import RSSException
 
 
 def main():
@@ -29,7 +30,7 @@ def main():
         print(args.version)
         logger.info('Exit')
 
-    rss_reader = RSSReader(arguments, logger)
+    rss_reader = RSSReader(args.url, args.limit, args.date, logger, args.colorize)
 
     if args.date:
         try:
@@ -46,22 +47,26 @@ def main():
             else:
                 rss_reader.print_cached_feed(cached_feed)
             if args.to_pdf:
-                pdf_converter = PDFConverter(arguments, logger)
+                pdf_converter = PDFConverter(args.url, args.limit, args.date, args.to_pdf, logger)
                 pdf_converter.write_json_to_pdf()
             if args.to_html:
-                html_converter = HTMLConverter(arguments, logger)
+                html_converter = HTMLConverter(args.url, args.limit, args.date, args.to_html, logger)
                 html_converter.write_to_html()
         logger.info('Exit')
         return
 
-    feed = rss_reader.get_feed()
+    try:
+        feed = rss_reader.get_feed()
+    except RSSException as rss_exc:
+        print(rss_exc)
+        return
 
     if args.to_pdf:
-        pdf_converter = PDFConverter(arguments, logger, news=feed)
+        pdf_converter = PDFConverter(args.url, args.limit, args.date, args.to_pdf, logger, news=feed)
         pdf_converter.write_to_pdf()
 
     if args.to_html:
-        html_converter = HTMLConverter(arguments, logger)
+        html_converter = HTMLConverter(args.url, args.limit, args.date, args.to_html, logger)
         html_converter.write_to_html()
 
     if args.json:

@@ -29,7 +29,8 @@ setup(
     },
     include_package_data=True,
     python_requires='>=3.8',
-    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'python-dateutil', 'fpdf', 'setuptools-git'],
+    install_requires=['feedparser>=6.0.0b1', 'requests', 'bs4', 'python-dateutil', 'fpdf', 'setuptools-git',
+                      'colorama'],
     entry_points={
         'console_scripts': [
             'rss-reader=app.__main__:main',
