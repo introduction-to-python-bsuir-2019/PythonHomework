@@ -2,7 +2,7 @@
 
 Python version: v3.8
 
-Current version: v0.4
+Current version: v0.5
 
 Code checking: Code correspond to pep8
 #### Usage:

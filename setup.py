@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="rss-reader",
-    version="0.4",
+    version="0.5",
     author="Archeex",
     author_email="qsanich@gmail.com",
     description="Pure Python command-line RSS reader",
@@ -15,11 +15,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['rss_reader = rss_reader.__main__:main']
     },
-    install_requires=[
-        'feedparser==5.2.1',
-        'requests==2.22.0',
-        'tldextract==2.2.2',
-        'fpdf=1.7.2'
-    ],
     python_requires='>=3.8'
 )

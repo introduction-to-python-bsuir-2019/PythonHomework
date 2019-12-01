@@ -19,7 +19,7 @@ class NewsCacher:
     def get_cached_news(self, date, limit):
         """Get cached news from json file"""
         logging.info("Get cached news from json file")
-        
+
         with open(self.file_name, 'r', encoding='utf-8') as json_file:
             self.data = json.load(json_file)
 
@@ -37,7 +37,7 @@ class NewsCacher:
                 self.date: []
             }
         }
-        
+
         if not exists(abspath(self.file_name)):
             open(self.file_name, 'w').close()
 

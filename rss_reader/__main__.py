@@ -1,3 +1,5 @@
+"""Main module"""
+
 import argparse
 import logging
 
@@ -7,8 +9,7 @@ from .rss_reader import NewsReader
 
 
 def main():
-    init() # colorama init
-
+    init()  # colorama init
     args = parse_args()
 
     if args.verbose:
@@ -16,7 +17,7 @@ def main():
     else:
         logging.basicConfig(format="%(levelname)s: %(message)s")
 
-    reader = NewsReader(args.source, args.limit, args.json, args.date, args.to_pdf, args.to_html)
+    reader = NewsReader(args.source, args.limit, args.json, args.date, args.to_pdf, args.to_html, args.colorize)
     reader.parse_url()
 
     reader.print_news()
@@ -33,6 +34,7 @@ def parse_args():
     parser.add_argument('--date', help='Show cached news by input date', type=str)
     parser.add_argument('--to-pdf', help='Convert news to pdf format', action='store_true')
     parser.add_argument('--to-html', help='Convert news to html format', action='store_true')
+    parser.add_argument('--colorize', help='Colorize output text', action='store_true')
 
     return parser.parse_args()
 

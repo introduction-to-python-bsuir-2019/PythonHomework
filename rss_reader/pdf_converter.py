@@ -7,6 +7,7 @@ from fpdf import SYSTEM_TTFONTS, FPDF
 
 SYSTEM_TTFONTS = ''
 
+
 class PDFConverter:
     def __init__(self, data, file_name):
         self.data = data
@@ -53,9 +54,10 @@ class PDFConverter:
                 try:
                     if page_height - self.pdf.get_y() < image_height + margin:
                         self.pdf.add_page()
-                    
+
                     if href[-4:] == '.png':
-                        self.pdf.image(href, x = self.pdf.get_x() + image_height + margin, y = self.pdf.get_y(), h = image_height)
+                        self.pdf.image(href, x=self.pdf.get_x() + image_height + margin, y=self.pdf.get_y(),
+                                       h=image_height)
                         self.pdf.ln(image_height + margin)
                 except Exception:
                     logging.error('Cant get an image from url')

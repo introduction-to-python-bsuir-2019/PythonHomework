@@ -7,7 +7,7 @@ import logging
 class NewsJsonFormatter:
     def __init__(self):
         self.data = {}
-    
+
     def __str__(self):
         """Compute json-file for print news to console in json-format"""
         logging.info('Compute json-file for print news to console in json-format')
