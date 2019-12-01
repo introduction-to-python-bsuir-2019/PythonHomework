@@ -12,11 +12,14 @@
             <p style="text-align:justify;text-overflow: ellipsis;overflow: hidden;">
                 {{ description }}
             </p>
-            <strong>links</strong>
-            {% for link in links %}
-                <a href="{{ link['href'] }}" type="{{ link['type'] }}">{{ link['href'] }}</a><br>
-            {% endfor %}
-            <br>
+            <strong>links:</strong>
+
+            <div style="margin-bottom: 3rem">
+                {% for link in links %}
+                    <a href="{{ link['href'] }}" type="{{ link['type'] }}">{{ link['href'] }}</a><br>
+                {% endfor %}
+            </div>
+
             <b>source: </b><a href="{{ link }}">{{ link }}</a>
             <div>
                 <h3 style="text-align:right">

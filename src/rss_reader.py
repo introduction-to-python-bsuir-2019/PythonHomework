@@ -8,8 +8,12 @@ import conf
 
 
 class App(Singleton):
+    """General class of rss-reader. Implements all classes and run utility"""
 
     def __init__(self) -> None:
+        """
+        This constructor parse program arguments, initialize all module params decide witch logic to run
+        """
         console = Parser(
             'Pure Python command-line RSS reader.',
             conf.__description__
@@ -29,11 +33,14 @@ class App(Singleton):
             PdfConverter(self._console_args.to_pdf, self._console_args.limit).render(self._feed)
 
     @classmethod
-    def start(cls) -> object:
+    def start(cls) -> None:
         return cls()._feed.show_feeds()
 
 
 def main():
+    """
+    Entry point of rss-reader.
+    """
     try:
         App.start()
     except KeyboardInterrupt:

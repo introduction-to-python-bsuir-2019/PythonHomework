@@ -12,7 +12,10 @@ class HtmlConverter(ConverterAbstract):
     _template_path = Path(__file__).parent.joinpath('templates')
 
     def render(self, feed: Feed) -> str:
-        Logger.log(f'Initialize {self._log_Converter} converter render')
+        Logger.log(
+            f'Converter option choosen. Default output was declined.\n'
+            f'Initialize {self._log_Converter} converter render'
+        )
 
         self._init_template_processor(self._template_path);
         render_feeds_entries = []
