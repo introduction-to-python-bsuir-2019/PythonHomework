@@ -7,23 +7,19 @@ class RSS_reader_error(Exception):
 
 class ArgError(RSS_reader_error):
     def __init__(self, msg):
-        print(f'ArgError: {msg}')
-        sys.exit(1)
+        self.msg = f'ArgError: {msg}'
 
 
 class SourceConnectingError(RSS_reader_error):
     def __init__(self, source, msg):
-        print(f"SourceConnectingError: Can't get feed from '{source}': {msg}")
-        sys.exit(1)
+        self.msg = f"SourceConnectingError: Can't get feed from '{source}': {msg}"
 
 
 class ParsingError(RSS_reader_error):
     def __init__(self, msg):
-        print(f"ParsingError: Can't to parse feed: {msg}")
-        sys.exit(1)
+        self.msg = f"ParsingError: Can't to parse feed: {msg}"
 
 
 class CacheError(RSS_reader_error):
     def __init__(self, msg):
-        print(f"CacheError: {msg}")
-        sys.exit(1)
+        self.msg = f"CacheError: {msg}"

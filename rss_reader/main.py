@@ -1,29 +1,36 @@
-import requests
 import argparse
 import logging
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 
+import requests
+
 from rss_reader.feed_parser import FeedParser
 from rss_reader.printer import Printer
-from rss_reader.exceptions import SourceConnectingError, ArgError
+from rss_reader.exceptions import RSS_reader_error, SourceConnectingError, ArgError
 from rss_reader.cache import CacheHandler
+from rss_reader.converters import FormatsConverter
 
 APP_VERSION = '3.0'
 
 
 class RSS_reader:
-    ''' Main programm class '''
-    def __init__(self, cmd_args):
-        self.source = cmd_args.source
-        self.limit = cmd_args.limit or None
-        self.json_mode = cmd_args.json or False
+    """Main programm class"""
+    def __init__(self, source, limit=None, json_mode=False, date=None, html_file_path=None, fb2_file_path=None):
+        self.source = source
+        self.limit = limit
+        self.json_mode = json_mode
+        self.html_file_path = html_file_path
+        self.fb2_file_path = fb2_file_path
+
         self.parser = FeedParser()
         self.printer = Printer()
+        self.coverter = FormatsConverter()
         self.logger = logging.getLogger('rss_reader.RSS_reader')
         self.cache = CacheHandler(Path().home().joinpath('.rss'))
-        if cmd_args.date:
+        if date:
             try:
                 self.date = datetime.strptime(cmd_args.date, '%Y%m%d').date()
             except ValueError:
@@ -38,6 +45,13 @@ class RSS_reader:
             self.get_feed_cache()
         else:
             self.get_feed_from_source()
+
+        if self.html_file_path:
+            self.coverter.convert_to_html(self.feed, self.html_file_path, self.limit)
+        elif self.fb2_file_path:
+            self.coverter.convert_to_fb2(self.feed, self.fb2_file_path, self.limit)
+        else:
+            self.print_feed()
 
     def get_feed_from_source(self):
         '''Get rss xml file from source and parse by FeedParser'''
@@ -59,12 +73,12 @@ class RSS_reader:
         self.cache.dump_articles(self.feed, self.source)
         if not self.limit:
             self.limit = len(self.feed['articles']) + 1
-        self.print_feed()
 
     def get_feed_cache(self):
         "Get cached articles from DB"
         self.feed = self.cache.load_articles(self.source, self.date)
-        self.print_feed()
+        if not self.limit:
+            self.limit = len(self.feed['articles']) + 1
 
     def print_feed(self):
         if self.json_mode:
@@ -89,6 +103,8 @@ def main():
     cmd_arg_parser.add_argument('--limit', type=int, help='Limit news topics if this parameter privided')
     cmd_arg_parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
     cmd_arg_parser.add_argument('--date', type=str, help='Return new for requested date and source')
+    cmd_arg_parser.add_argument('--to-html', dest='to_html', type=str, help='Write RSS feed in html file by path')
+    cmd_arg_parser.add_argument('--to-fb2', dest='to_fb2', type=str, help='Write RSS feed to fb2 by path')
     cmd_args = cmd_arg_parser.parse_args()
 
     app_dir_init()
@@ -102,9 +118,20 @@ def main():
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=log_handlers)
-
-    reader = RSS_reader(cmd_args)
-    reader.get_feed()
+    try:
+        if cmd_args.to_html and not Path(cmd_args.to_html).exists():
+            raise ArgError(f'Invalid path "{cmd_args.to_html}"')
+        if cmd_args.to_fb2 and not Path(cmd_args.to_fb2).exists():
+            raise ArgError(f'Invalid path "{cmd_args.to_fb2}"')
+        reader = RSS_reader(cmd_args.source,
+                            limit=cmd_args.limit,
+                            json_mode=cmd_args.json,
+                            html_file_path=cmd_args.to_html,
+                            fb2_file_path=cmd_args.to_fb2)
+        reader.get_feed()
+    except RSS_reader_error as e:
+        print(e.msg)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

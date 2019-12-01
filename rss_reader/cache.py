@@ -17,7 +17,7 @@ class CacheHandler:
         self.init_db(db_path)
 
     def init_db(self, db_path):
-        """Create table if not exists"""
+        """Create tables if they not exists"""
         self.logger.info('Create new cache storage.')
         cursor = self.db.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS article(id integer primary key autoincrement,
@@ -28,11 +28,9 @@ class CacheHandler:
                                                              media text not null,
                                                              link text not null unique)''')
         cursor.close()
-        self.db.commit()
 
     def dump_articles(self, feed, source):
-        "Dump articles from feed to DB"
-        duplicates = 0
+        """Save articles from feed to DB"""
         cursor = self.db.cursor()
         for artcl in feed['articles']:
             try:
@@ -44,8 +42,7 @@ class CacheHandler:
                                 json.dumps(artcl.media),
                                 artcl.link))
             except sqlite3.IntegrityError:
-                duplicates += 1
-        self.logger.info(f'{duplicates} duplicates was skipped')
+                self.logger.info('Skip founded duplicates.')
         cursor.close()
         self.db.commit()
 

@@ -17,7 +17,7 @@ class FeedParser:
         self.logger = logging.getLogger("rss_reader.Parser")
         self.feed = dict()
 
-    def parse(self, data):
+    def parse(self, data: str) -> dict:
         ''' Parse given feed in xml format to Article objects
             and save to self.feed
         '''
@@ -44,7 +44,7 @@ class FeedParser:
 
                 media['links'] = [link['href'] for link in content_html.find_all('a')]
                 for image in content_html.find_all('img'):
-                    if 'alt' in image.attrs and image['alt'] != '':
+                    if 'alt' in image.attrs:
                         description = image['alt']
                     else:
                         description = 'No description'
@@ -55,7 +55,7 @@ class FeedParser:
 
         return self.feed
 
-    def get_json_feed(self, limit):
+    def get_json_feed(self, limit: int) -> str:
         '''Reformat self.feed to JSON format and return it'''
         self.logger.info('Converting feed to JSON')
         try:
