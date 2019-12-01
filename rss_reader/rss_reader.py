@@ -9,10 +9,11 @@ import lxml.html.clean
 from tldextract import extract
 from colorama import Fore, Back, Style
 
-from .news_cacher import NewsCacher
-from .json_formatter import NewsJsonFormatter
-from .pdf_converter import PDFConverter
-from .html_converter import HTMLConverter
+from news_cacher import NewsCacher
+from json_formatter import NewsJsonFormatter
+from pdf_converter import PDFConverter
+from html_converter import HTMLConverter
+from date_validation import is_valid_date
 
 
 class NewsReader:
@@ -70,6 +71,10 @@ class NewsReader:
 
         if self.date is None:
             self.cacher_object.cache(self.news)
+        else:
+            if not is_valid_date(self.date, '%Y%m%d'):
+                logging.error("Unexpected date format")
+                exit()
 
         if self.json is True:
             self.json_object.format(self.news)
