@@ -1,9 +1,8 @@
 '''Module contain class related to news'''
-from sqlalchemy import create_engine, Column, String, DateTime, PickleType, Integer
+from sqlalchemy import Column, String, DateTime, PickleType, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 
-engine = create_engine('sqlite:///news')
 Base = declarative_base()
 
 

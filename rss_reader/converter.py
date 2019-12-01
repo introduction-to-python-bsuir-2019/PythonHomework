@@ -1,5 +1,8 @@
 '''Module contains classes that implement converters in different formats'''
 import logging
+import httplib2
+import io
+from PIL import Image
 from os import path, mkdir
 from abc import ABC, abstractmethod
 from fpdf import FPDF
@@ -9,18 +12,19 @@ class ConverterBase(ABC):
     '''Base class of converters'''
     def __init__(self, news, dir_for_save):
         self.news = news
-        self.dir_for_images = path.join(dir_for_save, '.images_from_news')
         self.dir_for_save = dir_for_save
-        self.init_dir_for_images_from_news()
+        self.dir_for_images = self.init_dir_for_images_from_news(path.join(dir_for_save, '.images_from_news'))
         self.get_images(news)
 
-    def init_dir_for_images_from_news(self):
+    @staticmethod
+    def init_dir_for_images_from_news(dir_for_images):
         '''Method creates directory where images from the news wiil be saved'''
-        if path.exists(self.dir_for_images):
-            logging.info('Directory %s already exists' % self.dir_for_images)
+        if path.exists(dir_for_images):
+            logging.info('Directory %s already exists' % dir_for_images)
         else:
-            mkdir(self.dir_for_images)
-            logging.info('Create directory %s for saving images from news' % self.dir_for_images)
+            mkdir(dir_for_images)
+            logging.info('Create directory %s for saving images from news' % dir_for_images)
+        return dir_for_images
 
     @abstractmethod
     def convert(self, news):
@@ -45,14 +49,11 @@ class ConverterBase(ABC):
 
     def get_images(self, news):
         '''Method that getting images that were in the news from their sources'''
-        import httplib2             # this lib selected because it is much faster than urllib or requests(if you use caching of course)
-        from PIL import Image
-        import io
         h = httplib2.Http('.cache')
         logging.info('Getting images from news')
         for feed in news:
             images = feed.media_content
-            for number_of_image, image in zip(range(len(images)), images):
+            for number_of_image, image in enumerate(images):
                 if not image:
                     continue
                 image = self.check_image_link(image)
@@ -137,10 +138,10 @@ class PdfConverter(ConverterBase):
         def __init__(self, dir_with_images):
             logging.info('Initialization of PDF document')
             self.dir_with_images = dir_with_images
-            super().__init__('P', 'mm', 'A4')
-            self.add_font('TimesNewRoman', '', 'times-new-roman.ttf', uni=True)
-            self.set_margins(30, 20, 10)
-            self.set_auto_page_break(True, 20)
+            super().__init__(orientation='P', unit='mm', format='A4')
+            self.add_font('TimesNewRoman', fname='times-new-roman.ttf', uni=True)
+            self.set_margins(left=30, top=20, right=10)
+            self.set_auto_page_break(True, margin=20)
             self.add_page()
             self.set_font('TimesNewRoman', size=22)
             self.cell(0, 20, 'News you were looking for', ln=1, align='C')

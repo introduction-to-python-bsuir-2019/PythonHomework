@@ -1,0 +1,22 @@
+{
+    "News": [
+        {
+            "Feed0": {
+                "Feed source": "Yahoo News - Latest News & Headlines",
+                "Title": "Inmate wanted by ICE released on bail. He was arrested weeks later for attempted murder",
+                "Date": "2019-11-30 00:01:47",
+                "Link": "https://news.yahoo.com/inmate-wanted-ice-released-bail-000147188.html",
+                "Description": "A 2019 Colorado law bars law enforcement officials in the state from holding a person based only on a request from ICE.",
+                "Media_content": "['http://l.yimg.com/uu/api/res/1.2/NAYKLmiuVlclFbmhgJhmmQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media.zenfs.com/en-us/usa_today_news_641/fad4e8fdfc4aec082a2ec8c57ab045dc']"
+            },
+            "Feed1": {
+                "Feed source": "Yahoo News - Latest News & Headlines",
+                "Title": "Newsweek 'fires' journalist who reported Trump was golfing for Thanksgiving before he secretly travelled to Afghanistan",
+                "Date": "2019-12-01 14:24:00",
+                "Link": "https://news.yahoo.com/newsweek-fires-journalist-reported-trump-142400157.html",
+                "Description": "A Newsweek reporter who wrote that Donald Trump would spend Thanksgiving ‘tweeting, golfing, and more’ - hours before he touched down in a surprise visit to US troops in Afghanistan - has reportedly been fired.The visit was kept highly secret for the president’s safety, and his public schedule said he would be at his Mar-a-Lago hotel in Florida on the holiday, where he would make calls to selected military members.",
+                "Media_content": "['http://l1.yimg.com/uu/api/res/1.2/zcYzP.Ed7Z2ViZZL6RjfJw--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media.zenfs.com/en/the_independent_635/218f25cad42049a1432f1d7fa1a031c8']"
+            }
+        }
+    ]
+}

@@ -10,13 +10,12 @@ class FeedEncoder(json.JSONEncoder):
         names_of_sections = ('Feed source', 'Title', 'Date', 'Link', 'Description', 'Media_content')
         if isinstance(obj, Json):
             logging.info('Encoding news into JSON format')
-            number_of_news = len(obj.news_to_convert)
             return {'News':
                         [{'Feed'+str(number):
                                 {section_name:str(feed_section) for section_name, feed_section
                                                                     in zip(names_of_sections, feed())}\
                                                                         for number, feed 
-                                                                            in zip(range(number_of_news),obj.news_to_convert)}]}
+                                                                            in enumerate(obj.news_to_convert)}]}
         return json.JSONEncoder.default(self, obj)
     
 
