@@ -248,7 +248,10 @@ class RssParser:
                 result_string += f'Links:\n'
                 for link in article.links:
                     if link.type == 'image':
-                        result_string += f'[{link.id + 1}]: {link.url} ({link.type})\n'
+                        if link.url:
+                            result_string += f'[{link.id + 1}]: {link.url} ({link.type})\n'
+                        else:
+                            result_string += f'[{link.id + 1}]: {link.alt} (invalid url or no image)({link.type})\n'
                     else:
                         result_string += f'[{link.id + 1}]: {link.url} ({link.type})\n'
                 result_string += f'\n'
@@ -270,14 +273,18 @@ class RssParser:
                              f'<h4 style="display:inline">Url:</h4><span> {article.url}</span><br><br>'
             for link in article.links:
                 if link.type == 'image':
-                    result_string += f'<img src="{link.url}" width="20%"><br><br>'
+                    result_string += f'<img src="{link.url}" width="10%"><br><br>'
                     result_string += f'<span>{article.description}</span><br><br>'
                     break
             result_string += f'<span>Links:</span><br>'
             for link in article.links:
                 if link.type == 'image':
-                    result_string += f'<span>[{link.id + 1}]: </span>' \
-                                     f'<a href="{link.url}">{link.alt}({link.type})</a><br>'
+                    if link.url:
+                        result_string += f'<span>[{link.id + 1}]: </span>' \
+                                         f'<a href="{link.url}">{link.alt}({link.type})</a><br>'
+                    else:
+                        result_string += f'<span>[{link.id + 1}]: </span>' \
+                                         f'<span>{link.alt}(invalid url or no image)({link.type})</span><br>'
                 else:
                     result_string += f'<span>[{link.id + 1}]: </span>' \
                                      f'<a href="{link.url}">{link.url}({link.type})</a><br>'
@@ -307,7 +314,9 @@ class RssParser:
             pdf.multi_cell(w=0, h=5, txt=f'Url: {article.url}')
             pdf.ln()
             images = self.download_images(article, self.img_path, self.news.index(article))
-            pdf.image(images[0], w=80)
+            if len(images):
+                if images[0]:
+                    pdf.image(images[0], w=30)
             pdf.ln()
             pdf.multi_cell(w=0, h=5, txt=article.description)
             pdf.ln()
@@ -315,7 +324,11 @@ class RssParser:
             pdf.ln()
             for link in article.links:
                 if link.type == 'image':
-                    pdf.multi_cell(w=0, h=5, txt=f'[{link.id + 1}]: {link.alt} ({link.type})')
+                    if link.url:
+                        pdf.multi_cell(w=0, h=5, txt=f'[{link.id + 1}]: {link.url} ({link.type})')
+                    else:
+                        pdf.multi_cell(w=0, h=5, txt=f'[{link.id + 1}]: {link.alt} (invalid url or no image)'
+                                                     f'({link.type})')
                 else:
                     pdf.multi_cell(w=0, h=5, txt=f'[{link.id + 1}]: {link.url} ({link.type})')
             pdf.ln()
@@ -466,7 +479,8 @@ class RssParser:
         image_index = 0
         for link in article.links:
             if link.type == 'image':
-                image_path = self.download_content_from_url(path, link.url, f'{article_index}_{image_index}.jpg')
-                images.append(image_path)
-                image_index += 1
+                if link.url:
+                    image_path = self.download_content_from_url(path, link.url, f'{article_index}_{image_index}.jpg')
+                    images.append(image_path)
+                    image_index += 1
         return images

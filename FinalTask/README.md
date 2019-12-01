@@ -132,52 +132,7 @@ vL3d3dy5ueXRpbWVzLmNvbS8yMDE5LzExLzMwL29waW5pb24vbGV0dGVycy90cnVtcC1pbXBlYWNobWV
        "type": "link"
       }
      ]
-    },
-    {
-     "title": "'Unsavory,' not impeachable: Democratic lawmaker explains why he opposes removing Trump - USA TODAY",
-     "date": "Sun, 01 Dec 2019 11:00:26 GMT",
-     "url": "https://news.google.com/__i/rss/rd/articles/CBMidmh0dHBzOi8vd3d3LnVzYXRvZGF5LmNvbS9zdG9yeS9uZXdzL3BvbGl0aWNzLzIwMTkvMTIvMDEvZGVtb2NyYXRpYy1sYXdtYWtlci10cnVtcC11b
-nNhdm9yeS1ub3QtaW1wZWFjaGFibGUvMjU2Nzg0ODAwMS_SASdodHRwczovL2FtcC51c2F0b2RheS5jb20vYW1wLzI1Njc4NDgwMDE?oc=5",
-     "description": "'Unsavory,' not impeachable: Democratic lawmaker explains why he opposes removing Trump\u00a0\u00a0USA TODAYIntelligence Committee to begin circulating d
-raft Ukraine report Monday\u00a0\u00a0POLITICOHouse Democrats charge ahead with next phase of impeachment proceedings\u00a0\u00a0CBS Evening NewsWhat swimming in my underwear
- taught me about Donald Trump and getting away with it\u00a0\u00a0USA TODAYThe Politics of Impeachment\u00a0\u00a0The New York TimesView full coverage on Google News",
-     "links": [
-      {
-       "id": 0,
-       "url": "https://news.google.com/__i/rss/rd/articles/CBMidmh0dHBzOi8vd3d3LnVzYXRvZGF5LmNvbS9zdG9yeS9uZXdzL3BvbGl0aWNzLzIwMTkvMTIvMDEvZGVtb2NyYXRpYy1sYXdtYWtlci10cnVtcC1
-1bnNhdm9yeS1ub3QtaW1wZWFjaGFibGUvMjU2Nzg0ODAwMS_SASdodHRwczovL2FtcC51c2F0b2RheS5jb20vYW1wLzI1Njc4NDgwMDE?oc=5",
-       "type": "link"
-      },
-      {
-       "id": 1,
-       "url": "https://news.google.com/__i/rss/rd/articles/CBMiW2h0dHBzOi8vd3d3LnBvbGl0aWNvLmNvbS9uZXdzLzIwMTkvMTEvMzAvaW50ZWxsaWdlbmNlLWNvbW1pdHRlZS1kcmFmdC11a3JhaW5lLXJlcG9
-ydC0wNzQ1MTjSAV9odHRwczovL3d3dy5wb2xpdGljby5jb20vYW1wL25ld3MvMjAxOS8xMS8zMC9pbnRlbGxpZ2VuY2UtY29tbWl0dGVlLWRyYWZ0LXVrcmFpbmUtcmVwb3J0LTA3NDUxOA?oc=5",
-       "type": "link"
-      },
-      {
-       "id": 2,
-       "url": "https://news.google.com/__i/rss/rd/articles/CBMiK2h0dHBzOi8vd3d3LnlvdXR1YmUuY29tL3dhdGNoP3Y9X2J0Z2E3T0N1NWvSAQA?oc=5",
-       "type": "link"
-      },
-      {
-       "id": 3,
-       "url": "https://news.google.com/__i/rss/rd/articles/CBMigQFodHRwczovL3d3dy51c2F0b2RheS5jb20vc3Rvcnkvb3Bpbmlvbi8yMDE5LzEyLzAxL2ltcGVhY2htZW50LWhpc3RvcmljLXZpdGFsLXN0YXR
-lbWVudC10cmFnaWMtdHJ1bXAtcHJlc2lkZW5jeS1jb2x1bW4vNDMxMTUyMTAwMi_SASdodHRwczovL2FtcC51c2F0b2RheS5jb20vYW1wLzQzMTE1MjEwMDI?oc=5",
-       "type": "link"
-      },
-      {
-       "id": 4,
-       "url": "https://news.google.com/__i/rss/rd/articles/CBMiSWh0dHBzOi8vd3d3Lm55dGltZXMuY29tLzIwMTkvMTEvMzAvb3Bpbmlvbi9sZXR0ZXJzL3RydW1wLWltcGVhY2htZW50Lmh0bWzSAU1odHRwczo
-vL3d3dy5ueXRpbWVzLmNvbS8yMDE5LzExLzMwL29waW5pb24vbGV0dGVycy90cnVtcC1pbXBlYWNobWVudC5hbXAuaHRtbA?oc=5",
-       "type": "link"
-      },
-      {
-       "id": 5,
-       "url": "https://news.google.com/stories/CAAqOQgKIjNDQklTSURvSmMzUnZjbmt0TXpZd1NoTUtFUWpHanRuQWpvQU1FZllOU3BheHpLamhLQUFQAQ?oc=5",
-       "type": "link"
-      }
-     ]
-    }
+    },    
    ]
   }
  ]
