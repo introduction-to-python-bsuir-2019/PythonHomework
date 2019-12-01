@@ -1,0 +1,6 @@
+feedparser==5.2.1
+requests==2.22.0
+tldextract==2.2.2
+fpdf==1.7.2
+colorama==0.4.1
+lxml==4.4.2

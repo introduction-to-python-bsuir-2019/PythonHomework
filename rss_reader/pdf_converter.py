@@ -2,10 +2,7 @@
 
 import logging
 import requests
-import convertapi
 
-from PIL import Image
-from io import BytesIO
 from fpdf import SYSTEM_TTFONTS, FPDF
 
 SYSTEM_TTFONTS = ''
