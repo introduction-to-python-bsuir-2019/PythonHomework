@@ -13,5 +13,6 @@
 * --date ()
 * --to-pdf (Converter in pdf)
 * --to-html (Converter in html)
+* --colorize
 # JSON structure
 news = {"Title": "title", "Date":"date", "Alt image":"alt", "Discription":"discription", "Links":{"News":"link", "Image":"src"} }
