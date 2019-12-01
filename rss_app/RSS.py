@@ -10,6 +10,8 @@ from dateutil.parser import parse
 import urllib
 import httplib2
 import os
+from colorama import init
+from colorama import Fore
 
 
 class RssAggregator():
@@ -18,11 +20,13 @@ class RssAggregator():
 
     feedurl = ""
 
-    def __init__(self, source, limit, date, log):
+    def __init__(self, source, limit, date, log, colorize):
         self.source = source
         self.limit = limit
         self.date = date
         self.log = log
+        self.colorize = colorize
+        init()
 
     def get_news(self):
 
@@ -31,9 +35,6 @@ class RssAggregator():
         self.log.info("Getting rss feed")
         thefeed = feedparser.parse(self.source)
         self.save_to_json_file(thefeed.entries)
-        #with open("test.txt", "w", encoding="utf-8") as rf:
-        #    rf.write(str(thefeed.entries[:self.limit]))
-        #print(str(thefeed.entries))
         return thefeed.entries[:self.limit]
 
     def print_news(self, entries):
@@ -43,14 +44,23 @@ class RssAggregator():
         self.log.info("Printing news")
         for thefeedentry in entries:
             try:
-                print("--------------------------------------------------")
-                print("Title: ", thefeedentry.title)
-                print("Date: ", thefeedentry.published, end="\n\n")
-                print("Alt image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'])
-                print(BeautifulSoup(thefeedentry.description, "html.parser").text, end="\n\n")
-                print("Links:")
-                print("News: ", thefeedentry.link)
-                print("Image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
+                if self.colorize:
+                    print("--------------------------------------------------")
+                    print(f"{Fore.RED}Title:{Fore.RESET} ", Fore.RED + thefeedentry.title + Fore.RESET)
+                    print(f"{Fore.BLUE}Date:{Fore.RESET} ", Fore.BLUE + thefeedentry.published + Fore.RESET, end="\n\n")
+                    print(f"{Fore.YELLOW}Alt image:{Fore.RESET} ", Fore.YELLOW + BeautifulSoup(thefeedentry.description + Fore.RESET, "html.parser").find('img')['alt'])
+                    print(Fore.GREEN + BeautifulSoup(thefeedentry.description, "html.parser").text + Fore.RESET, end="\n\n")
+                    print("Links:")
+                    print(f"{Fore.YELLOW}News:{Fore.RESET} ", Fore.YELLOW + thefeedentry.link + Fore.RESET)
+                    print(f"{Fore.YELLOW}Image:{Fore.RESET} ", Fore.YELLOW + BeautifulSoup(thefeedentry.description + Fore.RESET, "html.parser").find('img')['src'])
+                else:
+                    print("Title: ", thefeedentry.title)
+                    print("Date: ", thefeedentry.published, end="\n\n")
+                    print("Alt image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['alt'])
+                    print(BeautifulSoup(thefeedentry.description, "html.parser").text, end="\n\n")
+                    print("Links:")
+                    print("News: ", thefeedentry.link)
+                    print("Image: ", BeautifulSoup(thefeedentry.description, "html.parser").find('img')['src'])
             except TypeError:
                 self.log.info("TypeError: 'NoneType'")
 
@@ -183,11 +193,21 @@ class RssAggregator():
 
         self.log.info("Printing news by date")
         for thefeedentry in entries[:self.limit]:
-            print("--------------------------------------------------")
-            print("Title: ", thefeedentry['Title'])
-            print("Date: ", thefeedentry['Date'], end="\n\n")
-            print("Alt image: ", thefeedentry['Alt image'])
-            print(thefeedentry['Discription'], end="\n\n")
-            print("Links: ")
-            print("News: ", thefeedentry['Links']['News'])
-            print("Image: ", thefeedentry['Links']['Image'])
+            if self.colorize:
+                print("--------------------------------------------------")
+                print(f"{Fore.RED}Title:{Fore.RESET} ", Fore.RED + thefeedentry['Title'] + Fore.RESET)
+                print(f"{Fore.BLUE}Date:{Fore.RESET} ", Fore.BLUE + thefeedentry['Date'] + Fore.RESET, end="\n\n")
+                print(f"{Fore.YELLOW}Alt image:{Fore.RESET} ", Fore.YELLOW + thefeedentry['Alt image'] + Fore.RESET)
+                print(Fore.GREEN + thefeedentry['Discription'] + Fore.RESET, end="\n\n")
+                print("Links: ")
+                print(f"{Fore.YELLOW}News:{Fore.RESET} ", Fore.YELLOW + thefeedentry['Links']['News'] + Fore.RESET)
+                print(f"{Fore.YELLOW}Image:{Fore.RESET} ", Fore.YELLOW + thefeedentry['Links']['Image'] + Fore.RESET)
+            else:
+                print("--------------------------------------------------")
+                print("Title: ", thefeedentry['Title'])
+                print("Date: ", thefeedentry['Date'], end="\n\n")
+                print("Alt image: ", thefeedentry['Alt image'])
+                print(thefeedentry['Discription'], end="\n\n")
+                print("Links: ")
+                print("News: ", thefeedentry['Links']['News'])
+                print("Image: ", thefeedentry['Links']['Image'])

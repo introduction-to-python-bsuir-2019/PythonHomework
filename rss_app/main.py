@@ -29,6 +29,7 @@ def get_args():
                         "be saved in format pdf. For example: --to-pdf d:/news.pdf")
     parser.add_argument("--to-html", type=str, help="This argument receives the path where new file will" +
                         "be saved in format html. For example: --to-html d:/news.html")
+    parser.add_argument("--colorize", action="store_true", help="Print the result of the utility in colorized mode")
     args = parser.parse_args()
     return args
 
@@ -44,7 +45,7 @@ def main():
         logger = get_log()
     else:
         logger = logging.getLogger()
-    rssobject = RssAggregator(args.source, args.limit, args.date, logger)
+    rssobject = RssAggregator(args.source, args.limit, args.date, logger, args.colorize)
     converter = Converter(args.source, args.limit, args.to_pdf, args.to_html, logger)
     news = rssobject.get_news()
     if args.to_pdf:

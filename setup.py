@@ -25,7 +25,7 @@ setup(
         ]
     },
     python_requires='>=3.8',
-    install_requires=['bs4', 'feedparser', 'requests', 'python-dateutil', 'httplib2', 'fpdf'],
+    install_requires=['bs4', 'feedparser', 'requests', 'python-dateutil', 'httplib2', 'fpdf', 'colorama'],
     entry_points={
         'console_scripts': [
             'rss-reader=rss_app.main:main',

@@ -1,8 +1,8 @@
 # PythonHomework
 [Introduction to Python] Homework Repository
 # How to use
-* pip install -r requirements.txt
-* python rss-reader "https://news.yahoo.com/rss/" --limit 2 --json
+* pip install .
+* python rss-reader https://news.tut.by/rss/economics.rss --limit 2 --json
 # Parameters
 * --help (Show this help message and exit)
 * source (RSS URL)
