@@ -7,7 +7,7 @@ from App.Colors import Colors
 
 
 class RSSListener:
-    """"""
+    """Class listener"""
 
     def __init__(self, limit, json_flag, date, html_path, pdf_path):
         logging.info("Creating object RSSListener")

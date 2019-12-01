@@ -1,0 +1,19 @@
+version: "3"
+services:
+  db:
+    image: "postgres:12.1"
+    container_name: "my_postgres"
+    environment:
+      - POSTGRES_USER=django_user
+      - POSTGRES_PASSWORD=Sekret
+      - POSTGRES_DB=django_db
+    expose:
+      - "5432"
+  server:
+    container_name: "server"
+    build: ./
+    command: bash -c "python3 ./manage.py migrate && python3 ./manage.py runserver 0.0.0.0:2504"
+    ports:
+      - 2504:2504
+    depends_on:
+      - db
