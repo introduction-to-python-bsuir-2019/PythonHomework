@@ -7,11 +7,13 @@ import functools
 import json
 import textwrap
 from typing import List
+from pathlib import Path
 from time import strftime, altzone, mktime, localtime, ctime, time, struct_time
 
 import urllib3
 from colored import fg, attr
 
+import app
 from app.support_files.app_logger import get_logger
 from app.support_files.config import APP_NAME
 from app.support_files.dtos import Feed
@@ -31,8 +33,9 @@ def get_templates(template_type: str, template_names: List[str]) -> List[str]:
     Reads templates from files.
     """
     templates = []
+    app_path = Path(app.__path__[0]).joinpath()
     for template_name in template_names:
-        with open(f"app/support_files/templates/{template_type}/{template_name}", "r") as main_file:
+        with open(app_path.joinpath(f"support_files/templates/{template_type}/{template_name}"), "r") as main_file:
             templates.append(main_file.read())
     return templates
 
@@ -128,7 +131,7 @@ class Converter:
         :return: Converted data.
         """
         dicts_of_feeds = list(map(dataclasses.asdict, self.__feeds))
-        return textwrap.fill(json.dumps(dicts_of_feeds), width=str_len)
+        return textwrap.fill(json.dumps(dicts_of_feeds, ensure_ascii=False), width=str_len)
 
     def to_html_format(self) -> str:
         """

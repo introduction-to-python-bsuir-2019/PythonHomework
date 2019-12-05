@@ -1,15 +1,58 @@
 ## It is a one-shot command-line RSS reader by Zviger.
 ### Installation
-Clone this repository and run
+Install [Python3.8](https://www.python.org/downloads/)
+
+Install [pip](https://pip.pypa.io/en/stable/installing/)
+
+Install GIT.
+This [link](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) 
+may be useful in this matter.
+Clone this repository in the folder you need using this command
+```text
+git clone https://github.com/Zviger/PythonHomework
+```
+after change the branch to the project branch and run
+```text
+git checkout final_proj
+```
+Now you can install the application itself using this command from the application folder
 ```text
 pip install . --user
 ```
-Also, you must have installed and running MongoDB.
+You will also need MongoDB. You can install and run
+MongoDB on your system using this [link](https://docs.mongodb.com/manual/installation/).
+But you can install [Docker](https://docs.docker.com/install/) and
+[Docker-Compose](https://docs.docker.com/compose/install/).
+
+
+To start the container with MongoDB, run the following command in the application folder
+```text
+docker-compose up
+```
+* The application and database are connected through port 27017.
+
+You can stop container with MongoDB by command
+```text
+docker-compose stop
+```
+and run again
+```text
+docker-compose start
+```
+You can execute the command
+```text
+docker-compose down
+```
+but you will lose all saved data from the database.
+
+
+Congratulations!
+
 Run
 ```text
-service mongod status
+rss-reader --help
 ```
-to make sure that Mongodb is running.
+to learn about the features of the application and start using it.
 ### User interface
 ```text
 usage: rss-reader [-h] [--version] [-l LIMIT] [--verbose] [--json] [--length LENGTH] [--date DATE] [--to_html PATH] [--to_fb2 PATH] [--colorize] source

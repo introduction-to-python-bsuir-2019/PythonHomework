@@ -18,6 +18,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires=">=3.8",
     install_requires=install_requires,
+    include_package_data=True,
     entry_points={
         "console_scripts": [f"{APP_NAME}=app.core:main"],
     }
