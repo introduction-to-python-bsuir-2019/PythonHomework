@@ -1,0 +1,55 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<channel>
+	<title>Some sort of sourse</title>
+	<link>https://strange.news.by/</link>
+	<description>Nothing interesting here</description>
+	<language>en</language>
+	<image/>
+	<pubDate>Thu, 29 November 2019 14:00:00 +0300</pubDate>
+	<lastBuildDate>Thu, 30 Novebmer 2019 14:00:00 +0300</lastBuildDate>
+	<ttl>10</ttl>
+	<atom:link href="https://strange.news.by/rss/strange.rss" rel="self" type="application/rss+xml" />
+	<item>
+		<title>Stranger Sings</title>
+		<link>https://strange.news.by/strange/1.html</link>
+		<description><a href="https://strange.news.by/strange/1.html"><img src="https://img.strange.by/n/reuters/0c/a/secret_1.jpg"></img>The sun is shining</a></description>
+		<atom:author>
+			<atom:name>Meduza</atom:name>
+			<atom:uri>https://meduza.io/</atom:uri>
+		</atom:author>
+		<category domain="https://strange.news.by/strange/"></category>
+		<enclosure url="https://img.strange.by/n/reuters/0c/a/secret_1.jpg" type="image/jpeg" length="232938" />
+		<guid isPermaLink="true">https://strange.news.by/world/659576.html</guid>
+		<pubDate>Thu, 31 Oct 2019 14:42:00 +0300</pubDate>
+		<media:content url="https://img.strange.by/n/reuters/0c/a/secret_1.jpg" type="image/jpeg" medium="image" height="800" width="1200" fileSize="232938" />
+	</item>
+	<item>
+		<title>Birds</title>
+		<link>https://strange.news.by/strange/2.html</link>
+		<description><p>The birds are signing<a href="https://strange.news.by/strange/2.html"><img src="https://img.strange.by/n/reuters/0c/a/secret_2.jpg"></img></a></p></description>
+		<atom:author>
+			<atom:name>Meduza</atom:name>
+			<atom:uri>https://meduza.io/</atom:uri>
+		</atom:author>
+		<category domain="https://strange.news.by/world/">World</category>
+		<enclosure url="https://img.strange.by/n/reuters/0c/a/secret_22.jpg" type="image/jpeg" length="232938" />
+		<guid isPermaLink="true">https://strange.news.by/world/2.html</guid>
+		<pubDate>Thu, 31 Oct 2019 18:42:00 +0300</pubDate>
+		<media:content url="https://img.strange.by/n/reuters/0c/a/secret_22.jpg" type="image/jpeg" medium="image" height="800" width="1200" fileSize="232938" />
+	</item>
+	<item>
+		<title>Animals</title>
+		<link>https://strange.news.by/strange/3.html</link>
+		<description><p>The animals are jumping</p><p><a href="https://strange.news.by/strange/3.html"><img src="https://img.strange.by/n/reuters/0c/a/secret_3.jpg"></img></a></p></description>
+		<atom:author>
+			<atom:name>Meduza</atom:name>
+			<atom:uri>https://meduza.io/</atom:uri>
+		</atom:author>
+		<category domain="https://strange.news.by/world/">World</category>
+		<enclosure url="https://img.strange.by/n/reuters/0c/a/secret_43.jpg" type="image/jpeg" length="232938" />
+		<guid isPermaLink="true">https://strange.news.by/world/3.html</guid>
+		<pubDate>Mon, 29 Oct 2019 14:42:00 +0300</pubDate>
+		<media:content url="https://img.strange.by/n/reuters/0c/a/secret_3.jpg" type="image/jpeg" medium="image" height="800" width="1200" fileSize="232938" />
+	</item>
+</channel>
+</rss>
