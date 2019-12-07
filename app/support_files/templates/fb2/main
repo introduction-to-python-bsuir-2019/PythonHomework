@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+<description>
+    <title-info>
+        <genre>feeds</genre>
+        <author><first-name></first-name><last-name>ZvigerRogert</last-name></author>
+        <book-title>Feeds</book-title>
+    </title-info>
+    <document-info>
+        <author><first-name></first-name><last-name>ZvigerRogert</last-name></author>
+        <program-used>calibre 4.4.0</program-used>
+        <date>{date}</date>
+    </document-info>
+    <publish-info>
+    </publish-info>
+</description>
+<body>
+    <section>
+    {feeds}
+    </section>
+</body>
+{img_contents}
+</FictionBook>

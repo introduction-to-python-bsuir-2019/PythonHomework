@@ -1,0 +1,5 @@
+colored==1.4.1
+urllib3==1.25.7
+feedparser==5.2.1
+beautifulsoup4==4.8.1
+pymongo==3.9.0

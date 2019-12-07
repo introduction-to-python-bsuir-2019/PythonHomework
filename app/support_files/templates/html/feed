@@ -1,0 +1,6 @@
+<div>
+<a href="{feed_link}" class="font-weight-bold" style="color:black; font-size:x-large; font:bold" >{feed_title}</a>
+<div class="border border-black p-3">
+{items}
+</div>
+</div>

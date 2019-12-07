@@ -1,0 +1,20 @@
+<subtitle>
+<p>
+{item_title}
+</p>
+</subtitle>
+<p>
+Link: {item_link}
+</p>
+<p>
+Author: {item_author}
+</p>
+<p>
+Published: {item_published}
+</p>
+<empty-line/>
+<p>
+{item_description}
+</p>
+<empty-line/>
+{item_images}
