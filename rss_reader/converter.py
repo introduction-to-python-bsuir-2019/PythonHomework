@@ -140,7 +140,7 @@ class PdfConverter(ConverterBase):
             logging.info('Initialization of PDF document')
             self.dir_with_images = dir_with_images
             super().__init__(orientation='P', unit='mm', format='A4')
-            self.add_font('TimesNewRoman', fname='times-new-roman.ttf', uni=True)
+            self.add_font('TimesNewRoman', fname='rss_reader/times-new-roman.ttf', uni=True)
             self.set_margins(left=30, top=20, right=10)
             self.set_auto_page_break(True, margin=20)
             self.add_page()
