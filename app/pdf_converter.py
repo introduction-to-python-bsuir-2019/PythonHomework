@@ -131,6 +131,8 @@ class PDFConverter:
                 out.write(img)
         except FileNotFoundError:
             self.logger.info('Could not write image to folder images')
+        except TypeError:
+            self.logger.info('NoneType image')
         else:
             self.logger.info('Image has been downloaded')
         return img_path

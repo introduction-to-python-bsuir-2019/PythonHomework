@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 import dateutil.parser as dateparser
 from colorama import init
 from colorama import Fore
+import requests
 
 from app.rss_exception import RSSException
 
@@ -29,8 +30,8 @@ class RSSReader:
 
     def get_feed(self):
         """ Returns parsed feed and caches it"""
-
-        news_feed = feedparser.parse(self.url)
+        response = requests.get(self.url).text
+        news_feed = feedparser.parse(response)
         for entry in news_feed.entries[:self.limit]:
             self.cache_news_json(entry)
         self.logger.info('News has been cached')
