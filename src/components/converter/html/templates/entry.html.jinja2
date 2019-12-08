@@ -1,0 +1,33 @@
+<div class="feed_entry" style="margin-bottom:3.5rem">
+    <h2>
+        <a href="{{ link }}" style="color:#333;">{{ title }}</a>
+    </h2>
+    <div style="">
+        <div class="feed_entry__media" style="display: flex;justify-content: left;">
+            {% for item in media %}
+                {{ item }}
+            {% endfor %}
+        </div>
+        <div class="feed_entry__general" style="">
+            <p style="text-align:justify;text-overflow: ellipsis;overflow: hidden;">
+                {{ description }}
+            </p>
+            <strong>links:</strong>
+
+            <div style="margin-bottom: 3rem">
+                {% for link in links %}
+                    <a href="{{ link['href'] }}" type="{{ link['type'] }}">{{ link['href'] }}</a><br>
+                {% endfor %}
+            </div>
+
+            <b>source: </b><a href="{{ link }}">{{ link }}</a>
+            <div>
+                <h3 style="text-align:right">
+                    {{ date }}
+                </h3>
+                <div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

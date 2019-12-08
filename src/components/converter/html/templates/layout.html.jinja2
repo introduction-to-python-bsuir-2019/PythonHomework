@@ -1,0 +1,26 @@
+<html>
+<head>
+    <meta charset="{{ encoding }}">
+    <title>{{ title }}</title>
+</head>
+<body>
+<div class="wrapper" style="max-width: 1024px;margin: auto;">
+    <div class="top_data">
+        <h1 style="text-align:center;margin-top:2rem">{{ title }}</h1>
+        <h2 style="text-align:center;margin-top:2rem">
+            <a href="{{ url }}">{{ url }}</a>
+        </h2>
+        {% if logo %}
+            <div class='logo' style="text-align:center;margin: 3rem auto;;max-width: 20rem;">
+                <img src="{{ logo }}" alt="{{ title }}" style="max-width: 100%;">
+            </div>
+        {% endif %}
+    </div>
+    <div class="feeds" style="margin-top: 5rem;">
+        {% for entry in feeds_entries %}
+            {{ entry }}
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
