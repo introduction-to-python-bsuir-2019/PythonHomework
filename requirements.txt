@@ -1,0 +1,5 @@
+feedparser  # rss parsing
+requests  # http requests
+bs4 # for xml and html
+python-dateutil # for parsing date from news
+fpdf # conversion of news in PDF file
