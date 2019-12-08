@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{feed.Name}}</title>
+    <style>
+        .container{
+          max-width:1200px;
+          margin: 0 auto;
+        }
+        h3{
+          line-height: 30px;
+          margin-bottom: 30px;
+          margin-top: 70px;
+          font-weight: bold;
+        }
+
+        .img{
+          max-width:1200px;
+          height:auto;
+          margin: 10px;
+          text-align: center;
+        }
+
+        img{
+          max-width:100%;
+          max-height: 100%;
+          -o-object-fit: cover;
+          object-fit:cover;
+        }
+        .links{
+          height: auto;
+          max-width:1000px;
+        }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    {% for row in feed.news %}
+      <center>
+        <h3>{{row.title}}</h3>
+      </center>
+      <p><i>Published: {{row.published}}</i></p>
+      {% if row.get('feed') != None %}
+      <p><i>Feed: {{row.feed}}</i></p>
+      {% endif %}
+      <p><i>Source link: <a href={{row.src_link}}>{{row.src_link}}</a></i></p>
+      <p>{{row.content}}</p>
+      {% for image in row.media %}
+      <div class="img"><img src={{image}}></div>
+      {% endfor %}
+      <p>Links:</p>
+      <div class="links">
+      {% for link in row.links %}
+        <a href={{link}}><p>{{link}}</p></a>
+      {% endfor %}
+      </div>
+    {% endfor %}
+      </div>
+  </body>
+</html>
