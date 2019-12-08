@@ -6,7 +6,7 @@ from .components.feed import *
 from .components.logger.logger import Logger
 from .components.converter.html import HtmlConverter
 from .components.converter.pdf import PdfConverter
-import conf
+from src import conf
 
 
 class App(Singleton):

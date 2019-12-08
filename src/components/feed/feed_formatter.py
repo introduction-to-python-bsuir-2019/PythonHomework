@@ -1,11 +1,10 @@
 """this module contain class for various formatter output parsing data in console """
 
 import json
-from fabulous import image, color
+from fabulous import color
 from fabulous.text import Text
-from datetime import time, datetime
+from datetime import datetime
 from src.components.helper import Map
-import conf
 
 
 class FeedFormatter:

@@ -1,5 +1,5 @@
 import setuptools
-import conf
+from src import conf
 from pathlib import Path
 
 here = Path(__file__).parent
@@ -24,12 +24,12 @@ setuptools.setup(
     long_description=conf.__description__,
     long_description_content_type='text/markdown',
     url=conf.__url__,
-    packages=setuptools.find_packages(where='src'),
-    package_dir={'': 'src'},
+    packages=setuptools.find_packages(),
+    # package_dir={'': 'src'},
     install_requires=get_install_requirements(),
     python_requires='>=3.6',
     entry_points={
         'console_scripts':
-            ['%s = __main__:main' % conf.__package__]
+            ['%s = src.rss_reader:main' % conf.__package__]
     }
 )

@@ -3,7 +3,7 @@
 from src.components.logger import Logger
 from abc import ABC, abstractmethod
 from pathlib import Path
-import conf
+from src import conf
 import urllib.request as request
 from src.components.feed import Feed
 from src.components.feed import FeedEntry

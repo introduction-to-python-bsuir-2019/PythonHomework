@@ -1,7 +1,7 @@
 """This module contain class representing cli optional argument"""
 
 from .. import ArgumentsAbstract
-import conf
+from src import conf
 import argparse
 
 

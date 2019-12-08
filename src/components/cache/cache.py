@@ -10,7 +10,7 @@ from fabulous import color
 from datetime import timedelta
 from datetime import datetime
 from pathlib import Path
-import conf
+from src import conf
 import html
 
 
@@ -183,7 +183,7 @@ class Cache(Singleton):
                 f'{date.strftime("from %d, %b %Y")}'
                 f'{(date + timedelta(days=1)).strftime(" to %d, %b %Y")}'
             )
-
+        #@TODO:wrap into CacheEntry
         return self._db.map_data(cache_list)
 
     def _get_specify_by_date(self, url: str, date, limit: int = 100) -> list:
