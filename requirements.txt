@@ -4,3 +4,5 @@ coloredlogs==10.0.0
 fabulous==0.3.0
 jinja2==2.10.3
 WeasyPrint==50
+PyYAML==3.13
+lxml==4.2.1

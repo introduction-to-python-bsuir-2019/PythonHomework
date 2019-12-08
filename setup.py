@@ -25,7 +25,10 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url=conf.__url__,
     packages=setuptools.find_packages(),
-    # package_dir={'': 'src'},
+    include_package_data=True,
+    package_data={
+        '': ['*.jinja2', '*.yaml', '*.yml'],
+    },
     install_requires=get_install_requirements(),
     python_requires='>=3.6',
     entry_points={
