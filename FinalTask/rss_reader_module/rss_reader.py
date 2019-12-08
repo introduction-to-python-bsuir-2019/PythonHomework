@@ -45,6 +45,11 @@ def main():
                         type=str,
                         help='Create HTML file from RSS feed in given path')
 
+    parser.add_argument('--to-fb2',
+                        action='store',
+                        type=str,
+                        help='Create HTML file from RSS feed in given path')
+
     args = parser.parse_args()
 
     if args.verbose:
@@ -76,13 +81,22 @@ def main():
 
     if args.date is not None:
         cache.cache_output(args.limit, args.json)
-        convert = ConvertTo(cache.cache_dict, args.to_html)
+        if args.to_html is not None:
+            convert = ConvertTo(cache.cache_dict, args.to_html)
+        else:
+            convert = ConvertTo(cache.cache_dict, args.to_fb2)
     else:
         rss_object.output(args.json, args.limit)
-        convert = ConvertTo(rss_object.feed_dict, args.to_html)
+        if args.to_html is not None:
+            convert = ConvertTo(rss_object.feed_dict, args.to_html)
+        else:
+            convert = ConvertTo(rss_object.feed_dict, args.to_fb2)
 
     if args.to_html is not None:
         convert.to_html()
+
+    if args.to_fb2 is not None:
+        convert.to_fb2()
 
 
 if __name__ == '__main__':

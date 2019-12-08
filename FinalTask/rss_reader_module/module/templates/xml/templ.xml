@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+  <description>
+    <title-info>
+      <author/>
+      <book-title>{{feed.Name}}</book-title>
+      <lang>en</lang>
+    </title-info>
+    <document-info>
+      <author/>
+      <date>{{date}}</date>
+      <id>{{date}}</id>
+      <version>1.0</version>
+    </document-info>
+  </description>
+  <body>
+    <section>
+    {% for row in feed.news %}
+      <strong><p>{{row.title}}</p></strong>
+      <p>Published: {{row.published}}</p>
+      {% if row.get('feed') != None %}
+      <p>Feed: {{row.feed}}</p>
+      {% endif %}
+      <p>Source link: <a l:href="{{row.src_link}}">{{row.src_link}}</a></p>
+      <p>{{row.content}}</p>
+      {% for image in row.media %}
+      <p><image l:href="{{image}}"/></p>
+      {% endfor %}
+      <p>Links:</p>
+      {% for link in row.links %}
+      <p><a l:href="{{link}}">{{link}}</a></p>
+      {% endfor %}
+    {% endfor %}
+    </section>
+  </body>
+</FictionBook>
