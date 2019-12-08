@@ -16,13 +16,12 @@ class Source(ArgumentsAbstract):
         :return: argparse
         """
         self._parser.add_argument(
-            'source', type=self._validate_source, help='RSS URL'
+            'source', type=str, help='RSS URL'
         )
 
     def _validate_source(self, source: str) -> str:
         """
-        This method validate incoming required source parameter on feed
-        existence by url and another url checker exception
+        This method validate incoming required source parameter url checker exception
         :param source: str
         :return: str
         """
@@ -35,5 +34,3 @@ class Source(ArgumentsAbstract):
         except argparse.ArgumentError:
             raise argparse.ArgumentError('Server answer code is not 200')
 
-        except (url.HTTPError, url.URLError) as e:
-            raise url.URLError(f'Something wrong with your source. Please try another rss feed: {e}')

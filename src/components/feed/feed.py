@@ -8,6 +8,7 @@ from src.components.feed.feed_entry import FeedEntry
 from src.components.feed.feed_formatter import FeedFormatter
 from src.components.logger.logger import Logger
 from src.components.cache.cache import Cache
+import urllib.request as url
 
 
 class FeedProperty(ABC):
@@ -83,7 +84,7 @@ class Feed(FeedProperty):
             self._decide_output(),
             self._limit,
             top_data_output,
-            self._is_colorize
+            self._is_colorize,
         )
 
         print(output)
@@ -104,6 +105,12 @@ class Feed(FeedProperty):
         append entries to entries list and store to cache
         :return: None
         """
+
+        try:
+            url.urlopen(self._url)
+        except (url.HTTPError, url.URLError) as e:
+            return self._setup_cache_on_unavailable_source()
+
         Logger.log(f'Start parsing data from url: {self._url}')
 
         parse_data = feedparser.parse(self._url)
@@ -120,6 +127,26 @@ class Feed(FeedProperty):
 
         if self._entities_list:
             self._store_cache_instances()
+
+    def _setup_cache_on_unavailable_source(self) -> None:
+        """
+        This method check cache date on source unavailable
+        and set data of relevant cache url
+        :return: None
+        """
+        Logger.log('Something wrong with your source. Only cache available')
+
+        if not self._cache_date:
+            self._cache_date = Cache.cache_default
+            Logger.log(f'Cache set to: {self._cache_date}')
+
+        feed_general = Cache().load_feed_general(self._url)
+
+        self._feeds_title = feed_general.url
+        self._feeds_image = feed_general.image
+        self._feeds_encoding = feed_general.encoding
+
+        Logger.log('Cache feed data setup')
 
     def _set_global_feed_data(self, parse_data: feedparser.FeedParserDict) -> None:
         """

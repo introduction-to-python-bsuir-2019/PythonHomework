@@ -77,7 +77,7 @@ class FeedFormatter:
             "url": top_data_output.url,
             "image": top_data_output.image,
             "entries" : formatted_feeds,
-        }, indent=2, sort_keys=False)
+        }, indent=2, sort_keys=False, ensure_ascii=False)
 
         return output.encode(top_data_output.encoding).decode()
 
@@ -126,13 +126,18 @@ class FeedFormatter:
                 "body": {
                      "title": entry.title,
                      "date": str(cls.human_date(entry.published)),
-                     "links": [link for link in entry.links],
-                     "media": [media for media in entry.media],
+                     "links": [{
+                         'href':link.href,
+                         'type': link.type,
+                     } for link in entry.links],
+                     "media": [{
+                         'url':media.url,
+                         'additional': media.additional,
+                     } for media in entry.media],
                      "description": entry.description
                 }
             }
         }
-
 
     @staticmethod
     def format_links(links: list) -> str:

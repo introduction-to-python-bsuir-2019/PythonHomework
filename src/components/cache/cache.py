@@ -20,9 +20,12 @@ class Cache(Singleton):
 
         Attributes:
             _db_name attribute contain default name of database
+            cache_default attribute contain default cache date to retrieve
     """
 
     _db_name = 'cache.db'
+
+    cache_default = datetime.today().strftime('%Y%m%d')
 
     def __init__(self) -> None:
         """
@@ -185,6 +188,20 @@ class Cache(Singleton):
             )
         #@TODO:wrap into CacheEntry
         return self._db.map_data(cache_list)
+
+    def load_feed_general(self, url: str) -> list:
+        """
+        This method load feed general data by url
+        :param url: str
+        :return: list
+        """
+        return self._db.map_data(
+           self._db.where(
+               'feeds',
+               ['url', '=', url],
+               limit=1
+           )
+        )[0]
 
     def _get_specify_by_date(self, url: str, date, limit: int = 100) -> list:
         """
