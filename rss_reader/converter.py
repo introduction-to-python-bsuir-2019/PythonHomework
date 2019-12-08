@@ -55,7 +55,7 @@ class ConverterBase(ABC):
         for feed in news:
             images = feed.media_content
             for number_of_image, image in enumerate(images):
-                if not image:
+                if not image or image.endswith('.mp4'):
                     continue
                 image = self.check_image_link(image)
                 response, content = h.request(image)
@@ -75,6 +75,7 @@ class ConverterBase(ABC):
         where_sub_link = image_link.rfind('http')
         if where_sub_link:
             return image_link[where_sub_link:]
+        return image_link
 
 
 class HtmlConverter(ConverterBase):
@@ -181,8 +182,8 @@ class PdfConverter(ConverterBase):
 
         def add_images_from_the_feed(self, id, media_content):
             '''Method that adds images from the news to document'''
-            for number_of_image in range(len(media_content)):
-                if not media_content[0]:
+            for number_of_image, image_link in enumerate(media_content):
+                if not image_link or image_link.endswith('.mp4'):
                     continue
                 self.set_x(50)
                 self.image(path.join(self.dir_with_images, f'{id}{number_of_image}.png'), w=120, h=80)
