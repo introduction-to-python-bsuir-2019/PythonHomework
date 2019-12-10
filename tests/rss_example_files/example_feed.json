@@ -1,0 +1,22 @@
+{
+   "feed_name": "Yahoo News - Latest News & Headlines",
+   "articles": [
+      {
+         "date": "Tue, 12 Nov 2019 13:46:43 -0500",
+         "title": "Some title & ",
+         "content": "[image 1: Image description][1] Some article text with intersting things",
+         "media": {
+            "links": [
+               "https://some-source.net/somelink.html"
+            ],
+            "images": [
+               {
+                  "description": "Image description",
+                  "source_url": "http://some-image-link-f43ed8c16284"
+               }
+            ]
+         },
+         "link": "https://www.yahoo.com/news"
+      }
+   ]
+}

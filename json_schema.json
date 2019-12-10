@@ -1,0 +1,68 @@
+ 
+{
+   "$schema": "http://json-schema.org/draft-06/schema#",
+   "title": "Feed JSON schema",
+   "description": "JSON schema of feed for rss_reader",
+   "properties":{
+       "feed_name":{
+           "type": "string",
+           "title": "Feed name",
+           "description": "The title of feed source."
+        },
+        "articles": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "title": "Article",
+                "properties": {
+                    "date":{
+                        "type": "string",
+                        "title": "Data",
+                        "description": "Article publishing date."
+                    },
+                    "title":{
+                        "type": "string",
+                        "title": "Title",
+                        "description": "The title of the article."
+                    },
+                    "content":{
+                        "type": "string",
+                        "description": "A content of article."
+                    },
+                    "media": {
+                        "type": "object",
+                        "properties": {
+                            "links": {
+                                "type": "array",
+                                "items":{
+                                    "type": "string",
+                                }
+                            },
+                            "images": {
+                                "type": "array",
+                                "items":{
+                                    "type": "object",
+                                    "description": "Image from article",
+                                    "properties": {
+                                        "description": {
+                                            "type": "string",
+                                            "description": "Image description text"
+                                        },
+                                        "source_url":{
+                                            "type": "string",
+                                            "description": "Link to image"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "link":{
+                        "type": "string",
+                        "description": "Link to original article"
+                    }
+                }
+            }
+        }
+    }
+}
