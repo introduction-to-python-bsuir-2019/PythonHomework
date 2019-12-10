@@ -7,7 +7,7 @@ import urllib.request
 import urllib.error
 
 
-def _download_image(url, verbose, color):
+def _download_image(url, verbose, sv_path, color=False):
     """download image from Internet to your PC"""
     stdout_write("Downloading image", verbose=verbose, color="blue", colorize=color)
     try:
@@ -26,7 +26,7 @@ def _download_image(url, verbose, color):
 class Converter():
     """Converter class. Convert data to some format"""
 
-    def to_json(self, feed, column, verbose):
+    def to_json(self, feed, column, verbose, color):
         """Take data and return it in json"""
         stdout_write("Convert to json...", verbose=verbose, color="blue", colorize=color)
         counter = 0
@@ -42,7 +42,7 @@ class Converter():
             if 'date' in news:
                 json_text += '\n      "date": "' + news['date'] + '",'
             json_text += '\n      "link": "' + news['link'] + '",'
-            json_text += '\n      "description": "' + news['links'] + '",'
+            json_text += '\n      "description": "' + (news['text']) + '",'
             json_text += '\n      "links": ['
             links = ""
             for lin in news['links']:
@@ -125,7 +125,7 @@ class Converter():
                     text_links += [link[:-7]]
             images = []
             for link in image_links:
-                img_path = _download_image(link, verbose)
+                img_path = _download_image(link, verbose, sv_path, color)
                 try:
                     with open(img_path, 'rb') as binfile:
                         images += [b64encode(binfile.read()).decode()]
@@ -200,7 +200,7 @@ class Converter():
                     text_links += [link[:-7]]
             images = []
             for link in image_links:
-                img_path = _download_image(link, verbose)
+                img_path = _download_image(link, verbose, sv_path, color)
                 images += [img_path]
                 html_text += next_article(links=text_links,
                                           title=news["title"],

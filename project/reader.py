@@ -87,7 +87,7 @@ class RSSReader():
         items = xml.getElementsByTagName("item")
         counter = 0
         if self.__verbose:
-            progress(self.__limit, counter)
+            write_progressbar(self.__limit, counter)
         column = []
         for item in items:
             if counter == self.__limit:
@@ -101,7 +101,7 @@ class RSSReader():
                         "text": text,
                         "links": links}]
             if self.__verbose:
-                progress(self.__limit, counter)
+                write_progressbar(self.__limit, counter)
         self.__cache_data(column, feed)
         return feed, column
 
@@ -133,7 +133,7 @@ class RSSReader():
     def show_json(self):
         """Read data, convert into json and print info in stdout"""
         feed, column = self.__read()
-        json_text = Converter.to_json(feed, column, self.__verbose, color=self.__colorize)
+        json_text = Converter().to_json(feed, column, self.__verbose, color=self.__colorize)
         stdout_write(json_text)
 
     def save_fb2(self):

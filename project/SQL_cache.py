@@ -59,15 +59,15 @@ class Database():
                 VALUES (?,?)
                 """, (url, feed))
             self.conn.commit()
-            counter += 1
-            if verbose:
-                write_progressbar(len(data)+1, counter)
         except sqlite3.IntegrityError:
             pass
         except sqlite3.DatabaseError:
             stdout_write("Database error", color="red", colorize=color)
         finally:
             self._close()
+            counter = len(data)+1
+            if verbose:
+                write_progressbar(len(data)+1, counter)
 
     def read_data(self, url, date, color):
         """Get url & date

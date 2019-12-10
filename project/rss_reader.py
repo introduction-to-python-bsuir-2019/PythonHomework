@@ -20,6 +20,17 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
+    if ' ' in args.path:
+        args.path = None
+        if args.colorize:
+            print('\033[31m' + 'Error: path cannot contain spaces.' + '\033[0m')
+        else:
+            print('Error: path cannot contain spaces.')
+        working_dir = input("Input Y to use working directory")
+        if 'y' in working_dir or 'Y' in working_dir:
+            pass
+        else:
+            return 0
     rss = RSSReader(args.source, args.limit, args.verbose, args.date, args.path, args.colorize)
     used = False
     if args.json:
@@ -33,6 +44,7 @@ def main():
         used = True
     if not used:
         rss.show_news()
+    return 0
 
 
 if __name__ == "__main__":
