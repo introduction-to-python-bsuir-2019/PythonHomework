@@ -29,17 +29,23 @@ def main():
                                          "If only file name given, creates file in a current working directory. "
                                          "Write \"default\" to create a default file in package data folder", type=str)
     args = parser.parse_args()
+    error_raised = False
     if args.verbose:
         logger = RssParser.create_logger('rss-reader')
         logger.info('Logging enabled.')
-    if args.limit > 0:
-        limit = args.limit
-        if args.verbose:
-            logger.info(f'News limit was set to {limit}')
+    if args.limit:
+        if args.limit > 0:
+            limit = args.limit
+            if args.verbose:
+                logger.info(f'News limit was set to {limit}')
+        else:
+            limit = 10
+            if args.verbose:
+                logger.info(f'News limit was set to {limit} due to invalid limit value input')
     else:
         limit = 10
         if args.verbose:
-            logger.info(f'News limit was set to {limit} due to invalid limit value input')
+            logger.info(f'News limit was set to {limit} as default')
     if args.source:
         source = args.source
         if args.verbose:
@@ -66,6 +72,7 @@ def main():
             my_parser.parse_json_cache()
         except Exception as parse_json_exc:
             print(f'rss-reader: rss_parser.py : parse_json_cache : error : {parse_json_exc}')
+            error_raised = True
     else:
         online_or_cached += 'online'
         if args.verbose:
@@ -74,34 +81,37 @@ def main():
             my_parser.parse_rss()
         except Exception as parse_online_feed_exc:
             print(f'rss-reader: rss_parser.py : parse_rss : error : {parse_online_feed_exc}')
+            error_raised = True
         try:
             my_parser.cache_feed_to_json_file()
         except Exception as cache_to_json_exc:
             print(f'rss-reader: rss_parser.py : cache_feed_to_json_file : error : {cache_to_json_exc}')
-    if args.json:
-        print(json.dumps(my_parser.feed_to_json(), indent=1))
-        if args.verbose:
-            logger.info(f'{len(my_parser.news)} {online_or_cached} news have been printed in JSON format')
-    else:
-        text_feed = ''
-        text_feed += my_parser.feed_to_string()
-        print(text_feed)
-        if args.verbose:
-            logger.info(f'{len(my_parser.news)} {online_or_cached} news have been printed')
-    if args.to_html:
-        try:
-            my_parser.cache_feed_to_html_file()
-        except Exception as cache_to_html_exc:
-            print(f'rss-reader: rss_parser.py : cache_feed_to_html_file : error : {cache_to_html_exc}')
-        if args.verbose:
-            logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in html file')
-    if args.to_pdf:
-        try:
-            my_parser.cache_feed_to_pdf_file()
-        except Exception as cache_to_pdf_exc:
-            print(f'rss-reader: rss_parser.py : cache_feed_to_pdf_file : error : {cache_to_pdf_exc}')
-        if args.verbose:
-            logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in pdf file')
+            error_raised = True
+    if not error_raised:
+        if args.json:
+            print(json.dumps(my_parser.feed_to_json(), indent=1))
+            if args.verbose:
+                logger.info(f'{len(my_parser.news)} {online_or_cached} news have been printed in JSON format')
+        else:
+            text_feed = ''
+            text_feed += my_parser.feed_to_string()
+            print(text_feed)
+            if args.verbose:
+                logger.info(f'{len(my_parser.news)} {online_or_cached} news have been printed')
+        if args.to_html:
+            try:
+                my_parser.cache_feed_to_html_file()
+            except Exception as cache_to_html_exc:
+                print(f'rss-reader: rss_parser.py : cache_feed_to_html_file : error : {cache_to_html_exc}')
+            if args.verbose:
+                logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in html file')
+        if args.to_pdf:
+            try:
+                my_parser.cache_feed_to_pdf_file()
+            except Exception as cache_to_pdf_exc:
+                print(f'rss-reader: rss_parser.py : cache_feed_to_pdf_file : error : {cache_to_pdf_exc}')
+            if args.verbose:
+                logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in pdf file')
     if args.version:
         print(f'Current version: {current_version}')
         if args.verbose:

@@ -112,7 +112,7 @@ class RssParser:
             with open(cache_file_path, 'r') as cache_file:
                 json_cache = json.load(cache_file)
                 if self.verbose:
-                    self.logger.info(f'News cache file has been created via first use of utility. '
+                    self.logger.info(f'News are getting fetched from local cache. '
                                      f'Path to cache file: {cache_file_path}')
             for feed_instance in json_cache['news']:
                 if feed_instance['url'] == self.url:
@@ -347,7 +347,7 @@ class RssParser:
             cache_file = open(cache_file_path, 'w+')
             cache_file.close()
             if self.verbose:
-                self.logger.info(f'News cache has been created via first use of utility. '
+                self.logger.info(f'News cache has been created. '
                                  f'Path to cache file: {cache_file_path}')
         json_feed = self.feed_to_json()
         if os.path.getsize(cache_file_path) > 0:

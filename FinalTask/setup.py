@@ -8,7 +8,7 @@ setuptools.setup(
     url="https://github.com/euseand/PythonHomework/tree/FinalTask/FinalTask",
     description=("Basic rss-reader working in command prompt."),
     keywords="rss-reader",
-    package_data={'fonts': ['rss_reader/fonts/ttf/*']},
+    package_data={'fonts': ['rss_reader/fonts/ttf/DejaVuSerifCondensed.ttf']},
     include_package_data=True,
     install_requires=['feedparser', 'bs4', 'fpdf', 'requests'],
     packages=setuptools.find_packages(),
