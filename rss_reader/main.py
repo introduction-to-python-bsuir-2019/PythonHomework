@@ -13,7 +13,7 @@ from rss_reader.exceptions import RSS_reader_error, SourceConnectingError, ArgEr
 from rss_reader.cache import CacheHandler
 from rss_reader.converters import FormatsConverter
 
-APP_VERSION = '3.0'
+APP_VERSION = '4.0'
 
 
 class RSS_reader:
@@ -46,10 +46,11 @@ class RSS_reader:
         else:
             self.get_feed_from_source()
 
-        if self.html_file_path:
-            self.coverter.convert_to_html(self.feed, self.html_file_path, self.limit)
-        elif self.fb2_file_path:
-            self.coverter.convert_to_fb2(self.feed, self.fb2_file_path, self.limit)
+        if self.html_file_path or self.fb2_file_path:
+            if self.html_file_path:
+                self.coverter.convert_to_html(self.feed, self.html_file_path, self.limit)
+            if self.fb2_file_path:
+                self.coverter.convert_to_fb2(self.feed, self.fb2_file_path, self.limit)
         else:
             self.print_feed()
 
@@ -103,8 +104,10 @@ def main():
     cmd_arg_parser.add_argument('--limit', type=int, help='Limit news topics if this parameter privided')
     cmd_arg_parser.add_argument('--verbose', help='Outputs verbose status messages', action='store_true')
     cmd_arg_parser.add_argument('--date', type=str, help='Return new for requested date and source')
-    cmd_arg_parser.add_argument('--to-html', dest='to_html', type=str, help='Write RSS feed in html file by path')
-    cmd_arg_parser.add_argument('--to-fb2', dest='to_fb2', type=str, help='Write RSS feed to fb2 by path')
+    cmd_arg_parser.add_argument('--to-html', metavar='PATH', dest='to_html',
+                                type=str, help='Write RSS feed in html file by path')
+    cmd_arg_parser.add_argument('--to-fb2', metavar='PATH', dest='to_fb2',
+                                type=str, help='Write RSS feed to fb2 by path')
     cmd_args = cmd_arg_parser.parse_args()
 
     app_dir_init()
@@ -119,10 +122,14 @@ def main():
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=log_handlers)
     try:
-        if cmd_args.to_html and not Path(cmd_args.to_html).exists():
-            raise ArgError(f'Invalid path "{cmd_args.to_html}"')
-        if cmd_args.to_fb2 and not Path(cmd_args.to_fb2).exists():
-            raise ArgError(f'Invalid path "{cmd_args.to_fb2}"')
+        if cmd_args.to_html:
+            html_file_path = Path(cmd_args.to_html)
+            if not html_file_path.parent.exists() or html_file_path.is_dir():
+                raise ArgError(f'Invalid path "{html_file_path}"')
+        if cmd_args.to_fb2:
+            fb2_file_path = Path(cmd_args.to_html)
+            if not fb2_file_path.parent.exists() or fb2_file_path.is_dir():
+                raise ArgError(f'Invalid path "{fb2_file_path}"')
         reader = RSS_reader(cmd_args.source,
                             limit=cmd_args.limit,
                             json_mode=cmd_args.json,

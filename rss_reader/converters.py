@@ -82,7 +82,7 @@ class FormatsConverter:
         SubElement(title_info, 'book-title').text = feed['feed_name']
 
         document_info = SubElement(description, 'document-info')
-        SubElement(document_info, 'program-used').text = 'rss_reader v 3.0'
+        SubElement(document_info, 'program-used').text = 'rss_reader v 4.0'
         SubElement(document_info, 'version').text = '1.0'
 
         body = SubElement(fbook, 'body')
@@ -94,10 +94,12 @@ class FormatsConverter:
             fb_article.set('id', str(art_num))
             title = SubElement(fb_article, 'title')
             SubElement(title, 'p').text = article.title
-            link = SubElement(fb_article, 'p')
-            link.text = article.link
             date = SubElement(fb_article, 'p')
             SubElement(date, 'emphasis').text = article.date.strftime("%d-%m-%Y")
+            lnk = SubElement(fb_article, 'p')
+            source_link = SubElement(lnk, 'a')
+            source_link.text = 'Original article\n'
+            source_link.set('l:href', article.link)
 
             for image in article.media['images']:
                 fb_image = SubElement(fb_article, 'image')
@@ -107,11 +109,16 @@ class FormatsConverter:
                 binary.set('content-type', 'image/jpeg')
                 binary.text = self._handle_image(image['source_url'])
                 image_counter += 1
-            SubElement(fb_article, 'p').text = article.content
+            SubElement(fb_article, 'p').text = '\n' + article.content
             links = SubElement(fb_article, 'p')
             links.text = 'Links:\n'
-            for link in article.media['links']:
-                links.text += link + '\n'
+            if article.media['links']:
+                for link in article.media['links']:
+                    fb_link = SubElement(links, 'a')
+                    fb_link.set('l:href', link)
+                    fb_link.text = link
+            else:
+                links.text += 'No links'
 
         fbook_r = ElementTree(fbook)
         self.logger.info(f"Write feed to fb2 file {file_path}")
@@ -120,7 +127,7 @@ class FormatsConverter:
 
     def _handle_image(self, image_url):
         """Download image from image_url and return image base64 binary"""
-        self.logger(f"Download image {image_url}")
+        self.logger.info(f"Download image {image_url}")
         try:
             image = requests.get(image_url)
         except Exception:
