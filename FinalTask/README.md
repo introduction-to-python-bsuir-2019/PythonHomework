@@ -3,7 +3,7 @@ My RSS-reader is a command line utility which parses RSS URL and prints news in 
 ## installation
 You can use pip to install my package from test pypi index:
 ```bash
-pip install --extra-index-url https://test.pypi.org/simple/ rss-reader-euseand==0.42
+pip install --extra-index-url https://test.pypi.org/simple/ rss-reader-euseand==0.420
 ```
 Or simply clone the repo and use pip install:
 ```bash

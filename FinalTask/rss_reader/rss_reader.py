@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from .rss_parser import RssParser
 
-current_version = 0.42
+current_version = '0.420'
 
 
 def main():
@@ -33,6 +33,11 @@ def main():
     if args.verbose:
         logger = RssParser.create_logger('rss-reader')
         logger.info('Logging enabled.')
+    if args.version:
+        print(f'Current version: {current_version}')
+        exit()
+        if args.verbose:
+            logger.info('Current utility version was printed')
     if args.limit:
         if args.limit > 0:
             limit = args.limit
@@ -112,10 +117,6 @@ def main():
                 print(f'rss-reader: rss_parser.py : cache_feed_to_pdf_file : error : {cache_to_pdf_exc}')
             if args.verbose:
                 logger.info(f'{len(my_parser.news)} {online_or_cached} news have been cached in pdf file')
-    if args.version:
-        print(f'Current version: {current_version}')
-        if args.verbose:
-            logger.info('Current utility version was printed')
 
 
 if __name__ == '__main__':
