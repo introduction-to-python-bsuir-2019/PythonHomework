@@ -316,7 +316,12 @@ class RssParser:
             images = self.download_images(article, self.img_path, self.news.index(article))
             if len(images):
                 if images[0]:
-                    pdf.image(images[0], w=30)
+                    try:
+                        pdf.image(images[0], w=30)
+                    except Exception as feed_to_pdf_exc:
+                        print(f'rss-reader: rss_parser.py : feed_to_pdf : error : {feed_to_pdf_exc}')
+                        print(f'invalid image will be passed')
+                        pass
             pdf.ln()
             pdf.multi_cell(w=0, h=5, txt=article.description)
             pdf.ln()
