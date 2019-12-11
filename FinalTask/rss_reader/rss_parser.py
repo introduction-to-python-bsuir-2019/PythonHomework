@@ -192,12 +192,15 @@ class RssParser:
         This function converts current feed to JSON format
         :return: None
         """
-        article_list = []
-        for article in self.news:
-            my_article_dict = self.article_to_json(article)
-            article_list.append(my_article_dict)
-        if self.verbose:
-            self.logger.info('Feed was converted to JSON format')
+        if len(self.news) == 0:
+            return 'No news for that day, try another'
+        else:
+            article_list = []
+            for article in self.news:
+                my_article_dict = self.article_to_json(article)
+                article_list.append(my_article_dict)
+            if self.verbose:
+                self.logger.info('Feed was converted to JSON format')
 
         return {'feed': self.feed, 'url': self.url, 'news_objects': article_list}
 
