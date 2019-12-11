@@ -87,11 +87,12 @@ def main():
         except Exception as parse_online_feed_exc:
             print(f'rss-reader: rss_parser.py : parse_rss : error : {parse_online_feed_exc}')
             error_raised = True
-        try:
-            my_parser.cache_feed_to_json_file()
-        except Exception as cache_to_json_exc:
-            print(f'rss-reader: rss_parser.py : cache_feed_to_json_file : error : {cache_to_json_exc}')
-            error_raised = True
+        if not error_raised:
+            try:
+                my_parser.cache_feed_to_json_file()
+            except Exception as cache_to_json_exc:
+                print(f'rss-reader: rss_parser.py : cache_feed_to_json_file : error : {cache_to_json_exc}')
+                error_raised = True
     if not error_raised:
         if args.json:
             print(json.dumps(my_parser.feed_to_json(), indent=1))

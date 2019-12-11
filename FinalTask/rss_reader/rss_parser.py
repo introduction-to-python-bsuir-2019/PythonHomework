@@ -395,7 +395,7 @@ class RssParser:
             html_cache_file = open(cache_file_path, "w+")
             html_cache_file.close()
         if os.path.isfile(cache_file_path):
-            with open(cache_file_path, 'w+') as cache_file:
+            with open(cache_file_path, 'w+', encoding='utf8') as cache_file:
                 cache_file.write(self.feed_to_html())
                 if self.verbose:
                     self.logger.info(f'News have been cached to HTML file. Path to file: {cache_file_path}')
