@@ -1,0 +1,3 @@
+include requirements.txt
+include rss_reader/fonts/ttf/DejaVuSerifCondensed.ttf
+exclude rss-reader.py
