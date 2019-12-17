@@ -14,7 +14,7 @@ setup(
     package_dir={conf.__package__: 'rssreader'},
     package_data={conf.__package__: ['data/*.*']},
     python_requires='>=3.8',
-    install_requires=['feedparser', 'bs4', 'termcolor'],
+    install_requires=['feedparser', 'bs4', 'termcolor', 'flask', 'flask-restful'],
     entry_points={
         'console_scripts':
             ['rss-reader = %s.cmd:main' % conf.__package__]

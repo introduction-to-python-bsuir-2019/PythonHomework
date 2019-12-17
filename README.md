@@ -38,3 +38,24 @@ A whole set of news is cached every time. Sure, if any news already exists in th
 News can be converted into HTML and FictionBook2 formats. If a file already exists at the specified path, an error occurs.
 In case of no image in a news, default image is used.
 FictionBooks2 supports jpeg and png image formats only. In case of any other format default image is used.
+
+## Web-server
+Web-server implementation is based on Flask-RESTful. API point is http://0.0.0.0:5000/api/v1.0/news.
+Request parameters should be located in json. Following parameters are supported:
+  * required arguments:
+    * source .. RSS URL
+  * optional arguments:
+    * limit    .. Limit news topics.
+    * date     .. Return cached news from the specified day. Format is YYYY-MM-DD.
+
+You can communicate via curl, httpie or another tool. For example,\
+`http GET http://0.0.0.0:5000/api/v1.0/news source=https://news.tut.by/rss/realty.rss limit=3 date=2019-12-19`
+
+To build docker image execute this command \
+`docker image build --tag rssreader .`
+
+To run docker container execute this command \
+`docker run -d -p  5000:5000 rssreader`
+
+Compose is run in standard way as\
+`docker-compose up -d`

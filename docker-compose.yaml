@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+  server:
+    image: rssreader
+    ports:
+      - "5000:5000"
+    volumes:
+      - /home/docker/rssreader:/root/.rssreader
+    networks:
+      - webnet
+networks:
+  webnet:
