@@ -34,18 +34,18 @@ class RSSReader:
 
         :return: Nothing to return
         """
-        d = feedparser.parse(self.source)  # Parse rss from given source
-        if not self.limit:
-            self.limit = 1
-
-        self.feeds['news'] = []
-        channel = d['channel']['title']
-
-        for news in d['entries'][0:self.limit]:
-            self.feeds['news'].append(self.read_news(news, channel))
-
         # Method calls
-        if not self.date and not self.to_html and not self.to_fb2:
+        if not self.date:
+            d = feedparser.parse(self.source)  # Parse rss from given source
+            if not self.limit:
+                self.limit = 1
+
+            self.feeds['news'] = []
+            channel = d['channel']['title']
+
+            for news in d['entries'][0:self.limit]:
+                self.feeds['news'].append(self.read_news(news, channel))
+
             self.print_feeds(self.feeds['news'])
             self.to_cache()
         elif self.date:
