@@ -7,7 +7,7 @@ python -m pip install --upgrade pip
 ``` 
 Use the pip to install rss-reader.
 ```bash
-python -m pip install --extra https://test.pypi.org/simple/ rss-reader-kis==1.88
+python -m pip install --extra https://test.pypi.org/simple/ rss-reader-kis==1.89
 ``` 
 ## Usage
 ### Print first 2 news
