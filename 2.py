@@ -2,6 +2,8 @@
 from functools import reduce
 import functools
 import operator
+import os
+
 
 
 def quotes_changer(in_str):
@@ -103,7 +105,7 @@ def foo(integers: list):
     """
     result = []
     for i, num in enumerate(integers):
-        t = integers[:]
+        t = integers[:]  # making a copy
         t.pop(i)
         result.append(functools.reduce(operator.mul, t, 1))
     return result
@@ -121,6 +123,59 @@ def get_pairs(inp):
     return list(zip(inp[0::1], inp[1::1])) or None
 
 
+def get_sums(inp: list):
+    """
+    >>> get_sums([1, 2, 3, 4])
+    [1, 3, 6, 10]
+    """
+    # result = []
+    # for idx, d in enumerate(inp):
+    #     result.append(sum(inp[0:idx + 1]))
+    return [sum(inp[0:idx + 1]) for idx in range(len(inp))]
+
+
+def get_target_array(inp: list, target_value: int):
+    """
+    >>> get_target_array([1, 3, 7, 10], 11)
+    [0, 3]
+    """
+    
+    for i in inp:
+        if i < target_value:
+            pair = target_value - i
+            if pair in inp:
+                # print(f"the first number= {i} the second number {pair}")
+                return[inp.index(i), inp.index(pair)]
+            break
+
+
+def get_target_array_dict(list_, target_value):
+    hash_table = {}
+    len_list = len(list_)
+    result = []
+    for item in range(len_list):
+        if list_[item] in hash_table:
+            result.extend([hash_table[list_[item]], item])
+        else:
+            hash_table[target_value - list_[item]] = item
+    return result
+
+
+def F(n: int):
+    '''returns value of the n-th element of Fibonacci sequence'''
+    if n == 0: return 0
+    elif n == 1: return 1
+    else: return F(n-1)+F(n-2)
+
+
+def fibonacci(n: int):
+    ''' Returns the Fibonacci sequence of the length '''
+    r = []
+    for i in range(10):
+        r.append(F(i))
+    print(r)
+
+
 def get_none():
     """
     >>> get_none()
@@ -130,6 +185,13 @@ def get_none():
 
 
 if __name__ == "__main__":
-    import doctest
+    debug = os.environ.get('DEBUG')
+    if not debug:
+        import doctest
 
-    doctest.testmod()
+        doctest.testmod()
+    else:
+        # split('Mama washed the window frame')
+        # get_sums([1, 2, 3, 4])
+        # fibonacci(10)
+        get_target_array([1, 3, 7, 10], 11)
