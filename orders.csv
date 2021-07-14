@@ -1,0 +1,9 @@
+order_id,product_id,price,name,quantity,cust_name
+1,prod-b-1,195,Chair,1,Alice
+2,prod-b-5,1595,Mattress,1,Charlie
+2,prod-c-4,90,Pillow,2,Charlie
+5,prod-d-10,1900,King Sofa,1,Bob
+5,prod-c-4,175,Decorative Pillow,1,Bob
+5,prod-d-9,1200,Sofa,1,Bob
+5,prod-c-5,90,Pillow,1,Bob
+5,prod-m-7,580,Ottoman,1,Bob

@@ -184,6 +184,134 @@ def get_none():
     return None
 
 
+def bubbleSort(arr):
+    arr = [64, 34, 25, 12, 22, 11, 90]
+    n = len(arr)
+  
+    # Traverse through all array elements
+    for i in range(n-1):
+    # range(n) also work but outer loop will repeat one time more than needed.
+  
+        # Last i elements are already in place
+        for j in range(0, n-i-1):
+  
+            # traverse the array from 0 to n-i-1
+            # Swap if the element found is greater
+            # than the next element
+            if arr[j] > arr[j + 1] :
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+  
+
+
+# Python3 Program to print BFS traversal
+# from a given source vertex. BFS(int s)
+# traverses vertices reachable from s.
+from collections import defaultdict
+ 
+# This class represents a directed graph
+# using adjacency list representation
+class Graph:
+ 
+    # Constructor
+    def __init__(self):
+ 
+        # default dictionary to store graph
+        self.graph = defaultdict(list)
+ 
+    # function to add an edge to graph
+    def addEdge(self,u,v):
+        self.graph[u].append(v)
+ 
+    # Function to print a BFS of graph
+    def BFS(self, s):
+ 
+        # Mark all the vertices as not visited
+        visited = [False] * (max(self.graph) + 1)
+ 
+        # Create a queue for BFS
+        queue = []
+ 
+        # Mark the source node as
+        # visited and enqueue it
+        queue.append(s)
+        visited[s] = True
+ 
+        while queue:
+ 
+            # Dequeue a vertex from
+            # queue and print it
+            s = queue.pop(0)
+            print (s, end = " ")
+ 
+            # Get all adjacent vertices of the
+            # dequeued vertex s. If a adjacent
+            # has not been visited, then mark it
+            # visited and enqueue it
+            for i in self.graph[s]:
+                if visited[i] == False:
+                    queue.append(i)
+                    visited[i] = True
+
+
+def graph_driver_program():
+    # Create a graph given in
+    # the above diagram
+    g = Graph()
+    g.addEdge(0, 1)
+    g.addEdge(0, 2)
+    g.addEdge(1, 2)
+    g.addEdge(2, 0)
+    g.addEdge(2, 3)
+    g.addEdge(3, 3)
+    print ("Following is Breadth First Traversal starting from vertex 2)")
+    
+    g.BFS(2)
+
+import csv
+
+def test_func():
+    with open('orders.csv', 'r') as f:
+        data = f.read()
+    if not data:
+        raise ValueError('No data')
+    
+    rows = data.split('\n')
+    
+    json_data_list = list(csv.DictReader(rows, delimiter=','))
+    json_data_list
+    output = []
+
+    hash_keys = defaultdict(list)
+    
+    for item in json_data_list:
+        quantity = int(item.get('quantity', 0))
+        to_append = {
+                'product_id': item.get('product_id'),
+                'product_price': item.get('price'),
+                'product_title': item.get('name')
+            }
+        for _ in range(quantity):
+            hash_keys[(item.get('order_id'), item.get('cust_name'))].append(to_append)
+
+    output = []
+    for key, value in hash_keys.items():
+        order_id, cust_name = key
+        items = value
+        output.append({
+            'oder_id': order_id,
+            'items': items,
+            'cust_name': cust_name,
+        })
+        
+    import requests
+    
+    requests.post(url='https://my.awesome-api.com/orders', data=output, headers={
+        'Content-Type': 'application/json'
+    })
+    
+    return data
+
 if __name__ == "__main__":
     debug = os.environ.get('DEBUG')
     if not debug:
@@ -194,4 +322,7 @@ if __name__ == "__main__":
         # split('Mama washed the window frame')
         # get_sums([1, 2, 3, 4])
         # fibonacci(10)
-        get_target_array([1, 3, 7, 10], 11)
+        # get_target_array([1, 3, 7, 10], 11)
+        # bubbleSort([])
+        # graph_driver_program()
+        test_func()
