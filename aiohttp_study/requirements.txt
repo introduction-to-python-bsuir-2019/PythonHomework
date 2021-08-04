@@ -2,3 +2,4 @@ pyyaml
 aiohttp
 sqlalchemy
 aiopg[sa]
+aiohttp-jinja2
