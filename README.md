@@ -1,8 +1,11 @@
-# Rss reader hometask for EpamTrainee
-Python RSS-reader.
+# Small hometasks for EpamTrainee
+ALmost every task function covered with docstring
 
-Url for cloning:
-`https://github.com/Nenu1985/PythonHomework.git`
+# Launching:
+pip install -r requiremets.txt
+python 2.py
+python 3.py
+python 4.py
 
 Version 6
 ```shell
@@ -50,73 +53,10 @@ Use ./pycodestyle.sh to check the code corresponding to `pep8`
 Tests are available at `https://github.com/Nenu1985/PythonHomework`
 Launching:
 ```
-./make_tests.sh
-```
-- to pass test with coverage
-(nose and coverage packages must be installed)
-
-## Version 2: Distribution
-Utility wrapes into distribution package with setuptools.
-This package exports CLI utility named rss-reader.
-
-To generate distribution package (setuptool and wheel must be installed).
-Launch:
-
-``` python3 setup.py sdist bdist_wheel```
-
-In the ./dist repo you'll find a .tar and .whl files.
-
-Wheel package for the second iteration task 
-(maybe is discarded but it works) on the Google Drive:
-```https://drive.google.com/file/d/1RbMYxvpEXTx77Dk61xPkwSChD_jTf0jf/view?usp=sharin```
-
-Actual packages you may find in the './dist' repo if you don't want to generate it manually.
-
-Installing: 
-
-```python3 -m pip install ./dist/rss_reader-4.0-py3-none-any.whl```
-
-OR
-```
-python3 -m pip install -r requirements.txt
-pip install ./dist/rss_reader-4.0.tar.gz
-```
-
-## Version 3: News cashing
-News cashing implemented by using Sqlite3 DB. DB consists of 4 related tables: feed, news_item, links, imgs.
-The implementation is in the rss_reader/utils/sqlite.py file. It contains RssDB class. Builtin sqlite3 lib is
-used.
-Base RssParser class imports RssDB class and uses for storing and loading data. RssParser's method print_news() 
-is decorated with call_save_news_after_method() (rss_parser/utils/decorators) that calls appropriate function 
-for storing news data (_store_news()).
-
-## Version 4: Converters
-Utility implements news converting to pdf and html formats. See according files: rss_reader/utils/pdf.py and 
-rss_reader/utils/html_writer.py files.
-Pdf converter uses pyFPDF package. To correct print cyrillic symbols djvu fonts are imported. Html2Pdf method
-doesn't use because of unsupported utf-8 encoding. That's why I had to parse htmls and generate pdf object 
-manually.
-Html converter uses lxml.html library to parse and generate html content. 
-
-
-## Docker deployment
-
-Instructions checked double times. Please, give an error's message if you have problems.
-
-```docker run -it python /bin/bash
-git clone https://github.com/Nenu1985/PythonHomework.git 
-cd PythonHomework
-pip install .
-python -m rss_reader --help
-```
-
-OR if you run into errors
-
-```docker run -it python /bin/bash
-git clone https://github.com/Nenu1985/PythonHomework.git 
-cd PythonHomework
-pip install ./dist/rss_reader-4.0-py3-none-any.whl
-python -m rss_reader --help
+Starting static code analys 
+2.py PASSED
+3.py PASSED
+4.py PASSED
 ```
 ## Iteration 5
 Defined class Colors with stored attributes for text color.
