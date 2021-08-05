@@ -8,12 +8,9 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}Starting static code analys ${NC}"
 
 # utils/
-python3 -m pycodestyle 2.py --max-line-length=120
-echo -e "${YELLOW}2.py ${GREEN}PASSED${NC}"
+python3 -m pycodestyle rss_reader/ --max-line-length=120
+echo -e "${YELLOW}rss_reader/ ${GREEN}PASSED${NC}"
 
-python3 -m pycodestyle 3.py --max-line-length=120
-echo -e "${YELLOW}3.py ${GREEN}PASSED${NC}"
-
-python3 -m pycodestyle 4.py --max-line-length=120
-echo -e "${YELLOW}4.py ${GREEN}PASSED${NC}"
-
+# rss.py
+python3 -m pycodestyle server/ --max-line-length=120
+echo -e "${YELLOW}server/ ${GREEN}PASSED${NC}"

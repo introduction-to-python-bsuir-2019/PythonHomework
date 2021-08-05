@@ -1,10 +1,15 @@
 attrs==19.3.0
 bs4==0.0.1
+colorama==0.4.1
+coloredlogs==10.0
 coverage==4.5.4
 feedparser==5.2.1
+Flask==1.1.1
+Flask-RESTful==0.3.7
 fpdf==1.7.2
+lxml==4.4.1
 nose==1.3.7
 pycodestyle==2.5.0
 python-dateutil==2.8.1
 terminaltables==3.1.0
-lxml==4.4.1
+wheel==0.33.6
