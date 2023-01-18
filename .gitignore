@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+#dist/  Need for the final's second iteration task
 downloads/
 eggs/
 .eggs/
@@ -35,7 +35,7 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Unit tests / coverage reports
 htmlcov/
 .tox/
 .coverage
@@ -102,3 +102,32 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# MAC filesystem's files
+.DS_Store
+
+# pycharm files
+.idea/
+
+# tests data files
+cover/
+tests/data/test.html
+tests/data/help.txt
+tests/data/yahoo.txt
+
+# news storage
+rss_reader/storage
+*sqlite3.db
+
+# pdf & html files
+*.pdf
+rss_reader/my_html.html
+my_html.html
+static/*.pdf
+static/*.html
+server/templates/here.html
+
+# Unused files
+static/dejavu_font/DejaVuSansCondensed.cw127.pkl
+static/dejavu_font/DejaVuSansCondensed.pkl
+rss_reader/utils/no_imagepng.png
